@@ -1,0 +1,1841 @@
+<!DOCTYPE html>
+<html>
+  <!-- meta/link... -->
+  
+
+
+
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport">
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+
+
+  <title>halo+云服务器+nginx反向代理实现个人博客搭建 | Hexo</title>
+
+  <link rel="icon" type="image/x-icon, image/vnd.microsoft.icon" href="/favicon.ico">
+  <link rel="stylesheet" href="https://at.alicdn.com/t/font_1911880_c1nvbyezg17.css">
+  <link href="https://unpkg.com/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet">
+  <link href="/js/swiper/swiper@5.4.1.min.css" rel="stylesheet">
+  
+  
+  
+  
+<link rel="stylesheet" href="/css/animate.min.css">
+
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+  
+    
+<link rel="stylesheet" href="/js/fancybox/jquery.fancybox.min.css">
+
+  
+  
+    
+<link rel="stylesheet" href="/js/shareJs/share.min.css">
+
+  
+  <style>
+        @media (max-width: 992px) {
+            #waifu {
+                display: none;
+            }
+        }
+    </style>
+    <script src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
+    <link href="//cdn.bootcss.com/pace/1.0.2/themes/pink/pace-theme-flash.css" rel="stylesheet">
+
+    
+
+    <!-- import link -->
+    
+        
+            
+        
+            
+        
+    
+    <!-- import script -->
+    
+        
+            
+        
+            
+        
+    
+
+<meta name="generator" content="Hexo 6.2.0"></head>
+
+  
+  <!-- 依赖于jquery和vue -->
+  
+    
+<script src="https://unpkg.com/jquery@3.5.1/dist/jquery.min.js"></script>
+
+  
+
+  
+    
+<script src="https://unpkg.com/vue@2.6.11/dist/vue.min.js"></script>
+
+  
+  
+  <body>
+    <!-- 预加载动画 -->
+    <!-- 页面预加载动画 -->
+
+<div id='loader'>
+  <link rel="stylesheet" href="/js/loaded/index.css" >
+  <div class="loading-left-bg"></div>
+  <div class="loading-right-bg"></div>
+  <div class="spinner-box">
+    <div class="configure-border-1">
+      <div class="configure-core"></div>
+    </div>
+    <div class="configure-border-2">
+      <div class="configure-core"></div>
+    </div>
+    <div class="loading-word">loading...</div>
+  </div>
+</div>
+
+<script>
+  var endLoading = function () {
+    document.body.style.overflow = 'auto';
+    document.getElementById('loader').classList.add("loading");
+  }
+  window.addEventListener('DOMContentLoaded',endLoading);
+  
+</script>
+
+    
+    <!-- 判断是否为暗黑风格 -->
+    <!-- 判断是否为黑夜模式 -->
+<script>
+  let isDark = JSON.parse(localStorage.getItem('dark')) || JSON.parse('false');
+
+  if (isDark) {
+    $(document.body).addClass('darkModel');
+  }
+</script>
+
+    <!-- 需要在上面加载的js -->
+    <script>
+  function loadScript(src, cb) {
+    return new Promise(resolve => {
+      setTimeout(function () {
+        var HEAD = document.getElementsByTagName("head")[0] || document.documentElement;
+        var script = document.createElement("script");
+        script.setAttribute("type", "text/javascript");
+        if (cb) {
+          if (JSON.stringify(cb)) {
+            for (let p in cb) {
+              if (p == "onload") {
+                script[p] = () => {
+                  cb[p]()
+                  resolve()
+                }
+              } else {
+                script[p] = cb[p]
+                script.onload = resolve
+              }
+            }
+          } else {
+            script.onload = () => {
+              cb()
+              resolve()
+            };
+          }
+        } else {
+          script.onload = resolve
+        }
+        script.setAttribute("src", src);
+        HEAD.appendChild(script);
+      });
+    });
+  }
+
+  //https://github.com/filamentgroup/loadCSS
+  var loadCSS = function (href, before, media, attributes) {
+    return new Promise(resolve => {
+      setTimeout(function () {
+        var link = document.createElement('link');
+        link.rel = "stylesheet";
+        link.href = src;
+        link.onload = resolve;
+        document.getElementsByTagName("head")[0].appendChild(link);
+      });
+    });
+  };
+
+</script> 
+
+<!-- 轮播图所需要的js -->
+<script src="/js/swiper/swiper.min.js"></script>
+<script src="/js/swiper/vue-awesome-swiper.js"></script>
+<script src="/js/swiper/swiper.animate1.0.3.min.js"></script>
+
+<script type="text/javascript">
+  Vue.use(window.VueAwesomeSwiper)
+</script>
+
+
+  <script src="/js/vue-typed-js/index.js"></script>
+
+
+<!-- 首页的公告滚动插件的js需要重新加载 -->
+<script src="/js/vue-seamless-scroll/index.js"></script>
+
+<!-- 打字机效果js -->
+<script src="https://unpkg.com/typed.js@2.0.11"></script>
+
+
+    <div id="safearea">
+      <main class="main" id="pjax-container">
+        <!-- 头部导航 -->
+        
+<header class="header   " 
+  id="navHeader"
+  style="position: fixed;
+  left: 0; top: 0; z-index: 10;width: 100%;"
+>
+  <div class="header-content">
+    <div class="bars">
+      <div id="appDrawer" class="sidebar-image">
+  <div class="drawer-box-icon">
+    <i class="fas fa-bars" aria-hidden="true" @click="showDialogDrawer"></i>
+  </div>
+  
+  <transition name="fade">
+    <div class="drawer-box_mask" v-cloak style="display: none;" v-show="visible" @click.self="cancelDialogDrawer">
+    </div>
+  </transition>
+  <div class="drawer-box" :class="{'active': visible}">
+    <div class="drawer-box-head bg-color">
+      <img class="drawer-box-head_logo lazyload placeholder" src="/medias/logo.png" class="lazyload placeholder" data-srcset="/medias/logo.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="logo">
+      <h3 class="drawer-box-head_title">Hexo</h3>
+      <h5 class="drawer-box-head_desc"></h5>
+    </div>
+    
+    <div class="drawer-box-content">
+      <ul class="drawer-box-content_menu">
+        
+        
+          <li class="drawer-box-content_item">
+            <a target="_blank" rel="noopener" href="https://github.com/yuang01/hexo-theme-bamboo">
+              <i class="fas fa-github" aria-hidden="true"></i>
+              <span>Github</span>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</div>
+
+<script>
+  var body = document.body || document.documentElement || window;
+  var vm = new Vue({
+    el: '#appDrawer',
+    data: {
+      visible: false,
+      top: 0,
+      openArr: [],
+    },
+    computed: {
+    },
+    mounted() {
+    },
+    methods: {
+      isOpen(index) {
+        if (this.openArr.includes(index)) {
+          return true;
+        } else {
+          return false;
+        }
+      },
+      openOrCloseMenu(curIndex) {
+        const index = this.openArr.indexOf(curIndex);
+        if (index !== -1) {
+          this.openArr.splice(index, 1);
+        } else {
+          this.openArr.push(curIndex);
+        }
+      },
+      showDialogDrawer() {
+        this.visible = true;
+        // 防止页面滚动，只能让弹框滚动
+        this.top = $(document).scrollTop()
+        body.style.cssText = 'width: 100%; height: 100%;overflow: hidden;';
+      },
+      cancelDialogDrawer() {
+        this.visible = false;
+        body.removeAttribute('style');
+        $(document).scrollTop(this.top)
+      }
+    },
+    created() {}
+  })
+</script>
+
+    </div>
+    <div class="blog-title" id="author-avatar">
+      
+        <div class="avatar">
+          <img src="/medias/logo.png" class="lazyload placeholder" data-srcset="/medias/logo.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="logo">
+        </div>
+      
+      <a href="/" class="logo">Hexo</a>
+    </div>
+    <nav class="navbar">
+      <ul class="menu">
+        
+      </ul>
+      
+      
+        <div id="appSearch">
+  <div class="search"  @click="showDialog()"><i class="fas fa-search" aria-hidden="true"></i></div>
+  <transition name="fade">
+    <div class="message-box_wrapper" style="display: none;" v-cloak v-show="dialogVisible" @click.self="cancelDialogVisible()">
+      <div class="message-box animated bounceInDown">
+        <h2>
+          <span>
+            <i class="fas fa-search" aria-hidden="true"></i>
+            <span class="title">Search</span>
+          </span>
+          <i class="fas fa-times close" pointer style="float:right;" aria-hidden="true" @click.self="cancelDialogVisible()"></i>
+        </h2>
+        <form class="site-search-form">
+          <input type="text"
+            placeholder="Please enter keywords"
+            id="local-search-input" 
+            @click="getSearchFile()"
+            class="st-search-input"
+            v-model="searchInput"
+          />
+        </form>
+        <div class="result-wrapper">
+          <div id="local-search-result" class="local-search-result-cls"></div>
+        </div>
+      </div>
+    </div>
+  </transition>
+</div>
+<script src="/js/local_search.js"></script>
+<script>
+  var body = document.body || document.documentElement || window;
+  var vm = new Vue({
+    el: '#appSearch',
+    data: {
+      dialogVisible: false,
+      searchInput: '',
+      top: 0,
+    },
+    computed: {
+    },
+    mounted() {
+      window.addEventListener('pjax:complete', () => {
+        this.cancelDialogVisible();
+      })
+    },
+    methods: {
+      showDialog() {
+        this.dialogVisible = true;
+        // 防止页面滚动，只能让弹框滚动
+        this.top = $(document).scrollTop()
+        body.style.cssText = 'overflow: hidden;';
+      },
+      getSearchFile() {
+        if (!this.searchInput) {
+          getSearchFile("/search.xml");
+        }
+      },
+      cancelDialogVisible() {
+        this.dialogVisible = false;
+        body.removeAttribute('style');
+        $(document).scrollTop(this.top)
+      },
+    },
+    created() {}
+  })
+</script>
+<!-- 解决刷新页面闪烁问题，可以在元素上添加display: none, 或者用vue.extend方法，详情：https://blog.csdn.net/qq_31393401/article/details/81017912 -->
+<!-- 下面是搜索基本写法 -->
+<!-- <script type="text/javascript" id="local.search.active">
+  var inputArea = document.querySelector("#local-search-input");
+  inputArea.onclick   = function(){ getSearchFile(); this.onclick = null }
+  inputArea.onkeydown = function(){ if(event.keyCode == 13) return false }
+</script> -->
+
+      
+
+    </nav>
+  </div>
+  
+    <a target="_blank" rel="noopener" href="https://github.com/yuang01/hexo-theme-bamboo" class="github-corner color-primary" aria-label="View source on GitHub"><svg width="60" height="60" viewBox="0 0 250 250" style="fill:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+  
+  
+</header>
+        <!-- 内容区域 -->
+        
+ <!-- prismjs 代码高亮 -->
+ 
+
+
+<div class="bg-dark-floor" style="position: fixed;left: 0;top: 0;width: 100%;height: 100%;z-index: -1;"></div>
+
+
+  <!-- 文章详情页顶部图片和标题 -->
+
+
+
+
+<div class="post-detail-header" id="thumbnail_canvas" style="background-repeat: no-repeat; background-size: cover; 
+  background-position: center center;position: relative;background-image:url('/medias/8.jpg')">
+  <div class="post-detail-header-mask"></div>
+  <canvas id="header_canvas"style="position:absolute;bottom:0;pointer-events:none;"></canvas>
+  
+  <div class="post-detail-header_info-box">
+    <div class="title-box">
+      <span class="title">
+        halo+云服务器+nginx反向代理实现个人博客搭建
+      </span>
+    </div>
+    
+    
+      
+        <span class="post-detail-header_date">
+          <i class="fas fa-calendar"></i> Published in：2022-05-03 |
+        </span>
+      
+
+      
+        <span class="post-detail-header_categories">
+          <i class="iconfont iconbookmark1"></i> category：
+          
+            <a href="/categories/%E5%8D%9A%E5%AE%A2%F0%9F%92%BB/" class="post-detail-header_category">
+              博客💻
+            </a>
+          
+        </span>
+      
+
+      
+    
+  </div>
+  
+  
+    <script src="/js/bubble/bubble.js"></script>
+  
+</div>
+
+
+
+
+
+<div class="post-detail-content row justify-position" 
+  style="padding-top: 0px;">
+  <div class="main-content">
+    <article class="post post-detail">
+      <div class="post-content">
+        <h1 id="halo-云服务器-nginx反向代理实现个人博客搭建"><a href="#halo-云服务器-nginx反向代理实现个人博客搭建" class="headerlink" title="halo+云服务器+nginx反向代理实现个人博客搭建"></a>halo+云服务器+nginx反向代理实现个人博客搭建</h1><h2 id="1-云服务器选择"><a href="#1-云服务器选择" class="headerlink" title="1.云服务器选择"></a>1.云服务器选择</h2><p>这里直接选用 阿里云云服务器 ECS突发性能型 t6 别家的基本都一样，选用配置差不多的就行。</p>
+<p><a target="_blank" rel="noopener" href="https://developer.aliyun.com/plan/grow-up">https://developer.aliyun.com/plan/grow-up</a></p>
+<p><a target="_blank" rel="noopener" href="https://cdn.jsdelivr.net/gh/Daseinlux/Blog_image/blog_1_2021_3_21/1-%E6%9C%8D%E5%8A%A1%E5%99%A8%E8%B4%AD%E4%B9%B0.png"><img src="https://cdn.jsdelivr.net/gh/Daseinlux/Blog_image/blog_1_2021_3_21/1-%E6%9C%8D%E5%8A%A1%E5%99%A8%E8%B4%AD%E4%B9%B0.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/Daseinlux/Blog_image/blog_1_2021_3_21/1-%E6%9C%8D%E5%8A%A1%E5%99%A8%E8%B4%AD%E4%B9%B0.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="1-服务器购买"></a><br>（这里因为已经买过了，所以是724，第一次买应该是90+）</p>
+<p>这里的地域可以购买离自己进一点的（访问起来会快一点），如果服务器在大陆内，最后进行域名绑定的时候需要进行备案，选用在香港的服务器则不用。</p>
+<p>操作系统选用CentOS。</p>
+<p>其他的默认就好了。</p>
+<p><a target="_blank" rel="noopener" href="https://cdn.jsdelivr.net/gh/Daseinlux/Blog_image/blog_1_2021_3_21/2-%E6%9C%8D%E5%8A%A1%E5%99%A8%E8%B4%AD%E4%B9%B0%E8%AE%A2%E5%8D%95.png"><img src="https://cdn.jsdelivr.net/gh/Daseinlux/Blog_image/blog_1_2021_3_21/2-%E6%9C%8D%E5%8A%A1%E5%99%A8%E8%B4%AD%E4%B9%B0%E8%AE%A2%E5%8D%95.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/Daseinlux/Blog_image/blog_1_2021_3_21/2-%E6%9C%8D%E5%8A%A1%E5%99%A8%E8%B4%AD%E4%B9%B0%E8%AE%A2%E5%8D%95.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="2-服务器购买订单"></a></p>
+<p>进行订单的下单。</p>
+<p>在这一步下单完成后，我们还没有对我们的服务器设定密码。</p>
+<p>进去阿里云个人的ECS控制台。</p>
+<p><a target="_blank" rel="noopener" href="https://cdn.jsdelivr.net/gh/Daseinlux/Blog_image/blog_1_2021_3_21/3-ECS%E5%AE%9E%E4%BE%8B.png"><img src="https://cdn.jsdelivr.net/gh/Daseinlux/Blog_image/blog_1_2021_3_21/3-ECS%E5%AE%9E%E4%BE%8B.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/Daseinlux/Blog_image/blog_1_2021_3_21/3-ECS%E5%AE%9E%E4%BE%8B.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="3-ECS实例"></a></p>
+<p>点击实例</p>
+<p><a target="_blank" rel="noopener" href="https://cdn.jsdelivr.net/gh/Daseinlux/Blog_image/blog_1_2021_3_21/4-ECS%E5%AE%9E%E4%BE%8B%E5%9C%B0%E5%8C%BA%E9%80%89%E6%8B%A9.png"><img src="https://cdn.jsdelivr.net/gh/Daseinlux/Blog_image/blog_1_2021_3_21/4-ECS%E5%AE%9E%E4%BE%8B%E5%9C%B0%E5%8C%BA%E9%80%89%E6%8B%A9.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/Daseinlux/Blog_image/blog_1_2021_3_21/4-ECS%E5%AE%9E%E4%BE%8B%E5%9C%B0%E5%8C%BA%E9%80%89%E6%8B%A9.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="4-ECS实例地区选择"></a></p>
+<p>选择自己购买服务器时选择服务器所在的地区。</p>
+<p><a target="_blank" rel="noopener" href="https://cdn.jsdelivr.net/gh/Daseinlux/Blog_image/blog_1_2021_3_21/5-ECS%E5%AE%9E%E4%BE%8B%E5%88%9D%E5%A7%8B%E5%8C%96%E5%AF%86%E7%A0%81.png"><img src="https://cdn.jsdelivr.net/gh/Daseinlux/Blog_image/blog_1_2021_3_21/5-ECS%E5%AE%9E%E4%BE%8B%E5%88%9D%E5%A7%8B%E5%8C%96%E5%AF%86%E7%A0%81.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/Daseinlux/Blog_image/blog_1_2021_3_21/5-ECS%E5%AE%9E%E4%BE%8B%E5%88%9D%E5%A7%8B%E5%8C%96%E5%AF%86%E7%A0%81.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="5-ECS实例初始化密码"></a></p>
+<p>这时候我们就可以看到我们购买的服务器的信息。</p>
+<p>点击管理-&gt;进入到ECS实例的详情，点击重置实例密码。然后我们修改密码。<br><a target="_blank" rel="noopener" href="https://cdn.jsdelivr.net/gh/Daseinlux/Blog_image/blog_1_2021_3_21/6-ECS%E9%87%8D%E7%BD%AE%E5%AE%9E%E4%BE%8B%E5%AF%86%E7%A0%81.png"><img src="https://cdn.jsdelivr.net/gh/Daseinlux/Blog_image/blog_1_2021_3_21/6-ECS%E9%87%8D%E7%BD%AE%E5%AE%9E%E4%BE%8B%E5%AF%86%E7%A0%81.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/Daseinlux/Blog_image/blog_1_2021_3_21/6-ECS%E9%87%8D%E7%BD%AE%E5%AE%9E%E4%BE%8B%E5%AF%86%E7%A0%81.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="6-ECS重置实例密码"></a></p>
+<p><strong>这里我们的用户名root和实例密码都必须记住，最好截图保存下来，下面使用远程管理工具访问云服务器的时候会用到。</strong></p>
+<p>然后我们点击左侧菜单栏上的安全组，进入到安全组列表，点击右侧配置规则。</p>
+<p><a target="_blank" rel="noopener" href="https://cdn.jsdelivr.net/gh/Daseinlux/Blog_image/blog_1_2021_3_21/7-%E5%AE%89%E5%85%A8%E7%BB%84%E5%88%97%E8%A1%A8.png"><img src="https://cdn.jsdelivr.net/gh/Daseinlux/Blog_image/blog_1_2021_3_21/7-%E5%AE%89%E5%85%A8%E7%BB%84%E5%88%97%E8%A1%A8.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/Daseinlux/Blog_image/blog_1_2021_3_21/7-%E5%AE%89%E5%85%A8%E7%BB%84%E5%88%97%E8%A1%A8.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="7-安全组列表"></a></p>
+<p>然后选择入方向，点击手动添加，在新的规则中输入一下内容。</p>
+<p><a target="_blank" rel="noopener" href="https://cdn.jsdelivr.net/gh/Daseinlux/Blog_image/blog_1_2021_3_21/8-ECS%E5%BC%80%E6%94%BE%E7%AB%AF%E5%8F%A3.png"><img src="https://cdn.jsdelivr.net/gh/Daseinlux/Blog_image/blog_1_2021_3_21/8-ECS%E5%BC%80%E6%94%BE%E7%AB%AF%E5%8F%A3.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/Daseinlux/Blog_image/blog_1_2021_3_21/8-ECS%E5%BC%80%E6%94%BE%E7%AB%AF%E5%8F%A3.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="8-ECS开放端口"></a></p>
+<p>点击保存，然后重复进行这一步走，以此在端口范围中填入8888&#x2F;8888，443&#x2F;443，80&#x2F;80这三个，授权对象处都填写0.0.0.0&#x2F;0。</p>
+<p>最终结果如下：</p>
+<p><a target="_blank" rel="noopener" href="https://cdn.jsdelivr.net/gh/Daseinlux/Blog_image/blog_1_2021_3_21/9-ECS%E5%AE%89%E5%85%A8%E7%BB%84%E6%9C%80%E7%BB%88%E7%BB%93%E6%9E%9C.png"><img src="https://cdn.jsdelivr.net/gh/Daseinlux/Blog_image/blog_1_2021_3_21/9-ECS%E5%AE%89%E5%85%A8%E7%BB%84%E6%9C%80%E7%BB%88%E7%BB%93%E6%9E%9C.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/Daseinlux/Blog_image/blog_1_2021_3_21/9-ECS%E5%AE%89%E5%85%A8%E7%BB%84%E6%9C%80%E7%BB%88%E7%BB%93%E6%9E%9C.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="9-ECS安全组最终结果"></a></p>
+<p>这里8090端口为halo默认端口，8888为宝塔面板默认端口，443为SSL端口，80为网站默认端口。</p>
+<h2 id="2-服务器连接-halo安装"><a href="#2-服务器连接-halo安装" class="headerlink" title="2.服务器连接+halo安装"></a>2.服务器连接+halo安装</h2><h3 id="A-服务器连接"><a href="#A-服务器连接" class="headerlink" title="A.服务器连接"></a>A.服务器连接</h3><p>下面我们使用远程连接工具，对我们的云服务器进行连接。</p>
+<p>市面上常见的ssh工具有很多，可以自行搜索下载，用哪个都一样。</p>
+<p>（eg. Xshell7 puTTy等等）</p>
+<p>这里以Xshell7 为例</p>
+<p>我们在服务器实例管理页面，复制我们准备好的服务器的<strong>公网</strong>ip。</p>
+<p><a target="_blank" rel="noopener" href="https://cdn.jsdelivr.net/gh/Daseinlux/Blog_image/blog_1_2021_3_21/10-ECS%E5%AE%9E%E4%BE%8B%E5%85%AC%E7%BD%91ip.png"><img src="https://cdn.jsdelivr.net/gh/Daseinlux/Blog_image/blog_1_2021_3_21/10-ECS%E5%AE%9E%E4%BE%8B%E5%85%AC%E7%BD%91ip.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/Daseinlux/Blog_image/blog_1_2021_3_21/10-ECS%E5%AE%9E%E4%BE%8B%E5%85%AC%E7%BD%91ip.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="10-ECS实例公网ip"></a></p>
+<p>然后打开 ssh工具新建会话。</p>
+<p><a target="_blank" rel="noopener" href="https://cdn.jsdelivr.net/gh/Daseinlux/Blog_image/blog_1_2021_3_21/11-SSH%E6%96%B0%E5%BB%BA%E4%BC%9A%E8%AF%9D.png"><img src="https://cdn.jsdelivr.net/gh/Daseinlux/Blog_image/blog_1_2021_3_21/11-SSH%E6%96%B0%E5%BB%BA%E4%BC%9A%E8%AF%9D.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/Daseinlux/Blog_image/blog_1_2021_3_21/11-SSH%E6%96%B0%E5%BB%BA%E4%BC%9A%E8%AF%9D.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="11-SSH新建会话"></a></p>
+<p>在主机&#x2F;host这一栏中复制我们服务器的公网ip，其他不用变，点击确定进行连接。</p>
+<p><a target="_blank" rel="noopener" href="https://cdn.jsdelivr.net/gh/Daseinlux/Blog_image/blog_1_2021_3_21/12-%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%94%A8%E6%88%B7%E5%90%8D%E8%BE%93%E5%85%A5.png"><img src="https://cdn.jsdelivr.net/gh/Daseinlux/Blog_image/blog_1_2021_3_21/12-%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%94%A8%E6%88%B7%E5%90%8D%E8%BE%93%E5%85%A5.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/Daseinlux/Blog_image/blog_1_2021_3_21/12-%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%94%A8%E6%88%B7%E5%90%8D%E8%BE%93%E5%85%A5.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="12-服务器用户名输入"></a></p>
+<p>在用户名一栏中输入root。</p>
+<p><a target="_blank" rel="noopener" href="https://cdn.jsdelivr.net/gh/Daseinlux/Blog_image/blog_1_2021_3_21/13-%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%AF%86%E7%A0%81%E8%BE%93%E5%85%A5.png"><img src="https://cdn.jsdelivr.net/gh/Daseinlux/Blog_image/blog_1_2021_3_21/13-%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%AF%86%E7%A0%81%E8%BE%93%E5%85%A5.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/Daseinlux/Blog_image/blog_1_2021_3_21/13-%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%AF%86%E7%A0%81%E8%BE%93%E5%85%A5.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="13-服务器密码输入"></a></p>
+<p>然后在密码处输入我们在阿里云自己设置的服务器密码。</p>
+<p><a target="_blank" rel="noopener" href="https://cdn.jsdelivr.net/gh/Daseinlux/Blog_image/blog_1_2021_3_21/14-Xshell%E7%99%BB%E9%99%86%E6%88%90%E5%8A%9F.png"><img src="https://cdn.jsdelivr.net/gh/Daseinlux/Blog_image/blog_1_2021_3_21/14-Xshell%E7%99%BB%E9%99%86%E6%88%90%E5%8A%9F.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/Daseinlux/Blog_image/blog_1_2021_3_21/14-Xshell%E7%99%BB%E9%99%86%E6%88%90%E5%8A%9F.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="14-Xshell登陆成功"></a></p>
+<p>如果登陆成功，则可以在console看到以上画面。</p>
+<h3 id="B-halo安装"><a href="#B-halo安装" class="headerlink" title="B.halo安装"></a>B.halo安装</h3><p>接下来我们进行halo的安装。</p>
+<p>halo的安装教程可以在官方文档进行查看—-<a target="_blank" rel="noopener" href="https://docs.halo.run/install/linux%E3%80%82">https://docs.halo.run/install/linux。</a></p>
+<p>这里依照官方文档，进行安装的指导。只需要一步一步粘贴文档中的代码即可。</p>
+<p>1.首先我们对系统进行一下升级。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum -y update</span><br></pre></td></tr></table></figure>
+
+<p>然后我们会看到一下内容，不用管，等他升级完成，会在末尾出现complete！字样。</p>
+<p><a target="_blank" rel="noopener" href="https://cdn.jsdelivr.net/gh/Daseinlux/Blog_image/blog_1_2021_3_21/15-%E6%9C%8D%E5%8A%A1%E5%99%A8yum%E5%8D%87%E7%BA%A7.png"><img src="https://cdn.jsdelivr.net/gh/Daseinlux/Blog_image/blog_1_2021_3_21/15-%E6%9C%8D%E5%8A%A1%E5%99%A8yum%E5%8D%87%E7%BA%A7.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/Daseinlux/Blog_image/blog_1_2021_3_21/15-%E6%9C%8D%E5%8A%A1%E5%99%A8yum%E5%8D%87%E7%BA%A7.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="15-服务器yum升级"></a></p>
+<p>2.等yum升级完成后，我们进行java环境的安装。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo yum install java-11-openjdk -y</span><br></pre></td></tr></table></figure>
+
+<p>复制以上代码，回车安装java运行环境。中途会询问是否安装，回复y即可。</p>
+<p>安装成功后，会显示success等字样。</p>
+<p>完成后我们检查一下java版本，输入一下代码</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">java -version</span><br></pre></td></tr></table></figure>
+
+<p>如果出现一下类似内容，则成功。</p>
+<p><a target="_blank" rel="noopener" href="https://cdn.jsdelivr.net/gh/Daseinlux/Blog_image/blog_1_2021_3_21/16-%E6%9C%8D%E5%8A%A1%E5%99%A8java%E5%AE%89%E8%A3%85.png"><img src="https://cdn.jsdelivr.net/gh/Daseinlux/Blog_image/blog_1_2021_3_21/16-%E6%9C%8D%E5%8A%A1%E5%99%A8java%E5%AE%89%E8%A3%85.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/Daseinlux/Blog_image/blog_1_2021_3_21/16-%E6%9C%8D%E5%8A%A1%E5%99%A8java%E5%AE%89%E8%A3%85.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="16-服务器java安装"></a></p>
+<p>3.接下来我们正式进行halo的安装。</p>
+<p>这一步可以完全按照halo官方文档的指导来进行。</p>
+<p>这里只对一些容易出问题的地方进行解释。</p>
+<p>a.在官方文档中的安装第六点-编辑配置文件中。这一步一般来说使用默认即可，不需要进行改动。</p>
+<p><a target="_blank" rel="noopener" href="https://cdn.jsdelivr.net/gh/Daseinlux/Blog_image/blog_1_2021_3_21/17-%E5%AE%89%E8%A3%85%E7%AC%AC6%E7%82%B9%E8%AE%B2%E8%A7%A3.png"><img src="https://cdn.jsdelivr.net/gh/Daseinlux/Blog_image/blog_1_2021_3_21/17-%E5%AE%89%E8%A3%85%E7%AC%AC6%E7%82%B9%E8%AE%B2%E8%A7%A3.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/Daseinlux/Blog_image/blog_1_2021_3_21/17-%E5%AE%89%E8%A3%85%E7%AC%AC6%E7%82%B9%E8%AE%B2%E8%A7%A3.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="17-安装第6点讲解"></a></p>
+<p>打开配置文件后，可以看到以下内容：</p>
+<p><a target="_blank" rel="noopener" href="https://cdn.jsdelivr.net/gh/Daseinlux/Blog_image/blog_1_2021_3_21/18-application%E9%85%8D%E7%BD%AE.png"><img src="https://cdn.jsdelivr.net/gh/Daseinlux/Blog_image/blog_1_2021_3_21/18-application%E9%85%8D%E7%BD%AE.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/Daseinlux/Blog_image/blog_1_2021_3_21/18-application%E9%85%8D%E7%BD%AE.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="18-application配置"></a></p>
+<p>这里不做任何改动，直接退出即可，在该页面直接输入</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">:wq</span><br></pre></td></tr></table></figure>
+
+<p>即可退出。</p>
+<p>b.在官方文档中的安装第八点中，成功启动halo后，输入<code>ctrl+c</code>即可退出运行。</p>
+<p>c.在官方文档中的作为服务运行第四点中-修改配置</p>
+<p>进入vim编辑模式后，点击键盘上的<code>i</code>进入插入模式，即可修改配置文件，点击键盘上的<code>ESC</code>即可退出插入模式。</p>
+<p>如果有完全按照官方教程来进行halo的安装，那么Halo 运行包的绝对路径为 <code>/home/halo/app/halo.jar</code>，同时我们使用一个叫<code>halo</code>的用户来安装，那么最终配置文件将被修改为一下内容：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">[Unit]</span><br><span class="line">Description=Halo Service</span><br><span class="line">Documentation=https://halo.run</span><br><span class="line">After=network-online.target</span><br><span class="line">Wants=network-online.target</span><br><span class="line"> </span><br><span class="line">[Service]</span><br><span class="line">Type=simple</span><br><span class="line">User=halo</span><br><span class="line">ExecStart=/usr/bin/java -server -Xms256m -Xmx256m -jar /home/halo/app/halo.jar</span><br><span class="line">ExecStop=/bin/kill -s QUIT $MAINPID</span><br><span class="line">Restart=always</span><br><span class="line">StandOutput=syslog</span><br><span class="line"> </span><br><span class="line">StandError=inherit</span><br><span class="line"> </span><br><span class="line">[Install]</span><br><span class="line">WantedBy=multi-user.target</span><br></pre></td></tr></table></figure>
+
+<p>修改完成后，按下<code>ESC</code>退出插入模式，输入<code>:wq</code>退出配置文件。</p>
+<p>继续安装官方文档进行，即可完成halo的全部安装。</p>
+<p><strong>当全部完成时，我们可以通过ip:端口的方式来访问我们的网站。这里也非常建议使用这种方式来测试配置文件是否出现问题。</strong></p>
+<h2 id="3-nginx反向代理"><a href="#3-nginx反向代理" class="headerlink" title="3.nginx反向代理"></a>3.nginx反向代理</h2><p>1.域名解析</p>
+<p>这里我们还是用阿里云购买的域名为例</p>
+<p><a target="_blank" rel="noopener" href="https://cdn.jsdelivr.net/gh/Daseinlux/Blog_image/blog_1_2021_3_21/19-%E5%9F%9F%E5%90%8DDNS%E8%A7%A3%E6%9E%90.png"><img src="https://cdn.jsdelivr.net/gh/Daseinlux/Blog_image/blog_1_2021_3_21/19-%E5%9F%9F%E5%90%8DDNS%E8%A7%A3%E6%9E%90.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/Daseinlux/Blog_image/blog_1_2021_3_21/19-%E5%9F%9F%E5%90%8DDNS%E8%A7%A3%E6%9E%90.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="19-域名DNS解析"></a></p>
+<p>将我们已经购买的域名解析到我们的服务器上，图中的记录值就是我们的服务器的外网ip地址。</p>
+<p>我们解析完成后，可以在cmd中ping我们的域名，如果ping通则说明解析成功。刚解析完会有一定的延迟，过一会应该能ping通。</p>
+<p>1.宝塔面板安装</p>
+<p>这里nginx的反向代理我们通过宝塔面板来安装，我们使用<code>cd ~</code>返回到root用的根目录下。</p>
+<p>这里直接复制宝塔面板的下载安装命令，即可安装宝塔面板。</p>
+<p>Centos：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum install -y wget &amp;&amp; wget -O install.sh http://download.bt.cn/install/install_6.0.sh &amp;&amp; sh install.sh</span><br></pre></td></tr></table></figure>
+
+<p>不过的Linux系统安装命令不同，可以到<a target="_blank" rel="noopener" href="https://www.bt.cn/bbs/thread-19376-1-1.html">宝塔面板的官方文档</a>中查看。</p>
+<p>安装完成后，我们看我们的console上出现了一下内容：</p>
+<p><a target="_blank" rel="noopener" href="https://cdn.jsdelivr.net/gh/Daseinlux/Blog_image/blog_1_2021_3_21/20-%E5%AE%9D%E5%A1%94%E9%9D%A2%E6%9D%BF%E8%AE%BF%E9%97%AE%E5%9C%B0%E5%9D%80%E8%B4%A6%E5%8F%B7%E5%AF%86%E7%A0%81.png"><img src="https://cdn.jsdelivr.net/gh/Daseinlux/Blog_image/blog_1_2021_3_21/20-%E5%AE%9D%E5%A1%94%E9%9D%A2%E6%9D%BF%E8%AE%BF%E9%97%AE%E5%9C%B0%E5%9D%80%E8%B4%A6%E5%8F%B7%E5%AF%86%E7%A0%81.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/Daseinlux/Blog_image/blog_1_2021_3_21/20-%E5%AE%9D%E5%A1%94%E9%9D%A2%E6%9D%BF%E8%AE%BF%E9%97%AE%E5%9C%B0%E5%9D%80%E8%B4%A6%E5%8F%B7%E5%AF%86%E7%A0%81.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="20-宝塔面板访问地址账号密码"></a></p>
+<p>这个是我们服务器宝塔面板的访问地址，账号和密码。</p>
+<p>这里建立截图把这些保存下来，如果忘记了可以在SSH中输入<code>bt default</code>重新查看。</p>
+<p>2.宝塔面板nginx安装配置。</p>
+<p>我们复制外网面板地址到浏览器中打开，输入对应的username和password即可进入我们服务器的宝塔面板中。</p>
+<p><a target="_blank" rel="noopener" href="https://cdn.jsdelivr.net/gh/Daseinlux/Blog_image/blog_1_2021_3_21/21-%E5%AE%9D%E5%A1%94%E9%9D%A2%E6%9D%BF%E9%A6%96%E9%A1%B5.png"><img src="https://cdn.jsdelivr.net/gh/Daseinlux/Blog_image/blog_1_2021_3_21/21-%E5%AE%9D%E5%A1%94%E9%9D%A2%E6%9D%BF%E9%A6%96%E9%A1%B5.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/Daseinlux/Blog_image/blog_1_2021_3_21/21-%E5%AE%9D%E5%A1%94%E9%9D%A2%E6%9D%BF%E9%A6%96%E9%A1%B5.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="21-宝塔面板首页"></a></p>
+<p>首次进入宝塔面板会有软件的推荐安装，这个我们直接关掉，我们只需要后面从软件商城中自行安装nginx就好了。</p>
+<p>我们首先点击左侧菜单栏的安全。点开后我们可以看到防火墙。</p>
+<p><a target="_blank" rel="noopener" href="https://cdn.jsdelivr.net/gh/Daseinlux/Blog_image/blog_1_2021_3_21/22-%E5%AE%9D%E5%A1%94%E9%9D%A2%E6%9D%BF%E9%98%B2%E7%81%AB%E5%A2%99.png"><img src="https://cdn.jsdelivr.net/gh/Daseinlux/Blog_image/blog_1_2021_3_21/22-%E5%AE%9D%E5%A1%94%E9%9D%A2%E6%9D%BF%E9%98%B2%E7%81%AB%E5%A2%99.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/Daseinlux/Blog_image/blog_1_2021_3_21/22-%E5%AE%9D%E5%A1%94%E9%9D%A2%E6%9D%BF%E9%98%B2%E7%81%AB%E5%A2%99.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="22-宝塔面板防火墙"></a></p>
+<p>我们在防火墙中依次放行上面我们在阿里云服务器中已经放行过的端口。</p>
+<p><em><strong>注：这里8090端口没有默认的放行，所以安装好宝塔面板后，如果没有再次去放行则，不能通过ip：端口的方式去访问我们的博客。</strong></em></p>
+<p>然后我们在左侧菜单栏中选择软件商店-&gt;搜索nginx-&gt;选择快速安装-&gt;等待安装完毕。</p>
+<p>等待nginx安装完毕后，我们点击左侧网站-&gt;点击添加站点。添加我们的站点。</p>
+<p><a target="_blank" rel="noopener" href="https://cdn.jsdelivr.net/gh/Daseinlux/Blog_image/blog_1_2021_3_21/23-%E7%AB%99%E7%82%B9%E6%B7%BB%E5%8A%A0.png"><img src="https://cdn.jsdelivr.net/gh/Daseinlux/Blog_image/blog_1_2021_3_21/23-%E7%AB%99%E7%82%B9%E6%B7%BB%E5%8A%A0.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/Daseinlux/Blog_image/blog_1_2021_3_21/23-%E7%AB%99%E7%82%B9%E6%B7%BB%E5%8A%A0.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="23-站点添加"></a></p>
+<p>这里域名填写我们解析好的主域名（即我们在阿里云购买的域名，例如我购买的域名为yusart.xyz，那么我直接填写yusart.xyz，前面不需要填写其他的）</p>
+<p>其他的东西不用动，点击提交。</p>
+<p>这时我们的网站管理中就会多出我们刚才添加的站点，我们选择该站点点击设置。可以看到下面得到界面。</p>
+<p><a target="_blank" rel="noopener" href="https://cdn.jsdelivr.net/gh/Daseinlux/Blog_image/blog_1_2021_3_21/24-%E5%AE%9D%E5%A1%94%E9%9D%A2%E6%9D%BF%E5%9F%9F%E5%90%8D%E7%AE%A1%E7%90%86.png"><img src="https://cdn.jsdelivr.net/gh/Daseinlux/Blog_image/blog_1_2021_3_21/24-%E5%AE%9D%E5%A1%94%E9%9D%A2%E6%9D%BF%E5%9F%9F%E5%90%8D%E7%AE%A1%E7%90%86.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/Daseinlux/Blog_image/blog_1_2021_3_21/24-%E5%AE%9D%E5%A1%94%E9%9D%A2%E6%9D%BF%E5%9F%9F%E5%90%8D%E7%AE%A1%E7%90%86.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="24-宝塔面板域名管理"></a></p>
+<p>我们进去可以看到在域名管理中已经有一个我们的主域名了，然后我们在上方的方框中添加一个www开头的一级域名即可。添加完成后效果如上。</p>
+<p>然后我们点击配置文件，开始进行nginx的配置。</p>
+<p>这里的配置我们也是按照官方文档的说明来进行。</p>
+<p>官方文档：<a target="_blank" rel="noopener" href="https://docs.halo.run/install/bt-panel">https://docs.halo.run/install/bt-panel</a></p>
+<p>1.首先在根节点下添加以下代码（根节点与Server节点并列，添加根节点即在Server外添加）</p>
+<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">upstream</span> halo &#123;</span><br><span class="line">    <span class="attribute">server</span> <span class="number">127.0.0.1:8090</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里8090为halo默认端口，如果前面有改过端口号，则改为修改过的端口号。</p>
+<p>添加完毕后配置文件如下：</p>
+<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">upstream</span> halo &#123;</span><br><span class="line">    <span class="attribute">server</span> <span class="number">127.0.0.1:8090</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="section">server</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="attribute">listen</span> <span class="number">80</span>;</span><br><span class="line">	<span class="attribute">listen</span> <span class="number">443</span> ssl http2;</span><br><span class="line">    ...</span><br></pre></td></tr></table></figure>
+
+<p>2.在55行左右找到名为 <code>location ~ .*\.(gif|jpg|jpeg|png|bmp|swf)$</code>的<br>子节点</p>
+<p>将一下代码插入到该子节点中</p>
+<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">proxy_pass</span> http://halo;</span><br></pre></td></tr></table></figure>
+
+<p>最终效果见下方总览。</p>
+<p>3.在63行左右找到名为<code>location ~ .*\.(js|css)?$</code>的子节点<br>将一下代码插入到该子节点中</p>
+<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">proxy_pass</span> http://halo;</span><br></pre></td></tr></table></figure>
+
+<p>最终效果见下方总览。</p>
+<p>4.将一下内容插入到第69行后面。（即在Server内添加一个名为<code>location /</code>的子节点，与上述两个节点并列）</p>
+<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"> <span class="section">location</span> / &#123;</span><br><span class="line">      <span class="attribute">proxy_set_header</span> HOST <span class="variable">$host</span>;</span><br><span class="line">      <span class="attribute">proxy_set_header</span> X-Forwarded-Proto <span class="variable">$scheme</span>;</span><br><span class="line">      <span class="attribute">proxy_set_header</span> X-Real-IP <span class="variable">$remote_addr</span>;</span><br><span class="line">      <span class="attribute">proxy_set_header</span> X-Forwarded-For <span class="variable">$proxy_add_x_forwarded_for</span>;</span><br><span class="line"><span class="attribute">proxy_pass</span> http://halo;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+
+<p>最终配置文件如下：</p>
+<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">upstream</span> halo &#123;</span><br><span class="line">    <span class="attribute">server</span> <span class="number">127.0.0.1:8090</span>;</span><br><span class="line">&#125;//添加</span><br><span class="line"><span class="section">server</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="attribute">listen</span> <span class="number">80</span>;</span><br><span class="line">	<span class="attribute">listen</span> <span class="number">443</span> ssl http2;</span><br><span class="line">	</span><br><span class="line">	...</span><br><span class="line">	</span><br><span class="line">    <span class="section">location</span> <span class="regexp">~ .*\.(gif|jpg|jpeg|png|bmp|swf)$</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="attribute">proxy_pass</span> http://halo;//添加</span><br><span class="line">        <span class="attribute">expires</span>      <span class="number">30d</span>;</span><br><span class="line">        <span class="attribute">error_log</span> /dev/null;</span><br><span class="line">        <span class="attribute">access_log</span> <span class="literal">off</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="section">location</span> <span class="regexp">~ .*\.(js|css)?$</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="attribute">proxy_pass</span> http://halo;//添加</span><br><span class="line">        <span class="attribute">expires</span>      <span class="number">12h</span>;</span><br><span class="line">        <span class="attribute">error_log</span> /dev/null;</span><br><span class="line">        <span class="attribute">access_log</span> <span class="literal">off</span>; </span><br><span class="line">    &#125;</span><br><span class="line">   <span class="section">location</span> / &#123;</span><br><span class="line">        <span class="attribute">proxy_set_header</span> HOST <span class="variable">$host</span>;</span><br><span class="line">        <span class="attribute">proxy_set_header</span> X-Forwarded-Proto <span class="variable">$scheme</span>;</span><br><span class="line">        <span class="attribute">proxy_set_header</span> X-Real-IP <span class="variable">$remote_addr</span>;</span><br><span class="line">        <span class="attribute">proxy_set_header</span> X-Forwarded-For <span class="variable">$proxy_add_x_forwarded_for</span>;</span><br><span class="line">        <span class="attribute">proxy_pass</span> http://halo;</span><br><span class="line">    &#125;//添加</span><br><span class="line">&#125;//注意最后的大括号</span><br></pre></td></tr></table></figure>
+
+<p><em><strong>注意在78行(最下方一行，不一定是78)还有一个反大括号。</strong></em></p>
+<p>点击保存，这时我们就配置完成了，等待一段时间的延迟后，我们就可以通过我们的域名访问我们的博客了。如果不能访问可以尝试通过宝塔面板重启nginx。</p>
+<p><em><strong>注：如果我们访问我们的博客，出现css没有的情况有可能是在我们的博客后台-&gt;系统-&gt;博客设置中的博客地址没有相应的修改成我们的域名。可以修改为<a target="_blank" rel="noopener" href="http://+域名的格式/">http:&#x2F;&#x2F;+域名的格式</a></strong></em></p>
+<p>3.SSL认证</p>
+<p>当我们可以通过域名访问我们的博客后，我们可以为我们的博客添加SSL。</p>
+<p>在宝塔面板-&gt;域名管理-&gt;配置文件下方我们可以看到SSL。我们可以使用宝塔SSL或者Let&#96;s Encrypt（这里建议使用Lets Encrypt，使用宝塔SSL会比较慢）其中的一种。点击申请即可。<em><strong>申请成功后一点要打开右上角的强制HTTPS。</strong></em></p>
+<p><em><strong>注：如果我们访问我们的博客，出现css没有的情况有可能是在我们的博客后台-&gt;系统-&gt;博客设置中的博客地址没有相应的修改成我们的域名。可以修改为<a target="_blank" rel="noopener" href="https://+域名的格式/">https:&#x2F;&#x2F;+域名的格式</a></strong></em></p>
+<p><a target="_blank" rel="noopener" href="https://cdn.jsdelivr.net/gh/Daseinlux/Blog_image/blog_1_2021_3_21/25-SSL%E8%AE%A4%E8%AF%81.png"><img src="https://cdn.jsdelivr.net/gh/Daseinlux/Blog_image/blog_1_2021_3_21/25-SSL%E8%AE%A4%E8%AF%81.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/Daseinlux/Blog_image/blog_1_2021_3_21/25-SSL%E8%AE%A4%E8%AF%81.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="25-SSL认证"></a></p>
+
+      </div>
+      <div class="post-tags-categories">
+        
+        <div class="tags">
+          
+            <a href="/tags/%E5%8D%9A%E5%AE%A2%F0%9F%92%BB/" class="">
+              博客💻
+            </a>
+          
+            <a href="/tags/Halo/" class="">
+              Halo
+            </a>
+          
+        </div>
+        
+      </div>
+      
+        <div class="copyright">
+  <ul class="post-copyright">
+    <li class="post-copyright-author">
+    <strong>author:  </strong>John Doe</a>
+    </li>
+    <li class="post-copyright-link">
+    <strong>link:  </strong>
+    <a href="/2022/05/03/halo-云服务器-nginx反向代理实现个人博客搭建/" target="_blank" title="halo+云服务器+nginx反向代理实现个人博客搭建">http://example.com/2022/05/03/halo-云服务器-nginx反向代理实现个人博客搭建/</a>
+    </li>
+    <li class="post-copyright-license">
+      <strong>Copyright notice:   </strong>
+      All articles on this website, unless otherwise stated, adopt <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">CC BY-NC-ND 4.0</a>
+      reprint policy. If reproduced, please indicate source!
+    </li>
+  </ul>
+<div>
+      
+    </article>
+    <!-- 上一篇文章和下一篇文章 -->
+    
+      <!-- 文章详情页的上一页和下一页 -->
+<div class="post-nav">
+
+
+
+  
+  <div class="post-nav-prev post-nav-item">
+    <div class="post-nav-img" style="background-size: cover; 
+      background-position: center center;">
+      <img class="lazyload lazyload placeholder" src="/medias/7.jpg" class="lazyload placeholder" data-srcset="/medias/7.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="">
+    </div>
+    <a href="/2022/05/03/Java%E6%9E%9A%E4%B8%BE%E7%B1%BB/" class="post-nav-link">
+      <div class="title">
+        <i class="fas fa-angle-left"></i> Prev:
+        <div class="title-text">Java枚举类</div>
+      </div>
+      
+      <!-- <div class="content">
+        枚举类学习目标
+如何自定义枚举类
+如何使用关键字enum定义枚举类
+Enum类的主要方法
+实现接口的枚举类
+
+场景
+类的
+      </div> -->
+    </a>
+  </div>
+
+
+
+  
+  <div class="post-nav-next post-nav-item">
+    <div class="post-nav-img" style="background-size: cover; 
+      background-position: center center;">
+      <img class="lazyload lazyload placeholder" src="/medias/15.jpg" class="lazyload placeholder" data-srcset="/medias/15.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" src="" alt="">
+    </div>
+    <a href="/2022/05/03/%E5%A4%A7%E4%BD%AC%E8%BF%9B%E9%98%B6%E6%96%87%E7%AB%A0/" class="post-nav-link">
+      <div class="title">
+        Next: <i class="fas fa-angle-right"></i>
+        <div class="title-text">大佬进阶文章</div>
+      </div>
+      <!-- <div class="content">
+        大佬进阶文章我工作三年了，该懂并发了（干货）Atomic XXX 原理解析一文搞懂 CountDownLatch 用法和
+      </div> -->
+    </a>
+  </div>
+
+</div>
+
+    
+    
+
+    <!-- 打赏 -->
+    
+      <div id="appDonate" class="post-donate">
+  <div id="donate_board" class="donate_bar center" ref="donate">
+    <a id="btn_donate" class="btn_donate" href="javascript:;" title="打赏" @click="showDialogDrawer()"></a>
+  </div>
+  <transition name="fade">
+    <div 
+      class="donate-box-mask"
+      v-cloak 
+      v-show="visible"
+      @click="cancelDialogDrawer()"
+    >
+    </div>
+  </transition>
+  <transition name="bounce">
+    <div class="donate-box" v-cloak v-show="visible">
+      <div class="donate-box_close">
+        <i class="fas fa-times" aria-hidden="true" @click="cancelDialogDrawer" pointer></i>
+      </div>
+      <div class="donate-box_title">
+        <h4>
+          你的赏识是我前进的动力
+        </h4>
+      </div>
+      <div class="donate-box_tab">
+        <div class="Alipay" pointer :class="{'active': tabActive === 'Alipay'}" @click="changeTabActive('Alipay')">
+          支付宝
+        </div>
+        <div class="WeChatpay" pointer :class="{'active': tabActive === 'WeChatpay'}" @click="changeTabActive('WeChatpay')">
+          微信
+        </div>
+      </div>
+      <div class="donate-box_img">
+        <div class="AlipayImg" v-show="tabActive === 'Alipay'">
+          <img src="/medias/1.jpg" class="lazyload placeholder" data-srcset="/medias/1.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="支付宝打赏" />
+        </div> 
+        <div class="WeChatpayImg" v-show="tabActive === 'WeChatpay'">
+          <img src="/medias/2.jpg" class="lazyload placeholder" data-srcset="/medias/2.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="微信打赏" />
+        </div>
+      </div>
+    </div>
+  </transition>
+</div>
+
+<script>
+  var body = document.body || document.documentElement || window;
+  var vm = new Vue({
+    el: '#appDonate',
+    data: {
+      visible: false,
+      tabActive: 'Alipay',
+      top: 0,
+    },
+    computed: {
+    },
+    mounted() {
+    },
+    methods: {
+      showDialogDrawer() {
+        this.visible = true;
+        // 防止页面滚动，只能让弹框滚动
+        // function getScroll() {
+        //   return {
+        //     left: window.pageXOffset || document.documentElement.scrollLeft || document.body.scrollLeft || 0,
+        //     top: window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0
+        //   };
+        // }
+        this.top = $(document).scrollTop() // or getScroll().top
+        // console.log('aa', $('.main-content'));
+        body.style.cssText = 'overflow: hidden;';
+      },
+      cancelDialogDrawer() {
+        this.visible = false;
+        body.removeAttribute('style');
+        $(document).scrollTop(this.top)
+      },
+      changeTabActive(name) {
+        this.tabActive = name;
+      }
+    },
+    created() {}
+  })
+</script>
+    
+
+    <!-- 分享 -->
+    
+      <!-- https://github.com/overtrue/share.js -->
+<!-- 文章详情页的分享 -->
+<div class="social-share" data-sites="twitter,facebook,google,qq,qzone,wechat,weibo,douban,linkedin" data-wechat-qrcode-helper="<p>微信扫一扫即可分享！</p>"></div>
+
+<script src="/js/shareJs/social-share.min.js"></script>
+</script>
+
+<style>
+  .social-share {
+    margin: 20px 0;
+  }
+</style>
+
+
+    
+    
+    <!-- 评论 -->
+    <!-- 评论 -->
+
+  <div id="myComment">
+    
+      <div id="gitment-container"></div>
+
+    
+  </div>
+
+<!-- comment script in themes\hexo-theme-bamboo\layout\_partial\scripts\index.ejs -->
+
+
+  </div>
+
+  <!-- 目录 -->
+  <!-- 文章详情页右侧目录 -->
+
+  <div class="toc-aside">
+    <div class="toc-main">
+      <div class="toc-aside-title">
+        <i class="fas fa-list-ul" aria-hidden="true"></i><span>catalog</span>
+        
+          <div class="toc-open-close">catalog</div>
+        
+      </div>
+      <div class="toc-content">
+        <div class="toc"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 手机端目录按钮 -->
+  <div id="toc-mobile-btn">
+    <i class="fas fa-list-ul" aria-hidden="true"></i>
+  </div>
+
+
+<script>
+  function closeToc(init) {
+    $(".toc-aside").css({'width': 0, 'padding': 0, 'transition': init ?  'noe' : 'width 0.3s' });
+    $(".toc-content").css({'width': 0});
+    $(".toc-aside-title span, .toc-aside-title i").css({'display': 'none'});
+    $(".main-content").css({'width': '75%', 'margin-left': 'auto', 'margin-right': 'auto',});
+  };
+  function openToc() {
+    $(".main-content").css({'width': '65%', 'margin-right': '10px', 'margin-left': 'calc(35% - 350px)'});
+    $(".toc-aside").css({'width': '300px', 'padding': '0 10px', 'transition': 'width 0.3s'});
+    $(".toc-content").css({'width': '300px'});
+    $(".toc-aside-title span, .toc-aside-title i").css({'display': 'inline-block'});
+  }
+  function openBtnClickFn () {
+    let openOrCloseBtn = $('.toc-aside .toc-aside-title .toc-open-close');
+    let open = eval('' || 'true');
+    openOrCloseBtn.click(function() {
+      if (open) {
+        closeToc();
+        open = false;
+      } else {
+        openToc();
+        open = true;
+      }
+    });
+  };
+  openBtnClickFn();
+  initCloseTocWidth(true);
+
+  function initCloseTocWidth(init) {
+    if (window.innerWidth >= 992) {
+      let isClose = false;
+      isClose && closeToc(init)
+    }
+  }
+
+  document.addEventListener('pjax:complete', function () {
+    $(".toc-aside").css({'transition': 'no'});
+  })
+  document.addEventListener('pjax:complete', function () {
+    openBtnClickFn();
+  })
+  
+</script>
+
+  <!-- 图片放大 Wrap images with fancybox support -->
+  <script src="/js/wrapImage.js"></script>
+</div>
+
+<!-- 文章详情页背景图 -->
+<div id="appBgSwiper" style="position: fixed;left: 0;top: 0;width: 100%;height: 100%;z-index: -2;"
+	:style="{'background-color': bgColor ? bgColor : 'transparent'}">
+	<transition-group tag="ul" :name="names">
+		<li v-for='(image,index) in img' :key='index' v-show="index === mark" class="bg-swiper-box">
+			<img :src="image" class="bg-swiper-img no-lazy">
+		</li>
+	</transition-group>
+</div>
+<script>
+	var vm = new Vue({
+		el: '#appBgSwiper',
+		data: {
+			names: '' || 'fade' || 'fade', // translate-fade fade
+			mark: 0,
+			img: [],
+			bgColor: '',
+			time: null
+		},
+		methods: {   //添加方法
+			change(i, m) {
+				if (i > m) {
+					// this.names = 'fade';
+				} else if (i < m) {
+					// this.names = 'fade';
+				} else {
+					return;
+				}
+				this.mark = i;
+			},
+			prev() {
+				// this.names = 'fade';
+				this.mark--;
+				if (this.mark === -1) {
+					this.mark = 3;
+					return
+				}
+			},
+			next() {
+				// this.names = 'fade';
+				this.mark++;
+				if (this.mark === this.img.length) {
+					this.mark = 0;
+					return
+				}
+			},
+			autoPlay() {
+				// this.names = 'fade';
+				this.mark++;
+				if (this.mark === this.img.length) {
+					this.mark = 0;
+					return
+				}
+			},
+			play() {
+				let bgImgDelay = '' || '180000'
+				let delay = parseInt(bgImgDelay) || 180000;
+				this.time = setInterval(this.autoPlay, delay);
+			},
+			enter() {
+				clearInterval(this.time);
+			},
+			leave() {
+				this.play();
+			}
+		},
+		created() {
+			this.play()
+		},
+		beforeDestroy() {
+			clearInterval(this.time);
+		},
+		mounted() {
+			let prop = '' || '';
+			let isImg = prop.includes('.bmp') || prop.includes('.jpg') || prop.includes('.png') || prop.includes('.tif') || prop.includes('.gif') || prop.includes('.pcx') || prop.includes('.tga') || prop.includes('.exif') || prop.includes('.fpx') || prop.includes('.psd') || prop.includes('.cdr') || prop.includes('.pcd') || prop.includes('.dxf') || prop.includes('.ufo') || prop.includes('.eps') || prop.includes('.ai') || prop.includes('.raw') || prop.includes('.WMF') || prop.includes('.webp') || prop.includes('.jpeg') || prop.includes('http://') || prop.includes('https://')
+			if (isImg) {
+				let img = prop.split(',');
+				let configRoot = '/'
+				let arrImg = [];
+				img.forEach(el => {
+					var Expression = /http(s)?:\/\/([\w-]+\.)+[\w-]+(\/[\w- .\/?%&=]*)?/;
+					var objExp = new RegExp(Expression);
+
+					if (objExp.test(el)) {
+						// http or https
+						arrImg.push(el);
+					} else {
+						// 非http or https开头
+						// 本地文件
+						let firstStr = el.charAt(0);
+						if (firstStr == '/') {
+							el = el.substr(1); // 删除第一个字符 '/',因为 configRoot最后一个字符为 /
+						}
+						el = configRoot + el;
+						arrImg.push(el);
+					}
+				})
+				this.img = arrImg;
+			} else {
+				this.bgColor = prop;
+			}
+		}
+	})
+</script>
+
+<style>
+	.bg-swiper-box {
+		position: absolute;
+		display: block;
+		width: 100%;
+		height: 100%;
+	}
+
+	.bg-swiper-img {
+		object-fit: cover;
+		width: 100%;
+		height: 100%;
+	}
+</style>
+
+
+
+
+  <script>
+  function loadMermaid() {
+    if (document.getElementsByClassName('mermaid').length) {
+      if (window.mermaidJsLoad) mermaid.init()
+      else {
+        loadScript('https://unpkg.com/mermaid/dist/mermaid.min.js').then(() => {
+          window.mermaidJsLoad = true
+          mermaid.initialize({
+            theme: 'default',
+          })
+          if ('true') {
+            mermaid.init();
+          }
+        })
+      }
+    }
+  };
+  document.addEventListener("DOMContentLoaded", function () {
+    loadMermaid();
+  })
+
+  document.addEventListener('pjax:complete', function () {
+    loadMermaid();
+  })
+  
+</script>
+
+
+      </main>
+    </div>
+
+    <!-- 页脚 -->
+    
+  
+  
+    <!-- 底部鱼儿跳动效果，依赖于jquery-->
+<div id="j-fish-skip" style=" position: relative;height: 153px;width: auto;"></div>
+<script>
+  var RENDERER = {
+    POINT_INTERVAL: 5,
+    FISH_COUNT: 3,
+    MAX_INTERVAL_COUNT: 50,
+    INIT_HEIGHT_RATE: .5,
+    THRESHOLD: 50,
+    FISH_COLOR: '',
+    init: function () {
+      this.setFishColor(); this.setParameters(), this.reconstructMethods(), this.setup(), this.bindEvent(), this.render()
+    },
+    setFishColor: function () {
+      let isDark = JSON.parse(localStorage.getItem('dark')) || JSON.parse('false');
+      if (isDark) {
+        this.FISH_COLOR = '#222'; // 暗黑色，有时间把这整成一个变量
+      } else {
+        this.FISH_COLOR = '' || '#42b983';
+      }
+    },
+    setParameters: function () {
+      this.$window = $(window), this.$container = $("#j-fish-skip"), this.$canvas = $("<canvas />"), this.context = this.$canvas.appendTo(this.$container).get(0).getContext("2d"), this.points = [], this.fishes = [], this.watchIds = []
+    },
+    createSurfacePoints: function () {
+      var t = Math.round(this.width / this.POINT_INTERVAL);
+      this.pointInterval = this.width / (t - 1), this.points.push(new SURFACE_POINT(this, 0));
+      for (var i = 1; i < t; i++) {
+        var e = new SURFACE_POINT(this, i * this.pointInterval),
+          h = this.points[i - 1];
+        e.setPreviousPoint(h), h.setNextPoint(e), this.points.push(e)
+      }
+    },
+    reconstructMethods: function () {
+      this.watchWindowSize = this.watchWindowSize.bind(this), this.jdugeToStopResize = this.jdugeToStopResize.bind(this), this.startEpicenter = this.startEpicenter.bind(this), this.moveEpicenter = this.moveEpicenter.bind(this), this.reverseVertical = this.reverseVertical.bind(this), this.render = this.render.bind(this)
+    },
+    setup: function () {
+      this.points.length = 0, this.fishes.length = 0, this.watchIds.length = 0, this.intervalCount = this.MAX_INTERVAL_COUNT, this.width = this.$container.width(), this.height = this.$container.height(), this.fishCount = this.FISH_COUNT * this.width / 500 * this.height / 500, this.$canvas.attr({
+        width: this.width,
+        height: this.height
+      }), this.reverse = !1, this.fishes.push(new FISH(this)), this.createSurfacePoints()
+    },
+    watchWindowSize: function () {
+      this.clearTimer(), this.tmpWidth = this.$window.width(), this.tmpHeight = this.$window.height(), this.watchIds.push(setTimeout(this.jdugeToStopResize, this.WATCH_INTERVAL))
+    },
+    clearTimer: function () {
+      for (; this.watchIds.length > 0;) clearTimeout(this.watchIds.pop())
+    },
+    jdugeToStopResize: function () {
+      var t = this.$window.width(),
+        i = this.$window.height(),
+        e = t == this.tmpWidth && i == this.tmpHeight;
+      this.tmpWidth = t, this.tmpHeight = i, e && this.setup()
+    },
+    bindEvent: function () {
+      this.$window.on("resize", this.watchWindowSize), this.$container.on("mouseenter", this.startEpicenter), this.$container.on("mousemove", this.moveEpicenter)
+    },
+    getAxis: function (t) {
+      var i = this.$container.offset();
+      return {
+        x: t.clientX - i.left + this.$window.scrollLeft(),
+        y: t.clientY - i.top + this.$window.scrollTop()
+      }
+    },
+    startEpicenter: function (t) {
+      this.axis = this.getAxis(t)
+    },
+    moveEpicenter: function (t) {
+      var i = this.getAxis(t);
+      this.axis || (this.axis = i), this.generateEpicenter(i.x, i.y, i.y - this.axis.y), this.axis = i
+    },
+    generateEpicenter: function (t, i, e) {
+      if (!(i < this.height / 2 - this.THRESHOLD || i > this.height / 2 + this.THRESHOLD)) {
+        var h = Math.round(t / this.pointInterval);
+        h < 0 || h >= this.points.length || this.points[h].interfere(i, e)
+      }
+    },
+    reverseVertical: function () {
+      this.reverse = !this.reverse;
+      for (var t = 0, i = this.fishes.length; t < i; t++) this.fishes[t].reverseVertical()
+    },
+    controlStatus: function () {
+      for (var t = 0, i = this.points.length; t < i; t++) this.points[t].updateSelf();
+      for (t = 0, i = this.points.length; t < i; t++) this.points[t].updateNeighbors();
+      this.fishes.length < this.fishCount && 0 == --this.intervalCount && (this.intervalCount = this.MAX_INTERVAL_COUNT, this.fishes.push(new FISH(this)))
+    },
+    render: function () {
+      requestAnimationFrame(this.render), this.controlStatus(), this.context.clearRect(0, 0, this.width, this.height), this.context.fillStyle = this.FISH_COLOR;
+      for (var t = 0, i = this.fishes.length; t < i; t++) this.fishes[t].render(this.context);
+      this.context.save(), this.context.globalCompositeOperation = "xor", this.context.beginPath(), this.context.moveTo(0, this.reverse ? 0 : this.height);
+      for (t = 0, i = this.points.length; t < i; t++) this.points[t].render(this.context);
+      this.context.lineTo(this.width, this.reverse ? 0 : this.height), this.context.closePath(), this.context.fill(), this.context.restore()
+    }
+  },
+  SURFACE_POINT = function (t, i) {
+    this.renderer = t, this.x = i, this.init()
+  };
+  SURFACE_POINT.prototype = {
+    SPRING_CONSTANT: .03,
+    SPRING_FRICTION: .9,
+    WAVE_SPREAD: .3,
+    ACCELARATION_RATE: .01,
+    init: function () {
+      this.initHeight = this.renderer.height * this.renderer.INIT_HEIGHT_RATE, this.height = this.initHeight, this.fy = 0, this.force = {
+        previous: 0,
+        next: 0
+      }
+    },
+    setPreviousPoint: function (t) {
+      this.previous = t
+    },
+    setNextPoint: function (t) {
+      this.next = t
+    },
+    interfere: function (t, i) {
+      this.fy = this.renderer.height * this.ACCELARATION_RATE * (this.renderer.height - this.height - t >= 0 ? -1 : 1) * Math.abs(i)
+    },
+    updateSelf: function () {
+      this.fy += this.SPRING_CONSTANT * (this.initHeight - this.height), this.fy *= this.SPRING_FRICTION, this.height += this.fy
+    },
+    updateNeighbors: function () {
+      this.previous && (this.force.previous = this.WAVE_SPREAD * (this.height - this.previous.height)), this.next && (this.force.next = this.WAVE_SPREAD * (this.height - this.next.height))
+    },
+    render: function (t) {
+      this.previous && (this.previous.height += this.force.previous, this.previous.fy += this.force.previous), this.next && (this.next.height += this.force.next, this.next.fy += this.force.next), t.lineTo(this.x, this.renderer.height - this.height)
+    }
+  };
+  var FISH = function (t) {
+    this.renderer = t, this.init()
+  };
+  FISH.prototype = {
+    GRAVITY: .4,
+    init: function () {
+      this.direction = Math.random() < .5, this.x = this.direction ? this.renderer.width + this.renderer.THRESHOLD : -this.renderer.THRESHOLD, this.previousY = this.y, this.vx = this.getRandomValue(4, 10) * (this.direction ? -1 : 1), this.renderer.reverse ? (this.y = this.getRandomValue(1 * this.renderer.height / 10, 4 * this.renderer.height / 10), this.vy = this.getRandomValue(2, 5), this.ay = this.getRandomValue(.05, .2)) : (this.y = this.getRandomValue(6 * this.renderer.height / 10, 9 * this.renderer.height / 10), this.vy = this.getRandomValue(-5, -2), this.ay = this.getRandomValue(-.2, -.05)), this.isOut = !1, this.theta = 0, this.phi = 0
+    },
+    getRandomValue: function (t, i) {
+      return t + (i - t) * Math.random()
+    },
+    reverseVertical: function () {
+      this.isOut = !this.isOut, this.ay *= -1
+    },
+    controlStatus: function (t) {
+      this.previousY = this.y, this.x += this.vx, this.y += this.vy, this.vy += this.ay, this.renderer.reverse ? this.y > this.renderer.height * this.renderer.INIT_HEIGHT_RATE ? (this.vy -= this.GRAVITY, this.isOut = !0) : (this.isOut && (this.ay = this.getRandomValue(.05, .2)), this.isOut = !1) : this.y < this.renderer.height * this.renderer.INIT_HEIGHT_RATE ? (this.vy += this.GRAVITY, this.isOut = !0) : (this.isOut && (this.ay = this.getRandomValue(-.2, -.05)), this.isOut = !1), this.isOut || (this.theta += Math.PI / 20, this.theta %= 2 * Math.PI, this.phi += Math.PI / 30, this.phi %= 2 * Math.PI), this.renderer.generateEpicenter(this.x + (this.direction ? -1 : 1) * this.renderer.THRESHOLD, this.y, this.y - this.previousY), (this.vx > 0 && this.x > this.renderer.width + this.renderer.THRESHOLD || this.vx < 0 && this.x < -this.renderer.THRESHOLD) && this.init()
+    },
+    render: function (t) {
+      t.save(), t.translate(this.x, this.y), t.rotate(Math.PI + Math.atan2(this.vy, this.vx)), t.scale(1, this.direction ? 1 : -1), t.beginPath(), t.moveTo(-30, 0), t.bezierCurveTo(-20, 15, 15, 10, 40, 0), t.bezierCurveTo(15, -10, -20, -15, -30, 0), t.fill(), t.save(), t.translate(40, 0), t.scale(.9 + .2 * Math.sin(this.theta), 1), t.beginPath(), t.moveTo(0, 0), t.quadraticCurveTo(5, 10, 20, 8), t.quadraticCurveTo(12, 5, 10, 0), t.quadraticCurveTo(12, -5, 20, -8), t.quadraticCurveTo(5, -10, 0, 0), t.fill(), t.restore(), t.save(), t.translate(-3, 0), t.rotate((Math.PI / 3 + Math.PI / 10 * Math.sin(this.phi)) * (this.renderer.reverse ? -1 : 1)), t.beginPath(), this.renderer.reverse ? (t.moveTo(5, 0), t.bezierCurveTo(10, 10, 10, 30, 0, 40), t.bezierCurveTo(-12, 25, -8, 10, 0, 0)) : (t.moveTo(-5, 0), t.bezierCurveTo(-10, -10, -10, -30, 0, -40), t.bezierCurveTo(12, -25, 8, -10, 0, 0)), t.closePath(), t.fill(), t.restore(), t.restore(), this.controlStatus(t)
+    }
+  }, $(function () {
+    RENDERER.init()
+    $('.dark').click(function () {
+      setTimeout(() => {
+        RENDERER.setFishColor();
+        RENDERER.context.fill();
+      });
+    })
+  });
+</script>
+  
+  <div class="footer bg-color">
+    <div class="footer-main">
+      
+        
+          <div class="link">
+            
+          </div>
+        
+      
+        
+          <div class="footer-copyright">
+            <p>Copyright © 2019 - 2020 <a target="_blank" rel="noopener" href="https://github.com/yuang01">yuang01</a> | Powered by <a target="_blank" rel="noopener" href="https://hexo.io/zh-cn/docs/">Hexo</a> | Theme <a target="_blank" rel="noopener" href="https://github.com/yuang01/theme">Bamboo</a> </p>
+
+          </div>
+        
+      
+        
+          
+            <!-- 不蒜子统计 -->
+            <!-- 不蒜子统计 -->
+<span id="busuanzi_container_site_pv">
+      <i class="fas fa-eye" aria-hidden="true"></i>Total visits：<span id="busuanzi_value_site_pv"></span> times
+</span>
+<span class="post-meta-divider">|</span>
+<span id="busuanzi_container_site_uv" style='display:none'>
+      <i class="fas fa-users" aria-hidden="true"></i>Number of visitors：<span id="busuanzi_value_site_uv"></span> people
+</span>
+
+          
+        
+      
+        
+          <div class="footer-custom">
+            
+          </div>
+        
+      
+    </div>
+  </div>
+
+
+
+    <!-- 渲染暗黑按钮 -->
+    
+      <div class="dark">
+  <div class="dark-content">
+    <i class="fas fa-moon" aria-hidden="true"></i>
+    <!-- <span>关灯</span> -->
+  </div>
+  
+</div>
+
+<script>
+  $(function() {
+    let isDark = JSON.parse(localStorage.getItem('dark'))  || JSON.parse('false');
+    if (isDark) {
+      $(".dark-content").replaceWith(
+          `
+          <div class='dark-content'>
+            <i class="fas fa-lightbulb" aria-hidden="true"></i>
+          </div>
+          `
+        );
+    }
+    $('.dark').click(function() {
+      if ($(document.body).is('.darkModel')) {
+        $(document.body).removeClass('darkModel');
+        localStorage.setItem('dark', false);
+        $(".dark-content").replaceWith(
+          `
+          <div class='dark-content'>
+            <i class="fas fa-moon" aria-hidden="true"></i>
+          </div>
+          `
+        );
+      } else {
+        $(document.body).addClass('darkModel');
+        localStorage.setItem('dark', true);
+        $(".dark-content").replaceWith(
+          `
+          <div class='dark-content'>
+            <i class="fas fa-lightbulb" aria-hidden="true"></i>
+          </div>
+          `
+        );
+      }
+    })
+  })
+</script>
+    
+    <!-- 渲染回到顶部按钮 -->
+    
+      <div class="goTop top-btn-color" pointer>
+  <i class="fas fa-arrow-up" aria-hidden="true"></i>
+</div>
+<script src="/js/goTop.js"></script>
+
+    
+    <!-- 渲染左下角音乐播放器 -->
+    
+      <link rel="stylesheet" href="/js/aplayer/APlayer@1.10.1.min.css">
+<style>
+.aplayer .aplayer-lrc p {
+  
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 16px !important;
+}
+
+.aplayer .aplayer-lrc p.aplayer-lrc-current {
+  
+  font-size: 15px;
+  color: #42b983;
+}
+
+
+.aplayer.aplayer-fixed.aplayer-narrow .aplayer-body {
+  left: -66px !important;
+}
+
+.aplayer.aplayer-fixed.aplayer-narrow .aplayer-body:hover {
+  left: 0px !important;
+}
+
+
+</style>
+<meting-js  
+  class=""
+  server="tencent"
+  type="playlist"
+  id="8062553743"
+  fixed='true'
+  autoplay='false'
+  theme='#42b983'
+  loop='all'
+  order='random'
+  preload='auto'
+  volume='0.7'
+  list-folded='true'
+>
+</meting-js>
+
+<!-- <style>
+  #aplayer {
+    position: fixed;
+    left: 0;
+    bottom: 300px;
+  }
+</style> -->
+<script src="https://unpkg.com/aplayer@1.10.1/dist/APlayer.min.js"></script>
+<script src="https://unpkg.com/meting@2/dist/Meting.min.js"></script>
+    
+
+    <!-- 图片放大 -->
+    
+      <script src="/js/fancybox/jquery.fancybox.min.js"></script>
+    
+
+    <!-- 百度解析 -->
+    <!-- Baidu Analytics -->
+
+    <!-- Baidu Push -->
+
+<script>
+    (function () {
+        var bp = document.createElement('script');
+        var curProtocol = window.location.protocol.split(':')[0];
+        if (curProtocol === 'https') {
+            bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+        } else {
+            bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+        }
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(bp, s);
+    })();
+</script>
+
+    
+    <!-- 背景彩带 -->
+    
+      <script type="text/javascript" size="100" alpha='0.4' zIndex="-1" src="/js/ribbon.min.js"></script>
+    
+
+    <script src="/js/utils/index.js"></script>
+    <script src="/js/app.js"></script>
+    
+    <!-- 文章目录所需js -->
+<link href="/js/tocbot/tocbot.css" rel="stylesheet">
+<script src="/js/tocbot/tocbot.min.js"></script>
+
+<script>
+  var headerEl = 'h2, h3, h4',  //headers 
+    content = '.post-detail',//文章容器
+    idArr = {};  //标题数组以确定是否增加索引id
+  //add #id
+  var option = {
+    // Where to render the table of contents.
+    tocSelector: '.toc',
+    // Where to grab the headings to build the table of contents.
+    contentSelector: content,
+    // Which headings to grab inside of the contentSelector element.
+    headingSelector: headerEl,
+    scrollSmooth: true,
+    scrollSmoothOffset: -80,
+    headingsOffset: -($(window).height() * 0.4 - 45),
+    positionFixedSelector: '.toc-main',
+    positionFixedClass: 'is-position-fixed',
+    fixedSidebarOffset: 'auto',
+    activeLinkClass: 'is-active-link',
+    // onClick: function (e) {},
+  }
+  if ($('.toc').length > 0) {
+
+    $(content).children(headerEl).each(function () {
+      //去除空格以及多余标点
+      var headerId = $(this).text().replace(/[\s|\~|`|\!|\@|\#|\$|\%|\^|\&|\*|\(|\)|\_|\+|\=|\||\|\[|\]|\{|\}|\;|\:|\"|\'|\,|\<|\.|\>|\/|\?|\：|\，|\。]/g, '');
+
+      headerId = headerId.toLowerCase();
+      if (idArr[headerId]) {
+        //id已经存在
+        $(this).attr('id', headerId + '-' + idArr[headerId]);
+        idArr[headerId]++;
+      }
+      else {
+        //id未存在
+        idArr[headerId] = 1;
+        $(this).attr('id', headerId);
+      }
+    });
+
+    document.addEventListener("DOMContentLoaded", function () {
+      tocbot.init(option);
+      mobileTocClick();
+    });
+
+  }
+
+  window.tocScrollFn = function () {
+    return bamboo.throttle(function () {
+      findHeadPosition();
+    }, 100)()
+  }
+  window.addEventListener('scroll', tocScrollFn);
+
+  const findHeadPosition = function (top) {
+    if ($('.toc-list').length <= 0) {
+      return false;
+    }
+    setTimeout(() => {  // or DOMContentLoaded 
+      autoScrollToc();
+    }, 0);
+  }
+
+  const autoScrollToc = function () {
+    const $activeItem = document.querySelector('.is-active-link');
+    const $cardToc = document.querySelector('.toc-content');
+    const activePosition = $activeItem.getBoundingClientRect().top
+    const sidebarScrollTop = $cardToc.scrollTop
+    if (activePosition > (document.documentElement.clientHeight - 100)) {
+      $cardToc.scrollTop = sidebarScrollTop + 150
+    }
+    if (activePosition < 100) {
+      $cardToc.scrollTop = sidebarScrollTop - 150
+    }
+  }
+
+  document.addEventListener('pjax:send', function () {
+    if ($('.toc').length) {
+      tocbot.destroy();
+    }
+  });
+
+  document.addEventListener('pjax:complete', function () {
+    if ($('.toc').length) {
+      tocbot.init(option);
+      mobileTocClick();
+    }
+  });
+  
+  // 手机端toc按钮点击出现目录
+  const mobileTocClick = function () {
+    const $cardTocLayout = document.getElementsByClassName('toc-aside')[0];
+    const $cardToc = $cardTocLayout.getElementsByClassName('toc-content')[0];
+    let right = '45px';
+    if (window.innerWidth >= 551 && window.innerWidth <= 992) {
+      right = '100px'
+    }
+    const mobileToc = {
+      open: () => {
+        $cardTocLayout.style.cssText = 'animation: toc-open .3s; opacity: 1; right: ' + right
+      },
+
+      close: () => {
+        $cardTocLayout.style.animation = 'toc-close .2s'
+        setTimeout(() => {
+          $cardTocLayout.style.cssText = "opacity:''; animation: ''; right: ''"
+        }, 100)
+      }
+    }
+    document.getElementById('toc-mobile-btn').addEventListener('click', () => {
+      if (window.getComputedStyle($cardTocLayout).getPropertyValue('opacity') === '0') mobileToc.open()
+      else mobileToc.close()
+    })
+
+    $cardToc.addEventListener('click', (e) => {
+      if (window.innerWidth < 992) { // 小于992px的时候
+        mobileToc.close()
+      }
+    })
+  }
+</script>
+
+<style>
+  .is-position-fixed {
+    position: sticky !important;
+    top: 74px;
+  }
+
+  .toc-main ul {
+    counter-reset: show-list;
+  }
+
+  .toc-main ul li::before {
+    content: counter(item)".";
+    display: block;
+    position: absolute;
+    left: 12px;
+    top: 0;
+  }
+</style> 
+
+<!-- 设置导航背景 -->
+<script>
+  let setHeaderClass = () => {
+    const headerMenuTransparent = true;
+    if (!headerMenuTransparent) { return; }
+    const nav = $('#navHeader');
+    const navTop = nav.outerHeight();
+    const winTop = $(window).scrollTop();
+    if(winTop > navTop) {
+      nav.addClass('header-bg-color');
+    }
+    else {
+      nav.removeClass('header-bg-color');
+    }
+  };
+
+  let scrollCollect = () => {
+    return bamboo.throttle(function (e) {
+      setHeaderClass();
+    }, 200)()
+  }
+
+  let initHeaderBg = () => {
+    setHeaderClass();
+  }
+
+  setHeaderClass();
+  window.addEventListener('scroll', scrollCollect);
+
+  document.addEventListener('pjax:send', function () {
+    window.removeEventListener('scroll', scrollCollect)
+  })
+  document.addEventListener('pjax:complete', function () {
+    window.addEventListener('scroll', scrollCollect);
+    setHeaderClass();
+  })
+</script> 
+
+<!-- 渲染issues标签里的内容 -->
+<script>
+  function loadIssuesJS() {
+    if ($(".post-detail").find(".issues-api").length == 0) {
+      return;
+    } 
+    loadScript('/js/issues/index.js');
+  };
+  $(function () {
+    loadIssuesJS();
+  });
+  document.addEventListener('pjax:complete', function () {
+    if (typeof IssuesAPI == "undefined") {
+      loadIssuesJS();
+    }
+  })
+</script>
+
+<!-- 输入框打字特效 -->
+<!-- 输入框打字特效 -->
+
+  <script src="/js/activate-power-mode.js"></script>
+  <script>
+    POWERMODE.colorful = true;  // 打开随机颜色特效
+    POWERMODE.shake = false;    // 关闭输入框抖动
+    document.body.addEventListener('input', POWERMODE);//监听打字事件
+  </script>
+
+
+<!-- markdown代码一键复制功能 -->
+
+  <link rel="stylesheet" href="https://unpkg.com/v-plugs-ayu/lib/ayu.css">
+  <script src="https://unpkg.com/v-plugs-ayu/lib/ayu.umd.min.js"></script>
+  <script src="/js/clipboard/clipboard.min.js"></script>
+  <div id="appCopy">
+  </div>
+  <script data-pjax>
+    var vm = new Vue({
+      el: '#appCopy',
+      data: {
+      },
+      computed: {
+      },
+      mounted() {
+        const that = this;
+        var copy = 'copy';
+        /* code */
+        var initCopyCode = function () {
+          var copyHtml = '';
+          copyHtml += '<button class="btn-copy" data-clipboard-snippet="" style="position:absolute;top:0;right:0;z-index:1;">';
+          copyHtml += '<i class="fas fa-copy"></i><span>' + copy + '</span>';
+          copyHtml += '</button>';
+          $(".post-detail pre").not('.gutter pre').wrap("<div class='codeBox' style='position:relative;width:100%;'></div>")
+          $(".post-detail pre").not('.gutter pre').before(copyHtml);
+          new ClipboardJS('.btn-copy', {
+            target: function (trigger) {
+              return trigger.nextElementSibling;
+            }
+          });
+        }
+        initCopyCode();
+        $('.btn-copy').unbind('click').bind('click', function () {
+          doSomething();
+        })
+        $(document).unbind('keypress').bind('keypress', function (e) {
+          if (e.ctrlKey && e.keyCode == 67) {
+            doSomething();
+          }
+        })
+
+        function doSomething() {
+          that.$notify({
+            title: "成功",
+            content: "代码已复制，请遵守相关授权协议。",
+            type: 'success'
+          })
+        }
+      },
+      methods: {
+      },
+      created() { }
+    })
+  </script>
+  
+
+<!-- 图片懒加载 -->
+<script defer src="https://unpkg.com/vanilla-lazyload@17.1.0/dist/lazyload.min.js"></script>
+<script>
+  // https://www.npmjs.com/package/vanilla-lazyload
+  // Set the options globally
+  // to make LazyLoad self-initialize
+  window.lazyLoadOptions = {
+    elements_selector: ".lazyload",
+    threshold: 0
+  };
+  // Listen to the initialization event
+  // and get the instance of LazyLoad
+  window.addEventListener(
+    "LazyLoad::Initialized",
+    function (event) {
+      window.lazyLoadInstance = event.detail.instance;
+    },
+    false
+  );
+  document.addEventListener('DOMContentLoaded', function () {
+    lazyLoadInstance.update();
+  });
+  document.addEventListener('pjax:complete', function () {
+    lazyLoadInstance.update();
+  });
+</script>
+
+
+<!-- 卡片滚动动画 -->
+   
+
+<!-- 评论所需js -->
+
+  
+    <script type="text/javascript">
+  var utteranceCommon = {};
+
+  function check_utterance() {
+    let isDark = JSON.parse(localStorage.getItem('dark')) || JSON.parse('false');
+    if (isDark) {
+      utteranceCommon.Theme = 'github-dark';
+    } else {
+      utteranceCommon.Theme = 'github-light';
+    }
+
+    return document.getElementById("gitment-container");
+  }
+  comment_el = '#gitment-container';
+  load_utterance = function () {
+    if ($(comment_el).length) {
+      // 匿名函数，防止污染全局变量
+      const HEAD = check_utterance();
+
+      var utterances = document.createElement('script');
+      utterances.type = 'text/javascript';
+      utterances.async = true;
+      utterances.setAttribute('issue-term', 'pathname')
+      utterances.setAttribute('theme', utteranceCommon.Theme)
+      utterances.setAttribute('repo', '')
+      utterances.crossorigin = 'anonymous';
+      utterances.src = 'https://utteranc.es/client.js';
+      // content 是要插入评论的地方
+      document.getElementById('gitment-container').appendChild(utterances);
+
+    }
+  }
+
+  function dark_utterance() {
+    const HEAD = check_utterance();
+    if (!HEAD) return;
+    const message = {
+      type: 'set-theme',
+      theme: utteranceCommon.Theme
+    };
+    const utteranceIframe = document.querySelector('iframe');
+    utteranceIframe.contentWindow.postMessage(message, 'https://utteranc.es');
+  }
+
+  $(document).ready(load_utterance);
+  document.addEventListener('pjax:complete', function () {
+    load_utterance();
+  });
+
+  $('.dark').click(function () {
+    setTimeout(() => {
+      dark_utterance();
+    });
+  })
+
+</script>
+
+<style>
+  .utterances {
+    max-width: inherit !important;
+  }
+</style>
+  
+
+
+<!-- 鼠标点击特效 -->
+<!-- 爱心点击 -->
+
+  
+    <canvas class="fireworks" style="position: fixed;left: 0;top: 0;z-index: 999; pointer-events: none;" ></canvas>
+    <script src="//cdn.bootcss.com/animejs/2.2.0/anime.min.js"></script>
+    <script src="/js/cursor/explosion.min.js"></script>
+  
+
+
+
+
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" data-pjax></script>
+
+
+    <!-- pjax -->
+    
+
+<!-- pjax -->
+
+
+  <script src="/js/pjax@0.2.8/index.js"></script>
+  
+    <!-- 样式位于：source/css/_third-party/pjaxanimate.styl -->
+
+<div class="pjax-animate">
+  
+    <div class="loading-circle"><div id="loader-circle"></div></div>
+    <script>
+      window.ShowLoading = function() {
+        $(".loading-circle").css("display", "block");
+      };
+      window.HideLoading = function() {
+        $(".loading-circle").css("display", "none");
+      }
+    </script>
+  
+	<script>
+    document.addEventListener('pjax:complete', function () {
+      window.HideLoading();
+    })
+    document.addEventListener('pjax:send', function () {
+      window.ShowLoading();
+    })
+    document.addEventListener('pjax:error', function () {
+      window.HideLoading();
+    })
+	</script>
+</div>
+
+  
+
+  <script>
+    var pjax = new Pjax({
+      elements: 'a[href]:not([href^="#"]):not([href="javascript:void(0)"]):not([no-pjax])',   // 拦截正常带链接的 a 标签
+      selectors: ["#pjax-container","title"],                                   // 根据实际需要确认重载区域
+      cacheBust: false,   // url 地址追加时间戳，用以避免浏览器缓存
+      timeout: 5000
+    });
+
+    document.addEventListener('pjax:send', function (e) {
+
+      try {
+        var currentUrl = window.location.pathname;
+        var targetUrl = e.triggerElement.href;
+        var banUrl = [""];
+        if (banUrl[0] != "") {
+          banUrl.forEach(item => {
+            if(currentUrl.indexOf(item) != -1 || targetUrl.indexOf(item) != -1) {
+              window.location.href = targetUrl;
+            }
+          });
+        }
+      } catch (error) {}
+
+      $(window).unbind('resize');
+      $(window).unbind('scroll');
+      $(document).unbind('scroll');
+      $(document).unbind('click');
+      $('body').unbind('click');
+
+    })
+    
+    document.addEventListener('pjax:complete', function () {
+      $('script[data-pjax], .pjax-reload script').each(function () {
+        $(this).parent().append($(this).remove());
+      });
+    });
+
+    document.addEventListener('pjax:error', function (e) {
+      window.location.href = e.triggerElement.href;
+    })
+    
+    // 刷新不从顶部开始
+    document.addEventListener("DOMContentLoaded", function () {
+      history.scrollRestoration = 'auto';
+    })
+  </script>
+
+
+
+  </body>
+</html>

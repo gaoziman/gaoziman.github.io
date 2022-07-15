@@ -1,0 +1,1965 @@
+<!DOCTYPE html>
+<html>
+  <!-- meta/link... -->
+  
+
+
+
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport">
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+
+
+  <title>程序员需要了解的硬核知识之汇编语言 | Hexo</title>
+
+  <link rel="icon" type="image/x-icon, image/vnd.microsoft.icon" href="/favicon.ico">
+  <link rel="stylesheet" href="https://at.alicdn.com/t/font_1911880_c1nvbyezg17.css">
+  <link href="https://unpkg.com/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet">
+  <link href="/js/swiper/swiper@5.4.1.min.css" rel="stylesheet">
+  
+  
+  
+  
+<link rel="stylesheet" href="/css/animate.min.css">
+
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+  
+    
+<link rel="stylesheet" href="/js/fancybox/jquery.fancybox.min.css">
+
+  
+  
+    
+<link rel="stylesheet" href="/js/shareJs/share.min.css">
+
+  
+  <style>
+        @media (max-width: 992px) {
+            #waifu {
+                display: none;
+            }
+        }
+    </style>
+    <script src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
+    <link href="//cdn.bootcss.com/pace/1.0.2/themes/pink/pace-theme-flash.css" rel="stylesheet">
+
+    
+
+    <!-- import link -->
+    
+        
+            
+        
+            
+        
+    
+    <!-- import script -->
+    
+        
+            
+        
+            
+        
+    
+
+<meta name="generator" content="Hexo 6.2.0"></head>
+
+  
+  <!-- 依赖于jquery和vue -->
+  
+    
+<script src="https://unpkg.com/jquery@3.5.1/dist/jquery.min.js"></script>
+
+  
+
+  
+    
+<script src="https://unpkg.com/vue@2.6.11/dist/vue.min.js"></script>
+
+  
+  
+  <body>
+    <!-- 预加载动画 -->
+    <!-- 页面预加载动画 -->
+
+<div id='loader'>
+  <link rel="stylesheet" href="/js/loaded/index.css" >
+  <div class="loading-left-bg"></div>
+  <div class="loading-right-bg"></div>
+  <div class="spinner-box">
+    <div class="configure-border-1">
+      <div class="configure-core"></div>
+    </div>
+    <div class="configure-border-2">
+      <div class="configure-core"></div>
+    </div>
+    <div class="loading-word">loading...</div>
+  </div>
+</div>
+
+<script>
+  var endLoading = function () {
+    document.body.style.overflow = 'auto';
+    document.getElementById('loader').classList.add("loading");
+  }
+  window.addEventListener('DOMContentLoaded',endLoading);
+  
+</script>
+
+    
+    <!-- 判断是否为暗黑风格 -->
+    <!-- 判断是否为黑夜模式 -->
+<script>
+  let isDark = JSON.parse(localStorage.getItem('dark')) || JSON.parse('false');
+
+  if (isDark) {
+    $(document.body).addClass('darkModel');
+  }
+</script>
+
+    <!-- 需要在上面加载的js -->
+    <script>
+  function loadScript(src, cb) {
+    return new Promise(resolve => {
+      setTimeout(function () {
+        var HEAD = document.getElementsByTagName("head")[0] || document.documentElement;
+        var script = document.createElement("script");
+        script.setAttribute("type", "text/javascript");
+        if (cb) {
+          if (JSON.stringify(cb)) {
+            for (let p in cb) {
+              if (p == "onload") {
+                script[p] = () => {
+                  cb[p]()
+                  resolve()
+                }
+              } else {
+                script[p] = cb[p]
+                script.onload = resolve
+              }
+            }
+          } else {
+            script.onload = () => {
+              cb()
+              resolve()
+            };
+          }
+        } else {
+          script.onload = resolve
+        }
+        script.setAttribute("src", src);
+        HEAD.appendChild(script);
+      });
+    });
+  }
+
+  //https://github.com/filamentgroup/loadCSS
+  var loadCSS = function (href, before, media, attributes) {
+    return new Promise(resolve => {
+      setTimeout(function () {
+        var link = document.createElement('link');
+        link.rel = "stylesheet";
+        link.href = src;
+        link.onload = resolve;
+        document.getElementsByTagName("head")[0].appendChild(link);
+      });
+    });
+  };
+
+</script> 
+
+<!-- 轮播图所需要的js -->
+<script src="/js/swiper/swiper.min.js"></script>
+<script src="/js/swiper/vue-awesome-swiper.js"></script>
+<script src="/js/swiper/swiper.animate1.0.3.min.js"></script>
+
+<script type="text/javascript">
+  Vue.use(window.VueAwesomeSwiper)
+</script>
+
+
+  <script src="/js/vue-typed-js/index.js"></script>
+
+
+<!-- 首页的公告滚动插件的js需要重新加载 -->
+<script src="/js/vue-seamless-scroll/index.js"></script>
+
+<!-- 打字机效果js -->
+<script src="https://unpkg.com/typed.js@2.0.11"></script>
+
+
+    <div id="safearea">
+      <main class="main" id="pjax-container">
+        <!-- 头部导航 -->
+        
+<header class="header   " 
+  id="navHeader"
+  style="position: fixed;
+  left: 0; top: 0; z-index: 10;width: 100%;"
+>
+  <div class="header-content">
+    <div class="bars">
+      <div id="appDrawer" class="sidebar-image">
+  <div class="drawer-box-icon">
+    <i class="fas fa-bars" aria-hidden="true" @click="showDialogDrawer"></i>
+  </div>
+  
+  <transition name="fade">
+    <div class="drawer-box_mask" v-cloak style="display: none;" v-show="visible" @click.self="cancelDialogDrawer">
+    </div>
+  </transition>
+  <div class="drawer-box" :class="{'active': visible}">
+    <div class="drawer-box-head bg-color">
+      <img class="drawer-box-head_logo lazyload placeholder" src="/medias/logo.png" class="lazyload placeholder" data-srcset="/medias/logo.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="logo">
+      <h3 class="drawer-box-head_title">Hexo</h3>
+      <h5 class="drawer-box-head_desc"></h5>
+    </div>
+    
+    <div class="drawer-box-content">
+      <ul class="drawer-box-content_menu">
+        
+        
+          <li class="drawer-box-content_item">
+            <a target="_blank" rel="noopener" href="https://github.com/yuang01/hexo-theme-bamboo">
+              <i class="fas fa-github" aria-hidden="true"></i>
+              <span>Github</span>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</div>
+
+<script>
+  var body = document.body || document.documentElement || window;
+  var vm = new Vue({
+    el: '#appDrawer',
+    data: {
+      visible: false,
+      top: 0,
+      openArr: [],
+    },
+    computed: {
+    },
+    mounted() {
+    },
+    methods: {
+      isOpen(index) {
+        if (this.openArr.includes(index)) {
+          return true;
+        } else {
+          return false;
+        }
+      },
+      openOrCloseMenu(curIndex) {
+        const index = this.openArr.indexOf(curIndex);
+        if (index !== -1) {
+          this.openArr.splice(index, 1);
+        } else {
+          this.openArr.push(curIndex);
+        }
+      },
+      showDialogDrawer() {
+        this.visible = true;
+        // 防止页面滚动，只能让弹框滚动
+        this.top = $(document).scrollTop()
+        body.style.cssText = 'width: 100%; height: 100%;overflow: hidden;';
+      },
+      cancelDialogDrawer() {
+        this.visible = false;
+        body.removeAttribute('style');
+        $(document).scrollTop(this.top)
+      }
+    },
+    created() {}
+  })
+</script>
+
+    </div>
+    <div class="blog-title" id="author-avatar">
+      
+        <div class="avatar">
+          <img src="/medias/logo.png" class="lazyload placeholder" data-srcset="/medias/logo.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="logo">
+        </div>
+      
+      <a href="/" class="logo">Hexo</a>
+    </div>
+    <nav class="navbar">
+      <ul class="menu">
+        
+      </ul>
+      
+      
+        <div id="appSearch">
+  <div class="search"  @click="showDialog()"><i class="fas fa-search" aria-hidden="true"></i></div>
+  <transition name="fade">
+    <div class="message-box_wrapper" style="display: none;" v-cloak v-show="dialogVisible" @click.self="cancelDialogVisible()">
+      <div class="message-box animated bounceInDown">
+        <h2>
+          <span>
+            <i class="fas fa-search" aria-hidden="true"></i>
+            <span class="title">Search</span>
+          </span>
+          <i class="fas fa-times close" pointer style="float:right;" aria-hidden="true" @click.self="cancelDialogVisible()"></i>
+        </h2>
+        <form class="site-search-form">
+          <input type="text"
+            placeholder="Please enter keywords"
+            id="local-search-input" 
+            @click="getSearchFile()"
+            class="st-search-input"
+            v-model="searchInput"
+          />
+        </form>
+        <div class="result-wrapper">
+          <div id="local-search-result" class="local-search-result-cls"></div>
+        </div>
+      </div>
+    </div>
+  </transition>
+</div>
+<script src="/js/local_search.js"></script>
+<script>
+  var body = document.body || document.documentElement || window;
+  var vm = new Vue({
+    el: '#appSearch',
+    data: {
+      dialogVisible: false,
+      searchInput: '',
+      top: 0,
+    },
+    computed: {
+    },
+    mounted() {
+      window.addEventListener('pjax:complete', () => {
+        this.cancelDialogVisible();
+      })
+    },
+    methods: {
+      showDialog() {
+        this.dialogVisible = true;
+        // 防止页面滚动，只能让弹框滚动
+        this.top = $(document).scrollTop()
+        body.style.cssText = 'overflow: hidden;';
+      },
+      getSearchFile() {
+        if (!this.searchInput) {
+          getSearchFile("/search.xml");
+        }
+      },
+      cancelDialogVisible() {
+        this.dialogVisible = false;
+        body.removeAttribute('style');
+        $(document).scrollTop(this.top)
+      },
+    },
+    created() {}
+  })
+</script>
+<!-- 解决刷新页面闪烁问题，可以在元素上添加display: none, 或者用vue.extend方法，详情：https://blog.csdn.net/qq_31393401/article/details/81017912 -->
+<!-- 下面是搜索基本写法 -->
+<!-- <script type="text/javascript" id="local.search.active">
+  var inputArea = document.querySelector("#local-search-input");
+  inputArea.onclick   = function(){ getSearchFile(); this.onclick = null }
+  inputArea.onkeydown = function(){ if(event.keyCode == 13) return false }
+</script> -->
+
+      
+
+    </nav>
+  </div>
+  
+    <a target="_blank" rel="noopener" href="https://github.com/yuang01/hexo-theme-bamboo" class="github-corner color-primary" aria-label="View source on GitHub"><svg width="60" height="60" viewBox="0 0 250 250" style="fill:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+  
+  
+</header>
+        <!-- 内容区域 -->
+        
+ <!-- prismjs 代码高亮 -->
+ 
+
+
+<div class="bg-dark-floor" style="position: fixed;left: 0;top: 0;width: 100%;height: 100%;z-index: -1;"></div>
+
+
+  <!-- 文章详情页顶部图片和标题 -->
+
+
+
+
+<div class="post-detail-header" id="thumbnail_canvas" style="background-repeat: no-repeat; background-size: cover; 
+  background-position: center center;position: relative;background-image:url('/medias/12.jpg')">
+  <div class="post-detail-header-mask"></div>
+  <canvas id="header_canvas"style="position:absolute;bottom:0;pointer-events:none;"></canvas>
+  
+  <div class="post-detail-header_info-box">
+    <div class="title-box">
+      <span class="title">
+        程序员需要了解的硬核知识之汇编语言
+      </span>
+    </div>
+    
+    
+      
+        <span class="post-detail-header_date">
+          <i class="fas fa-calendar"></i> Published in：2022-05-03 |
+        </span>
+      
+
+      
+        <span class="post-detail-header_categories">
+          <i class="iconfont iconbookmark1"></i> category：
+          
+            <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BB%84%E6%88%90%E5%8E%9F%E7%90%86/" class="post-detail-header_category">
+              计算机组成原理
+            </a>
+          
+        </span>
+      
+
+      
+    
+  </div>
+  
+  
+    <script src="/js/bubble/bubble.js"></script>
+  
+</div>
+
+
+
+
+
+<div class="post-detail-content row justify-position" 
+  style="padding-top: 0px;">
+  <div class="main-content">
+    <article class="post post-detail">
+      <div class="post-content">
+        <h1 id="程序员需要了解的硬核知识之汇编语言"><a href="#程序员需要了解的硬核知识之汇编语言" class="headerlink" title="程序员需要了解的硬核知识之汇编语言"></a>程序员需要了解的硬核知识之汇编语言</h1><p>之前的系列文章从 CPU 和内存方面简单介绍了一下汇编语言，但是还没有系统的了解一下汇编语言，汇编语言作为第二代计算机语言，会用一些容易理解和记忆的字母，单词来代替一个特定的指令，作为高级编程语言的基础，有必要系统的了解一下汇编语言，那么本篇文章希望大家跟我一起来了解一下汇编语言。</p>
+<h2 id="汇编语言和本地代码"><a href="#汇编语言和本地代码" class="headerlink" title="汇编语言和本地代码"></a>汇编语言和本地代码</h2><p>我们在之前的文章中探讨过，计算机 CPU 只能运行本地代码(机器语言)程序，用 C 语言等高级语言编写的代码，需要经过编译器编译后，转换为本地代码才能够被 CPU 解释执行。</p>
+<p>但是本地代码的可读性非常差，所以需要使用一种能够直接读懂的语言来替换本地代码，那就是在各本地代码中，附带上表示其功能的英文缩写，比如在加法运算的本地代码加上<code>add(addition)</code> 的缩写、在比较运算符的本地代码中加上<code>cmp(compare)</code>的缩写等，这些通过缩写来表示具体本地代码指令的标志称为 <code>助记符</code>，使用助记符的语言称为<code>汇编语言</code>。这样，通过阅读汇编语言，也能够了解本地代码的含义了。</p>
+<p>不过，即使是使用汇编语言编写的源代码，最终也必须要转换为本地代码才能够运行，负责做这项工作的程序称为<code>编译器</code>，转换的这个过程称为<code>汇编</code>。在将源代码转换为本地代码这个功能方面，汇编器和编译器是同样的。</p>
+<p>用汇编语言编写的源代码和本地代码是一一对应的。因而，本地代码也可以反过来转换成汇编语言编写的代码。把本地代码转换为汇编代码的这一过程称为<code>反汇编</code>，执行反汇编的程序称为<code>反汇编程序</code>。</p>
+<img src="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/1515111-20191203123354738-600256658.png" class="lazyload placeholder" data-srcset="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/1515111-20191203123354738-600256658.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" style="zoom:50%;" />
+
+
+<p>哪怕是 C 语言编写的源代码，编译后也会转换成特定 CPU 用的本地代码。而将其反汇编的话，就可以得到汇编语言的源代码，并对其内容进行调查。不过，<strong>本地代码变成 C 语言源代码的反编译，要比本地代码转换成汇编代码的反汇编要困难</strong>，这是因为，C 语言代码和本地代码不是一一对应的关系。</p>
+<h2 id="通过编译器输出汇编语言的源代码"><a href="#通过编译器输出汇编语言的源代码" class="headerlink" title="通过编译器输出汇编语言的源代码"></a>通过编译器输出汇编语言的源代码</h2><p>我们上面提到本地代码可以经过反汇编转换成为汇编代码，但是只有这一种转换方式吗？显然不是，C 语言编写的源代码也能够通过编译器编译称为汇编代码，下面就来尝试一下。</p>
+<p>首先需要先做一些准备，需要先下载 <code>Borland C++ 5.5</code> 编译器，为了方便，我这边直接下载好了读者直接从我的百度网盘提取即可 （链接:<a target="_blank" rel="noopener" href="https://pan.baidu.com/s/19LqVICpn5GcV88thD2AnlA">https://pan.baidu.com/s/19LqVICpn5GcV88thD2AnlA</a>  密码:hz1u）</p>
+<p>下载完毕，需要进行配置，下面是配置说明 （<a target="_blank" rel="noopener" href="https://wenku.baidu.com/view/22e2f418650e52ea551898ad.html%EF%BC%89%EF%BC%8C%E6%95%99%E7%A8%8B%E5%BE%88%E5%AE%8C%E6%95%B4%E8%B7%9F%E7%9D%80%E9%85%8D%E7%BD%AE%E5%B0%B1%E5%8F%AF%E4%BB%A5%EF%BC%8C%E4%B8%8B%E9%9D%A2%E5%BC%80%E5%A7%8B%E6%88%91%E4%BB%AC%E7%9A%84%E7%BC%96%E8%AF%91%E8%BF%87%E7%A8%8B">https://wenku.baidu.com/view/22e2f418650e52ea551898ad.html），教程很完整跟着配置就可以，下面开始我们的编译过程</a></p>
+<p>首先用 Windows 记事本等文本编辑器编写如下代码</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 返回两个参数值之和的函数</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">AddNum</span><span class="params">(<span class="type">int</span> a,<span class="type">int</span> b)</span>&#123;</span><br><span class="line">  <span class="keyword">return</span> a + b;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 调用 AddNum 函数的函数</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">MyFunc</span><span class="params">()</span>&#123;</span><br><span class="line">  <span class="type">int</span> c;</span><br><span class="line">  c = AddNum(<span class="number">123</span>,<span class="number">456</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>编写完成后将其文件名保存为 Sample4.c ，C 语言源文件的扩展名，通常用<code>.c</code> 来表示，上面程序是提供两个输入参数并返回它们之和。</p>
+<p>在 Windows 操作系统下打开 <code>命令提示符</code>，切换到保存 Sample4.c 的文件夹下，然后在命令提示符中输入</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">bcc32 -c -S Sample4.c</span><br></pre></td></tr></table></figure>
+
+<p>bcc32 是启动 Borland C++ 的命令，<code>-c</code> 的选项是指仅进行编译而不进行链接，<code>-S</code> 选项被用来指定生成汇编语言的源代码</p>
+<p>作为编译的结果，当前目录下会生成一个名为<code>Sample4.asm</code> 的汇编语言源代码。汇编语言源文件的扩展名，通常用<code>.asm</code> 来表示，下面就让我们用编辑器打开看一下 Sample4.asm 中的内容</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br></pre></td><td class="code"><pre><span class="line">	.386p</span><br><span class="line">	ifdef ??version</span><br><span class="line">	if    ??version GT 500H</span><br><span class="line">	.mmx</span><br><span class="line">	endif</span><br><span class="line">	endif</span><br><span class="line">	model flat</span><br><span class="line">	ifndef	??version</span><br><span class="line">	?debug	macro</span><br><span class="line">	endm</span><br><span class="line">	endif</span><br><span class="line">	?debug	S &quot;Sample4.c&quot;</span><br><span class="line">	?debug	T &quot;Sample4.c&quot;</span><br><span class="line">_TEXT	segment dword public use32 &#x27;CODE&#x27;</span><br><span class="line">_TEXT	ends</span><br><span class="line">_DATA	segment dword public use32 &#x27;DATA&#x27;</span><br><span class="line">_DATA	ends</span><br><span class="line">_BSS	segment dword public use32 &#x27;BSS&#x27;</span><br><span class="line">_BSS	ends</span><br><span class="line">DGROUP	group	_BSS,_DATA</span><br><span class="line">_TEXT	segment dword public use32 &#x27;CODE&#x27;</span><br><span class="line">_AddNum	proc	near</span><br><span class="line">?live1@0:</span><br><span class="line">   ;	</span><br><span class="line">   ;	int AddNum(int a,int b)&#123;</span><br><span class="line">   ;	</span><br><span class="line">	push      ebp</span><br><span class="line">	mov       ebp,esp</span><br><span class="line">   ;	</span><br><span class="line">   ;	</span><br><span class="line">   ;	    return a + b;</span><br><span class="line">   ;	</span><br><span class="line">@1:</span><br><span class="line">	mov       eax,dword ptr [ebp+8]</span><br><span class="line">	add       eax,dword ptr [ebp+12]</span><br><span class="line">   ;	</span><br><span class="line">   ;	&#125;</span><br><span class="line">   ;	</span><br><span class="line">@3:</span><br><span class="line">@2:</span><br><span class="line">	pop       ebp</span><br><span class="line">	ret </span><br><span class="line">_AddNum	endp</span><br><span class="line">_MyFunc	proc	near</span><br><span class="line">?live1@48:</span><br><span class="line">   ;	</span><br><span class="line">   ;	void MyFunc()&#123;</span><br><span class="line">   ;	</span><br><span class="line">	push      ebp</span><br><span class="line">	mov       ebp,esp</span><br><span class="line">   ;	</span><br><span class="line">   ;	    int c;</span><br><span class="line">   ;	    c = AddNum(123,456);</span><br><span class="line">   ;	</span><br><span class="line">@4:</span><br><span class="line">	push      456</span><br><span class="line">	push      123</span><br><span class="line">	call      _AddNum</span><br><span class="line">	add       esp,8</span><br><span class="line">   ;	</span><br><span class="line">   ;	&#125;</span><br><span class="line">   ;	</span><br><span class="line">@5:</span><br><span class="line">	pop       ebp</span><br><span class="line">	ret </span><br><span class="line">_MyFunc	endp</span><br><span class="line">_TEXT	ends</span><br><span class="line">	public	_AddNum</span><br><span class="line">	public	_MyFunc</span><br><span class="line">	?debug	D &quot;Sample4.c&quot; 20343 45835</span><br><span class="line">	end</span><br></pre></td></tr></table></figure>
+
+<p>这样，编译器就成功的把 C 语言转换成为了汇编代码了。</p>
+<h2 id="不会转换成本地代码的伪指令"><a href="#不会转换成本地代码的伪指令" class="headerlink" title="不会转换成本地代码的伪指令"></a>不会转换成本地代码的伪指令</h2><p>第一次看到汇编代码的读者可能感觉起来比较难，不过实际上其实比较简单，而且可能比 C 语言还要简单，为了便于阅读汇编代码的源代码，需要注意几个要点</p>
+<p>汇编语言的源代码，是由转换成本地代码的指令（后面讲述的操作码）和针对汇编器的伪指令构成的。伪指令负责把程序的构造以及汇编的方法指示给汇编器（转换程序）。不过伪指令是无法汇编转换成为本地代码的。下面是上面程序截取的伪指令</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">_TEXT	segment dword public use32 &#x27;CODE&#x27;</span><br><span class="line">_TEXT	ends</span><br><span class="line">_DATA	segment dword public use32 &#x27;DATA&#x27;</span><br><span class="line">_DATA	ends</span><br><span class="line">_BSS	segment dword public use32 &#x27;BSS&#x27;</span><br><span class="line">_BSS	ends</span><br><span class="line">DGROUP	group	_BSS,_DATA</span><br><span class="line"></span><br><span class="line">_AddNum	proc	near</span><br><span class="line">_AddNum	endp</span><br><span class="line"></span><br><span class="line">_MyFunc	proc	near</span><br><span class="line">_MyFunc	endp</span><br><span class="line"></span><br><span class="line">_TEXT	ends</span><br><span class="line">	end</span><br></pre></td></tr></table></figure>
+
+<p>由伪指令 <code>segment</code> 和 <code>ends</code> 围起来的部分，是给构成程序的命令和数据的集合体上加一个名字而得到的，称为<code>段定义</code>。段定义的英文表达具有<code>区域</code>的意思，在这个程序中，段定义指的是命令和数据等程序的集合体的意思，一个程序由多个段定义构成。</p>
+<p>上面代码的开始位置，定义了3个名称分别为 <code>_TEXT、_DATA、_BSS</code> 的段定义，<code>_TEXT</code> 是指定的段定义，<code>_DATA</code> 是被初始化（有初始值）的数据的段定义，<code>_BSS</code> 是尚未初始化的数据的段定义。这种定义的名称是由 Borland C++ 定义的，是由 Borland C++ 编译器自动分配的，所以程序段定义的顺序就成为了 <code>_TEXT、_DATA、_BSS</code> ，这样也确保了内存的连续性</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">_TEXT	segment dword public use32 &#x27;CODE&#x27;</span><br><span class="line">_TEXT	ends</span><br><span class="line">_DATA	segment dword public use32 &#x27;DATA&#x27;</span><br><span class="line">_DATA	ends</span><br><span class="line">_BSS	segment dword public use32 &#x27;BSS&#x27;</span><br><span class="line">_BSS	ends</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>段定义( segment ) 是用来区分或者划分范围区域的意思。汇编语言的 segment 伪指令表示段定义的起始，ends 伪指令表示段定义的结束。段定义是一段连续的内存空间</p>
+</blockquote>
+<p>而<code>group</code> 这个伪指令表示的是将 <code>_BSS和_DATA</code> 这两个段定义汇总名为 DGROUP 的组</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">DGROUP	group	_BSS,_DATA</span><br></pre></td></tr></table></figure>
+
+<p>围起 <code>_AddNum</code> 和 <code>_MyFun</code> 的 <code>_TEXT</code> segment 和 <code>_TEXT</code>  ends ，表示<code>_AddNum</code> 和 <code>_MyFun</code> 是属于 <code>_TEXT</code> 这一段定义的。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">_TEXT	segment dword public use32 &#x27;CODE&#x27;</span><br><span class="line">_TEXT	ends</span><br></pre></td></tr></table></figure>
+
+<p>因此，即使在源代码中指令和数据是混杂编写的，经过编译和汇编后，也会转换成为规整的本地代码。</p>
+<p><code>_AddNum proc </code> 和 <code>_AddNum endp</code> 围起来的部分，以及<code>_MyFunc proc</code> 和 <code>_MyFunc endp</code> 围起来的部分，分别表示 AddNum 函数和 MyFunc 函数的范围。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">_AddNum	proc	near</span><br><span class="line">_AddNum	endp</span><br><span class="line"></span><br><span class="line">_MyFunc	proc	near</span><br><span class="line">_MyFunc	endp</span><br></pre></td></tr></table></figure>
+
+<p>编译后在函数名前附带上下划线<code>_</code> ，是 Borland C++ 的规定。在 C 语言中编写的 AddNum 函数，在内部是以 _AddNum 这个名称处理的。伪指令 proc 和 endp 围起来的部分，表示的是 <code>过程(procedure)</code> 的范围。在汇编语言中，这种相当于 C 语言的函数的形式称为过程。</p>
+<p>末尾的 <code>end</code> 伪指令，表示的是源代码的结束。</p>
+<h2 id="汇编语言的语法是-操作码-操作数"><a href="#汇编语言的语法是-操作码-操作数" class="headerlink" title="汇编语言的语法是 操作码 + 操作数"></a>汇编语言的语法是 操作码 + 操作数</h2><p>在汇编语言中，一行表示一对 CPU 的一个指令。汇编语言指令的语法结构是 <strong>操作码 + 操作数</strong>，也存在只有操作码没有操作数的指令。</p>
+<p>操作码表示的是指令动作，操作数表示的是指令对象。操作码和操作数一起使用就是一个英文指令。比如从英语语法来分析的话，操作码是动词，操作数是宾语。比如这个句子 <code>Give me money</code>这个英文指令的话，Give 就是操作码，me 和 money 就是操作数。汇编语言中存在多个操作数的情况，要用逗号把它们分割，就像是 Give me,money 这样。</p>
+<p>能够使用何种形式的操作码，是由 CPU 的种类决定的，下面对操作码的功能进行了整理。</p>
+<img src="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/1515111-20191203123428866-1157682254.png" class="lazyload placeholder" data-srcset="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/1515111-20191203123428866-1157682254.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" style="zoom:50%;" />
+
+<p>本地代码需要加载到内存后才能运行，内存中存储着构成本地代码的指令和数据。程序运行时，CPU会从内存中把数据和指令读出来，然后放在 CPU 内部的寄存器中进行处理。</p>
+<img src="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/1515111-20191203123436672-463062191.png" class="lazyload placeholder" data-srcset="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/1515111-20191203123436672-463062191.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" style="zoom:50%;" />
+
+
+<p>如果 CPU 和内存的关系你还不是很了解的话，请阅读作者的另一篇文章 <a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s?__biz=MzU2NDg0OTgyMA==&mid=2247484585&idx=1&sn=0d6c3ccf8cc5bec2fea80eb437213801&chksm=fc45f95acb32704c7dcc952a803e88e8a9b0e67c86d8c27abf4e6c776e48b1fcd770dd2dcc8d&token=653889808&lang=zh_CN#rd">程序员需要了解的硬核知识之CPU</a> 详细了解。</p>
+<p>寄存器是 CPU 中的存储区域，寄存器除了具有临时存储和计算的功能之外，还具有运算功能，x86 系列的主要种类和角色如下图所示</p>
+<img src="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/1515111-20191203123447823-1497735831.png" class="lazyload placeholder" data-srcset="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/1515111-20191203123447823-1497735831.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" style="zoom:50%;" />
+
+
+<h3 id="指令解析"><a href="#指令解析" class="headerlink" title="指令解析"></a>指令解析</h3><p>下面就对 CPU 中的指令进行分析</p>
+<p><strong>最常用的 mov 指令</strong></p>
+<p>指令中最常使用的是对寄存器和内存进行数据存储的 <code>mov</code> 指令，mov 指令的两个操作数，分别用来指定数据的存储地和读出源。操作数中可以指定寄存器、常数、标签(附加在地址前)，以及用方括号<code>([])</code> 围起来的这些内容。如果指定了没有用<code>([])</code> 方括号围起来的内容，就表示对该值进行处理；如果指定了用方括号围起来的内容，方括号的值则会被解释为内存地址，然后就会对该内存地址对应的值进行读写操作。让我们对上面的代码片段进行说明</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">mov       ebp,esp</span><br><span class="line">mov       eax,dword ptr [ebp+8]</span><br></pre></td></tr></table></figure>
+
+<p>mov ebp,esp 中，esp 寄存器中的值被直接存储在了 ebp 中，也就是说，如果 esp 寄存器的值是100的话那么 ebp 寄存器的值也是 100。</p>
+<p>而在 <code>mov eax,dword ptr [ebp+8]</code> 这条指令中，ebp 寄存器的值 + 8 后会被解析称为内存地址。如果 ebp</p>
+<p> 寄存器的值是100的话，那么 eax 寄存器的值就是 100 + 8 的地址的值。<code>dword ptr</code> 也叫做 <code>double word pointer</code> 简单解释一下就是从指定的内存地址中读出4字节的数据</p>
+<p><strong>对栈进行 push 和 pop</strong></p>
+<p>程序运行时，会在内存上申请分配一个称为栈的数据空间。栈（stack）的特性是后入先出，数据在存储时是从内存的下层（大的地址编号）逐渐往上层（小的地址编号）累积，读出时则是按照从上往下进行读取的。</p>
+<img src="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/1515111-20191203123512303-1466982879.png" class="lazyload placeholder" data-srcset="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/1515111-20191203123512303-1466982879.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" style="zoom:50%;" />
+
+
+<p>栈是存储临时数据的区域，它的特点是通过 push 指令和 pop 指令进行数据的存储和读出。向栈中存储数据称为 <code>入栈</code> ，从栈中读出数据称为 <code>出栈</code>，32位 x86 系列的 CPU 中，进行1次 push 或者 pop，即可处理 32 位（4字节）的数据。</p>
+<h3 id="函数的调用机制"><a href="#函数的调用机制" class="headerlink" title="函数的调用机制"></a>函数的调用机制</h3><p>下面我们一起来分析一下函数的调用机制，我们以上面的 C 语言编写的代码为例。首先，让我们从<code>MyFunc</code> 函数调用<code>AddNum</code> 函数的汇编语言部分开始，来对函数的调用机制进行说明。栈在函数的调用中发挥了巨大的作用，下面是经过处理后的 MyFunc 函数的汇编处理内容</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">_MyFunc 	 proc 	 near</span><br><span class="line">	push 			ebp		  ; 将 ebp 寄存器的值存入栈中                                      (1) </span><br><span class="line">	mov				ebp,esp ; 将 esp 寄存器的值存入 ebp 寄存器中	                        (2)</span><br><span class="line">	push			456			; 将 456 入栈							        (3)</span><br><span class="line">	push 			123			; 将 123 入栈								(4)</span><br><span class="line">	call			_AddNum ; 调用 AddNum 函数								(5)</span><br><span class="line">	add				esp,8		; esp 寄存器的值 + 8						(6)</span><br><span class="line">	pop				ebp			; 读出栈中的数值存入 ebp 寄存器中			(7)</span><br><span class="line">	ret 							; 结束 MyFunc 函数，返回到调用源			(8)</span><br><span class="line">_MyFunc 		endp</span><br></pre></td></tr></table></figure>
+
+<p>代码解释中的(1)、(2)、(7)、(8)的处理适用于 C 语言中的所有函数，我们会在后面展示 <code>AddNum</code> 函数处理内容时进行说明。这里希望大家先关注(3) - (6) 这一部分，这对了解函数调用机制至关重要。</p>
+<p>(3) 和 (4) 表示的是将传递给 AddNum 函数的参数通过 push 入栈。在 C 语言源代码中，虽然记述为函数 AddNum(123,456)，但入栈时则会先按照 456，123 这样的顺序。也就是位于后面的数值先入栈。这是 C 语言的规定。(5) 表示的 call 指令，会把程序流程跳转到 AddNum 函数指令的地址处。在汇编语言中，<code>函数名</code>表示的就是函数所在的内存地址。AddNum 函数处理完毕后，程序流程必须要返回到编号(6) 这一行。call 指令运行后，call 指令的下一行(也就指的是 (6) 这一行)的内存地址(调用函数完毕后要返回的内存地址)会自动的 push 入栈。该值会在 AddNum 函数处理的最后通过 <code>ret</code> 指令 pop 出栈，然后程序会返回到 (6) 这一行。</p>
+<p>(6) 部分会把栈中存储的两个参数 (456 和 123) 进行销毁处理。虽然通过两次的 pop 指令也可以实现，不过采用 esp 寄存器 + 8 的方式会更有效率(处理 1 次即可)。对栈进行数值的输入和输出时，数值的单位是4字节。因此，通过在负责栈地址管理的 esp 寄存器中加上4的2倍8，就可以达到和运行两次 pop 命令同样的效果。虽然内存中的数据实际上还残留着，但只要把 esp 寄存器的值更新为数据存储地址前面的数据位置，该数据也就相当于销毁了。</p>
+<p>我在编译 <code>Sample4.c</code> 文件时，出现了下图的这条消息</p>
+<p><img src="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/1515111-20191203123521044-706624331.png" class="lazyload placeholder" data-srcset="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/1515111-20191203123521044-706624331.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>图中的意思是指 c 的值在 MyFunc 定义了但是一直未被使用，这其实是一项编译器优化的功能，由于存储着 AddNum 函数返回值的变量 c 在后面没有被用到，因此编译器就认为 <strong>该变量没有意义</strong>，进而也就<strong>没有生成与之对应的汇编语言代码</strong>。</p>
+<p>下图是调用 AddNum 这一函数前后栈内存的变化</p>
+<img src="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/1515111-20191203123614763-976959339.png" class="lazyload placeholder" data-srcset="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/1515111-20191203123614763-976959339.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" style="zoom:50%;" />
+                            
+
+<h3 id="函数的内部处理"><a href="#函数的内部处理" class="headerlink" title="函数的内部处理"></a>函数的内部处理</h3><p>上面我们用汇编代码分析了一下 Sample4.c 整个过程的代码，现在我们着重分析一下 AddNum 函数的源代码部分，分析一下参数的接收、返回值和返回等机制</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">_AddNum 		proc		near</span><br><span class="line">	push			ebp			                                                   (1)</span><br><span class="line">	mov				ebp,esp                                                             (2)</span><br><span class="line">	mov				eax,dword ptr[ebp+8]                                     (3)</span><br><span class="line">	add				eax,dword ptr[ebp+12]                                   (4)</span><br><span class="line">	pop				ebp									  (5)</span><br><span class="line">	ret				                                                                          (6)</span><br><span class="line">_AddNum			endp</span><br></pre></td></tr></table></figure>
+
+<p>ebp 寄存器的值在(1)中入栈，在(5)中出栈，这主要是为了把函数中用到的 ebp 寄存器的内容，恢复到函数调用前的状态。</p>
+<p>(2) 中把负责管理栈地址的 esp 寄存器的值赋值到了 ebp 寄存器中。这是因为，在 mov 指令中方括号内的参数，是不允许指定 esp 寄存器的。因此，这里就采用了不直接通过 esp，而是用 ebp 寄存器来读写栈内容的方法。</p>
+<p>(3) 使用[ebp + 8] 指定栈中存储的第1个参数123，并将其读出到 eax 寄存器中。像这样，不使用 pop 指令，也可以参照栈的内容。而之所以从多个寄存器中选择了 eax 寄存器，是因为 eax 是负责运算的累加寄存器。</p>
+<p>通过(4) 的 add 指令，把当前 eax 寄存器的值同第2个参数相加后的结果存储在 eax 寄存器中。[ebp + 12] 是用来指定第2个参数456的。在 C 语言中，函数的返回值必须通过 eax 寄存器返回，这也是规定。也就是 <strong>函数的参数是通过栈来传递，返回值是通过寄存器返回的</strong>。</p>
+<p>(6) 中 ret 指令运行后，函数返回目的地内存地址会<code>自动出栈</code>，据此，程序流程就会跳转返回到<code>(6) (Call _AddNum)</code> 的下一行。这时，AddNum 函数入口和出口处栈的状态变化，就如下图所示</p>
+<img src="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/1515111-20191203123625512-198708091.png" class="lazyload placeholder" data-srcset="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/1515111-20191203123625512-198708091.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" style="zoom:50%;" />
+
+
+<h3 id="全局变量和局部变量"><a href="#全局变量和局部变量" class="headerlink" title="全局变量和局部变量"></a>全局变量和局部变量</h3><p>在熟悉了汇编语言后，接下来我们来了解一下全局变量和局部变量，在函数外部定义的变量称为<code>全局变量</code>，在函数内部定义的变量称为<code>局部变量</code>，全局变量可以在任意函数中使用，局部变量只能在函数定义局部变量的内部使用。下面，我们就通过汇编语言来看一下全局变量和局部变量的不同之处。</p>
+<p>下面定义的 C 语言代码分别定义了局部变量和全局变量，并且给各变量进行了赋值，我们先看一下源代码部分</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 定义被初始化的全局变量</span></span><br><span class="line"><span class="type">int</span> a1 = <span class="number">1</span>;</span><br><span class="line"><span class="type">int</span> a2 = <span class="number">2</span>;</span><br><span class="line"><span class="type">int</span> a3 = <span class="number">3</span>;</span><br><span class="line"><span class="type">int</span> a4 = <span class="number">4</span>;</span><br><span class="line"><span class="type">int</span> a5 = <span class="number">5</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 定义没有初始化的全局变量</span></span><br><span class="line"><span class="type">int</span> b1,b2,b3,b4,b5;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 定义函数</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">MyFunc</span><span class="params">()</span>&#123;</span><br><span class="line">  <span class="comment">// 定义局部变量</span></span><br><span class="line">  <span class="type">int</span> c1,c2,c3,c4,c5,c6,c7,c8,c9,c10;</span><br><span class="line">  </span><br><span class="line">  <span class="comment">// 给局部变量赋值</span></span><br><span class="line">  c1 = <span class="number">1</span>;</span><br><span class="line">  c2 = <span class="number">2</span>;</span><br><span class="line">  c3 = <span class="number">3</span>;</span><br><span class="line">  c4 = <span class="number">4</span>;</span><br><span class="line">  c5 = <span class="number">5</span>;</span><br><span class="line">  c6 = <span class="number">6</span>;</span><br><span class="line">  c7 = <span class="number">7</span>;</span><br><span class="line">  c8 = <span class="number">8</span>;</span><br><span class="line">  c9 = <span class="number">9</span>;</span><br><span class="line">  c10 = <span class="number">10</span>;</span><br><span class="line">  </span><br><span class="line">  <span class="comment">// 把局部变量赋值给全局变量</span></span><br><span class="line">  a1 = c1;</span><br><span class="line">  a2 = c2;</span><br><span class="line">  a3 = c3;</span><br><span class="line">  a4 = c4;</span><br><span class="line">  a5 = c5;</span><br><span class="line">  b1 = c6;</span><br><span class="line">  b2 = c7;</span><br><span class="line">  b3 = c8;</span><br><span class="line">  b4 = c9;</span><br><span class="line">  b5 = c10;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>上面的代码挺暴力的，不过没关系，能够便于我们分析其汇编源码就好，我们用 Borland C++ 编译后的汇编代码如下，编译完成后的源码比较长，这里我们只拿出来一部分作为分析使用（我们改变了一下段定义顺序，删除了部分注释）</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br></pre></td><td class="code"><pre><span class="line">_DATA segment dword public use32 &#x27;DATA&#x27;</span><br><span class="line">   align 4</span><br><span class="line">  _a1 label dword</span><br><span class="line">   			dd 1</span><br><span class="line">   align 4</span><br><span class="line">  _a2 label dword</span><br><span class="line">   			dd 2</span><br><span class="line">   align 4</span><br><span class="line">  _a3 label dword</span><br><span class="line">   			dd 3</span><br><span class="line">   align 4</span><br><span class="line">  _a4 label dword</span><br><span class="line">   			dd 4</span><br><span class="line">   align 4</span><br><span class="line">  _a5 label dword</span><br><span class="line">   			dd 5</span><br><span class="line">_DATA ends</span><br><span class="line"></span><br><span class="line">_BSS segment dword public use32 &#x27;BSS&#x27;</span><br><span class="line"> align 4</span><br><span class="line">  _b1 label dword</span><br><span class="line">   			db 4 dup(?)</span><br><span class="line">   align 4</span><br><span class="line">  _b2 label dword</span><br><span class="line">   			db 4 dup(?)</span><br><span class="line">   align 4</span><br><span class="line">  _b3 label dword</span><br><span class="line">   			db 4 dup(?)</span><br><span class="line">   align 4</span><br><span class="line">  _b4 label dword</span><br><span class="line">   			db 4 dup(?)</span><br><span class="line">   align 4</span><br><span class="line">  _b5 label dword</span><br><span class="line">   			db 4 dup(?)</span><br><span class="line">_BSS ends</span><br><span class="line"></span><br><span class="line">_TEXT segment dword public use32 &#x27;CODE&#x27;</span><br><span class="line">_MyFunc proc near</span><br><span class="line"></span><br><span class="line"> push      ebp</span><br><span class="line"> mov       ebp,esp</span><br><span class="line"> add       esp,-20</span><br><span class="line"> push      ebx</span><br><span class="line"> push      esi</span><br><span class="line"> mov       eax,1</span><br><span class="line"> mov       edx,2</span><br><span class="line"> mov       ecx,3</span><br><span class="line"> mov       ebx,4</span><br><span class="line"> mov       esi,5</span><br><span class="line"> mov       dword ptr [ebp-4],6</span><br><span class="line"> mov       dword ptr [ebp-8],7</span><br><span class="line"> mov       dword ptr [ebp-12],8</span><br><span class="line"> mov       dword ptr [ebp-16],9</span><br><span class="line"> mov       dword ptr [ebp-20],10</span><br><span class="line"> mov       dword ptr [_a1],eax</span><br><span class="line"> mov       dword ptr [_a2],edx</span><br><span class="line"> mov       dword ptr [_a3],ecx</span><br><span class="line"> mov       dword ptr [_a4],ebx</span><br><span class="line"> mov       dword ptr [_a5],esi</span><br><span class="line"> mov       eax,dword ptr [ebp-4]</span><br><span class="line"> mov       dword ptr [_b1],eax</span><br><span class="line"> mov       edx,dword ptr [ebp-8]</span><br><span class="line"> mov       dword ptr [_b2],edx</span><br><span class="line"> mov       ecx,dword ptr [ebp-12]</span><br><span class="line"> mov       dword ptr [_b3],ecx</span><br><span class="line"> mov       eax,dword ptr [ebp-16]</span><br><span class="line"> mov       dword ptr [_b4],eax</span><br><span class="line"> mov       edx,dword ptr [ebp-20]</span><br><span class="line"> mov       dword ptr [_b5],edx</span><br><span class="line"> pop       esi</span><br><span class="line"> pop       ebx</span><br><span class="line"> mov       esp,ebp</span><br><span class="line"> pop       ebp</span><br><span class="line"> ret</span><br><span class="line"> </span><br><span class="line">_MyFunc   endp</span><br><span class="line">_TEXT 	ends</span><br></pre></td></tr></table></figure>
+
+<p>编译后的程序，会被归类到名为段定义的组。</p>
+<ul>
+<li>初始化的全局变量，会汇总到名为 _DATA 的段定义中</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">_DATA segment dword public use32 &#x27;DATA&#x27;</span><br><span class="line">...</span><br><span class="line">_DATA ends</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>没有初始化的全局变量，会汇总到名为 _BSS 的段定义中</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">_BSS segment dword public use32 &#x27;BSS&#x27;</span><br><span class="line"> ...</span><br><span class="line">_BSS ends</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>被段定义 _TEXT 围起来的汇编代码则是 Borland C++ 的定义</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">_TEXT segment dword public use32 &#x27;CODE&#x27;</span><br><span class="line">_MyFunc proc near</span><br><span class="line">...</span><br><span class="line">_MyFunc   endp</span><br><span class="line">_TEXT 	ends</span><br></pre></td></tr></table></figure>
+
+<p>我们在分析上面汇编代码之前，先来认识一下更多的汇编指令，此表是对上面<strong>部分操作码及其功能</strong>的接续</p>
+<table>
+<thead>
+<tr>
+<th>操作码</th>
+<th>操作数</th>
+<th>功能</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>add</td>
+<td>A,B</td>
+<td>把A和B的值相加，并把结果赋值给A</td>
+</tr>
+<tr>
+<td>call</td>
+<td>A</td>
+<td>调用函数A</td>
+</tr>
+<tr>
+<td>cmp</td>
+<td>A,B</td>
+<td>对A和B进行比较，比较结果会自动存入标志寄存器中</td>
+</tr>
+<tr>
+<td>inc</td>
+<td>A</td>
+<td>对A的值 + 1</td>
+</tr>
+<tr>
+<td>ige</td>
+<td>标签名</td>
+<td>和 cmp 命令组合使用。跳转到标签行</td>
+</tr>
+<tr>
+<td>jl</td>
+<td>标签名</td>
+<td>和 cmp 命令组合使用。跳转到标签行</td>
+</tr>
+<tr>
+<td>jle</td>
+<td>标签名</td>
+<td>和 cmp 命令组合使用。跳转到标签行</td>
+</tr>
+<tr>
+<td>jmp</td>
+<td>标签名</td>
+<td>和 cmp 命令组合使用。跳转到标签行</td>
+</tr>
+<tr>
+<td>mov</td>
+<td>A,B</td>
+<td>把 B 的值赋给 A</td>
+</tr>
+<tr>
+<td>pop</td>
+<td>A</td>
+<td>从栈中读取数值并存入A</td>
+</tr>
+<tr>
+<td>push</td>
+<td>A</td>
+<td>把A的值存入栈中</td>
+</tr>
+<tr>
+<td>ret</td>
+<td>无</td>
+<td>将处理返回到调用源</td>
+</tr>
+<tr>
+<td>xor</td>
+<td>A,B</td>
+<td>A和B的位进行亦或比较，并将结果存入A中</td>
+</tr>
+</tbody></table>
+<p>我们首先来看一下 <code>_DATA</code> 段定义的内容。<code> _a1 label dword</code> 定义了 <code>_a1</code> 这个标签。标签表示的是相对于段定义起始位置的位置。由于<code>_a1</code> 在 <code>_DATA 段</code>定义的开头位置，所以相对位置是0。 <code>_a1</code> 就相当于是全局变量a1。编译后的函数名和变量名前面会加一个<code>(_)</code>，这也是 Borland C++ 的规定。<code>dd 1</code> 指的是，申请分配了4字节的内存空间，存储着1这个初始值。 dd指的是 <code>define double word </code>表示有两个长度为2的字节领域(word)，也就是4字节的意思。</p>
+<p>Borland C++ 中，由于<code>int</code> 类型的长度是4字节，因此汇编器就把 int a1 &#x3D; 1 变换成了 <code>_a1 label dword 和 dd 1</code>。同样，这里也定义了相当于全局变量的 a2 - a5 的标签 <code>_a2 - _a5</code>，它们各自的初始值 2 - 5 也被存储在各自的4字节中。</p>
+<p>接下来，我们来说一说 <code>_BSS</code> 段定义的内容。这里定义了相当于全局变量 b1 - b5 的标签 <code>_b1 - _b5</code>。其中的<code>db 4dup(?)</code> 表示的是申请分配了4字节的领域，但值尚未确定（这里用 ? 来表示）的意思。<code>db(define byte)</code> 表示有1个长度是1字节的内存空间。因而，db 4 dup(?) 的情况下，就是4字节的内存空间。</p>
+<blockquote>
+<p>注意：db 4 dup(?) 不要和 dd 4 混淆了，前者表示的是4个长度是1字节的内存空间。而 db 4 表示的则是双字节( &#x3D; 4 字节) 的内存空间中存储的值是 4 </p>
+</blockquote>
+<h3 id="临时确保局部变量使用的内存空间"><a href="#临时确保局部变量使用的内存空间" class="headerlink" title="临时确保局部变量使用的内存空间"></a>临时确保局部变量使用的内存空间</h3><p>我们知道，局部变量是临时保存在寄存器和栈中的。函数内部利用栈进行局部变量的存储，函数调用完成后，局部变量值被销毁，但是寄存器可能用于其他目的。所以，<strong>局部变量只是函数在处理期间临时存储在寄存器和栈中的</strong>。</p>
+<p>回想一下上述代码是不是定义了10个局部变量？这是为了表示存储局部变量的不仅仅是栈，还有寄存器。为了确保 c1 - c10 所需的域，寄存器空闲的时候就会使用寄存器，寄存器空间不足的时候就会使用栈。</p>
+<p>让我们继续来分析上面代码的内容。<code>_TEXT</code>段定义表示的是 <code>MyFunc</code> 函数的范围。在 MyFunc 函数中定义的局部变量所需要的内存领域。会被尽可能的分配在寄存器中。大家可能认为使用高性能的寄存器来替代普通的内存是一种资源浪费，但是编译器不这么认为，只要寄存器有空间，编译器就会使用它。由于寄存器的访问速度远高于内存，所以直接访问寄存器能够高效的处理。局部变量使用寄存器，是 Borland C++ 编译器最优化的运行结果。</p>
+<p>代码清单中的如下内容表示的是向寄存器中分配局部变量的部分</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">mov       eax,1</span><br><span class="line">mov       edx,2</span><br><span class="line">mov       ecx,3</span><br><span class="line">mov       ebx,4</span><br><span class="line">mov       esi,5</span><br></pre></td></tr></table></figure>
+
+<p>仅仅对局部变量进行定义是不够的，只有在给局部变量赋值时，才会被分配到寄存器的内存区域。上述代码相当于就是给5个局部变量 c1 - c5 分别赋值为 1 - 5。<strong>eax、edx、ecx、ebx、esi</strong> 是 x86 系列32位 CPU 寄存器的名称。至于使用哪个寄存器，是由<code>编译器</code>来决定的 。</p>
+<p>x86 系列 CPU 拥有的寄存器中，程序可以操作的是十几，其中空闲的最多会有几个。因而，局部变量超过寄存器数量的时候，可分配的寄存器就不够用了，这种情况下，编译器就会把栈派上用场，用来存储剩余的局部变量。</p>
+<p>在上述代码这一部分，给局部变量c1 - c5 分配完寄存器后，可用的寄存器数量就不足了。于是，剩下的5个局部变量c6 - c10 就被分配给了栈的内存空间。如下面代码所示</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">mov       dword ptr [ebp-4],6</span><br><span class="line">mov       dword ptr [ebp-8],7</span><br><span class="line">mov       dword ptr [ebp-12],8</span><br><span class="line">mov       dword ptr [ebp-16],9</span><br><span class="line">mov       dword ptr [ebp-20],10</span><br></pre></td></tr></table></figure>
+
+<p>函数入口 <code>add esp,-20</code> 指的是，对栈数据存储位置的 esp 寄存器(栈指针)的值做减20的处理。为了确保内存变量 c6 - c10 在栈中，就需要保留5个 int 类型的局部变量（4字节 * 5 &#x3D; 20 字节）所需的空间。<code> mov ebp,esp</code>这行指令表示的意思是将 esp 寄存器的值赋值到 ebp 寄存器。之所以需要这么处理，是为了通过在函数出口处 <code>mov esp ebp</code> 这一处理，把 esp 寄存器的值还原到原始状态，从而对申请分配的栈空间进行释放，这时栈中用到的局部变量就消失了。这也是栈的清理处理。在使用寄存器的情况下，局部变量则会在寄存器被用于其他用途时自动消失，如下图所示。</p>
+<img src="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/1515111-20191203123644754-1246886774.png" class="lazyload placeholder" data-srcset="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/1515111-20191203123644754-1246886774.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" style="zoom:50%;" />
+
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">mov       dword ptr [ebp-4],6</span><br><span class="line">mov       dword ptr [ebp-8],7</span><br><span class="line">mov       dword ptr [ebp-12],8</span><br><span class="line">mov       dword ptr [ebp-16],9</span><br><span class="line">mov       dword ptr [ebp-20],10</span><br></pre></td></tr></table></figure>
+
+<p>这五行代码是往栈空间代入数值的部分，由于在向栈申请内存空间前，借助了 <code>mov ebp, esp</code> 这个处理，esp 寄存器的值被保存到了 ebp 寄存器中，因此，通过使用[ebp - 4]、[ebp - 8]、[ebp - 12]、[ebp - 16]、[ebp - 20] 这样的形式，就可以申请分配20字节的栈内存空间切分成5个长度为4字节的空间来使用。例如，<code> mov dword ptr [ebp-4],6</code> 表示的就是，从申请分配的内存空间的下端(ebp寄存器指示的位置)开始向前4字节的地址([ebp - 4]) 中，存储着6这一4字节数据。</p>
+<img src="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/1515111-20191203123654000-1954362146.png" class="lazyload placeholder" data-srcset="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/1515111-20191203123654000-1954362146.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" style="zoom:50%;" />
+
+
+<h3 id="循环控制语句的处理"><a href="#循环控制语句的处理" class="headerlink" title="循环控制语句的处理"></a>循环控制语句的处理</h3><p>上面说的都是顺序流程，那么现在就让我们分析一下循环流程的处理，看一下 <code>for 循环</code>以及 <code>if 条件分支</code>等 c 语言程序的 <code>流程控制</code>是如何实现的，我们还是以代码以及编译后的结果为例，看一下程序控制流程的处理过程。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 定义MySub 函数</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">MySub</span><span class="params">()</span>&#123;</span><br><span class="line">  <span class="comment">// 不做任何处理</span></span><br><span class="line">  </span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 定义MyFunc 函数</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">Myfunc</span><span class="params">()</span>&#123;</span><br><span class="line">  <span class="type">int</span> i;</span><br><span class="line">  <span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">0</span>;i &lt; <span class="number">10</span>;i++)&#123;</span><br><span class="line">    <span class="comment">// 重复调用MySub十次</span></span><br><span class="line">    MySub();</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>上述代码将局部变量 i 作为循环条件，循环调用十次<code>MySub</code> 函数，下面是它主要的汇编代码</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">		xor 		ebx, ebx 	; 将寄存器清0</span><br><span class="line">@4  call		_MySub		; 调用MySub函数</span><br><span class="line">		inc			ebx				; ebx寄存器的值 + 1</span><br><span class="line">		cmp			ebx,10		;	将ebx寄存器的值和10进行比较</span><br><span class="line">		jl			short @4	; 如果小于10就跳转到 @4</span><br></pre></td></tr></table></figure>
+
+<p>C 语言中的 for 语句是通过在括号中指定循环计数器的初始值(i &#x3D; 0)、循环的继续条件(i &lt; 10)、循环计数器的更新(i++) 这三种形式来进行循环处理的。与此相对的汇编代码就是通过<code>比较指令(cmp)</code> 和 <code>跳转指令(jl)</code>来实现的。</p>
+<p>下面我们来对上述代码进行说明</p>
+<p><code>MyFunc</code> 函数中用到的局部变量只有 i ，变量 i 申请分配了 ebx 寄存器的内存空间。for 语句括号中的 i &#x3D; 0 被转换为 <code>xor ebx,ebx</code> 这一处理，xor 指令会对左起第一个操作数和右起第二个操作数进行 XOR 运算，然后把结果存储在第一个操作数中。由于这里把第一个操作数和第二个操作数都指定为了 ebx，因此就变成了对相同数值的  XOR 运算。也就是说不管当前寄存器的值是什么，最终的结果都是0。类似的，我们使用 <code>mov ebx,0</code> 也能得到相同的结果，但是 xor 指令的处理速度更快，而且编译器也会启动最优化功能。</p>
+<blockquote>
+<p>XOR 指的就是异或操作，它的运算规则是 <strong>如果a、b两个值不相同，则异或结果为1。如果a、b两个值相同，异或结果为0</strong>。</p>
+<p>相同数值进行 XOR 运算，运算结果为0。XOR 的运算规则是，值不同时结果为1，值相同时结果为0。例如 01010101 和 01010101 进行运算，就会分别对各个数字位进行 XOR 运算。因为每个数字位都相同，所以运算结果为0。</p>
+</blockquote>
+<p>ebx 寄存器的值初始化后，会通过 call 指定调用 _MySub 函数，从 _MySub 函数返回后，会执行<code>inc ebx</code> 指令，对 ebx 的值进行 + 1 操作，这个操作就相当于 i++ 的意思，++ 表示的就是当前数值 + 1。</p>
+<blockquote>
+<p>这里需要知道 i++ 和 ++i 的区别</p>
+<p>i++ 是先赋值，复制完成后再对 i执行 + 1 操作</p>
+<p>++i 是先进行 +1 操作，完成后再进行赋值</p>
+</blockquote>
+<p><code>inc</code> 下一行的 <code>cmp</code> 是用来对第一个操作数和第二个操作数的数值进行比较的指令。 <code>cmp ebx,10</code> 就相当于 C 语言中的 i &lt; 10 这一处理，意思是把 ebx 寄存器的值与10进行比较。汇编语言中比较指令的结果，会存储在 CPU 的标志寄存器中。不过，标志寄存器的值，程序是无法直接参考的。那如何判断比较结果呢？</p>
+<p>汇编语言中有多个<code>跳转指令</code>，这些跳转指令会根据标志寄存器的值来判断是否进行跳转操作，例如最后一行的 jl，它会根据 cmp ebx,10 指令所存储在标志寄存器中的值来判断是否跳转，<code>jl</code> 这条指令表示的就是 <code>jump on less than(小于的话就跳转)</code>。发现如果 i 比 10 小，就会跳转到 @4 所在的指令处继续执行。</p>
+<p>那么汇编代码的意思也可以用 C 语言来改写一下，加深理解</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">		i ^= i;</span><br><span class="line">L4: MySub();</span><br><span class="line">		i++;</span><br><span class="line">		<span class="keyword">if</span>(i &lt; <span class="number">10</span>) <span class="keyword">goto</span> L4;</span><br></pre></td></tr></table></figure>
+
+<p>代码第一行 i ^&#x3D; i 指的就是 i 和 i 进行异或运算，也就是 XOR 运算，MySub() 函数用 L4 标签来替代，然后进行 i 自增操作，如果i 的值小于 10 的话，就会一直循环 MySub() 函数。</p>
+<h3 id="条件分支的处理方法"><a href="#条件分支的处理方法" class="headerlink" title="条件分支的处理方法"></a>条件分支的处理方法</h3><p>条件分支的处理方式和循环的处理方式很相似，使用的也是 cmp 指令和跳转指令。下面是用 C 语言编写的条件分支的代码</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 定义MySub1 函数</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">MySub1</span><span class="params">()</span>&#123;</span><br><span class="line"></span><br><span class="line"> <span class="comment">// 不做任何处理</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 定义MySub2 函数</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">MySub2</span><span class="params">()</span>&#123;</span><br><span class="line">  </span><br><span class="line"> <span class="comment">// 不做任何处理</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 定义MySub3 函数</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">MySub3</span><span class="params">()</span>&#123;</span><br><span class="line"></span><br><span class="line"> <span class="comment">// 不做任何处理</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 定义MyFunc 函数</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">MyFunc</span><span class="params">()</span>&#123;</span><br><span class="line"></span><br><span class="line"> <span class="type">int</span> a = <span class="number">123</span>;</span><br><span class="line"> <span class="comment">// 根据条件调用不同的函数</span></span><br><span class="line"> <span class="keyword">if</span>(a &gt; <span class="number">100</span>)&#123;</span><br><span class="line">  MySub1();</span><br><span class="line"> &#125;</span><br><span class="line"> <span class="keyword">else</span> <span class="keyword">if</span>(a &lt; <span class="number">50</span>)&#123;</span><br><span class="line">  MySub2();</span><br><span class="line"> &#125;</span><br><span class="line"> <span class="keyword">else</span></span><br><span class="line"> &#123;</span><br><span class="line">  MySub3();</span><br><span class="line"> &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>很简单的一个实现了条件判断的 C 语言代码，那么我们把它用 Borland C++ 编译之后的结果如下</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">_MyFunc proc near</span><br><span class="line"> push      ebp 				</span><br><span class="line"> mov       ebp,esp</span><br><span class="line"> mov       eax,123			; 把123存入 eax 寄存器中</span><br><span class="line"> cmp       eax,100			; 把 eax 寄存器的值同100进行比较</span><br><span class="line"> jle       short @8			; 比100小时，跳转到@8标签</span><br><span class="line"> call      _MySub1			; 调用MySub1函数</span><br><span class="line"> jmp 			 short @11 		; 跳转到@11标签</span><br><span class="line">@8:</span><br><span class="line"> cmp       eax,50				; 把 eax 寄存器的值同50进行比较</span><br><span class="line"> jge       short @10		; 比50大时，跳转到@10标签</span><br><span class="line"> call      _MySub2			; 调用MySub2函数</span><br><span class="line"> jmp			 short @11		; 跳转到@11标签</span><br><span class="line">@10:</span><br><span class="line"> call      _MySub3			; 调用MySub3函数</span><br><span class="line">@11:</span><br><span class="line"> pop       ebp</span><br><span class="line"> ret </span><br><span class="line">_MyFunc endp</span><br></pre></td></tr></table></figure>
+
+<p>上面代码用到了三种跳转指令，分别是<code>jle(jump on less or equal)</code> 比较结果小时跳转，<code>jge(jump on greater or equal)</code> 比较结果大时跳转，还有不管结果怎样都会进行跳转的<code>jmp</code>，在这些跳转指令之前还有用来比较的指令 <code>cmp</code>，构成了上述汇编代码的主要逻辑形式。</p>
+<h3 id="了解程序运行逻辑的必要性"><a href="#了解程序运行逻辑的必要性" class="headerlink" title="了解程序运行逻辑的必要性"></a>了解程序运行逻辑的必要性</h3><p>通过对上述汇编代码和 C 语言源代码进行比较，想必大家对程序的运行方式有了新的理解，而且，从汇编源代码中获取的知识，也有助于了解 Java 等高级语言的特性，比如 Java 中就有 native 关键字修饰的变量，那么这个变量的底层就是使用 C 语言编写的，还有一些 Java 中的语法糖只有通过汇编代码才能知道其运行逻辑。在某些情况下，对于查找 bug 的原因也是有帮助的。</p>
+<p>上面我们了解到的编程方式都是串行处理的，那么串行处理有什么特点呢？</p>
+<img src="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/1515111-20191203123708392-1030634841.png" class="lazyload placeholder" data-srcset="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/1515111-20191203123708392-1030634841.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" style="zoom:50%;" />
+
+
+<p>串行处理最大的一个特点就是<code>专心只做一件事情</code>，一件事情做完之后才会去做另外一件事情。</p>
+<p>计算机是支持多线程的，多线程的核心就是 CPU切换，如下图所示</p>
+<img src="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/1515111-20191203123716994-937922840.png" class="lazyload placeholder" data-srcset="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/1515111-20191203123716994-937922840.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" style="zoom:50%;" />
+
+
+<p>我们还是举个实际的例子，让我们来看一段代码</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 定义全局变量</span></span><br><span class="line"><span class="type">int</span> counter = <span class="number">100</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 定义MyFunc1()</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">MyFunc</span><span class="params">()</span>&#123;</span><br><span class="line">  counter *= <span class="number">2</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 定义MyFunc2()</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">MyFunc2</span><span class="params">()</span>&#123;</span><br><span class="line">  counter *= <span class="number">2</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>上述代码是更新 counter 的值的 C 语言程序，MyFunc1() 和 MyFunc2() 的处理内容都是把 counter 的值扩大至原来的二倍，然后再把 counter 的值赋值给 counter 。这里，我们假设使用<code>多线程处理</code>，同时调用了一次MyFunc1 和 MyFunc2 函数，这时，全局变量 counter 的值，理应编程 100 * 2 * 2 &#x3D; 400。如果你开启了多个线程的话，你会发现 counter 的数值有时也是 200，对于为什么出现这种情况，如果你不了解程序的运行方式，是很难找到原因的。</p>
+<p>我们将上面的代码转换成汇编语言的代码如下</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">mov eax,dword ptr[_counter] 	; 将 counter 的值读入 eax 寄存器</span><br><span class="line">add eax,eax										; 将 eax 寄存器的值扩大2倍。</span><br><span class="line">mov dword ptr[_counter],eax		; 将 eax 寄存器的值存入 counter 中。</span><br></pre></td></tr></table></figure>
+
+<p>在多线程程序中，用汇编语言表示的代码每运行一行，处理都有可能切换到其他线程中。因而，假设 MyFun1 函数在读出 counter 数值100后，还未来得及将它的二倍值200写入 counter 时，正巧 MyFun2 函数读出了 counter 的值100，那么结果就将变为 200 。</p>
+<img src="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/1515111-20191203123727671-1544480279.png" class="lazyload placeholder" data-srcset="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/1515111-20191203123727671-1544480279.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" style="zoom:50%;" />
+
+
+<p>为了避免该bug，我们可以采用以函数或 C 语言代码的行为单位来禁止线程切换的<code>锁定</code>方法，或者使用某种线程安全的方式来避免该问题的出现。	</p>
+<p>现在基本上没有人用汇编语言来编写程序了，因为 C、Java等高级语言的效率要比汇编语言快很多。不过，汇编语言的经验还是很重要的，通过借助汇编语言，我们可以更好的了解计算机运行机制。</p>
+
+      </div>
+      <div class="post-tags-categories">
+        
+        <div class="tags">
+          
+            <a href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BB%84%E6%88%90%E5%8E%9F%E7%90%86/" class="">
+              计算机组成原理
+            </a>
+          
+        </div>
+        
+      </div>
+      
+        <div class="copyright">
+  <ul class="post-copyright">
+    <li class="post-copyright-author">
+    <strong>author:  </strong>John Doe</a>
+    </li>
+    <li class="post-copyright-link">
+    <strong>link:  </strong>
+    <a href="/2022/05/03/程序员需要了解的硬核知识之汇编语言/" target="_blank" title="程序员需要了解的硬核知识之汇编语言">http://example.com/2022/05/03/程序员需要了解的硬核知识之汇编语言/</a>
+    </li>
+    <li class="post-copyright-license">
+      <strong>Copyright notice:   </strong>
+      All articles on this website, unless otherwise stated, adopt <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">CC BY-NC-ND 4.0</a>
+      reprint policy. If reproduced, please indicate source!
+    </li>
+  </ul>
+<div>
+      
+    </article>
+    <!-- 上一篇文章和下一篇文章 -->
+    
+      <!-- 文章详情页的上一页和下一页 -->
+<div class="post-nav">
+
+
+
+  
+  <div class="post-nav-prev post-nav-item">
+    <div class="post-nav-img" style="background-size: cover; 
+      background-position: center center;">
+      <img class="lazyload lazyload placeholder" src="/medias/4.jpg" class="lazyload placeholder" data-srcset="/medias/4.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="">
+    </div>
+    <a href="/2022/05/03/%E7%A8%8B%E5%BA%8F%E5%91%98%E9%9C%80%E8%A6%81%E4%BA%86%E8%A7%A3%E7%9A%84%E7%A1%AC%E6%A0%B8%E7%9F%A5%E8%AF%86%E4%B9%8B%E5%8E%8B%E7%BC%A9%E7%AE%97%E6%B3%95/" class="post-nav-link">
+      <div class="title">
+        <i class="fas fa-angle-left"></i> Prev:
+        <div class="title-text">程序员需要了解的硬核知识之压缩算法</div>
+      </div>
+      
+      <!-- <div class="content">
+        程序员需要了解的硬核知识之压缩算法认识压缩算法我们想必都有过压缩和 解压缩文件的经历，当文件太大时，我们会使用文件压缩来
+      </div> -->
+    </a>
+  </div>
+
+
+
+  
+  <div class="post-nav-next post-nav-item">
+    <div class="post-nav-img" style="background-size: cover; 
+      background-position: center center;">
+      <img class="lazyload lazyload placeholder" src="/medias/1.jpg" class="lazyload placeholder" data-srcset="/medias/1.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" src="" alt="">
+    </div>
+    <a href="/2022/05/03/%E7%A8%8B%E5%BA%8F%E5%91%98%E9%9C%80%E8%A6%81%E4%BA%86%E8%A7%A3%E7%9A%84%E7%A1%AC%E6%A0%B8%E7%9F%A5%E8%AF%86%E4%B9%8B%E4%BA%8C%E8%BF%9B%E5%88%B6/" class="post-nav-link">
+      <div class="title">
+        Next: <i class="fas fa-angle-right"></i>
+        <div class="title-text">程序员需要了解的硬核知识之二进制</div>
+      </div>
+      <!-- <div class="content">
+        程序员需要了解的硬核知识之二进制我们都知道，计算机的底层都是使用二进制数据进行数据流传输的，那么为什么会使用二进制表示计
+      </div> -->
+    </a>
+  </div>
+
+</div>
+
+    
+    
+
+    <!-- 打赏 -->
+    
+      <div id="appDonate" class="post-donate">
+  <div id="donate_board" class="donate_bar center" ref="donate">
+    <a id="btn_donate" class="btn_donate" href="javascript:;" title="打赏" @click="showDialogDrawer()"></a>
+  </div>
+  <transition name="fade">
+    <div 
+      class="donate-box-mask"
+      v-cloak 
+      v-show="visible"
+      @click="cancelDialogDrawer()"
+    >
+    </div>
+  </transition>
+  <transition name="bounce">
+    <div class="donate-box" v-cloak v-show="visible">
+      <div class="donate-box_close">
+        <i class="fas fa-times" aria-hidden="true" @click="cancelDialogDrawer" pointer></i>
+      </div>
+      <div class="donate-box_title">
+        <h4>
+          你的赏识是我前进的动力
+        </h4>
+      </div>
+      <div class="donate-box_tab">
+        <div class="Alipay" pointer :class="{'active': tabActive === 'Alipay'}" @click="changeTabActive('Alipay')">
+          支付宝
+        </div>
+        <div class="WeChatpay" pointer :class="{'active': tabActive === 'WeChatpay'}" @click="changeTabActive('WeChatpay')">
+          微信
+        </div>
+      </div>
+      <div class="donate-box_img">
+        <div class="AlipayImg" v-show="tabActive === 'Alipay'">
+          <img src="/medias/1.jpg" class="lazyload placeholder" data-srcset="/medias/1.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="支付宝打赏" />
+        </div> 
+        <div class="WeChatpayImg" v-show="tabActive === 'WeChatpay'">
+          <img src="/medias/2.jpg" class="lazyload placeholder" data-srcset="/medias/2.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="微信打赏" />
+        </div>
+      </div>
+    </div>
+  </transition>
+</div>
+
+<script>
+  var body = document.body || document.documentElement || window;
+  var vm = new Vue({
+    el: '#appDonate',
+    data: {
+      visible: false,
+      tabActive: 'Alipay',
+      top: 0,
+    },
+    computed: {
+    },
+    mounted() {
+    },
+    methods: {
+      showDialogDrawer() {
+        this.visible = true;
+        // 防止页面滚动，只能让弹框滚动
+        // function getScroll() {
+        //   return {
+        //     left: window.pageXOffset || document.documentElement.scrollLeft || document.body.scrollLeft || 0,
+        //     top: window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0
+        //   };
+        // }
+        this.top = $(document).scrollTop() // or getScroll().top
+        // console.log('aa', $('.main-content'));
+        body.style.cssText = 'overflow: hidden;';
+      },
+      cancelDialogDrawer() {
+        this.visible = false;
+        body.removeAttribute('style');
+        $(document).scrollTop(this.top)
+      },
+      changeTabActive(name) {
+        this.tabActive = name;
+      }
+    },
+    created() {}
+  })
+</script>
+    
+
+    <!-- 分享 -->
+    
+      <!-- https://github.com/overtrue/share.js -->
+<!-- 文章详情页的分享 -->
+<div class="social-share" data-sites="twitter,facebook,google,qq,qzone,wechat,weibo,douban,linkedin" data-wechat-qrcode-helper="<p>微信扫一扫即可分享！</p>"></div>
+
+<script src="/js/shareJs/social-share.min.js"></script>
+</script>
+
+<style>
+  .social-share {
+    margin: 20px 0;
+  }
+</style>
+
+
+    
+    
+    <!-- 评论 -->
+    <!-- 评论 -->
+
+  <div id="myComment">
+    
+      <div id="gitment-container"></div>
+
+    
+  </div>
+
+<!-- comment script in themes\hexo-theme-bamboo\layout\_partial\scripts\index.ejs -->
+
+
+  </div>
+
+  <!-- 目录 -->
+  <!-- 文章详情页右侧目录 -->
+
+  <div class="toc-aside">
+    <div class="toc-main">
+      <div class="toc-aside-title">
+        <i class="fas fa-list-ul" aria-hidden="true"></i><span>catalog</span>
+        
+          <div class="toc-open-close">catalog</div>
+        
+      </div>
+      <div class="toc-content">
+        <div class="toc"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 手机端目录按钮 -->
+  <div id="toc-mobile-btn">
+    <i class="fas fa-list-ul" aria-hidden="true"></i>
+  </div>
+
+
+<script>
+  function closeToc(init) {
+    $(".toc-aside").css({'width': 0, 'padding': 0, 'transition': init ?  'noe' : 'width 0.3s' });
+    $(".toc-content").css({'width': 0});
+    $(".toc-aside-title span, .toc-aside-title i").css({'display': 'none'});
+    $(".main-content").css({'width': '75%', 'margin-left': 'auto', 'margin-right': 'auto',});
+  };
+  function openToc() {
+    $(".main-content").css({'width': '65%', 'margin-right': '10px', 'margin-left': 'calc(35% - 350px)'});
+    $(".toc-aside").css({'width': '300px', 'padding': '0 10px', 'transition': 'width 0.3s'});
+    $(".toc-content").css({'width': '300px'});
+    $(".toc-aside-title span, .toc-aside-title i").css({'display': 'inline-block'});
+  }
+  function openBtnClickFn () {
+    let openOrCloseBtn = $('.toc-aside .toc-aside-title .toc-open-close');
+    let open = eval('' || 'true');
+    openOrCloseBtn.click(function() {
+      if (open) {
+        closeToc();
+        open = false;
+      } else {
+        openToc();
+        open = true;
+      }
+    });
+  };
+  openBtnClickFn();
+  initCloseTocWidth(true);
+
+  function initCloseTocWidth(init) {
+    if (window.innerWidth >= 992) {
+      let isClose = false;
+      isClose && closeToc(init)
+    }
+  }
+
+  document.addEventListener('pjax:complete', function () {
+    $(".toc-aside").css({'transition': 'no'});
+  })
+  document.addEventListener('pjax:complete', function () {
+    openBtnClickFn();
+  })
+  
+</script>
+
+  <!-- 图片放大 Wrap images with fancybox support -->
+  <script src="/js/wrapImage.js"></script>
+</div>
+
+<!-- 文章详情页背景图 -->
+<div id="appBgSwiper" style="position: fixed;left: 0;top: 0;width: 100%;height: 100%;z-index: -2;"
+	:style="{'background-color': bgColor ? bgColor : 'transparent'}">
+	<transition-group tag="ul" :name="names">
+		<li v-for='(image,index) in img' :key='index' v-show="index === mark" class="bg-swiper-box">
+			<img :src="image" class="bg-swiper-img no-lazy">
+		</li>
+	</transition-group>
+</div>
+<script>
+	var vm = new Vue({
+		el: '#appBgSwiper',
+		data: {
+			names: '' || 'fade' || 'fade', // translate-fade fade
+			mark: 0,
+			img: [],
+			bgColor: '',
+			time: null
+		},
+		methods: {   //添加方法
+			change(i, m) {
+				if (i > m) {
+					// this.names = 'fade';
+				} else if (i < m) {
+					// this.names = 'fade';
+				} else {
+					return;
+				}
+				this.mark = i;
+			},
+			prev() {
+				// this.names = 'fade';
+				this.mark--;
+				if (this.mark === -1) {
+					this.mark = 3;
+					return
+				}
+			},
+			next() {
+				// this.names = 'fade';
+				this.mark++;
+				if (this.mark === this.img.length) {
+					this.mark = 0;
+					return
+				}
+			},
+			autoPlay() {
+				// this.names = 'fade';
+				this.mark++;
+				if (this.mark === this.img.length) {
+					this.mark = 0;
+					return
+				}
+			},
+			play() {
+				let bgImgDelay = '' || '180000'
+				let delay = parseInt(bgImgDelay) || 180000;
+				this.time = setInterval(this.autoPlay, delay);
+			},
+			enter() {
+				clearInterval(this.time);
+			},
+			leave() {
+				this.play();
+			}
+		},
+		created() {
+			this.play()
+		},
+		beforeDestroy() {
+			clearInterval(this.time);
+		},
+		mounted() {
+			let prop = '' || '';
+			let isImg = prop.includes('.bmp') || prop.includes('.jpg') || prop.includes('.png') || prop.includes('.tif') || prop.includes('.gif') || prop.includes('.pcx') || prop.includes('.tga') || prop.includes('.exif') || prop.includes('.fpx') || prop.includes('.psd') || prop.includes('.cdr') || prop.includes('.pcd') || prop.includes('.dxf') || prop.includes('.ufo') || prop.includes('.eps') || prop.includes('.ai') || prop.includes('.raw') || prop.includes('.WMF') || prop.includes('.webp') || prop.includes('.jpeg') || prop.includes('http://') || prop.includes('https://')
+			if (isImg) {
+				let img = prop.split(',');
+				let configRoot = '/'
+				let arrImg = [];
+				img.forEach(el => {
+					var Expression = /http(s)?:\/\/([\w-]+\.)+[\w-]+(\/[\w- .\/?%&=]*)?/;
+					var objExp = new RegExp(Expression);
+
+					if (objExp.test(el)) {
+						// http or https
+						arrImg.push(el);
+					} else {
+						// 非http or https开头
+						// 本地文件
+						let firstStr = el.charAt(0);
+						if (firstStr == '/') {
+							el = el.substr(1); // 删除第一个字符 '/',因为 configRoot最后一个字符为 /
+						}
+						el = configRoot + el;
+						arrImg.push(el);
+					}
+				})
+				this.img = arrImg;
+			} else {
+				this.bgColor = prop;
+			}
+		}
+	})
+</script>
+
+<style>
+	.bg-swiper-box {
+		position: absolute;
+		display: block;
+		width: 100%;
+		height: 100%;
+	}
+
+	.bg-swiper-img {
+		object-fit: cover;
+		width: 100%;
+		height: 100%;
+	}
+</style>
+
+
+
+
+  <script>
+  function loadMermaid() {
+    if (document.getElementsByClassName('mermaid').length) {
+      if (window.mermaidJsLoad) mermaid.init()
+      else {
+        loadScript('https://unpkg.com/mermaid/dist/mermaid.min.js').then(() => {
+          window.mermaidJsLoad = true
+          mermaid.initialize({
+            theme: 'default',
+          })
+          if ('true') {
+            mermaid.init();
+          }
+        })
+      }
+    }
+  };
+  document.addEventListener("DOMContentLoaded", function () {
+    loadMermaid();
+  })
+
+  document.addEventListener('pjax:complete', function () {
+    loadMermaid();
+  })
+  
+</script>
+
+
+      </main>
+    </div>
+
+    <!-- 页脚 -->
+    
+  
+  
+    <!-- 底部鱼儿跳动效果，依赖于jquery-->
+<div id="j-fish-skip" style=" position: relative;height: 153px;width: auto;"></div>
+<script>
+  var RENDERER = {
+    POINT_INTERVAL: 5,
+    FISH_COUNT: 3,
+    MAX_INTERVAL_COUNT: 50,
+    INIT_HEIGHT_RATE: .5,
+    THRESHOLD: 50,
+    FISH_COLOR: '',
+    init: function () {
+      this.setFishColor(); this.setParameters(), this.reconstructMethods(), this.setup(), this.bindEvent(), this.render()
+    },
+    setFishColor: function () {
+      let isDark = JSON.parse(localStorage.getItem('dark')) || JSON.parse('false');
+      if (isDark) {
+        this.FISH_COLOR = '#222'; // 暗黑色，有时间把这整成一个变量
+      } else {
+        this.FISH_COLOR = '' || '#42b983';
+      }
+    },
+    setParameters: function () {
+      this.$window = $(window), this.$container = $("#j-fish-skip"), this.$canvas = $("<canvas />"), this.context = this.$canvas.appendTo(this.$container).get(0).getContext("2d"), this.points = [], this.fishes = [], this.watchIds = []
+    },
+    createSurfacePoints: function () {
+      var t = Math.round(this.width / this.POINT_INTERVAL);
+      this.pointInterval = this.width / (t - 1), this.points.push(new SURFACE_POINT(this, 0));
+      for (var i = 1; i < t; i++) {
+        var e = new SURFACE_POINT(this, i * this.pointInterval),
+          h = this.points[i - 1];
+        e.setPreviousPoint(h), h.setNextPoint(e), this.points.push(e)
+      }
+    },
+    reconstructMethods: function () {
+      this.watchWindowSize = this.watchWindowSize.bind(this), this.jdugeToStopResize = this.jdugeToStopResize.bind(this), this.startEpicenter = this.startEpicenter.bind(this), this.moveEpicenter = this.moveEpicenter.bind(this), this.reverseVertical = this.reverseVertical.bind(this), this.render = this.render.bind(this)
+    },
+    setup: function () {
+      this.points.length = 0, this.fishes.length = 0, this.watchIds.length = 0, this.intervalCount = this.MAX_INTERVAL_COUNT, this.width = this.$container.width(), this.height = this.$container.height(), this.fishCount = this.FISH_COUNT * this.width / 500 * this.height / 500, this.$canvas.attr({
+        width: this.width,
+        height: this.height
+      }), this.reverse = !1, this.fishes.push(new FISH(this)), this.createSurfacePoints()
+    },
+    watchWindowSize: function () {
+      this.clearTimer(), this.tmpWidth = this.$window.width(), this.tmpHeight = this.$window.height(), this.watchIds.push(setTimeout(this.jdugeToStopResize, this.WATCH_INTERVAL))
+    },
+    clearTimer: function () {
+      for (; this.watchIds.length > 0;) clearTimeout(this.watchIds.pop())
+    },
+    jdugeToStopResize: function () {
+      var t = this.$window.width(),
+        i = this.$window.height(),
+        e = t == this.tmpWidth && i == this.tmpHeight;
+      this.tmpWidth = t, this.tmpHeight = i, e && this.setup()
+    },
+    bindEvent: function () {
+      this.$window.on("resize", this.watchWindowSize), this.$container.on("mouseenter", this.startEpicenter), this.$container.on("mousemove", this.moveEpicenter)
+    },
+    getAxis: function (t) {
+      var i = this.$container.offset();
+      return {
+        x: t.clientX - i.left + this.$window.scrollLeft(),
+        y: t.clientY - i.top + this.$window.scrollTop()
+      }
+    },
+    startEpicenter: function (t) {
+      this.axis = this.getAxis(t)
+    },
+    moveEpicenter: function (t) {
+      var i = this.getAxis(t);
+      this.axis || (this.axis = i), this.generateEpicenter(i.x, i.y, i.y - this.axis.y), this.axis = i
+    },
+    generateEpicenter: function (t, i, e) {
+      if (!(i < this.height / 2 - this.THRESHOLD || i > this.height / 2 + this.THRESHOLD)) {
+        var h = Math.round(t / this.pointInterval);
+        h < 0 || h >= this.points.length || this.points[h].interfere(i, e)
+      }
+    },
+    reverseVertical: function () {
+      this.reverse = !this.reverse;
+      for (var t = 0, i = this.fishes.length; t < i; t++) this.fishes[t].reverseVertical()
+    },
+    controlStatus: function () {
+      for (var t = 0, i = this.points.length; t < i; t++) this.points[t].updateSelf();
+      for (t = 0, i = this.points.length; t < i; t++) this.points[t].updateNeighbors();
+      this.fishes.length < this.fishCount && 0 == --this.intervalCount && (this.intervalCount = this.MAX_INTERVAL_COUNT, this.fishes.push(new FISH(this)))
+    },
+    render: function () {
+      requestAnimationFrame(this.render), this.controlStatus(), this.context.clearRect(0, 0, this.width, this.height), this.context.fillStyle = this.FISH_COLOR;
+      for (var t = 0, i = this.fishes.length; t < i; t++) this.fishes[t].render(this.context);
+      this.context.save(), this.context.globalCompositeOperation = "xor", this.context.beginPath(), this.context.moveTo(0, this.reverse ? 0 : this.height);
+      for (t = 0, i = this.points.length; t < i; t++) this.points[t].render(this.context);
+      this.context.lineTo(this.width, this.reverse ? 0 : this.height), this.context.closePath(), this.context.fill(), this.context.restore()
+    }
+  },
+  SURFACE_POINT = function (t, i) {
+    this.renderer = t, this.x = i, this.init()
+  };
+  SURFACE_POINT.prototype = {
+    SPRING_CONSTANT: .03,
+    SPRING_FRICTION: .9,
+    WAVE_SPREAD: .3,
+    ACCELARATION_RATE: .01,
+    init: function () {
+      this.initHeight = this.renderer.height * this.renderer.INIT_HEIGHT_RATE, this.height = this.initHeight, this.fy = 0, this.force = {
+        previous: 0,
+        next: 0
+      }
+    },
+    setPreviousPoint: function (t) {
+      this.previous = t
+    },
+    setNextPoint: function (t) {
+      this.next = t
+    },
+    interfere: function (t, i) {
+      this.fy = this.renderer.height * this.ACCELARATION_RATE * (this.renderer.height - this.height - t >= 0 ? -1 : 1) * Math.abs(i)
+    },
+    updateSelf: function () {
+      this.fy += this.SPRING_CONSTANT * (this.initHeight - this.height), this.fy *= this.SPRING_FRICTION, this.height += this.fy
+    },
+    updateNeighbors: function () {
+      this.previous && (this.force.previous = this.WAVE_SPREAD * (this.height - this.previous.height)), this.next && (this.force.next = this.WAVE_SPREAD * (this.height - this.next.height))
+    },
+    render: function (t) {
+      this.previous && (this.previous.height += this.force.previous, this.previous.fy += this.force.previous), this.next && (this.next.height += this.force.next, this.next.fy += this.force.next), t.lineTo(this.x, this.renderer.height - this.height)
+    }
+  };
+  var FISH = function (t) {
+    this.renderer = t, this.init()
+  };
+  FISH.prototype = {
+    GRAVITY: .4,
+    init: function () {
+      this.direction = Math.random() < .5, this.x = this.direction ? this.renderer.width + this.renderer.THRESHOLD : -this.renderer.THRESHOLD, this.previousY = this.y, this.vx = this.getRandomValue(4, 10) * (this.direction ? -1 : 1), this.renderer.reverse ? (this.y = this.getRandomValue(1 * this.renderer.height / 10, 4 * this.renderer.height / 10), this.vy = this.getRandomValue(2, 5), this.ay = this.getRandomValue(.05, .2)) : (this.y = this.getRandomValue(6 * this.renderer.height / 10, 9 * this.renderer.height / 10), this.vy = this.getRandomValue(-5, -2), this.ay = this.getRandomValue(-.2, -.05)), this.isOut = !1, this.theta = 0, this.phi = 0
+    },
+    getRandomValue: function (t, i) {
+      return t + (i - t) * Math.random()
+    },
+    reverseVertical: function () {
+      this.isOut = !this.isOut, this.ay *= -1
+    },
+    controlStatus: function (t) {
+      this.previousY = this.y, this.x += this.vx, this.y += this.vy, this.vy += this.ay, this.renderer.reverse ? this.y > this.renderer.height * this.renderer.INIT_HEIGHT_RATE ? (this.vy -= this.GRAVITY, this.isOut = !0) : (this.isOut && (this.ay = this.getRandomValue(.05, .2)), this.isOut = !1) : this.y < this.renderer.height * this.renderer.INIT_HEIGHT_RATE ? (this.vy += this.GRAVITY, this.isOut = !0) : (this.isOut && (this.ay = this.getRandomValue(-.2, -.05)), this.isOut = !1), this.isOut || (this.theta += Math.PI / 20, this.theta %= 2 * Math.PI, this.phi += Math.PI / 30, this.phi %= 2 * Math.PI), this.renderer.generateEpicenter(this.x + (this.direction ? -1 : 1) * this.renderer.THRESHOLD, this.y, this.y - this.previousY), (this.vx > 0 && this.x > this.renderer.width + this.renderer.THRESHOLD || this.vx < 0 && this.x < -this.renderer.THRESHOLD) && this.init()
+    },
+    render: function (t) {
+      t.save(), t.translate(this.x, this.y), t.rotate(Math.PI + Math.atan2(this.vy, this.vx)), t.scale(1, this.direction ? 1 : -1), t.beginPath(), t.moveTo(-30, 0), t.bezierCurveTo(-20, 15, 15, 10, 40, 0), t.bezierCurveTo(15, -10, -20, -15, -30, 0), t.fill(), t.save(), t.translate(40, 0), t.scale(.9 + .2 * Math.sin(this.theta), 1), t.beginPath(), t.moveTo(0, 0), t.quadraticCurveTo(5, 10, 20, 8), t.quadraticCurveTo(12, 5, 10, 0), t.quadraticCurveTo(12, -5, 20, -8), t.quadraticCurveTo(5, -10, 0, 0), t.fill(), t.restore(), t.save(), t.translate(-3, 0), t.rotate((Math.PI / 3 + Math.PI / 10 * Math.sin(this.phi)) * (this.renderer.reverse ? -1 : 1)), t.beginPath(), this.renderer.reverse ? (t.moveTo(5, 0), t.bezierCurveTo(10, 10, 10, 30, 0, 40), t.bezierCurveTo(-12, 25, -8, 10, 0, 0)) : (t.moveTo(-5, 0), t.bezierCurveTo(-10, -10, -10, -30, 0, -40), t.bezierCurveTo(12, -25, 8, -10, 0, 0)), t.closePath(), t.fill(), t.restore(), t.restore(), this.controlStatus(t)
+    }
+  }, $(function () {
+    RENDERER.init()
+    $('.dark').click(function () {
+      setTimeout(() => {
+        RENDERER.setFishColor();
+        RENDERER.context.fill();
+      });
+    })
+  });
+</script>
+  
+  <div class="footer bg-color">
+    <div class="footer-main">
+      
+        
+          <div class="link">
+            
+          </div>
+        
+      
+        
+          <div class="footer-copyright">
+            <p>Copyright © 2019 - 2020 <a target="_blank" rel="noopener" href="https://github.com/yuang01">yuang01</a> | Powered by <a target="_blank" rel="noopener" href="https://hexo.io/zh-cn/docs/">Hexo</a> | Theme <a target="_blank" rel="noopener" href="https://github.com/yuang01/theme">Bamboo</a> </p>
+
+          </div>
+        
+      
+        
+          
+            <!-- 不蒜子统计 -->
+            <!-- 不蒜子统计 -->
+<span id="busuanzi_container_site_pv">
+      <i class="fas fa-eye" aria-hidden="true"></i>Total visits：<span id="busuanzi_value_site_pv"></span> times
+</span>
+<span class="post-meta-divider">|</span>
+<span id="busuanzi_container_site_uv" style='display:none'>
+      <i class="fas fa-users" aria-hidden="true"></i>Number of visitors：<span id="busuanzi_value_site_uv"></span> people
+</span>
+
+          
+        
+      
+        
+          <div class="footer-custom">
+            
+          </div>
+        
+      
+    </div>
+  </div>
+
+
+
+    <!-- 渲染暗黑按钮 -->
+    
+      <div class="dark">
+  <div class="dark-content">
+    <i class="fas fa-moon" aria-hidden="true"></i>
+    <!-- <span>关灯</span> -->
+  </div>
+  
+</div>
+
+<script>
+  $(function() {
+    let isDark = JSON.parse(localStorage.getItem('dark'))  || JSON.parse('false');
+    if (isDark) {
+      $(".dark-content").replaceWith(
+          `
+          <div class='dark-content'>
+            <i class="fas fa-lightbulb" aria-hidden="true"></i>
+          </div>
+          `
+        );
+    }
+    $('.dark').click(function() {
+      if ($(document.body).is('.darkModel')) {
+        $(document.body).removeClass('darkModel');
+        localStorage.setItem('dark', false);
+        $(".dark-content").replaceWith(
+          `
+          <div class='dark-content'>
+            <i class="fas fa-moon" aria-hidden="true"></i>
+          </div>
+          `
+        );
+      } else {
+        $(document.body).addClass('darkModel');
+        localStorage.setItem('dark', true);
+        $(".dark-content").replaceWith(
+          `
+          <div class='dark-content'>
+            <i class="fas fa-lightbulb" aria-hidden="true"></i>
+          </div>
+          `
+        );
+      }
+    })
+  })
+</script>
+    
+    <!-- 渲染回到顶部按钮 -->
+    
+      <div class="goTop top-btn-color" pointer>
+  <i class="fas fa-arrow-up" aria-hidden="true"></i>
+</div>
+<script src="/js/goTop.js"></script>
+
+    
+    <!-- 渲染左下角音乐播放器 -->
+    
+      <link rel="stylesheet" href="/js/aplayer/APlayer@1.10.1.min.css">
+<style>
+.aplayer .aplayer-lrc p {
+  
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 16px !important;
+}
+
+.aplayer .aplayer-lrc p.aplayer-lrc-current {
+  
+  font-size: 15px;
+  color: #42b983;
+}
+
+
+.aplayer.aplayer-fixed.aplayer-narrow .aplayer-body {
+  left: -66px !important;
+}
+
+.aplayer.aplayer-fixed.aplayer-narrow .aplayer-body:hover {
+  left: 0px !important;
+}
+
+
+</style>
+<meting-js  
+  class=""
+  server="tencent"
+  type="playlist"
+  id="8062553743"
+  fixed='true'
+  autoplay='false'
+  theme='#42b983'
+  loop='all'
+  order='random'
+  preload='auto'
+  volume='0.7'
+  list-folded='true'
+>
+</meting-js>
+
+<!-- <style>
+  #aplayer {
+    position: fixed;
+    left: 0;
+    bottom: 300px;
+  }
+</style> -->
+<script src="https://unpkg.com/aplayer@1.10.1/dist/APlayer.min.js"></script>
+<script src="https://unpkg.com/meting@2/dist/Meting.min.js"></script>
+    
+
+    <!-- 图片放大 -->
+    
+      <script src="/js/fancybox/jquery.fancybox.min.js"></script>
+    
+
+    <!-- 百度解析 -->
+    <!-- Baidu Analytics -->
+
+    <!-- Baidu Push -->
+
+<script>
+    (function () {
+        var bp = document.createElement('script');
+        var curProtocol = window.location.protocol.split(':')[0];
+        if (curProtocol === 'https') {
+            bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+        } else {
+            bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+        }
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(bp, s);
+    })();
+</script>
+
+    
+    <!-- 背景彩带 -->
+    
+      <script type="text/javascript" size="100" alpha='0.4' zIndex="-1" src="/js/ribbon.min.js"></script>
+    
+
+    <script src="/js/utils/index.js"></script>
+    <script src="/js/app.js"></script>
+    
+    <!-- 文章目录所需js -->
+<link href="/js/tocbot/tocbot.css" rel="stylesheet">
+<script src="/js/tocbot/tocbot.min.js"></script>
+
+<script>
+  var headerEl = 'h2, h3, h4',  //headers 
+    content = '.post-detail',//文章容器
+    idArr = {};  //标题数组以确定是否增加索引id
+  //add #id
+  var option = {
+    // Where to render the table of contents.
+    tocSelector: '.toc',
+    // Where to grab the headings to build the table of contents.
+    contentSelector: content,
+    // Which headings to grab inside of the contentSelector element.
+    headingSelector: headerEl,
+    scrollSmooth: true,
+    scrollSmoothOffset: -80,
+    headingsOffset: -($(window).height() * 0.4 - 45),
+    positionFixedSelector: '.toc-main',
+    positionFixedClass: 'is-position-fixed',
+    fixedSidebarOffset: 'auto',
+    activeLinkClass: 'is-active-link',
+    // onClick: function (e) {},
+  }
+  if ($('.toc').length > 0) {
+
+    $(content).children(headerEl).each(function () {
+      //去除空格以及多余标点
+      var headerId = $(this).text().replace(/[\s|\~|`|\!|\@|\#|\$|\%|\^|\&|\*|\(|\)|\_|\+|\=|\||\|\[|\]|\{|\}|\;|\:|\"|\'|\,|\<|\.|\>|\/|\?|\：|\，|\。]/g, '');
+
+      headerId = headerId.toLowerCase();
+      if (idArr[headerId]) {
+        //id已经存在
+        $(this).attr('id', headerId + '-' + idArr[headerId]);
+        idArr[headerId]++;
+      }
+      else {
+        //id未存在
+        idArr[headerId] = 1;
+        $(this).attr('id', headerId);
+      }
+    });
+
+    document.addEventListener("DOMContentLoaded", function () {
+      tocbot.init(option);
+      mobileTocClick();
+    });
+
+  }
+
+  window.tocScrollFn = function () {
+    return bamboo.throttle(function () {
+      findHeadPosition();
+    }, 100)()
+  }
+  window.addEventListener('scroll', tocScrollFn);
+
+  const findHeadPosition = function (top) {
+    if ($('.toc-list').length <= 0) {
+      return false;
+    }
+    setTimeout(() => {  // or DOMContentLoaded 
+      autoScrollToc();
+    }, 0);
+  }
+
+  const autoScrollToc = function () {
+    const $activeItem = document.querySelector('.is-active-link');
+    const $cardToc = document.querySelector('.toc-content');
+    const activePosition = $activeItem.getBoundingClientRect().top
+    const sidebarScrollTop = $cardToc.scrollTop
+    if (activePosition > (document.documentElement.clientHeight - 100)) {
+      $cardToc.scrollTop = sidebarScrollTop + 150
+    }
+    if (activePosition < 100) {
+      $cardToc.scrollTop = sidebarScrollTop - 150
+    }
+  }
+
+  document.addEventListener('pjax:send', function () {
+    if ($('.toc').length) {
+      tocbot.destroy();
+    }
+  });
+
+  document.addEventListener('pjax:complete', function () {
+    if ($('.toc').length) {
+      tocbot.init(option);
+      mobileTocClick();
+    }
+  });
+  
+  // 手机端toc按钮点击出现目录
+  const mobileTocClick = function () {
+    const $cardTocLayout = document.getElementsByClassName('toc-aside')[0];
+    const $cardToc = $cardTocLayout.getElementsByClassName('toc-content')[0];
+    let right = '45px';
+    if (window.innerWidth >= 551 && window.innerWidth <= 992) {
+      right = '100px'
+    }
+    const mobileToc = {
+      open: () => {
+        $cardTocLayout.style.cssText = 'animation: toc-open .3s; opacity: 1; right: ' + right
+      },
+
+      close: () => {
+        $cardTocLayout.style.animation = 'toc-close .2s'
+        setTimeout(() => {
+          $cardTocLayout.style.cssText = "opacity:''; animation: ''; right: ''"
+        }, 100)
+      }
+    }
+    document.getElementById('toc-mobile-btn').addEventListener('click', () => {
+      if (window.getComputedStyle($cardTocLayout).getPropertyValue('opacity') === '0') mobileToc.open()
+      else mobileToc.close()
+    })
+
+    $cardToc.addEventListener('click', (e) => {
+      if (window.innerWidth < 992) { // 小于992px的时候
+        mobileToc.close()
+      }
+    })
+  }
+</script>
+
+<style>
+  .is-position-fixed {
+    position: sticky !important;
+    top: 74px;
+  }
+
+  .toc-main ul {
+    counter-reset: show-list;
+  }
+
+  .toc-main ul li::before {
+    content: counter(item)".";
+    display: block;
+    position: absolute;
+    left: 12px;
+    top: 0;
+  }
+</style> 
+
+<!-- 设置导航背景 -->
+<script>
+  let setHeaderClass = () => {
+    const headerMenuTransparent = true;
+    if (!headerMenuTransparent) { return; }
+    const nav = $('#navHeader');
+    const navTop = nav.outerHeight();
+    const winTop = $(window).scrollTop();
+    if(winTop > navTop) {
+      nav.addClass('header-bg-color');
+    }
+    else {
+      nav.removeClass('header-bg-color');
+    }
+  };
+
+  let scrollCollect = () => {
+    return bamboo.throttle(function (e) {
+      setHeaderClass();
+    }, 200)()
+  }
+
+  let initHeaderBg = () => {
+    setHeaderClass();
+  }
+
+  setHeaderClass();
+  window.addEventListener('scroll', scrollCollect);
+
+  document.addEventListener('pjax:send', function () {
+    window.removeEventListener('scroll', scrollCollect)
+  })
+  document.addEventListener('pjax:complete', function () {
+    window.addEventListener('scroll', scrollCollect);
+    setHeaderClass();
+  })
+</script> 
+
+<!-- 渲染issues标签里的内容 -->
+<script>
+  function loadIssuesJS() {
+    if ($(".post-detail").find(".issues-api").length == 0) {
+      return;
+    } 
+    loadScript('/js/issues/index.js');
+  };
+  $(function () {
+    loadIssuesJS();
+  });
+  document.addEventListener('pjax:complete', function () {
+    if (typeof IssuesAPI == "undefined") {
+      loadIssuesJS();
+    }
+  })
+</script>
+
+<!-- 输入框打字特效 -->
+<!-- 输入框打字特效 -->
+
+  <script src="/js/activate-power-mode.js"></script>
+  <script>
+    POWERMODE.colorful = true;  // 打开随机颜色特效
+    POWERMODE.shake = false;    // 关闭输入框抖动
+    document.body.addEventListener('input', POWERMODE);//监听打字事件
+  </script>
+
+
+<!-- markdown代码一键复制功能 -->
+
+  <link rel="stylesheet" href="https://unpkg.com/v-plugs-ayu/lib/ayu.css">
+  <script src="https://unpkg.com/v-plugs-ayu/lib/ayu.umd.min.js"></script>
+  <script src="/js/clipboard/clipboard.min.js"></script>
+  <div id="appCopy">
+  </div>
+  <script data-pjax>
+    var vm = new Vue({
+      el: '#appCopy',
+      data: {
+      },
+      computed: {
+      },
+      mounted() {
+        const that = this;
+        var copy = 'copy';
+        /* code */
+        var initCopyCode = function () {
+          var copyHtml = '';
+          copyHtml += '<button class="btn-copy" data-clipboard-snippet="" style="position:absolute;top:0;right:0;z-index:1;">';
+          copyHtml += '<i class="fas fa-copy"></i><span>' + copy + '</span>';
+          copyHtml += '</button>';
+          $(".post-detail pre").not('.gutter pre').wrap("<div class='codeBox' style='position:relative;width:100%;'></div>")
+          $(".post-detail pre").not('.gutter pre').before(copyHtml);
+          new ClipboardJS('.btn-copy', {
+            target: function (trigger) {
+              return trigger.nextElementSibling;
+            }
+          });
+        }
+        initCopyCode();
+        $('.btn-copy').unbind('click').bind('click', function () {
+          doSomething();
+        })
+        $(document).unbind('keypress').bind('keypress', function (e) {
+          if (e.ctrlKey && e.keyCode == 67) {
+            doSomething();
+          }
+        })
+
+        function doSomething() {
+          that.$notify({
+            title: "成功",
+            content: "代码已复制，请遵守相关授权协议。",
+            type: 'success'
+          })
+        }
+      },
+      methods: {
+      },
+      created() { }
+    })
+  </script>
+  
+
+<!-- 图片懒加载 -->
+<script defer src="https://unpkg.com/vanilla-lazyload@17.1.0/dist/lazyload.min.js"></script>
+<script>
+  // https://www.npmjs.com/package/vanilla-lazyload
+  // Set the options globally
+  // to make LazyLoad self-initialize
+  window.lazyLoadOptions = {
+    elements_selector: ".lazyload",
+    threshold: 0
+  };
+  // Listen to the initialization event
+  // and get the instance of LazyLoad
+  window.addEventListener(
+    "LazyLoad::Initialized",
+    function (event) {
+      window.lazyLoadInstance = event.detail.instance;
+    },
+    false
+  );
+  document.addEventListener('DOMContentLoaded', function () {
+    lazyLoadInstance.update();
+  });
+  document.addEventListener('pjax:complete', function () {
+    lazyLoadInstance.update();
+  });
+</script>
+
+
+<!-- 卡片滚动动画 -->
+   
+
+<!-- 评论所需js -->
+
+  
+    <script type="text/javascript">
+  var utteranceCommon = {};
+
+  function check_utterance() {
+    let isDark = JSON.parse(localStorage.getItem('dark')) || JSON.parse('false');
+    if (isDark) {
+      utteranceCommon.Theme = 'github-dark';
+    } else {
+      utteranceCommon.Theme = 'github-light';
+    }
+
+    return document.getElementById("gitment-container");
+  }
+  comment_el = '#gitment-container';
+  load_utterance = function () {
+    if ($(comment_el).length) {
+      // 匿名函数，防止污染全局变量
+      const HEAD = check_utterance();
+
+      var utterances = document.createElement('script');
+      utterances.type = 'text/javascript';
+      utterances.async = true;
+      utterances.setAttribute('issue-term', 'pathname')
+      utterances.setAttribute('theme', utteranceCommon.Theme)
+      utterances.setAttribute('repo', '')
+      utterances.crossorigin = 'anonymous';
+      utterances.src = 'https://utteranc.es/client.js';
+      // content 是要插入评论的地方
+      document.getElementById('gitment-container').appendChild(utterances);
+
+    }
+  }
+
+  function dark_utterance() {
+    const HEAD = check_utterance();
+    if (!HEAD) return;
+    const message = {
+      type: 'set-theme',
+      theme: utteranceCommon.Theme
+    };
+    const utteranceIframe = document.querySelector('iframe');
+    utteranceIframe.contentWindow.postMessage(message, 'https://utteranc.es');
+  }
+
+  $(document).ready(load_utterance);
+  document.addEventListener('pjax:complete', function () {
+    load_utterance();
+  });
+
+  $('.dark').click(function () {
+    setTimeout(() => {
+      dark_utterance();
+    });
+  })
+
+</script>
+
+<style>
+  .utterances {
+    max-width: inherit !important;
+  }
+</style>
+  
+
+
+<!-- 鼠标点击特效 -->
+<!-- 爱心点击 -->
+
+  
+    <canvas class="fireworks" style="position: fixed;left: 0;top: 0;z-index: 999; pointer-events: none;" ></canvas>
+    <script src="//cdn.bootcss.com/animejs/2.2.0/anime.min.js"></script>
+    <script src="/js/cursor/explosion.min.js"></script>
+  
+
+
+
+
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" data-pjax></script>
+
+
+    <!-- pjax -->
+    
+
+<!-- pjax -->
+
+
+  <script src="/js/pjax@0.2.8/index.js"></script>
+  
+    <!-- 样式位于：source/css/_third-party/pjaxanimate.styl -->
+
+<div class="pjax-animate">
+  
+    <div class="loading-circle"><div id="loader-circle"></div></div>
+    <script>
+      window.ShowLoading = function() {
+        $(".loading-circle").css("display", "block");
+      };
+      window.HideLoading = function() {
+        $(".loading-circle").css("display", "none");
+      }
+    </script>
+  
+	<script>
+    document.addEventListener('pjax:complete', function () {
+      window.HideLoading();
+    })
+    document.addEventListener('pjax:send', function () {
+      window.ShowLoading();
+    })
+    document.addEventListener('pjax:error', function () {
+      window.HideLoading();
+    })
+	</script>
+</div>
+
+  
+
+  <script>
+    var pjax = new Pjax({
+      elements: 'a[href]:not([href^="#"]):not([href="javascript:void(0)"]):not([no-pjax])',   // 拦截正常带链接的 a 标签
+      selectors: ["#pjax-container","title"],                                   // 根据实际需要确认重载区域
+      cacheBust: false,   // url 地址追加时间戳，用以避免浏览器缓存
+      timeout: 5000
+    });
+
+    document.addEventListener('pjax:send', function (e) {
+
+      try {
+        var currentUrl = window.location.pathname;
+        var targetUrl = e.triggerElement.href;
+        var banUrl = [""];
+        if (banUrl[0] != "") {
+          banUrl.forEach(item => {
+            if(currentUrl.indexOf(item) != -1 || targetUrl.indexOf(item) != -1) {
+              window.location.href = targetUrl;
+            }
+          });
+        }
+      } catch (error) {}
+
+      $(window).unbind('resize');
+      $(window).unbind('scroll');
+      $(document).unbind('scroll');
+      $(document).unbind('click');
+      $('body').unbind('click');
+
+    })
+    
+    document.addEventListener('pjax:complete', function () {
+      $('script[data-pjax], .pjax-reload script').each(function () {
+        $(this).parent().append($(this).remove());
+      });
+    });
+
+    document.addEventListener('pjax:error', function (e) {
+      window.location.href = e.triggerElement.href;
+    })
+    
+    // 刷新不从顶部开始
+    document.addEventListener("DOMContentLoaded", function () {
+      history.scrollRestoration = 'auto';
+    })
+  </script>
+
+
+
+  </body>
+</html>

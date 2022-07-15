@@ -1,0 +1,2041 @@
+<!DOCTYPE html>
+<html>
+  <!-- meta/link... -->
+  
+
+
+
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport">
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+
+
+  <title>JVM笔记（三） | Hexo</title>
+
+  <link rel="icon" type="image/x-icon, image/vnd.microsoft.icon" href="/favicon.ico">
+  <link rel="stylesheet" href="https://at.alicdn.com/t/font_1911880_c1nvbyezg17.css">
+  <link href="https://unpkg.com/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet">
+  <link href="/js/swiper/swiper@5.4.1.min.css" rel="stylesheet">
+  
+  
+  
+  
+<link rel="stylesheet" href="/css/animate.min.css">
+
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+  
+    
+<link rel="stylesheet" href="/js/fancybox/jquery.fancybox.min.css">
+
+  
+  
+    
+<link rel="stylesheet" href="/js/shareJs/share.min.css">
+
+  
+  <style>
+        @media (max-width: 992px) {
+            #waifu {
+                display: none;
+            }
+        }
+    </style>
+    <script src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
+    <link href="//cdn.bootcss.com/pace/1.0.2/themes/pink/pace-theme-flash.css" rel="stylesheet">
+
+    
+
+    <!-- import link -->
+    
+        
+            
+        
+            
+        
+    
+    <!-- import script -->
+    
+        
+            
+        
+            
+        
+    
+
+<meta name="generator" content="Hexo 6.2.0"></head>
+
+  
+  <!-- 依赖于jquery和vue -->
+  
+    
+<script src="https://unpkg.com/jquery@3.5.1/dist/jquery.min.js"></script>
+
+  
+
+  
+    
+<script src="https://unpkg.com/vue@2.6.11/dist/vue.min.js"></script>
+
+  
+  
+  <body>
+    <!-- 预加载动画 -->
+    <!-- 页面预加载动画 -->
+
+<div id='loader'>
+  <link rel="stylesheet" href="/js/loaded/index.css" >
+  <div class="loading-left-bg"></div>
+  <div class="loading-right-bg"></div>
+  <div class="spinner-box">
+    <div class="configure-border-1">
+      <div class="configure-core"></div>
+    </div>
+    <div class="configure-border-2">
+      <div class="configure-core"></div>
+    </div>
+    <div class="loading-word">loading...</div>
+  </div>
+</div>
+
+<script>
+  var endLoading = function () {
+    document.body.style.overflow = 'auto';
+    document.getElementById('loader').classList.add("loading");
+  }
+  window.addEventListener('DOMContentLoaded',endLoading);
+  
+</script>
+
+    
+    <!-- 判断是否为暗黑风格 -->
+    <!-- 判断是否为黑夜模式 -->
+<script>
+  let isDark = JSON.parse(localStorage.getItem('dark')) || JSON.parse('false');
+
+  if (isDark) {
+    $(document.body).addClass('darkModel');
+  }
+</script>
+
+    <!-- 需要在上面加载的js -->
+    <script>
+  function loadScript(src, cb) {
+    return new Promise(resolve => {
+      setTimeout(function () {
+        var HEAD = document.getElementsByTagName("head")[0] || document.documentElement;
+        var script = document.createElement("script");
+        script.setAttribute("type", "text/javascript");
+        if (cb) {
+          if (JSON.stringify(cb)) {
+            for (let p in cb) {
+              if (p == "onload") {
+                script[p] = () => {
+                  cb[p]()
+                  resolve()
+                }
+              } else {
+                script[p] = cb[p]
+                script.onload = resolve
+              }
+            }
+          } else {
+            script.onload = () => {
+              cb()
+              resolve()
+            };
+          }
+        } else {
+          script.onload = resolve
+        }
+        script.setAttribute("src", src);
+        HEAD.appendChild(script);
+      });
+    });
+  }
+
+  //https://github.com/filamentgroup/loadCSS
+  var loadCSS = function (href, before, media, attributes) {
+    return new Promise(resolve => {
+      setTimeout(function () {
+        var link = document.createElement('link');
+        link.rel = "stylesheet";
+        link.href = src;
+        link.onload = resolve;
+        document.getElementsByTagName("head")[0].appendChild(link);
+      });
+    });
+  };
+
+</script> 
+
+<!-- 轮播图所需要的js -->
+<script src="/js/swiper/swiper.min.js"></script>
+<script src="/js/swiper/vue-awesome-swiper.js"></script>
+<script src="/js/swiper/swiper.animate1.0.3.min.js"></script>
+
+<script type="text/javascript">
+  Vue.use(window.VueAwesomeSwiper)
+</script>
+
+
+  <script src="/js/vue-typed-js/index.js"></script>
+
+
+<!-- 首页的公告滚动插件的js需要重新加载 -->
+<script src="/js/vue-seamless-scroll/index.js"></script>
+
+<!-- 打字机效果js -->
+<script src="https://unpkg.com/typed.js@2.0.11"></script>
+
+
+    <div id="safearea">
+      <main class="main" id="pjax-container">
+        <!-- 头部导航 -->
+        
+<header class="header   " 
+  id="navHeader"
+  style="position: fixed;
+  left: 0; top: 0; z-index: 10;width: 100%;"
+>
+  <div class="header-content">
+    <div class="bars">
+      <div id="appDrawer" class="sidebar-image">
+  <div class="drawer-box-icon">
+    <i class="fas fa-bars" aria-hidden="true" @click="showDialogDrawer"></i>
+  </div>
+  
+  <transition name="fade">
+    <div class="drawer-box_mask" v-cloak style="display: none;" v-show="visible" @click.self="cancelDialogDrawer">
+    </div>
+  </transition>
+  <div class="drawer-box" :class="{'active': visible}">
+    <div class="drawer-box-head bg-color">
+      <img class="drawer-box-head_logo lazyload placeholder" src="/medias/logo.png" class="lazyload placeholder" data-srcset="/medias/logo.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="logo">
+      <h3 class="drawer-box-head_title">Hexo</h3>
+      <h5 class="drawer-box-head_desc"></h5>
+    </div>
+    
+    <div class="drawer-box-content">
+      <ul class="drawer-box-content_menu">
+        
+        
+          <li class="drawer-box-content_item">
+            <a target="_blank" rel="noopener" href="https://github.com/yuang01/hexo-theme-bamboo">
+              <i class="fas fa-github" aria-hidden="true"></i>
+              <span>Github</span>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</div>
+
+<script>
+  var body = document.body || document.documentElement || window;
+  var vm = new Vue({
+    el: '#appDrawer',
+    data: {
+      visible: false,
+      top: 0,
+      openArr: [],
+    },
+    computed: {
+    },
+    mounted() {
+    },
+    methods: {
+      isOpen(index) {
+        if (this.openArr.includes(index)) {
+          return true;
+        } else {
+          return false;
+        }
+      },
+      openOrCloseMenu(curIndex) {
+        const index = this.openArr.indexOf(curIndex);
+        if (index !== -1) {
+          this.openArr.splice(index, 1);
+        } else {
+          this.openArr.push(curIndex);
+        }
+      },
+      showDialogDrawer() {
+        this.visible = true;
+        // 防止页面滚动，只能让弹框滚动
+        this.top = $(document).scrollTop()
+        body.style.cssText = 'width: 100%; height: 100%;overflow: hidden;';
+      },
+      cancelDialogDrawer() {
+        this.visible = false;
+        body.removeAttribute('style');
+        $(document).scrollTop(this.top)
+      }
+    },
+    created() {}
+  })
+</script>
+
+    </div>
+    <div class="blog-title" id="author-avatar">
+      
+        <div class="avatar">
+          <img src="/medias/logo.png" class="lazyload placeholder" data-srcset="/medias/logo.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="logo">
+        </div>
+      
+      <a href="/" class="logo">Hexo</a>
+    </div>
+    <nav class="navbar">
+      <ul class="menu">
+        
+      </ul>
+      
+      
+        <div id="appSearch">
+  <div class="search"  @click="showDialog()"><i class="fas fa-search" aria-hidden="true"></i></div>
+  <transition name="fade">
+    <div class="message-box_wrapper" style="display: none;" v-cloak v-show="dialogVisible" @click.self="cancelDialogVisible()">
+      <div class="message-box animated bounceInDown">
+        <h2>
+          <span>
+            <i class="fas fa-search" aria-hidden="true"></i>
+            <span class="title">Search</span>
+          </span>
+          <i class="fas fa-times close" pointer style="float:right;" aria-hidden="true" @click.self="cancelDialogVisible()"></i>
+        </h2>
+        <form class="site-search-form">
+          <input type="text"
+            placeholder="Please enter keywords"
+            id="local-search-input" 
+            @click="getSearchFile()"
+            class="st-search-input"
+            v-model="searchInput"
+          />
+        </form>
+        <div class="result-wrapper">
+          <div id="local-search-result" class="local-search-result-cls"></div>
+        </div>
+      </div>
+    </div>
+  </transition>
+</div>
+<script src="/js/local_search.js"></script>
+<script>
+  var body = document.body || document.documentElement || window;
+  var vm = new Vue({
+    el: '#appSearch',
+    data: {
+      dialogVisible: false,
+      searchInput: '',
+      top: 0,
+    },
+    computed: {
+    },
+    mounted() {
+      window.addEventListener('pjax:complete', () => {
+        this.cancelDialogVisible();
+      })
+    },
+    methods: {
+      showDialog() {
+        this.dialogVisible = true;
+        // 防止页面滚动，只能让弹框滚动
+        this.top = $(document).scrollTop()
+        body.style.cssText = 'overflow: hidden;';
+      },
+      getSearchFile() {
+        if (!this.searchInput) {
+          getSearchFile("/search.xml");
+        }
+      },
+      cancelDialogVisible() {
+        this.dialogVisible = false;
+        body.removeAttribute('style');
+        $(document).scrollTop(this.top)
+      },
+    },
+    created() {}
+  })
+</script>
+<!-- 解决刷新页面闪烁问题，可以在元素上添加display: none, 或者用vue.extend方法，详情：https://blog.csdn.net/qq_31393401/article/details/81017912 -->
+<!-- 下面是搜索基本写法 -->
+<!-- <script type="text/javascript" id="local.search.active">
+  var inputArea = document.querySelector("#local-search-input");
+  inputArea.onclick   = function(){ getSearchFile(); this.onclick = null }
+  inputArea.onkeydown = function(){ if(event.keyCode == 13) return false }
+</script> -->
+
+      
+
+    </nav>
+  </div>
+  
+    <a target="_blank" rel="noopener" href="https://github.com/yuang01/hexo-theme-bamboo" class="github-corner color-primary" aria-label="View source on GitHub"><svg width="60" height="60" viewBox="0 0 250 250" style="fill:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+  
+  
+</header>
+        <!-- 内容区域 -->
+        
+ <!-- prismjs 代码高亮 -->
+ 
+
+
+<div class="bg-dark-floor" style="position: fixed;left: 0;top: 0;width: 100%;height: 100%;z-index: -1;"></div>
+
+
+  <!-- 文章详情页顶部图片和标题 -->
+
+
+
+
+<div class="post-detail-header" id="thumbnail_canvas" style="background-repeat: no-repeat; background-size: cover; 
+  background-position: center center;position: relative;background-image:url('/medias/1.jpg')">
+  <div class="post-detail-header-mask"></div>
+  <canvas id="header_canvas"style="position:absolute;bottom:0;pointer-events:none;"></canvas>
+  
+  <div class="post-detail-header_info-box">
+    <div class="title-box">
+      <span class="title">
+        JVM笔记（三）
+      </span>
+    </div>
+    
+    
+      
+        <span class="post-detail-header_date">
+          <i class="fas fa-calendar"></i> Published in：2022-05-03 |
+        </span>
+      
+
+      
+        <span class="post-detail-header_categories">
+          <i class="iconfont iconbookmark1"></i> category：
+          
+            <a href="/categories/JVM/" class="post-detail-header_category">
+              JVM
+            </a>
+          
+        </span>
+      
+
+      
+    
+  </div>
+  
+  
+    <script src="/js/bubble/bubble.js"></script>
+  
+</div>
+
+
+
+
+
+<div class="post-detail-content row justify-position" 
+  style="padding-top: 0px;">
+  <div class="main-content">
+    <article class="post post-detail">
+      <div class="post-content">
+        <h1 id="类与类加载"><a href="#类与类加载" class="headerlink" title="类与类加载"></a>类与类加载</h1><p>前面我们讲解了JVM的内存结构，包括JVM如何对内存进行划分，如何对内存区域进行垃圾回收。接下来，我们来研究一下类文件结构以及类的加载机制。</p>
+<h2 id="类文件结构"><a href="#类文件结构" class="headerlink" title="类文件结构"></a>类文件结构</h2><p>在我们学习C语言的时候，我们的编程过程会经历如下几个阶段：写代码、保存、编译、运行。实际上，最关键的一步是编译，因为只有经历了编译之后，我们所编写的代码才能够翻译为机器可以直接运行的二进制代码，并且在不同的操作系统下，我们的代码都需要进行一次编译之后才能运行。</p>
+<blockquote>
+<p>如果全世界所有的计算机指令集只有x86一种，操作系统只有Windows一种，那也许就不会有Java语言的出现。</p>
+</blockquote>
+<p>随着时代的发展，人们迫切希望能够在不同的操作系统、不同的计算机架构中运行同一套编译之后的代码。本地代码不应该是我们编程的唯一选择，所以，越来越多的语言选择了与操作系统和机器指令集无关的中立格式作为编译后的存储格式。</p>
+<p>“一次编写，到处运行”，Java最引以为傲的口号，标志着平台不再是限制编程语言的阻碍。</p>
+<p>实际上，Java正式利用了这样的解决方案，将源代码编译为平台无关的中间格式，并通过对应的Java虚拟机读取和运行这些中间格式的编译文件，这样，我们只需要考虑不同平台的虚拟机如何编写，而Java语言本身很轻松地实现了跨平台。</p>
+<p>现在，越来越多的开发语言都支持将源代码编译为<code>.class</code>字节码文件格式，以便能够直接交给JVM运行，包括Kotlin（安卓开发官方指定语言）、Groovy、Scala等。</p>
+<p><img src="https://tva1.sinaimg.cn/large/e6c9d24egy1gznizn2l97j21qc0jedgq.jpg" class="lazyload placeholder" data-srcset="https://tva1.sinaimg.cn/large/e6c9d24egy1gznizn2l97j21qc0jedgq.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20220223162914535"></p>
+<p>那么，让我们来看看，我们的源代码编译之后，是如何保存在字节码文件中的。</p>
+<hr>
+<h3 id="类文件信息"><a href="#类文件信息" class="headerlink" title="类文件信息"></a>类文件信息</h3><p>我们之前都是使用<code>javap</code>命令来对字节码文件进行反编译查看的，那么，它以二进制格式是怎么保存呢？我们可以使用WinHex软件（Mac平台可以使用<a target="_blank" rel="noopener" href="https://www.macwk.com/soft/010-editor">010 Editor</a>）来以十六进制查看字节码文件。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Main</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">10</span>;</span><br><span class="line">        <span class="type">int</span> <span class="variable">a</span> <span class="operator">=</span> i++;</span><br><span class="line">        <span class="type">int</span> <span class="variable">b</span> <span class="operator">=</span> ++i;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>找到我们在IDEA中编译出来的class文件，将其拖动进去：</p>
+<p><img src="https://tva1.sinaimg.cn/large/e6c9d24egy1gznjij4fgpj21800u011h.jpg" class="lazyload placeholder" data-srcset="https://tva1.sinaimg.cn/large/e6c9d24egy1gznjij4fgpj21800u011h.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20220223164725971"></p>
+<p>可以看到整个文件中，全是一个字节一个字节分组的样子，从左上角开始，一行一行向下读取。可以看到在右侧中还出现了一些我们之前也许见过的字符串，比如”<init>“、”Object”等。</p>
+<p>实际上Class文件采用了一种类似于C中结构体的伪结构来存储数据（当然我们直接看是看不出来的），但是如果像这样呢？</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br></pre></td><td class="code"><pre><span class="line">Classfile /Users/nagocoler/Develop.localized/JavaHelloWorld/target/classes/com/test/Main.class</span><br><span class="line">  Last modified 2022-2-23; size 444 bytes</span><br><span class="line">  MD5 checksum 8af3e63f57bcb5e3d0eec4b0468de35b</span><br><span class="line">  Compiled from &quot;Main.java&quot;</span><br><span class="line">public class com.test.Main</span><br><span class="line">  minor version: 0</span><br><span class="line">  major version: 52</span><br><span class="line">  flags: ACC_PUBLIC, ACC_SUPER</span><br><span class="line">Constant pool:</span><br><span class="line">   #1 = Methodref          #3.#21         // java/lang/Object.&quot;&lt;init&gt;&quot;:()V</span><br><span class="line">   #2 = Class              #22            // com/test/Main</span><br><span class="line">   #3 = Class              #23            // java/lang/Object</span><br><span class="line">   #4 = Utf8               &lt;init&gt;</span><br><span class="line">   #5 = Utf8               ()V</span><br><span class="line">   #6 = Utf8               Code</span><br><span class="line">   #7 = Utf8               LineNumberTable</span><br><span class="line">   #8 = Utf8               LocalVariableTable</span><br><span class="line">   #9 = Utf8               this</span><br><span class="line">  #10 = Utf8               Lcom/test/Main;</span><br><span class="line">  #11 = Utf8               main</span><br><span class="line">  #12 = Utf8               ([Ljava/lang/String;)V</span><br><span class="line">  #13 = Utf8               args</span><br><span class="line">  #14 = Utf8               [Ljava/lang/String;</span><br><span class="line">  #15 = Utf8               i</span><br><span class="line">  #16 = Utf8               I</span><br><span class="line">  #17 = Utf8               a</span><br><span class="line">  #18 = Utf8               b</span><br><span class="line">  #19 = Utf8               SourceFile</span><br><span class="line">  #20 = Utf8               Main.java</span><br><span class="line">  #21 = NameAndType        #4:#5          // &quot;&lt;init&gt;&quot;:()V</span><br><span class="line">  #22 = Utf8               com/test/Main</span><br><span class="line">  #23 = Utf8               java/lang/Object</span><br><span class="line">&#123;</span><br><span class="line">  public com.test.Main();</span><br><span class="line">    descriptor: ()V</span><br><span class="line">    flags: ACC_PUBLIC</span><br><span class="line">    Code:</span><br><span class="line">      stack=1, locals=1, args_size=1</span><br><span class="line">         0: aload_0</span><br><span class="line">         1: invokespecial #1                  // Method java/lang/Object.&quot;&lt;init&gt;&quot;:()V</span><br><span class="line">         4: return</span><br><span class="line">      LineNumberTable:</span><br><span class="line">        line 11: 0</span><br><span class="line">      LocalVariableTable:</span><br><span class="line">        Start  Length  Slot  Name   Signature</span><br><span class="line">            0       5     0  this   Lcom/test/Main;</span><br><span class="line"></span><br><span class="line">  public static void main(java.lang.String[]);</span><br><span class="line">    descriptor: ([Ljava/lang/String;)V</span><br><span class="line">    flags: ACC_PUBLIC, ACC_STATIC</span><br><span class="line">    Code:</span><br><span class="line">      stack=1, locals=4, args_size=1</span><br><span class="line">         0: bipush        10</span><br><span class="line">         2: istore_1</span><br><span class="line">         3: iload_1</span><br><span class="line">         4: iinc          1, 1</span><br><span class="line">         7: istore_2</span><br><span class="line">         8: iinc          1, 1</span><br><span class="line">        11: iload_1</span><br><span class="line">        12: istore_3</span><br><span class="line">        13: return</span><br><span class="line">      LineNumberTable:</span><br><span class="line">        line 13: 0</span><br><span class="line">        line 14: 3</span><br><span class="line">        line 15: 8</span><br><span class="line">        line 16: 13</span><br><span class="line">      LocalVariableTable:</span><br><span class="line">        Start  Length  Slot  Name   Signature</span><br><span class="line">            0      14     0  args   [Ljava/lang/String;</span><br><span class="line">            3      11     1     i   I</span><br><span class="line">            8       6     2     a   I</span><br><span class="line">           13       1     3     b   I</span><br><span class="line">&#125;</span><br><span class="line">SourceFile: &quot;Main.java&quot;</span><br></pre></td></tr></table></figure>
+
+<p>乍一看，是不是感觉还真的有点结构体那味？</p>
+<p>而结构体中，有两种允许存在的数据类型，一个是无符号数，还有一个是表。</p>
+<ul>
+<li>无符号数一般是基本数据类型，用u1、u2、u4、u8来表示，表示1个字节~8个字节的无符号数。可以表示数字、索引引用、数量值或是以UTF-8编码格式的字符串。</li>
+<li>表包含多个无符号数，并且以”_info”结尾。</li>
+</ul>
+<p>我们首先从最简的开始看起。</p>
+<p><img src="https://tva1.sinaimg.cn/large/e6c9d24egy1gznjcb9bipj21ro0iutfs.jpg" class="lazyload placeholder" data-srcset="https://tva1.sinaimg.cn/large/e6c9d24egy1gznjcb9bipj21ro0iutfs.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20220223164126100"></p>
+<p>首先，我们可以看到，前4个字节（共32位）组成了魔数（其实就是表示这个文件是一个JVM可以运行的字节码文件，除了Java以外，其他某些文件中也采用了这种魔数机制来进行区分，这种方式比直接起个文件扩展名更安全）</p>
+<p>字节码文件的魔数为：CAFEBABE（这名字能想出来也是挺难的了，毕竟4个bit位只能表示出A-F这几个字母）</p>
+<p>紧接着魔数的后面4个字节存储的是字节码文件的版本号，注意前两个是次要版本号（现在基本都不用了，都是直接Java8、Java9这样命名了），后面两个是主要版本号，这里我们主要看主版本号，比如上面的就是34，注意这是以16进制表示的，我们把它换算为10进制后，得到的结果为：<code>34  -&gt;  3*16 + 4 = 52</code>，其中<code>52</code>代表的是<code>JDK8</code>编译的字节码文件（51是JDK7、50是JDK6、53是JDK9，以此类推）</p>
+<p>JVM会根据版本号决定是否能够运行，比如JDK6只能支持版本号为1.1<del>6的版本，也就是说必须是Java6之前的环境编译出来的字节码文件，否则无法运行。又比如我们现在安装的是JDK8版本，它能够支持的版本号为1.1</del>8，那么如果这时我们有一个通过Java7编译出来的字节码文件，依然是可以运行的，所以说Java版本是向下兼容的。</p>
+<p>紧接着，就是类的常量池了，这里面存放了类中所有的常量信息（注意这里的常量并不是指我们手动创建的final类型常量，而是程序运行一些需要用到的常量数据，比如字面量和符号引用等）由于常量的数量不是确定的，所以在最开始的位置会存放常量池中常量的数量（是从1开始计算的，不是0，比如这里是18，翻译为10进制就是24，所以实际上有23个常量）</p>
+<p>接着再往下，就是常量池里面的数据了，每一项常量池里面的数据都是一个表，我们可以看到他们都是以_info结尾的：</p>
+<p><img src="https://tva1.sinaimg.cn/large/e6c9d24egy1gznkh0jr31j21800u07dm.jpg" class="lazyload placeholder" data-srcset="https://tva1.sinaimg.cn/large/e6c9d24egy1gznkh0jr31j21800u07dm.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20220223171746645"></p>
+<p>我们来看看一个表中定义了哪些内容：</p>
+<p><img src="https://tva1.sinaimg.cn/large/e6c9d24egy1gznkh14d4rj21b805wt9v.jpg" class="lazyload placeholder" data-srcset="https://tva1.sinaimg.cn/large/e6c9d24egy1gznkh14d4rj21b805wt9v.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20220223172031889"></p>
+<p>首先上来就会有一个1字节的无符号数，它用于表示当前常量的类型（常量类型有很多个）这里只列举一部分的类型介绍：</p>
+<table>
+<thead>
+<tr>
+<th align="center">类型</th>
+<th align="center">标志</th>
+<th align="center">描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">CONSTANT_Utf8_info</td>
+<td align="center">1</td>
+<td align="center">UTF-8编码格式的字符串</td>
+</tr>
+<tr>
+<td align="center">CONSTANT_Integer_info</td>
+<td align="center">3</td>
+<td align="center">整形字面量（第一章我们演示的很大的数字，实际上就是以字面量存储在常量池中的）</td>
+</tr>
+<tr>
+<td align="center">CONSTANT_Class_info</td>
+<td align="center">7</td>
+<td align="center">类或接口的符号引用</td>
+</tr>
+<tr>
+<td align="center">CONSTANT_String_info</td>
+<td align="center">8</td>
+<td align="center">字符串类型的字面量</td>
+</tr>
+<tr>
+<td align="center">CONSTANT_Fieldref_info</td>
+<td align="center">9</td>
+<td align="center">字段的符号引用</td>
+</tr>
+<tr>
+<td align="center">CONSTANT_Methodref_info</td>
+<td align="center">10</td>
+<td align="center">方法的符号引用</td>
+</tr>
+<tr>
+<td align="center">CONSTANT_MethodType_info</td>
+<td align="center">16</td>
+<td align="center">方法类型</td>
+</tr>
+<tr>
+<td align="center">CONSTANT_NameAndType_info</td>
+<td align="center">12</td>
+<td align="center">字段或方法的部分符号引用</td>
+</tr>
+</tbody></table>
+<p>实际上这些东西，虽然我们不知道符号引用是什么东西，我们可以观察出来，这些东西或多或少都是存放类中一些名称、数据之类的东西。</p>
+<p>比如我们来看第一个<code>CONSTANT_Methodref_info</code>表中存放了什么数据，这里我只列出它的结构表（详细的结构表可以查阅《深入理解Java虚拟机 第三版》中222页总表）：</p>
+<table>
+<thead>
+<tr>
+<th align="center">常量</th>
+<th align="center">项目</th>
+<th align="center">类型</th>
+<th align="center">描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">CONSTANT_Methodref_info</td>
+<td align="center">tag</td>
+<td align="center">u1</td>
+<td align="center">值为10</td>
+</tr>
+<tr>
+<td align="center"></td>
+<td align="center">index</td>
+<td align="center">u2</td>
+<td align="center">指向声明方法的类描述父CONSTANT_Class_info索引项</td>
+</tr>
+<tr>
+<td align="center"></td>
+<td align="center">index</td>
+<td align="center">u2</td>
+<td align="center">指向名称及类型描述符CONSTANT_NameAndType_info索引项</td>
+</tr>
+</tbody></table>
+<p>比如我们刚刚的例子中：</p>
+<p><img src="https://tva1.sinaimg.cn/large/e6c9d24ely1gznnkpf7cqj21b40503zi.jpg" class="lazyload placeholder" data-srcset="https://tva1.sinaimg.cn/large/e6c9d24ely1gznnkpf7cqj21b40503zi.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20220223190659053"></p>
+<p>可以看到，第一个索引项指向了第3号常量，我们来看看三号常量：</p>
+<p><img src="https://tva1.sinaimg.cn/large/e6c9d24ely1gznnmsuh1pj219w03amxj.jpg" class="lazyload placeholder" data-srcset="https://tva1.sinaimg.cn/large/e6c9d24ely1gznnmsuh1pj219w03amxj.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20220223190957382"></p>
+<table>
+<thead>
+<tr>
+<th align="center">常量</th>
+<th align="center">项目</th>
+<th align="center">类型</th>
+<th align="center">描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">CONSTANT_Class_info</td>
+<td align="center">tag</td>
+<td align="center">u1</td>
+<td align="center">值为7</td>
+</tr>
+<tr>
+<td align="center"></td>
+<td align="center">index</td>
+<td align="center">u2</td>
+<td align="center">指向全限定名常量项的索引</td>
+</tr>
+</tbody></table>
+<p>那么我们接着来看23号常量又写的啥：</p>
+<p><img src="https://tva1.sinaimg.cn/large/e6c9d24ely1gznnqfknqaj21fo0j6te5.jpg" class="lazyload placeholder" data-srcset="https://tva1.sinaimg.cn/large/e6c9d24ely1gznnqfknqaj21fo0j6te5.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20220223191325689"></p>
+<p>可以看到指向的UTF-8字符串值为<code>java/lang/Object</code>这下搞明白了，首先这个方法是由Object类定义的，那么接着我们来看第二项u2 <code>name_and_type_index</code>，指向了21号常量，也就是字段或方法的部分符号引用：</p>
+<p><img src="https://tva1.sinaimg.cn/large/e6c9d24ely1gzno0zakf9j21eg0qyqbl.jpg" class="lazyload placeholder" data-srcset="https://tva1.sinaimg.cn/large/e6c9d24ely1gzno0zakf9j21eg0qyqbl.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20220223191921550"></p>
+<table>
+<thead>
+<tr>
+<th align="center">常量</th>
+<th align="center">项目</th>
+<th align="center">类型</th>
+<th align="center">描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">CONSTANT_NameAndType_info</td>
+<td align="center">tag</td>
+<td align="center">u1</td>
+<td align="center">值为12</td>
+</tr>
+<tr>
+<td align="center"></td>
+<td align="center">index</td>
+<td align="center">u2</td>
+<td align="center">指向字段或方法名称常量项的索引</td>
+</tr>
+<tr>
+<td align="center"></td>
+<td align="center">index</td>
+<td align="center">u2</td>
+<td align="center">指向字段或方法描述符常量项的索引</td>
+</tr>
+</tbody></table>
+<p>其中第一个索引就是方法的名称，而第二个就是方法的描述符，描述符明确了方法的参数以及返回值类型，我们分别来看看4号和5号常量：</p>
+<p><img src="https://tva1.sinaimg.cn/large/e6c9d24ely1gzno0z1yp1j21eg0qyqbl.jpg" class="lazyload placeholder" data-srcset="https://tva1.sinaimg.cn/large/e6c9d24ely1gzno0z1yp1j21eg0qyqbl.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20220223192332068"></p>
+<p>可以看到，方法名称为”<init>“，一般构造方法的名称都是<init>，普通方法名称是什么就是什么，方法描述符为”()V”，表示此方法没有任何参数，并且返回值类型为void，描述符对照表如下：</p>
+<p><img src="https://tva1.sinaimg.cn/large/e6c9d24ely1gzno2stssaj216i08mjsr.jpg" class="lazyload placeholder" data-srcset="https://tva1.sinaimg.cn/large/e6c9d24ely1gzno2stssaj216i08mjsr.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20220223192518999"></p>
+<p>比如这里有一个方法<code>public int test(double a, char c)&#123; ... &#125;</code>，那么它的描述符就应该是：<code>(DC)I</code>，参数依次放入括号中，括号右边是返回值类型。再比如<code>public String test(Object obj)&#123; ... &#125;</code>，那么它的描述符就应该是：<code>(Ljava/lang/Object;)Ljava/lang/String</code>，注意如果参数是对象类型，那么必须在后面添加<code>;</code></p>
+<p>对于数组类型，只需要在类型最前面加上<code>[</code>即可，有几个维度，就加几个，比如<code>public void test(int[][] arr)</code>，参数是一个二维int类型数组，那么它的描述符为：<code>([[I)V</code></p>
+<p>所以，这里表示的，实际上就是此方法是一个无参构造方法，并且是属于Object类的。那么，为什么这里需要Object类构造方法的符号引用呢？还记得我们在JavaSE中说到的，每个类都是直接或间接继承自Object类，所有类的构造方法，必须先调用父类的构造方法，但是如果父类存在无参构造，默认可以不用显示调用<code>super</code>关键字（当然本质上是调用了的）。</p>
+<p>所以说，当前类因为没有继承自任何其他类，那么就默认继承的Object类，所以，在当前类的默认构造方法中，调用了父类Object类的无参构造方法，因此这里需要符号引用的用途显而易见，就是因为需要调用Object类的无参构造方法。</p>
+<p>我们可以在反编译结果中的方法中看到：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">public com.test.Main();</span><br><span class="line">    descriptor: ()V</span><br><span class="line">    flags: ACC_PUBLIC</span><br><span class="line">    Code:</span><br><span class="line">      stack=1, locals=1, args_size=1</span><br><span class="line">         0: aload_0</span><br><span class="line">         1: invokespecial #1                  // Method java/lang/Object.&quot;&lt;init&gt;&quot;:()V</span><br><span class="line">         4: return</span><br><span class="line">      LineNumberTable:</span><br><span class="line">        line 11: 0</span><br><span class="line">      LocalVariableTable:</span><br><span class="line">        Start  Length  Slot  Name   Signature</span><br><span class="line">            0       5     0  this   Lcom/test/Main;</span><br></pre></td></tr></table></figure>
+
+<p>其中<code>invokespecial</code>（调用父类构造方法）指令的参数指向了1号常量，而1号常量正是代表的Object类的无参构造方法，虽然饶了这么大一圈，但是过程理清楚，还是很简单的。</p>
+<p>虽然我们可以直接查看16进制的结果，但是还是不够方便，但是我们也不能每次都去使用<code>javap</code>命令，所以我们这里安装一个IDEA插件，来方便我们查看字节码中的信息，名称为<code>jclasslib Bytecode Viewer</code> ：</p>
+<p><img src="https://tva1.sinaimg.cn/large/e6c9d24ely1gznojlqgl3j216y0dc0u0.jpg" class="lazyload placeholder" data-srcset="https://tva1.sinaimg.cn/large/e6c9d24ely1gznojlqgl3j216y0dc0u0.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20220223194128297"></p>
+<p>安装完成后，我们可以在我们的IDEA右侧看到它的板块，但是还没任何数据，那么比如现在我们想要查看Main类的字节码文件时，可以这样操作：</p>
+<p><img src="https://tva1.sinaimg.cn/large/e6c9d24ely1gznomfiqu8j22ll0u0tfa.jpg" class="lazyload placeholder" data-srcset="https://tva1.sinaimg.cn/large/e6c9d24ely1gznomfiqu8j22ll0u0tfa.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20220223194410699"></p>
+<p>首先在项目中选中我们的Main类，然后点击工具栏的视图，然后点击<code>Show Bytecode With Jclasslib</code>，这样右侧就会出现当前类的字节码解析信息了。注意如果修改了类的话，那么需要你点击运行或是构建，然后点击刷新按钮来进行更新。</p>
+<p>接着我们来看下一个内容，在常量池之后，紧接着就是访问标志，访问标志就是类的种类以及类上添加的一些关键字等内容：</p>
+<p><img src="https://tva1.sinaimg.cn/large/e6c9d24ely1gznos6c7j9j21e60giq7s.jpg" class="lazyload placeholder" data-srcset="https://tva1.sinaimg.cn/large/e6c9d24ely1gznos6c7j9j21e60giq7s.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20220223194942810"></p>
+<p>可以看到它只占了2个字节，那么它是如何表示访问标志呢?</p>
+<p><img src="https://tva1.sinaimg.cn/large/e6c9d24ely1gznp9glonej216i0hcjui.jpg" class="lazyload placeholder" data-srcset="https://tva1.sinaimg.cn/large/e6c9d24ely1gznp9glonej216i0hcjui.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20220223200619811"></p>
+<p>比如我们这里的Main类，它是一个普通的class类型，并且访问权限为public，那么它的访问标志值是这样计算的：</p>
+<p><code>ACC_PUBLIC | ACC_SUPER = 0x0001 | 0x0020 = 0x0021</code>（这里进行的是按位或运算），可以看到和我们上面的结果是一致的。</p>
+<p>再往下就是类索引、父类索引、接口索引：</p>
+<p><img src="https://tva1.sinaimg.cn/large/e6c9d24ely1gznp3uofdej219803q0t7.jpg" class="lazyload placeholder" data-srcset="https://tva1.sinaimg.cn/large/e6c9d24ely1gznp3uofdej219803q0t7.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20220223200054866"></p>
+<p>可以看到它们的值也是指向常量池中的值，其中2号常量正是存储的当前类信息，3号常量存储的是父类信息，这里就不再倒推回去了，由于没有接口，所以这里接口数量为0，如果不为0还会有一个索引表来引用接口。</p>
+<p>接着就是字段和方法表集合了：</p>
+<p><img src="https://tva1.sinaimg.cn/large/e6c9d24ely1gznp8gd1nfj21ai04mdgp.jpg" class="lazyload placeholder" data-srcset="https://tva1.sinaimg.cn/large/e6c9d24ely1gznp8gd1nfj21ai04mdgp.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20220223200521912"></p>
+<p>由于我们这里没有声明任何字段，所以我们先给Main类添加一个字段再重新加载一下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Main</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="type">int</span> <span class="variable">a</span> <span class="operator">=</span> <span class="number">10</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">10</span>;</span><br><span class="line">        <span class="type">int</span> <span class="variable">a</span> <span class="operator">=</span> i++;</span><br><span class="line">        <span class="type">int</span> <span class="variable">b</span> <span class="operator">=</span> ++i;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://tva1.sinaimg.cn/large/e6c9d24ely1gznpbh3k7rj21bi06o3zn.jpg" class="lazyload placeholder" data-srcset="https://tva1.sinaimg.cn/large/e6c9d24ely1gznpbh3k7rj21bi06o3zn.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20220223200733342"></p>
+<p>现在字节码就新增了一个字段表，这个字段表实际上就是我们刚刚添加的成员字段<code>a</code>的数据。</p>
+<p>可以看到一共有四个2字节的数据：</p>
+<p><img src="https://tva1.sinaimg.cn/large/e6c9d24ely1gznpcxjzgfj216o06et9o.jpg" class="lazyload placeholder" data-srcset="https://tva1.sinaimg.cn/large/e6c9d24ely1gznpcxjzgfj216o06et9o.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20220223200939786"></p>
+<p>首先是<code>access_flags</code>，这个与上面类标志的计算规则是一样的，表还是先列出来吧：</p>
+<p><img src="https://tva1.sinaimg.cn/large/e6c9d24ely1gznpe7is4wj21620eswh4.jpg" class="lazyload placeholder" data-srcset="https://tva1.sinaimg.cn/large/e6c9d24ely1gznpe7is4wj21620eswh4.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20220223201053780"></p>
+<p>第二个数据<code>name_index</code>表示字段的名称常量，这里指向的是5号常量，那么我们来看看5号常量是不是字段名称：</p>
+<p><img src="https://tva1.sinaimg.cn/large/e6c9d24ely1gznpgw09wjj21bc0tuk0x.jpg" class="lazyload placeholder" data-srcset="https://tva1.sinaimg.cn/large/e6c9d24ely1gznpgw09wjj21bc0tuk0x.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20220223201327180"></p>
+<p>没问题，这里就是<code>a</code>,下一个是<code>descirptor_index</code>，存放的是描述符，不过这里因为不是方法而是变量，所以描述符直接写对应类型的标识字符即可，比如这里是<code>int</code>类型，那么就是<code>I</code>。</p>
+<p>最后，<code>attrbutes_count</code>属性计数器，用于描述一些额外信息，这里我们暂时不做介绍。</p>
+<p>接着就是我们的方法表了：</p>
+<p><img src="https://tva1.sinaimg.cn/large/e6c9d24ely1gznppnxpcqj21ai04odgx.jpg" class="lazyload placeholder" data-srcset="https://tva1.sinaimg.cn/large/e6c9d24ely1gznppnxpcqj21ai04odgx.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20220223202153955"></p>
+<p>可以看到方法表中一共有三个方法，其中第一个方法我们刚刚已经介绍过了，它的方法名称为<code>&lt;init&gt;</code>，表示它是一个构造方法，我们看到最后一个方法名称为<code>&lt;clinit&gt;</code>，这个是类在初始化时会调用的方法（是隐式的，自动生成的），它主要是用于静态变量初始化语句和静态块的执行，因为我们这里给静态成员变量a赋值为10，所以会在一开始为其赋值：</p>
+<p><img src="https://tva1.sinaimg.cn/large/e6c9d24ely1gznpt5dhg3j224c0katcg.jpg" class="lazyload placeholder" data-srcset="https://tva1.sinaimg.cn/large/e6c9d24ely1gznpt5dhg3j224c0katcg.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20220223202515287"></p>
+<p>而第二个方法，就是我们的<code>main</code>方法了，但是现在我们先不急着去看它的详细实现过程，我们来看看它的属性表。</p>
+<p>属性表实际上类中、字段中、方法中都可以携带自己的属性表，属性表存放的正是我们的代码、本地变量等数据，比如main方法就存在4个本地变量，那么它的本地变量存放在哪里呢：</p>
+<p><img src="https://tva1.sinaimg.cn/large/e6c9d24ely1gznpy0i9ehj21by0hywii.jpg" class="lazyload placeholder" data-srcset="https://tva1.sinaimg.cn/large/e6c9d24ely1gznpy0i9ehj21by0hywii.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20220223202955858"></p>
+<p>可以看到，属性信息呈现套娃状态，在此方法中的属性包括了一个Code属性，此属性正是我们的Java代码编译之后变成字节码指令，然后存放的地方，而在此属性中，又嵌套了本地变量表和源码行号表。</p>
+<p>可以看到code中存放的就是所有的字节码指令：</p>
+<p><img src="https://tva1.sinaimg.cn/large/e6c9d24ely1gznq0wqe4xj215a0bi76l.jpg" class="lazyload placeholder" data-srcset="https://tva1.sinaimg.cn/large/e6c9d24ely1gznq0wqe4xj215a0bi76l.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20220223203241262"></p>
+<p>这里我们暂时不对字节码指令进行讲解（其实也用不着讲了，都认识的差不多了）。我们接着来看本地变量表，这里存放了我们方法中要用到的局部变量：</p>
+<p><img src="https://tva1.sinaimg.cn/large/e6c9d24ely1gznq26f7rhj219w0ekq5v.jpg" class="lazyload placeholder" data-srcset="https://tva1.sinaimg.cn/large/e6c9d24ely1gznq26f7rhj219w0ekq5v.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20220223203356129"></p>
+<p>可以看到一共有四个本地变量，而第一个变量正是main方法的形参<code>String[] args</code>，并且表中存放了本地变量的长度、名称、描述符等内容。当然，除了我们刚刚认识的这几个属性之外，完整属性可以查阅《深入理解Java虚拟机 第三版》231页。</p>
+<p>最后，类也有一些属性：</p>
+<p><img src="https://tva1.sinaimg.cn/large/e6c9d24ely1gznq712n66j21dw0n20xw.jpg" class="lazyload placeholder" data-srcset="https://tva1.sinaimg.cn/large/e6c9d24ely1gznq712n66j21dw0n20xw.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20220223203835282"></p>
+<p>此属性记录的是源文件名称。</p>
+<p>这样，我们对一个字节码文件的认识差不多就结束了，在了解了字节码文件的结构之后，是不是感觉豁然开朗？</p>
+<hr>
+<h3 id="字节码指令"><a href="#字节码指令" class="headerlink" title="字节码指令"></a>字节码指令</h3><p>虚拟机的指令是由一个字节长度的、代表某种特定操作含义的数字（操作码，类似于机器语言），操作后面也可以携带0个或多个参数一起执行。我们前面已经介绍过了，JVM实际上并不是面向寄存器架构的，而是面向操作数栈，所以大多数指令都是不带参数的。</p>
+<p>由于之前已经讲解过大致运行流程，这里我们就以当前的Main类中的main方法作为教材进行讲解：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">    <span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">10</span>;</span><br><span class="line">    <span class="type">int</span> <span class="variable">a</span> <span class="operator">=</span> i++;</span><br><span class="line">    <span class="type">int</span> <span class="variable">b</span> <span class="operator">=</span> ++i;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>可以看到，main方法中首先是定义了一个int类型的变量i，并赋值为10，然后变量a接收<code>i++</code>的值，变量b接收<code>++i</code>的值。</p>
+<p>那么我们来看看编译成字节码之后，是什么样的：</p>
+<p><img src="https://tva1.sinaimg.cn/large/e6c9d24ely1gznqsryzgfj225c0lgq6o.jpg" class="lazyload placeholder" data-srcset="https://tva1.sinaimg.cn/large/e6c9d24ely1gznqsryzgfj225c0lgq6o.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20220223205928901"></p>
+<ul>
+<li>首先第一句，<code>bipush</code>，将10送至操作数栈顶。</li>
+<li>接下来将操作数栈顶的数值存进1号本地变量，也就是变量i中。</li>
+<li>接着将变量i中的值又丢向操作数栈顶</li>
+<li>这里使用<code>iinc</code>指令，将1号本地变量的值增加1（结束之后i的值就是11了）</li>
+<li>接着将操作数栈顶的值（操作数栈顶的值是10）存入2号本地变量（这下彻底知道i++到底干了啥才会先返回后自增了吧，从原理角度来说，实际上i是先自增了的，但由于这里取的是操作数栈中的值，所以说就得到了i之前的值）</li>
+<li>接着往下，我们看到++i是先直接将i的值自增1</li>
+<li>然后在将其值推向操作数栈顶</li>
+</ul>
+<p><img src="https://tva1.sinaimg.cn/large/e6c9d24ely1gzns3syhe7j21x8090q5k.jpg" class="lazyload placeholder" data-srcset="https://tva1.sinaimg.cn/large/e6c9d24ely1gzns3syhe7j21x8090q5k.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20220223214441621"></p>
+<p>而从结果来看，<code>i++</code>操作确实是先返回再自增的，而字节码指令层面来说，却是截然相反的，只是结果一致罢了。</p>
+<hr>
+<h3 id="ASM字节码编程"><a href="#ASM字节码编程" class="headerlink" title="ASM字节码编程"></a>ASM字节码编程</h3><p>既然字节码文件结构如此清晰，那么我们能否通过编程，来直接创建一个字节码文件呢？如果我们可以直接编写一个字节码文件，那么我们就可以省去编译的过程。ASM（某些JDK中内置）框架正是用于支持字节码编程的框架。</p>
+<p>比如现在我们需要创建一个普通的Main类（暂时不写任何内容）</p>
+<p>首先我们来看看如何通过编程创建一个Main类的字节码文件：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Main</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="type">ClassWriter</span> <span class="variable">writer</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ClassWriter</span>(ClassWriter.COMPUTE_MAXS);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>首先需要获取<code>ClassWriter</code>对象，我们可以使用它来编辑类的字节码文件，在构造时需要传入参数：</p>
+<ul>
+<li>0     这种方式不会自动计算操作数栈和局部临时变量表大小，需要自己手动来指定</li>
+<li>ClassWriter.COMPUTE_MAXS(1)     这种方式会自动计算上述操作数栈和局部临时变量表大小，但需要手动触发。</li>
+<li>ClassWriter.COMPUTE_FRAMES(2)   这种方式不仅会计算上述操作数栈和局部临时变量表大小，而且会自动计算StackMapFrames</li>
+</ul>
+<p>这里我们使用<code>ClassWriter.COMPUTE_MAXS</code>即可。</p>
+<p>接着我们首先需要指定类的一些基本信息：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Main</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="type">ClassWriter</span> <span class="variable">writer</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ClassWriter</span>(ClassWriter.COMPUTE_MAXS);</span><br><span class="line">        <span class="comment">//因为这里用到的常量比较多，所以说直接一次性静态导入：import static jdk.internal.org.objectweb.asm.Opcodes.*;</span></span><br><span class="line">        writer.visit(V1_8, ACC_PUBLIC,<span class="string">&quot;com/test/Main&quot;</span>, <span class="literal">null</span>, <span class="string">&quot;java/lang/Object&quot;</span>,<span class="literal">null</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里我们将字节码文件的版本设定位Java8，然后修饰符设定为<code>ACC_PUBLIC</code>代表<code>public class Main</code>，类名称注意要携带包名，标签设置为<code>null</code>，父类设定为Object类，然后没有实现任何接口，所以说最后一个参数也是<code>null</code>。</p>
+<p>接着，一个简答的类字节码文件就创建好了，我们可以尝试将其进行保存：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Main</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="type">ClassWriter</span> <span class="variable">writer</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ClassWriter</span>(ClassWriter.COMPUTE_MAXS);</span><br><span class="line">        writer.visit(V1_8, ACC_PUBLIC,<span class="string">&quot;com/test/Main&quot;</span>, <span class="literal">null</span>, <span class="string">&quot;java/lang/Object&quot;</span>,<span class="literal">null</span>);</span><br><span class="line">        <span class="comment">//调用visitEnd表示结束编辑</span></span><br><span class="line">        writer.visitEnd();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">try</span>(<span class="type">FileOutputStream</span> <span class="variable">stream</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">FileOutputStream</span>(<span class="string">&quot;./Main.class&quot;</span>))&#123;</span><br><span class="line">            stream.write(writer.toByteArray());  <span class="comment">//直接通过ClassWriter将字节码文件转换为byte数组，并保存到根目录下</span></span><br><span class="line">        &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>可以看到，在IDEA中反编译的结果为：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.test;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Main</span> &#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>我们知道，正常的类在编译之后，如果没有手动添加构造方法，那么会自带一个无参构造，但是我们这个类中还没有，所以我们来手动添加一个无参构造方法：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//通过visitMethod方法可以添加一个新的方法</span></span><br><span class="line">writer.visitMethod(ACC_PUBLIC, <span class="string">&quot;&lt;init&gt;&quot;</span>, <span class="string">&quot;()V&quot;</span>, <span class="literal">null</span>, <span class="literal">null</span>);</span><br></pre></td></tr></table></figure>
+
+<p>可以看到反编译的结果中已经存在了我们的构造方法：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.test;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Main</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">Main</span><span class="params">()</span> &#123;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>但是这样是不合法的，因为我们的构造方法还没有添加父类构造方法调用，所以说我们还需要在方法中添加父类构造方法调用指令：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">public com.test.Main();</span><br><span class="line">    descriptor: ()V</span><br><span class="line">    flags: ACC_PUBLIC</span><br><span class="line">    Code:</span><br><span class="line">      stack=1, locals=1, args_size=1</span><br><span class="line">         0: aload_0</span><br><span class="line">         1: invokespecial #1                  // Method java/lang/Object.&quot;&lt;init&gt;&quot;:()V</span><br><span class="line">         4: return</span><br><span class="line">      LineNumberTable:</span><br><span class="line">        line 11: 0</span><br><span class="line">      LocalVariableTable:</span><br><span class="line">        Start  Length  Slot  Name   Signature</span><br><span class="line">            0       5     0  this   Lcom/test/Main;</span><br></pre></td></tr></table></figure>
+
+<p>我们需要对方法进行详细编辑：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//通过MethodVisitor接收返回值，进行进一步操作</span></span><br><span class="line"><span class="type">MethodVisitor</span> <span class="variable">visitor</span> <span class="operator">=</span> writer.visitMethod(ACC_PUBLIC, <span class="string">&quot;&lt;init&gt;&quot;</span>, <span class="string">&quot;()V&quot;</span>, <span class="literal">null</span>, <span class="literal">null</span>);</span><br><span class="line"><span class="comment">//开始编辑代码</span></span><br><span class="line">visitor.visitCode();</span><br><span class="line"></span><br><span class="line"><span class="comment">//Label用于存储行号</span></span><br><span class="line"><span class="type">Label</span> <span class="variable">l1</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Label</span>();</span><br><span class="line"><span class="comment">//当前代码写到哪行了，l1得到的就是多少行</span></span><br><span class="line">visitor.visitLabel(l1);</span><br><span class="line"><span class="comment">//添加源码行数对应表（其实可以不用）</span></span><br><span class="line">visitor.visitLineNumber(<span class="number">11</span>, l1);</span><br><span class="line"></span><br><span class="line"><span class="comment">//注意不同类型的指令需要用不同方法来调用，因为操作数不一致，具体的注释有写</span></span><br><span class="line">visitor.visitVarInsn(ALOAD, <span class="number">0</span>);</span><br><span class="line">visitor.visitMethodInsn(INVOKESPECIAL, <span class="string">&quot;java/lang/Object&quot;</span>, <span class="string">&quot;&lt;init&gt;&quot;</span>, <span class="string">&quot;()V&quot;</span>, <span class="literal">false</span>);</span><br><span class="line">visitor.visitInsn(RETURN);</span><br><span class="line"></span><br><span class="line"><span class="type">Label</span> <span class="variable">l2</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Label</span>();</span><br><span class="line">visitor.visitLabel(l2);</span><br><span class="line"><span class="comment">//添加本地变量表，这里加的是this关键字，但是方法中没用到，其实可以不加</span></span><br><span class="line">visitor.visitLocalVariable(<span class="string">&quot;this&quot;</span>, <span class="string">&quot;Lcom/test/Main;&quot;</span>, <span class="literal">null</span>, l1, l2, <span class="number">0</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">//最后设定最大栈深度和本地变量数</span></span><br><span class="line">visitor.visitMaxs(<span class="number">1</span>, <span class="number">1</span>);</span><br><span class="line"><span class="comment">//结束编辑</span></span><br><span class="line">visitor.visitEnd();</span><br></pre></td></tr></table></figure>
+
+<p>我们可以对编写好的class文件进行反编译，看看是不是和IDEA编译之后的结果差不多：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  public com.test.Main();</span><br><span class="line">    descriptor: ()V</span><br><span class="line">    flags: ACC_PUBLIC</span><br><span class="line">    Code:</span><br><span class="line">      stack=1, locals=1, args_size=1</span><br><span class="line">         0: aload_0</span><br><span class="line">         1: invokespecial #8                  // Method java/lang/Object.&quot;&lt;init&gt;&quot;:()V</span><br><span class="line">         4: return</span><br><span class="line">      LocalVariableTable:</span><br><span class="line">        Start  Length  Slot  Name   Signature</span><br><span class="line">            0       5     0  this   Lcom/test/Main</span><br><span class="line">      LineNumberTable:</span><br><span class="line">        line 11: 0</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>可以看到和之前的基本一致了，到此为止我们构造方法就编写完成了，接着我们来写一下main方法，一会我们就可以通过main方法来运行Java程序了。比如我们要编写这样一个程序：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">    <span class="type">int</span> <span class="variable">a</span> <span class="operator">=</span> <span class="number">10</span>;</span><br><span class="line">    System.out.println(a);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>看起来很简单的一个程序对吧，但是我们如果手动去组装指令，会极其麻烦！首先main方法是一个静态方法，并且方法是public权限，然后还有一个参数<code>String[] args</code>，所以说我们这里要写的内容有点小多：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//开始安排main方法</span></span><br><span class="line"><span class="type">MethodVisitor</span> <span class="variable">v2</span> <span class="operator">=</span> writer.visitMethod(ACC_PUBLIC | ACC_STATIC, <span class="string">&quot;main&quot;</span>, <span class="string">&quot;([Ljava/lang/String;)V&quot;</span>, <span class="literal">null</span>, <span class="literal">null</span>);</span><br><span class="line">v2.visitCode();</span><br><span class="line"><span class="comment">//记录起始行信息</span></span><br><span class="line"><span class="type">Label</span> <span class="variable">l3</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Label</span>();</span><br><span class="line">v2.visitLabel(l3);</span><br><span class="line">v2.visitLineNumber(<span class="number">13</span>, l3);</span><br><span class="line"></span><br><span class="line"><span class="comment">//首先是int a = 10的操作，执行指令依次为：</span></span><br><span class="line"><span class="comment">// bipush 10     将10推向操作数栈顶</span></span><br><span class="line"><span class="comment">// istore_1      将操作数栈顶元素保存到1号本地变量a中</span></span><br><span class="line">v2.visitIntInsn(BIPUSH, <span class="number">10</span>);</span><br><span class="line">v2.visitVarInsn(ISTORE, <span class="number">1</span>);</span><br><span class="line"><span class="type">Label</span> <span class="variable">l4</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Label</span>();</span><br><span class="line">v2.visitLabel(l4);</span><br><span class="line"><span class="comment">//记录一下行信息</span></span><br><span class="line">v2.visitLineNumber(<span class="number">14</span>, l4);</span><br><span class="line"></span><br><span class="line"><span class="comment">//这里是获取System类中的out静态变量（PrintStream接口），用于打印</span></span><br><span class="line">v2.visitFieldInsn(GETSTATIC, <span class="string">&quot;java/lang/System&quot;</span>, <span class="string">&quot;out&quot;</span>, <span class="string">&quot;Ljava/io/PrintStream;&quot;</span>);</span><br><span class="line"><span class="comment">//把a的值取出来</span></span><br><span class="line">v2.visitVarInsn(ILOAD, <span class="number">1</span>);</span><br><span class="line"><span class="comment">//调用接口中的抽象方法println</span></span><br><span class="line">v2.visitMethodInsn(INVOKEVIRTUAL, <span class="string">&quot;java/io/PrintStream&quot;</span>, <span class="string">&quot;println&quot;</span>, <span class="string">&quot;(I)V&quot;</span>, <span class="literal">false</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">//再次记录行信息</span></span><br><span class="line"><span class="type">Label</span> <span class="variable">l6</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Label</span>();</span><br><span class="line">v2.visitLabel(l6);</span><br><span class="line">v2.visitLineNumber(<span class="number">15</span>, l6);</span><br><span class="line"></span><br><span class="line">v2.visitInsn(RETURN);</span><br><span class="line"><span class="type">Label</span> <span class="variable">l7</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Label</span>();</span><br><span class="line">v2.visitLabel(l7);</span><br><span class="line"></span><br><span class="line"><span class="comment">//最后是本地变量表中的各个变量</span></span><br><span class="line">v2.visitLocalVariable(<span class="string">&quot;args&quot;</span>, <span class="string">&quot;[Ljava/lang/String;&quot;</span>, <span class="literal">null</span>, l3, l7, <span class="number">0</span>);</span><br><span class="line">v2.visitLocalVariable(<span class="string">&quot;a&quot;</span>, <span class="string">&quot;I&quot;</span>, <span class="literal">null</span>, l4, l7, <span class="number">1</span>);</span><br><span class="line">v2.visitMaxs(<span class="number">1</span>, <span class="number">2</span>);</span><br><span class="line"><span class="comment">//终于OK了</span></span><br><span class="line">v2.visitEnd();</span><br></pre></td></tr></table></figure>
+
+<p>可以看到，虽然很简单的一个程序，但是如果我们手动去编写字节码，实际上是非常麻烦的，但是要实现动态代理之类的操作（可以很方便地修改字节码创建子类），是不是感觉又Get到了新操作（其实Spring实现动态代理的CGLib框架底层正是调用了ASM框架来实现的），所以说了解一下还是可以的，不过我们自己肯定是没多少玩这个的机会了。</p>
+<hr>
+<h2 id="类加载机制"><a href="#类加载机制" class="headerlink" title="类加载机制"></a>类加载机制</h2><p>现在，我们已经了解了字节码文件的结构，以及JVM如何对内存进行管理，现在只剩下最后一个谜团等待解开了，也就是我们的类字节码文件到底是如何加载到内存中的，加载之后又会做什么事情。</p>
+<h3 id="类加载过程"><a href="#类加载过程" class="headerlink" title="类加载过程"></a>类加载过程</h3><p>首先，要加载一个类，一定是出于某种目的的，比如我们要运行我们的Java程序，那么就必须要加载主类才能运行主类中的主方法，又或是我们需要加载数据库驱动，那么可以通过反射来将对应的数据库驱动类进行加载。</p>
+<p>所以，一般在这些情况下，如果类没有被加载，那么会被自动加载：</p>
+<ul>
+<li>使用new关键字创建对象时</li>
+<li>使用某个类的静态成员（包括方法和字段）的时候（当然，final类型的静态字段有可能在编译的时候被放到了当前类的常量池中，这种情况下是不会触发自动加载的）</li>
+<li>使用反射对类信息进行获取的时候（之前的数据库驱动就是这样的）</li>
+<li>加载一个类的子类时</li>
+<li>加载接口的实现类，且接口带有<code>default</code>的方法默认实现时</li>
+</ul>
+<p>比如这种情况，那么需要用到另一个类中的成员字段，所以就必须将另一个类加载之后才能访问：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Main</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        System.out.println(Test.str);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">class</span> <span class="title class_">Test</span>&#123;</span><br><span class="line">        <span class="keyword">static</span> &#123;</span><br><span class="line">            System.out.println(<span class="string">&quot;我被初始化了！&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">public</span> <span class="keyword">static</span> <span class="type">String</span> <span class="variable">str</span> <span class="operator">=</span> <span class="string">&quot;都看到这里了，不给个三连+关注吗？&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里我们就演示一个不太好理解的情况，我们现在将静态成员变量修改为final类型的：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Main</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        System.out.println(Test.str);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">class</span> <span class="title class_">Test</span>&#123;</span><br><span class="line">        <span class="keyword">static</span> &#123;</span><br><span class="line">            System.out.println(<span class="string">&quot;我被初始化了！&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">static</span> <span class="type">String</span> <span class="variable">str</span> <span class="operator">=</span> <span class="string">&quot;都看到这里了，不给个三连+关注吗？&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>可以看到，在主方法中，我们使用了Test类的静态成员变量，并且此静态成员变量是一个final类型的，也就是说不可能再发生改变。那么各位觉得，Test类会像上面一样被初始化吗？</p>
+<p>按照正常逻辑来说，既然要用到其他类中的字段，那么肯定需要加载其他类，但是这里我们结果发现，并没有对Test类进行加载，那么这是为什么呢？我们来看看Main类编译之后的字节码指令就知道了：</p>
+<p><img src="https://tva1.sinaimg.cn/large/e6c9d24ely1gzoizzv7azj227c0lcjvp.jpg" class="lazyload placeholder" data-srcset="https://tva1.sinaimg.cn/large/e6c9d24ely1gzoizzv7azj227c0lcjvp.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20220224131511381"></p>
+<p>很明显，这里使用的是<code>ldc</code>指令从常量池中将字符串取出并推向操作数栈顶，也就是说，在编译阶段，整个<code>Test.str</code>直接被替换为了对应的字符串（因为final不可能发生改变的，编译就会进行优化，直接来个字符串比你去加载类在获取快得多不是吗，反正结果都一样），所以说编译之后，实际上跟Test类半毛钱关系都没有了。</p>
+<p>所以说，当你在某些情况下疑惑为什么类加载了或是没有加载时，可以从字节码指令的角度去进行分析，一般情况下，只要遇到<code>new</code>、<code>getstatic</code>、<code>putstatic</code>、<code>invokestatic</code>这些指令时，都会进行类加载，比如：</p>
+<p><img src="https://tva1.sinaimg.cn/large/e6c9d24ely1gzoj5isswmj22520j877u.jpg" class="lazyload placeholder" data-srcset="https://tva1.sinaimg.cn/large/e6c9d24ely1gzoj5isswmj22520j877u.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20220224132029992"></p>
+<p>这里很明显，是一定会将Test类进行加载的。除此之外，各位也可以试试看数组的定义会不会导致类被加载。</p>
+<p>好了，聊完了类的加载触发条件，我们接着来看一下类的详细加载流程。</p>
+<p><img src="https://tva1.sinaimg.cn/large/e6c9d24ely1gzojblu4woj21380jkjtf.jpg" class="lazyload placeholder" data-srcset="https://tva1.sinaimg.cn/large/e6c9d24ely1gzojblu4woj21380jkjtf.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20220224132621764"></p>
+<p>首先类的生命周期一共有7个阶段，而首当其冲的就是加载，加载阶段需要获取此类的二进制数据流，比如我们要从硬盘中读取一个class文件，那么就可以通过文件输入流来获取类文件的<code>byte[]</code>，也可以是其他各种途径获取类文件的输入流，甚至网络传输并加载一个类也不是不可以。然后交给类加载器进行加载（类加载器可以是JDK内置的，也可以是开发者自己撸的，后面会详细介绍）类的所有信息会被加载到方法区中，并且在堆内存中会生成一个代表当前类的Class类对象（那么思考一下，同一个Class文件加载的类，是唯一存在的吗？），我们可以通过此对象以及反射机制来访问这个类的各种信息。</p>
+<p>数组类要稍微特殊一点，通过前面的检验，我没发现数组在创建后是不会导致类加载的，数组类型本身不会通过类加载器进行加载的，不过你既然要往里面丢对象进去，那最终依然是要加载类的。</p>
+<p>接着我们来看验证阶段，验证阶段相当于是对加载的类进行一次规范校验（因为一个类并不一定是由我们使用IDEA编译出来的，有可能是像我们之前那样直接用ASM框架写的一个），如果说类的任何地方不符合虚拟机规范，那么这个类是不会验证通过的，如果没有验证机制，那么一旦出现危害虚拟机的操作，整个程序会出现无法预料的后果。</p>
+<p>验证阶段，首先是文件格式的验证：</p>
+<ul>
+<li>是否魔数为CAFEBABE开头。</li>
+<li>主、次版本号是否可以由当前Java虚拟机运行</li>
+<li>Class文件各个部分的完整性如何。</li>
+<li>…</li>
+</ul>
+<p>有关类验证的详细过程，可以参考《深入理解Java虚拟机 第三版》268页。</p>
+<p>接下来就是准备阶段了，这个阶段会为类变量分配内存，并为一些字段设定初始值，注意是系统规定的初始值，不是我们手动指定的初始值。</p>
+<p>再往下就是解析阶段，此阶段是将常量池内的符号引用替换为直接引用的过程，也就是说，到这个时候，所有引用变量的指向都是已经切切实实地指向了内存中的对象了。</p>
+<p>到这里，链接过程就结束了，也就是说这个时候类基本上已经完成大部分内容的初始化了。</p>
+<p>最后就是真正的初始化阶段了，从这里开始，类中的Java代码部分，才会开始执行，还记得我们之前介绍的<code>&lt;clinit&gt;</code>方法吗，它就是在这个时候执行的，比如我们的类中存在一个静态成员变量，并且赋值为10，或是存在一个静态代码块，那么就会自动生成一个<code>&lt;clinit&gt;</code>方法来进行赋值操作，但是这个方法是自动生成的。</p>
+<p>全部完成之后，我们的类就算是加载完成了。</p>
+<hr>
+<h3 id="类加载器"><a href="#类加载器" class="headerlink" title="类加载器"></a>类加载器</h3><p>Java提供了类加载器，以便我们自己可以更好地控制类加载，我们可以自定义类加载器，也可以使用官方自带的类加载器去加载类。对于任意一个类，都必须由加载它的类加载器和这个类本身一起共同确立其在Java虚拟机中的唯一性。</p>
+<p>也就是说，一个类可以由不同的类加载器加载，并且，不同的类加载器加载的出来的类，即使来自同一个Class文件，也是不同的，只有两个类来自同一个Class文件并且是由同一个类加载器加载的，才能判断为是同一个。默认情况下，所有的类都是由JDK自带的类加载器进行加载。</p>
+<p>比如，我们先创建一个Test类用于测试：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.test;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Test</span> &#123;</span><br><span class="line">    </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>接着我们自己实现一个ClassLoader来加载我们的Test类，同时使用官方默认的类加载器来加载：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Main</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> ReflectiveOperationException &#123;</span><br><span class="line">        Class&lt;?&gt; testClass1 = Main.class.getClassLoader().loadClass(<span class="string">&quot;com.test.Test&quot;</span>);</span><br><span class="line">        <span class="type">CustomClassLoader</span> <span class="variable">customClassLoader</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">CustomClassLoader</span>();</span><br><span class="line">        Class&lt;?&gt; testClass2 = customClassLoader.loadClass(<span class="string">&quot;com.test.Test&quot;</span>);</span><br><span class="line"></span><br><span class="line">     	  <span class="comment">//看看两个类的类加载器是不是同一个</span></span><br><span class="line">        System.out.println(testClass1.getClassLoader());</span><br><span class="line">        System.out.println(testClass2.getClassLoader());</span><br><span class="line">				</span><br><span class="line">      	<span class="comment">//看看两个类是不是长得一模一样</span></span><br><span class="line">        System.out.println(testClass1);</span><br><span class="line">        System.out.println(testClass2);</span><br><span class="line"></span><br><span class="line">      	<span class="comment">//两个类是同一个吗？</span></span><br><span class="line">        System.out.println(testClass1 == testClass2);</span><br><span class="line">      </span><br><span class="line">      	<span class="comment">//能成功实现类型转换吗？</span></span><br><span class="line">        <span class="type">Test</span> <span class="variable">test</span> <span class="operator">=</span> (Test) testClass2.newInstance();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">class</span> <span class="title class_">CustomClassLoader</span> <span class="keyword">extends</span> <span class="title class_">ClassLoader</span> &#123;</span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="keyword">public</span> Class&lt;?&gt; loadClass(String name) <span class="keyword">throws</span> ClassNotFoundException &#123;</span><br><span class="line">            <span class="keyword">try</span> (<span class="type">FileInputStream</span> <span class="variable">stream</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">FileInputStream</span>(<span class="string">&quot;./target/classes/&quot;</span>+name.replace(<span class="string">&quot;.&quot;</span>, <span class="string">&quot;/&quot;</span>)+<span class="string">&quot;.class&quot;</span>))&#123;</span><br><span class="line">                <span class="type">byte</span>[] data = <span class="keyword">new</span> <span class="title class_">byte</span>[stream.available()];</span><br><span class="line">                stream.read(data);</span><br><span class="line">                <span class="keyword">if</span>(data.length == <span class="number">0</span>) <span class="keyword">return</span> <span class="built_in">super</span>.loadClass(name);</span><br><span class="line">                <span class="keyword">return</span> defineClass(name, data, <span class="number">0</span>, data.length);</span><br><span class="line">            &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">                <span class="keyword">return</span> <span class="built_in">super</span>.loadClass(name);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>通过结果我们发现，即使两个类是同一个Class文件加载的，只要类加载器不同，那么这两个类就是不同的两个类。</p>
+<p>所以说，我们当时在JavaSE阶段讲解的每个类都在堆中有一个唯一的Class对象放在这里来看，并不完全正确，只是当前为了防止各位初学者搞混。</p>
+<p>实际上，JDK内部提供的类加载器一共有三个，比如上面我们的Main类，其实是被AppClassLoader加载的，而JDK内部的类，都是由BootstrapClassLoader加载的，这其实就是为了实现双亲委派机制而做的。</p>
+<p><img src="https://tva1.sinaimg.cn/large/e6c9d24ely1gzpoy41z31j20wb0u040w.jpg" class="lazyload placeholder" data-srcset="https://tva1.sinaimg.cn/large/e6c9d24ely1gzpoy41z31j20wb0u040w.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20220225132629954"></p>
+<p>有关双亲委派机制，我们在JavaSE阶段反射板块已经讲解过了，所以说这就不多做介绍了。</p>
+
+      </div>
+      <div class="post-tags-categories">
+        
+        <div class="tags">
+          
+            <a href="/tags/JVM/" class="">
+              JVM
+            </a>
+          
+        </div>
+        
+      </div>
+      
+        <div class="copyright">
+  <ul class="post-copyright">
+    <li class="post-copyright-author">
+    <strong>author:  </strong>John Doe</a>
+    </li>
+    <li class="post-copyright-link">
+    <strong>link:  </strong>
+    <a href="/2022/05/03/JVM笔记（三）/" target="_blank" title="JVM笔记（三）">http://example.com/2022/05/03/JVM笔记（三）/</a>
+    </li>
+    <li class="post-copyright-license">
+      <strong>Copyright notice:   </strong>
+      All articles on this website, unless otherwise stated, adopt <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">CC BY-NC-ND 4.0</a>
+      reprint policy. If reproduced, please indicate source!
+    </li>
+  </ul>
+<div>
+      
+    </article>
+    <!-- 上一篇文章和下一篇文章 -->
+    
+      <!-- 文章详情页的上一页和下一页 -->
+<div class="post-nav">
+
+
+
+  
+  <div class="post-nav-prev post-nav-item">
+    <div class="post-nav-img" style="background-size: cover; 
+      background-position: center center;">
+      <img class="lazyload lazyload placeholder" src="/medias/1.jpg" class="lazyload placeholder" data-srcset="/medias/1.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="">
+    </div>
+    <a href="/2022/05/03/Docker/" class="post-nav-link">
+      <div class="title">
+        <i class="fas fa-angle-left"></i> Prev:
+        <div class="title-text">Docker</div>
+      </div>
+      
+      <!-- <div class="content">
+        DockerDocker 是目前火热的容器化虚拟化技术，每一个 Docker 容器都是一个精简的 Linux 虚拟机，通
+      </div> -->
+    </a>
+  </div>
+
+
+
+  
+  <div class="post-nav-next post-nav-item">
+    <div class="post-nav-img" style="background-size: cover; 
+      background-position: center center;">
+      <img class="lazyload lazyload placeholder" src="/medias/12.jpg" class="lazyload placeholder" data-srcset="/medias/12.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" src="" alt="">
+    </div>
+    <a href="/2022/05/03/JVM%E7%AC%94%E8%AE%B0%EF%BC%88%E4%BA%8C%EF%BC%89/" class="post-nav-link">
+      <div class="title">
+        Next: <i class="fas fa-angle-right"></i>
+        <div class="title-text">JVM笔记（二）</div>
+      </div>
+      <!-- <div class="content">
+        JVM内存管理在之前，我们了解了JVM的大致运作原理以及相关特性，这一章，我们首先会从内存管理说起。
+在传统的C&#x2
+      </div> -->
+    </a>
+  </div>
+
+</div>
+
+    
+    
+
+    <!-- 打赏 -->
+    
+      <div id="appDonate" class="post-donate">
+  <div id="donate_board" class="donate_bar center" ref="donate">
+    <a id="btn_donate" class="btn_donate" href="javascript:;" title="打赏" @click="showDialogDrawer()"></a>
+  </div>
+  <transition name="fade">
+    <div 
+      class="donate-box-mask"
+      v-cloak 
+      v-show="visible"
+      @click="cancelDialogDrawer()"
+    >
+    </div>
+  </transition>
+  <transition name="bounce">
+    <div class="donate-box" v-cloak v-show="visible">
+      <div class="donate-box_close">
+        <i class="fas fa-times" aria-hidden="true" @click="cancelDialogDrawer" pointer></i>
+      </div>
+      <div class="donate-box_title">
+        <h4>
+          你的赏识是我前进的动力
+        </h4>
+      </div>
+      <div class="donate-box_tab">
+        <div class="Alipay" pointer :class="{'active': tabActive === 'Alipay'}" @click="changeTabActive('Alipay')">
+          支付宝
+        </div>
+        <div class="WeChatpay" pointer :class="{'active': tabActive === 'WeChatpay'}" @click="changeTabActive('WeChatpay')">
+          微信
+        </div>
+      </div>
+      <div class="donate-box_img">
+        <div class="AlipayImg" v-show="tabActive === 'Alipay'">
+          <img src="/medias/1.jpg" class="lazyload placeholder" data-srcset="/medias/1.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="支付宝打赏" />
+        </div> 
+        <div class="WeChatpayImg" v-show="tabActive === 'WeChatpay'">
+          <img src="/medias/2.jpg" class="lazyload placeholder" data-srcset="/medias/2.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="微信打赏" />
+        </div>
+      </div>
+    </div>
+  </transition>
+</div>
+
+<script>
+  var body = document.body || document.documentElement || window;
+  var vm = new Vue({
+    el: '#appDonate',
+    data: {
+      visible: false,
+      tabActive: 'Alipay',
+      top: 0,
+    },
+    computed: {
+    },
+    mounted() {
+    },
+    methods: {
+      showDialogDrawer() {
+        this.visible = true;
+        // 防止页面滚动，只能让弹框滚动
+        // function getScroll() {
+        //   return {
+        //     left: window.pageXOffset || document.documentElement.scrollLeft || document.body.scrollLeft || 0,
+        //     top: window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0
+        //   };
+        // }
+        this.top = $(document).scrollTop() // or getScroll().top
+        // console.log('aa', $('.main-content'));
+        body.style.cssText = 'overflow: hidden;';
+      },
+      cancelDialogDrawer() {
+        this.visible = false;
+        body.removeAttribute('style');
+        $(document).scrollTop(this.top)
+      },
+      changeTabActive(name) {
+        this.tabActive = name;
+      }
+    },
+    created() {}
+  })
+</script>
+    
+
+    <!-- 分享 -->
+    
+      <!-- https://github.com/overtrue/share.js -->
+<!-- 文章详情页的分享 -->
+<div class="social-share" data-sites="twitter,facebook,google,qq,qzone,wechat,weibo,douban,linkedin" data-wechat-qrcode-helper="<p>微信扫一扫即可分享！</p>"></div>
+
+<script src="/js/shareJs/social-share.min.js"></script>
+</script>
+
+<style>
+  .social-share {
+    margin: 20px 0;
+  }
+</style>
+
+
+    
+    
+    <!-- 评论 -->
+    <!-- 评论 -->
+
+  <div id="myComment">
+    
+      <div id="gitment-container"></div>
+
+    
+  </div>
+
+<!-- comment script in themes\hexo-theme-bamboo\layout\_partial\scripts\index.ejs -->
+
+
+  </div>
+
+  <!-- 目录 -->
+  <!-- 文章详情页右侧目录 -->
+
+  <div class="toc-aside">
+    <div class="toc-main">
+      <div class="toc-aside-title">
+        <i class="fas fa-list-ul" aria-hidden="true"></i><span>catalog</span>
+        
+          <div class="toc-open-close">catalog</div>
+        
+      </div>
+      <div class="toc-content">
+        <div class="toc"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 手机端目录按钮 -->
+  <div id="toc-mobile-btn">
+    <i class="fas fa-list-ul" aria-hidden="true"></i>
+  </div>
+
+
+<script>
+  function closeToc(init) {
+    $(".toc-aside").css({'width': 0, 'padding': 0, 'transition': init ?  'noe' : 'width 0.3s' });
+    $(".toc-content").css({'width': 0});
+    $(".toc-aside-title span, .toc-aside-title i").css({'display': 'none'});
+    $(".main-content").css({'width': '75%', 'margin-left': 'auto', 'margin-right': 'auto',});
+  };
+  function openToc() {
+    $(".main-content").css({'width': '65%', 'margin-right': '10px', 'margin-left': 'calc(35% - 350px)'});
+    $(".toc-aside").css({'width': '300px', 'padding': '0 10px', 'transition': 'width 0.3s'});
+    $(".toc-content").css({'width': '300px'});
+    $(".toc-aside-title span, .toc-aside-title i").css({'display': 'inline-block'});
+  }
+  function openBtnClickFn () {
+    let openOrCloseBtn = $('.toc-aside .toc-aside-title .toc-open-close');
+    let open = eval('' || 'true');
+    openOrCloseBtn.click(function() {
+      if (open) {
+        closeToc();
+        open = false;
+      } else {
+        openToc();
+        open = true;
+      }
+    });
+  };
+  openBtnClickFn();
+  initCloseTocWidth(true);
+
+  function initCloseTocWidth(init) {
+    if (window.innerWidth >= 992) {
+      let isClose = false;
+      isClose && closeToc(init)
+    }
+  }
+
+  document.addEventListener('pjax:complete', function () {
+    $(".toc-aside").css({'transition': 'no'});
+  })
+  document.addEventListener('pjax:complete', function () {
+    openBtnClickFn();
+  })
+  
+</script>
+
+  <!-- 图片放大 Wrap images with fancybox support -->
+  <script src="/js/wrapImage.js"></script>
+</div>
+
+<!-- 文章详情页背景图 -->
+<div id="appBgSwiper" style="position: fixed;left: 0;top: 0;width: 100%;height: 100%;z-index: -2;"
+	:style="{'background-color': bgColor ? bgColor : 'transparent'}">
+	<transition-group tag="ul" :name="names">
+		<li v-for='(image,index) in img' :key='index' v-show="index === mark" class="bg-swiper-box">
+			<img :src="image" class="bg-swiper-img no-lazy">
+		</li>
+	</transition-group>
+</div>
+<script>
+	var vm = new Vue({
+		el: '#appBgSwiper',
+		data: {
+			names: '' || 'fade' || 'fade', // translate-fade fade
+			mark: 0,
+			img: [],
+			bgColor: '',
+			time: null
+		},
+		methods: {   //添加方法
+			change(i, m) {
+				if (i > m) {
+					// this.names = 'fade';
+				} else if (i < m) {
+					// this.names = 'fade';
+				} else {
+					return;
+				}
+				this.mark = i;
+			},
+			prev() {
+				// this.names = 'fade';
+				this.mark--;
+				if (this.mark === -1) {
+					this.mark = 3;
+					return
+				}
+			},
+			next() {
+				// this.names = 'fade';
+				this.mark++;
+				if (this.mark === this.img.length) {
+					this.mark = 0;
+					return
+				}
+			},
+			autoPlay() {
+				// this.names = 'fade';
+				this.mark++;
+				if (this.mark === this.img.length) {
+					this.mark = 0;
+					return
+				}
+			},
+			play() {
+				let bgImgDelay = '' || '180000'
+				let delay = parseInt(bgImgDelay) || 180000;
+				this.time = setInterval(this.autoPlay, delay);
+			},
+			enter() {
+				clearInterval(this.time);
+			},
+			leave() {
+				this.play();
+			}
+		},
+		created() {
+			this.play()
+		},
+		beforeDestroy() {
+			clearInterval(this.time);
+		},
+		mounted() {
+			let prop = '' || '';
+			let isImg = prop.includes('.bmp') || prop.includes('.jpg') || prop.includes('.png') || prop.includes('.tif') || prop.includes('.gif') || prop.includes('.pcx') || prop.includes('.tga') || prop.includes('.exif') || prop.includes('.fpx') || prop.includes('.psd') || prop.includes('.cdr') || prop.includes('.pcd') || prop.includes('.dxf') || prop.includes('.ufo') || prop.includes('.eps') || prop.includes('.ai') || prop.includes('.raw') || prop.includes('.WMF') || prop.includes('.webp') || prop.includes('.jpeg') || prop.includes('http://') || prop.includes('https://')
+			if (isImg) {
+				let img = prop.split(',');
+				let configRoot = '/'
+				let arrImg = [];
+				img.forEach(el => {
+					var Expression = /http(s)?:\/\/([\w-]+\.)+[\w-]+(\/[\w- .\/?%&=]*)?/;
+					var objExp = new RegExp(Expression);
+
+					if (objExp.test(el)) {
+						// http or https
+						arrImg.push(el);
+					} else {
+						// 非http or https开头
+						// 本地文件
+						let firstStr = el.charAt(0);
+						if (firstStr == '/') {
+							el = el.substr(1); // 删除第一个字符 '/',因为 configRoot最后一个字符为 /
+						}
+						el = configRoot + el;
+						arrImg.push(el);
+					}
+				})
+				this.img = arrImg;
+			} else {
+				this.bgColor = prop;
+			}
+		}
+	})
+</script>
+
+<style>
+	.bg-swiper-box {
+		position: absolute;
+		display: block;
+		width: 100%;
+		height: 100%;
+	}
+
+	.bg-swiper-img {
+		object-fit: cover;
+		width: 100%;
+		height: 100%;
+	}
+</style>
+
+
+
+
+  <script>
+  function loadMermaid() {
+    if (document.getElementsByClassName('mermaid').length) {
+      if (window.mermaidJsLoad) mermaid.init()
+      else {
+        loadScript('https://unpkg.com/mermaid/dist/mermaid.min.js').then(() => {
+          window.mermaidJsLoad = true
+          mermaid.initialize({
+            theme: 'default',
+          })
+          if ('true') {
+            mermaid.init();
+          }
+        })
+      }
+    }
+  };
+  document.addEventListener("DOMContentLoaded", function () {
+    loadMermaid();
+  })
+
+  document.addEventListener('pjax:complete', function () {
+    loadMermaid();
+  })
+  
+</script>
+
+
+      </main>
+    </div>
+
+    <!-- 页脚 -->
+    
+  
+  
+    <!-- 底部鱼儿跳动效果，依赖于jquery-->
+<div id="j-fish-skip" style=" position: relative;height: 153px;width: auto;"></div>
+<script>
+  var RENDERER = {
+    POINT_INTERVAL: 5,
+    FISH_COUNT: 3,
+    MAX_INTERVAL_COUNT: 50,
+    INIT_HEIGHT_RATE: .5,
+    THRESHOLD: 50,
+    FISH_COLOR: '',
+    init: function () {
+      this.setFishColor(); this.setParameters(), this.reconstructMethods(), this.setup(), this.bindEvent(), this.render()
+    },
+    setFishColor: function () {
+      let isDark = JSON.parse(localStorage.getItem('dark')) || JSON.parse('false');
+      if (isDark) {
+        this.FISH_COLOR = '#222'; // 暗黑色，有时间把这整成一个变量
+      } else {
+        this.FISH_COLOR = '' || '#42b983';
+      }
+    },
+    setParameters: function () {
+      this.$window = $(window), this.$container = $("#j-fish-skip"), this.$canvas = $("<canvas />"), this.context = this.$canvas.appendTo(this.$container).get(0).getContext("2d"), this.points = [], this.fishes = [], this.watchIds = []
+    },
+    createSurfacePoints: function () {
+      var t = Math.round(this.width / this.POINT_INTERVAL);
+      this.pointInterval = this.width / (t - 1), this.points.push(new SURFACE_POINT(this, 0));
+      for (var i = 1; i < t; i++) {
+        var e = new SURFACE_POINT(this, i * this.pointInterval),
+          h = this.points[i - 1];
+        e.setPreviousPoint(h), h.setNextPoint(e), this.points.push(e)
+      }
+    },
+    reconstructMethods: function () {
+      this.watchWindowSize = this.watchWindowSize.bind(this), this.jdugeToStopResize = this.jdugeToStopResize.bind(this), this.startEpicenter = this.startEpicenter.bind(this), this.moveEpicenter = this.moveEpicenter.bind(this), this.reverseVertical = this.reverseVertical.bind(this), this.render = this.render.bind(this)
+    },
+    setup: function () {
+      this.points.length = 0, this.fishes.length = 0, this.watchIds.length = 0, this.intervalCount = this.MAX_INTERVAL_COUNT, this.width = this.$container.width(), this.height = this.$container.height(), this.fishCount = this.FISH_COUNT * this.width / 500 * this.height / 500, this.$canvas.attr({
+        width: this.width,
+        height: this.height
+      }), this.reverse = !1, this.fishes.push(new FISH(this)), this.createSurfacePoints()
+    },
+    watchWindowSize: function () {
+      this.clearTimer(), this.tmpWidth = this.$window.width(), this.tmpHeight = this.$window.height(), this.watchIds.push(setTimeout(this.jdugeToStopResize, this.WATCH_INTERVAL))
+    },
+    clearTimer: function () {
+      for (; this.watchIds.length > 0;) clearTimeout(this.watchIds.pop())
+    },
+    jdugeToStopResize: function () {
+      var t = this.$window.width(),
+        i = this.$window.height(),
+        e = t == this.tmpWidth && i == this.tmpHeight;
+      this.tmpWidth = t, this.tmpHeight = i, e && this.setup()
+    },
+    bindEvent: function () {
+      this.$window.on("resize", this.watchWindowSize), this.$container.on("mouseenter", this.startEpicenter), this.$container.on("mousemove", this.moveEpicenter)
+    },
+    getAxis: function (t) {
+      var i = this.$container.offset();
+      return {
+        x: t.clientX - i.left + this.$window.scrollLeft(),
+        y: t.clientY - i.top + this.$window.scrollTop()
+      }
+    },
+    startEpicenter: function (t) {
+      this.axis = this.getAxis(t)
+    },
+    moveEpicenter: function (t) {
+      var i = this.getAxis(t);
+      this.axis || (this.axis = i), this.generateEpicenter(i.x, i.y, i.y - this.axis.y), this.axis = i
+    },
+    generateEpicenter: function (t, i, e) {
+      if (!(i < this.height / 2 - this.THRESHOLD || i > this.height / 2 + this.THRESHOLD)) {
+        var h = Math.round(t / this.pointInterval);
+        h < 0 || h >= this.points.length || this.points[h].interfere(i, e)
+      }
+    },
+    reverseVertical: function () {
+      this.reverse = !this.reverse;
+      for (var t = 0, i = this.fishes.length; t < i; t++) this.fishes[t].reverseVertical()
+    },
+    controlStatus: function () {
+      for (var t = 0, i = this.points.length; t < i; t++) this.points[t].updateSelf();
+      for (t = 0, i = this.points.length; t < i; t++) this.points[t].updateNeighbors();
+      this.fishes.length < this.fishCount && 0 == --this.intervalCount && (this.intervalCount = this.MAX_INTERVAL_COUNT, this.fishes.push(new FISH(this)))
+    },
+    render: function () {
+      requestAnimationFrame(this.render), this.controlStatus(), this.context.clearRect(0, 0, this.width, this.height), this.context.fillStyle = this.FISH_COLOR;
+      for (var t = 0, i = this.fishes.length; t < i; t++) this.fishes[t].render(this.context);
+      this.context.save(), this.context.globalCompositeOperation = "xor", this.context.beginPath(), this.context.moveTo(0, this.reverse ? 0 : this.height);
+      for (t = 0, i = this.points.length; t < i; t++) this.points[t].render(this.context);
+      this.context.lineTo(this.width, this.reverse ? 0 : this.height), this.context.closePath(), this.context.fill(), this.context.restore()
+    }
+  },
+  SURFACE_POINT = function (t, i) {
+    this.renderer = t, this.x = i, this.init()
+  };
+  SURFACE_POINT.prototype = {
+    SPRING_CONSTANT: .03,
+    SPRING_FRICTION: .9,
+    WAVE_SPREAD: .3,
+    ACCELARATION_RATE: .01,
+    init: function () {
+      this.initHeight = this.renderer.height * this.renderer.INIT_HEIGHT_RATE, this.height = this.initHeight, this.fy = 0, this.force = {
+        previous: 0,
+        next: 0
+      }
+    },
+    setPreviousPoint: function (t) {
+      this.previous = t
+    },
+    setNextPoint: function (t) {
+      this.next = t
+    },
+    interfere: function (t, i) {
+      this.fy = this.renderer.height * this.ACCELARATION_RATE * (this.renderer.height - this.height - t >= 0 ? -1 : 1) * Math.abs(i)
+    },
+    updateSelf: function () {
+      this.fy += this.SPRING_CONSTANT * (this.initHeight - this.height), this.fy *= this.SPRING_FRICTION, this.height += this.fy
+    },
+    updateNeighbors: function () {
+      this.previous && (this.force.previous = this.WAVE_SPREAD * (this.height - this.previous.height)), this.next && (this.force.next = this.WAVE_SPREAD * (this.height - this.next.height))
+    },
+    render: function (t) {
+      this.previous && (this.previous.height += this.force.previous, this.previous.fy += this.force.previous), this.next && (this.next.height += this.force.next, this.next.fy += this.force.next), t.lineTo(this.x, this.renderer.height - this.height)
+    }
+  };
+  var FISH = function (t) {
+    this.renderer = t, this.init()
+  };
+  FISH.prototype = {
+    GRAVITY: .4,
+    init: function () {
+      this.direction = Math.random() < .5, this.x = this.direction ? this.renderer.width + this.renderer.THRESHOLD : -this.renderer.THRESHOLD, this.previousY = this.y, this.vx = this.getRandomValue(4, 10) * (this.direction ? -1 : 1), this.renderer.reverse ? (this.y = this.getRandomValue(1 * this.renderer.height / 10, 4 * this.renderer.height / 10), this.vy = this.getRandomValue(2, 5), this.ay = this.getRandomValue(.05, .2)) : (this.y = this.getRandomValue(6 * this.renderer.height / 10, 9 * this.renderer.height / 10), this.vy = this.getRandomValue(-5, -2), this.ay = this.getRandomValue(-.2, -.05)), this.isOut = !1, this.theta = 0, this.phi = 0
+    },
+    getRandomValue: function (t, i) {
+      return t + (i - t) * Math.random()
+    },
+    reverseVertical: function () {
+      this.isOut = !this.isOut, this.ay *= -1
+    },
+    controlStatus: function (t) {
+      this.previousY = this.y, this.x += this.vx, this.y += this.vy, this.vy += this.ay, this.renderer.reverse ? this.y > this.renderer.height * this.renderer.INIT_HEIGHT_RATE ? (this.vy -= this.GRAVITY, this.isOut = !0) : (this.isOut && (this.ay = this.getRandomValue(.05, .2)), this.isOut = !1) : this.y < this.renderer.height * this.renderer.INIT_HEIGHT_RATE ? (this.vy += this.GRAVITY, this.isOut = !0) : (this.isOut && (this.ay = this.getRandomValue(-.2, -.05)), this.isOut = !1), this.isOut || (this.theta += Math.PI / 20, this.theta %= 2 * Math.PI, this.phi += Math.PI / 30, this.phi %= 2 * Math.PI), this.renderer.generateEpicenter(this.x + (this.direction ? -1 : 1) * this.renderer.THRESHOLD, this.y, this.y - this.previousY), (this.vx > 0 && this.x > this.renderer.width + this.renderer.THRESHOLD || this.vx < 0 && this.x < -this.renderer.THRESHOLD) && this.init()
+    },
+    render: function (t) {
+      t.save(), t.translate(this.x, this.y), t.rotate(Math.PI + Math.atan2(this.vy, this.vx)), t.scale(1, this.direction ? 1 : -1), t.beginPath(), t.moveTo(-30, 0), t.bezierCurveTo(-20, 15, 15, 10, 40, 0), t.bezierCurveTo(15, -10, -20, -15, -30, 0), t.fill(), t.save(), t.translate(40, 0), t.scale(.9 + .2 * Math.sin(this.theta), 1), t.beginPath(), t.moveTo(0, 0), t.quadraticCurveTo(5, 10, 20, 8), t.quadraticCurveTo(12, 5, 10, 0), t.quadraticCurveTo(12, -5, 20, -8), t.quadraticCurveTo(5, -10, 0, 0), t.fill(), t.restore(), t.save(), t.translate(-3, 0), t.rotate((Math.PI / 3 + Math.PI / 10 * Math.sin(this.phi)) * (this.renderer.reverse ? -1 : 1)), t.beginPath(), this.renderer.reverse ? (t.moveTo(5, 0), t.bezierCurveTo(10, 10, 10, 30, 0, 40), t.bezierCurveTo(-12, 25, -8, 10, 0, 0)) : (t.moveTo(-5, 0), t.bezierCurveTo(-10, -10, -10, -30, 0, -40), t.bezierCurveTo(12, -25, 8, -10, 0, 0)), t.closePath(), t.fill(), t.restore(), t.restore(), this.controlStatus(t)
+    }
+  }, $(function () {
+    RENDERER.init()
+    $('.dark').click(function () {
+      setTimeout(() => {
+        RENDERER.setFishColor();
+        RENDERER.context.fill();
+      });
+    })
+  });
+</script>
+  
+  <div class="footer bg-color">
+    <div class="footer-main">
+      
+        
+          <div class="link">
+            
+          </div>
+        
+      
+        
+          <div class="footer-copyright">
+            <p>Copyright © 2019 - 2020 <a target="_blank" rel="noopener" href="https://github.com/yuang01">yuang01</a> | Powered by <a target="_blank" rel="noopener" href="https://hexo.io/zh-cn/docs/">Hexo</a> | Theme <a target="_blank" rel="noopener" href="https://github.com/yuang01/theme">Bamboo</a> </p>
+
+          </div>
+        
+      
+        
+          
+            <!-- 不蒜子统计 -->
+            <!-- 不蒜子统计 -->
+<span id="busuanzi_container_site_pv">
+      <i class="fas fa-eye" aria-hidden="true"></i>Total visits：<span id="busuanzi_value_site_pv"></span> times
+</span>
+<span class="post-meta-divider">|</span>
+<span id="busuanzi_container_site_uv" style='display:none'>
+      <i class="fas fa-users" aria-hidden="true"></i>Number of visitors：<span id="busuanzi_value_site_uv"></span> people
+</span>
+
+          
+        
+      
+        
+          <div class="footer-custom">
+            
+          </div>
+        
+      
+    </div>
+  </div>
+
+
+
+    <!-- 渲染暗黑按钮 -->
+    
+      <div class="dark">
+  <div class="dark-content">
+    <i class="fas fa-moon" aria-hidden="true"></i>
+    <!-- <span>关灯</span> -->
+  </div>
+  
+</div>
+
+<script>
+  $(function() {
+    let isDark = JSON.parse(localStorage.getItem('dark'))  || JSON.parse('false');
+    if (isDark) {
+      $(".dark-content").replaceWith(
+          `
+          <div class='dark-content'>
+            <i class="fas fa-lightbulb" aria-hidden="true"></i>
+          </div>
+          `
+        );
+    }
+    $('.dark').click(function() {
+      if ($(document.body).is('.darkModel')) {
+        $(document.body).removeClass('darkModel');
+        localStorage.setItem('dark', false);
+        $(".dark-content").replaceWith(
+          `
+          <div class='dark-content'>
+            <i class="fas fa-moon" aria-hidden="true"></i>
+          </div>
+          `
+        );
+      } else {
+        $(document.body).addClass('darkModel');
+        localStorage.setItem('dark', true);
+        $(".dark-content").replaceWith(
+          `
+          <div class='dark-content'>
+            <i class="fas fa-lightbulb" aria-hidden="true"></i>
+          </div>
+          `
+        );
+      }
+    })
+  })
+</script>
+    
+    <!-- 渲染回到顶部按钮 -->
+    
+      <div class="goTop top-btn-color" pointer>
+  <i class="fas fa-arrow-up" aria-hidden="true"></i>
+</div>
+<script src="/js/goTop.js"></script>
+
+    
+    <!-- 渲染左下角音乐播放器 -->
+    
+      <link rel="stylesheet" href="/js/aplayer/APlayer@1.10.1.min.css">
+<style>
+.aplayer .aplayer-lrc p {
+  
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 16px !important;
+}
+
+.aplayer .aplayer-lrc p.aplayer-lrc-current {
+  
+  font-size: 15px;
+  color: #42b983;
+}
+
+
+.aplayer.aplayer-fixed.aplayer-narrow .aplayer-body {
+  left: -66px !important;
+}
+
+.aplayer.aplayer-fixed.aplayer-narrow .aplayer-body:hover {
+  left: 0px !important;
+}
+
+
+</style>
+<meting-js  
+  class=""
+  server="tencent"
+  type="playlist"
+  id="8062553743"
+  fixed='true'
+  autoplay='false'
+  theme='#42b983'
+  loop='all'
+  order='random'
+  preload='auto'
+  volume='0.7'
+  list-folded='true'
+>
+</meting-js>
+
+<!-- <style>
+  #aplayer {
+    position: fixed;
+    left: 0;
+    bottom: 300px;
+  }
+</style> -->
+<script src="https://unpkg.com/aplayer@1.10.1/dist/APlayer.min.js"></script>
+<script src="https://unpkg.com/meting@2/dist/Meting.min.js"></script>
+    
+
+    <!-- 图片放大 -->
+    
+      <script src="/js/fancybox/jquery.fancybox.min.js"></script>
+    
+
+    <!-- 百度解析 -->
+    <!-- Baidu Analytics -->
+
+    <!-- Baidu Push -->
+
+<script>
+    (function () {
+        var bp = document.createElement('script');
+        var curProtocol = window.location.protocol.split(':')[0];
+        if (curProtocol === 'https') {
+            bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+        } else {
+            bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+        }
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(bp, s);
+    })();
+</script>
+
+    
+    <!-- 背景彩带 -->
+    
+      <script type="text/javascript" size="100" alpha='0.4' zIndex="-1" src="/js/ribbon.min.js"></script>
+    
+
+    <script src="/js/utils/index.js"></script>
+    <script src="/js/app.js"></script>
+    
+    <!-- 文章目录所需js -->
+<link href="/js/tocbot/tocbot.css" rel="stylesheet">
+<script src="/js/tocbot/tocbot.min.js"></script>
+
+<script>
+  var headerEl = 'h2, h3, h4',  //headers 
+    content = '.post-detail',//文章容器
+    idArr = {};  //标题数组以确定是否增加索引id
+  //add #id
+  var option = {
+    // Where to render the table of contents.
+    tocSelector: '.toc',
+    // Where to grab the headings to build the table of contents.
+    contentSelector: content,
+    // Which headings to grab inside of the contentSelector element.
+    headingSelector: headerEl,
+    scrollSmooth: true,
+    scrollSmoothOffset: -80,
+    headingsOffset: -($(window).height() * 0.4 - 45),
+    positionFixedSelector: '.toc-main',
+    positionFixedClass: 'is-position-fixed',
+    fixedSidebarOffset: 'auto',
+    activeLinkClass: 'is-active-link',
+    // onClick: function (e) {},
+  }
+  if ($('.toc').length > 0) {
+
+    $(content).children(headerEl).each(function () {
+      //去除空格以及多余标点
+      var headerId = $(this).text().replace(/[\s|\~|`|\!|\@|\#|\$|\%|\^|\&|\*|\(|\)|\_|\+|\=|\||\|\[|\]|\{|\}|\;|\:|\"|\'|\,|\<|\.|\>|\/|\?|\：|\，|\。]/g, '');
+
+      headerId = headerId.toLowerCase();
+      if (idArr[headerId]) {
+        //id已经存在
+        $(this).attr('id', headerId + '-' + idArr[headerId]);
+        idArr[headerId]++;
+      }
+      else {
+        //id未存在
+        idArr[headerId] = 1;
+        $(this).attr('id', headerId);
+      }
+    });
+
+    document.addEventListener("DOMContentLoaded", function () {
+      tocbot.init(option);
+      mobileTocClick();
+    });
+
+  }
+
+  window.tocScrollFn = function () {
+    return bamboo.throttle(function () {
+      findHeadPosition();
+    }, 100)()
+  }
+  window.addEventListener('scroll', tocScrollFn);
+
+  const findHeadPosition = function (top) {
+    if ($('.toc-list').length <= 0) {
+      return false;
+    }
+    setTimeout(() => {  // or DOMContentLoaded 
+      autoScrollToc();
+    }, 0);
+  }
+
+  const autoScrollToc = function () {
+    const $activeItem = document.querySelector('.is-active-link');
+    const $cardToc = document.querySelector('.toc-content');
+    const activePosition = $activeItem.getBoundingClientRect().top
+    const sidebarScrollTop = $cardToc.scrollTop
+    if (activePosition > (document.documentElement.clientHeight - 100)) {
+      $cardToc.scrollTop = sidebarScrollTop + 150
+    }
+    if (activePosition < 100) {
+      $cardToc.scrollTop = sidebarScrollTop - 150
+    }
+  }
+
+  document.addEventListener('pjax:send', function () {
+    if ($('.toc').length) {
+      tocbot.destroy();
+    }
+  });
+
+  document.addEventListener('pjax:complete', function () {
+    if ($('.toc').length) {
+      tocbot.init(option);
+      mobileTocClick();
+    }
+  });
+  
+  // 手机端toc按钮点击出现目录
+  const mobileTocClick = function () {
+    const $cardTocLayout = document.getElementsByClassName('toc-aside')[0];
+    const $cardToc = $cardTocLayout.getElementsByClassName('toc-content')[0];
+    let right = '45px';
+    if (window.innerWidth >= 551 && window.innerWidth <= 992) {
+      right = '100px'
+    }
+    const mobileToc = {
+      open: () => {
+        $cardTocLayout.style.cssText = 'animation: toc-open .3s; opacity: 1; right: ' + right
+      },
+
+      close: () => {
+        $cardTocLayout.style.animation = 'toc-close .2s'
+        setTimeout(() => {
+          $cardTocLayout.style.cssText = "opacity:''; animation: ''; right: ''"
+        }, 100)
+      }
+    }
+    document.getElementById('toc-mobile-btn').addEventListener('click', () => {
+      if (window.getComputedStyle($cardTocLayout).getPropertyValue('opacity') === '0') mobileToc.open()
+      else mobileToc.close()
+    })
+
+    $cardToc.addEventListener('click', (e) => {
+      if (window.innerWidth < 992) { // 小于992px的时候
+        mobileToc.close()
+      }
+    })
+  }
+</script>
+
+<style>
+  .is-position-fixed {
+    position: sticky !important;
+    top: 74px;
+  }
+
+  .toc-main ul {
+    counter-reset: show-list;
+  }
+
+  .toc-main ul li::before {
+    content: counter(item)".";
+    display: block;
+    position: absolute;
+    left: 12px;
+    top: 0;
+  }
+</style> 
+
+<!-- 设置导航背景 -->
+<script>
+  let setHeaderClass = () => {
+    const headerMenuTransparent = true;
+    if (!headerMenuTransparent) { return; }
+    const nav = $('#navHeader');
+    const navTop = nav.outerHeight();
+    const winTop = $(window).scrollTop();
+    if(winTop > navTop) {
+      nav.addClass('header-bg-color');
+    }
+    else {
+      nav.removeClass('header-bg-color');
+    }
+  };
+
+  let scrollCollect = () => {
+    return bamboo.throttle(function (e) {
+      setHeaderClass();
+    }, 200)()
+  }
+
+  let initHeaderBg = () => {
+    setHeaderClass();
+  }
+
+  setHeaderClass();
+  window.addEventListener('scroll', scrollCollect);
+
+  document.addEventListener('pjax:send', function () {
+    window.removeEventListener('scroll', scrollCollect)
+  })
+  document.addEventListener('pjax:complete', function () {
+    window.addEventListener('scroll', scrollCollect);
+    setHeaderClass();
+  })
+</script> 
+
+<!-- 渲染issues标签里的内容 -->
+<script>
+  function loadIssuesJS() {
+    if ($(".post-detail").find(".issues-api").length == 0) {
+      return;
+    } 
+    loadScript('/js/issues/index.js');
+  };
+  $(function () {
+    loadIssuesJS();
+  });
+  document.addEventListener('pjax:complete', function () {
+    if (typeof IssuesAPI == "undefined") {
+      loadIssuesJS();
+    }
+  })
+</script>
+
+<!-- 输入框打字特效 -->
+<!-- 输入框打字特效 -->
+
+  <script src="/js/activate-power-mode.js"></script>
+  <script>
+    POWERMODE.colorful = true;  // 打开随机颜色特效
+    POWERMODE.shake = false;    // 关闭输入框抖动
+    document.body.addEventListener('input', POWERMODE);//监听打字事件
+  </script>
+
+
+<!-- markdown代码一键复制功能 -->
+
+  <link rel="stylesheet" href="https://unpkg.com/v-plugs-ayu/lib/ayu.css">
+  <script src="https://unpkg.com/v-plugs-ayu/lib/ayu.umd.min.js"></script>
+  <script src="/js/clipboard/clipboard.min.js"></script>
+  <div id="appCopy">
+  </div>
+  <script data-pjax>
+    var vm = new Vue({
+      el: '#appCopy',
+      data: {
+      },
+      computed: {
+      },
+      mounted() {
+        const that = this;
+        var copy = 'copy';
+        /* code */
+        var initCopyCode = function () {
+          var copyHtml = '';
+          copyHtml += '<button class="btn-copy" data-clipboard-snippet="" style="position:absolute;top:0;right:0;z-index:1;">';
+          copyHtml += '<i class="fas fa-copy"></i><span>' + copy + '</span>';
+          copyHtml += '</button>';
+          $(".post-detail pre").not('.gutter pre').wrap("<div class='codeBox' style='position:relative;width:100%;'></div>")
+          $(".post-detail pre").not('.gutter pre').before(copyHtml);
+          new ClipboardJS('.btn-copy', {
+            target: function (trigger) {
+              return trigger.nextElementSibling;
+            }
+          });
+        }
+        initCopyCode();
+        $('.btn-copy').unbind('click').bind('click', function () {
+          doSomething();
+        })
+        $(document).unbind('keypress').bind('keypress', function (e) {
+          if (e.ctrlKey && e.keyCode == 67) {
+            doSomething();
+          }
+        })
+
+        function doSomething() {
+          that.$notify({
+            title: "成功",
+            content: "代码已复制，请遵守相关授权协议。",
+            type: 'success'
+          })
+        }
+      },
+      methods: {
+      },
+      created() { }
+    })
+  </script>
+  
+
+<!-- 图片懒加载 -->
+<script defer src="https://unpkg.com/vanilla-lazyload@17.1.0/dist/lazyload.min.js"></script>
+<script>
+  // https://www.npmjs.com/package/vanilla-lazyload
+  // Set the options globally
+  // to make LazyLoad self-initialize
+  window.lazyLoadOptions = {
+    elements_selector: ".lazyload",
+    threshold: 0
+  };
+  // Listen to the initialization event
+  // and get the instance of LazyLoad
+  window.addEventListener(
+    "LazyLoad::Initialized",
+    function (event) {
+      window.lazyLoadInstance = event.detail.instance;
+    },
+    false
+  );
+  document.addEventListener('DOMContentLoaded', function () {
+    lazyLoadInstance.update();
+  });
+  document.addEventListener('pjax:complete', function () {
+    lazyLoadInstance.update();
+  });
+</script>
+
+
+<!-- 卡片滚动动画 -->
+   
+
+<!-- 评论所需js -->
+
+  
+    <script type="text/javascript">
+  var utteranceCommon = {};
+
+  function check_utterance() {
+    let isDark = JSON.parse(localStorage.getItem('dark')) || JSON.parse('false');
+    if (isDark) {
+      utteranceCommon.Theme = 'github-dark';
+    } else {
+      utteranceCommon.Theme = 'github-light';
+    }
+
+    return document.getElementById("gitment-container");
+  }
+  comment_el = '#gitment-container';
+  load_utterance = function () {
+    if ($(comment_el).length) {
+      // 匿名函数，防止污染全局变量
+      const HEAD = check_utterance();
+
+      var utterances = document.createElement('script');
+      utterances.type = 'text/javascript';
+      utterances.async = true;
+      utterances.setAttribute('issue-term', 'pathname')
+      utterances.setAttribute('theme', utteranceCommon.Theme)
+      utterances.setAttribute('repo', '')
+      utterances.crossorigin = 'anonymous';
+      utterances.src = 'https://utteranc.es/client.js';
+      // content 是要插入评论的地方
+      document.getElementById('gitment-container').appendChild(utterances);
+
+    }
+  }
+
+  function dark_utterance() {
+    const HEAD = check_utterance();
+    if (!HEAD) return;
+    const message = {
+      type: 'set-theme',
+      theme: utteranceCommon.Theme
+    };
+    const utteranceIframe = document.querySelector('iframe');
+    utteranceIframe.contentWindow.postMessage(message, 'https://utteranc.es');
+  }
+
+  $(document).ready(load_utterance);
+  document.addEventListener('pjax:complete', function () {
+    load_utterance();
+  });
+
+  $('.dark').click(function () {
+    setTimeout(() => {
+      dark_utterance();
+    });
+  })
+
+</script>
+
+<style>
+  .utterances {
+    max-width: inherit !important;
+  }
+</style>
+  
+
+
+<!-- 鼠标点击特效 -->
+<!-- 爱心点击 -->
+
+  
+    <canvas class="fireworks" style="position: fixed;left: 0;top: 0;z-index: 999; pointer-events: none;" ></canvas>
+    <script src="//cdn.bootcss.com/animejs/2.2.0/anime.min.js"></script>
+    <script src="/js/cursor/explosion.min.js"></script>
+  
+
+
+
+
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" data-pjax></script>
+
+
+    <!-- pjax -->
+    
+
+<!-- pjax -->
+
+
+  <script src="/js/pjax@0.2.8/index.js"></script>
+  
+    <!-- 样式位于：source/css/_third-party/pjaxanimate.styl -->
+
+<div class="pjax-animate">
+  
+    <div class="loading-circle"><div id="loader-circle"></div></div>
+    <script>
+      window.ShowLoading = function() {
+        $(".loading-circle").css("display", "block");
+      };
+      window.HideLoading = function() {
+        $(".loading-circle").css("display", "none");
+      }
+    </script>
+  
+	<script>
+    document.addEventListener('pjax:complete', function () {
+      window.HideLoading();
+    })
+    document.addEventListener('pjax:send', function () {
+      window.ShowLoading();
+    })
+    document.addEventListener('pjax:error', function () {
+      window.HideLoading();
+    })
+	</script>
+</div>
+
+  
+
+  <script>
+    var pjax = new Pjax({
+      elements: 'a[href]:not([href^="#"]):not([href="javascript:void(0)"]):not([no-pjax])',   // 拦截正常带链接的 a 标签
+      selectors: ["#pjax-container","title"],                                   // 根据实际需要确认重载区域
+      cacheBust: false,   // url 地址追加时间戳，用以避免浏览器缓存
+      timeout: 5000
+    });
+
+    document.addEventListener('pjax:send', function (e) {
+
+      try {
+        var currentUrl = window.location.pathname;
+        var targetUrl = e.triggerElement.href;
+        var banUrl = [""];
+        if (banUrl[0] != "") {
+          banUrl.forEach(item => {
+            if(currentUrl.indexOf(item) != -1 || targetUrl.indexOf(item) != -1) {
+              window.location.href = targetUrl;
+            }
+          });
+        }
+      } catch (error) {}
+
+      $(window).unbind('resize');
+      $(window).unbind('scroll');
+      $(document).unbind('scroll');
+      $(document).unbind('click');
+      $('body').unbind('click');
+
+    })
+    
+    document.addEventListener('pjax:complete', function () {
+      $('script[data-pjax], .pjax-reload script').each(function () {
+        $(this).parent().append($(this).remove());
+      });
+    });
+
+    document.addEventListener('pjax:error', function (e) {
+      window.location.href = e.triggerElement.href;
+    })
+    
+    // 刷新不从顶部开始
+    document.addEventListener("DOMContentLoaded", function () {
+      history.scrollRestoration = 'auto';
+    })
+  </script>
+
+
+
+  </body>
+</html>

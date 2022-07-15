@@ -1,0 +1,2001 @@
+<!DOCTYPE html>
+<html>
+  <!-- meta/link... -->
+  
+
+
+
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport">
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+
+
+  <title>Linux 常用命令整合 | Hexo</title>
+
+  <link rel="icon" type="image/x-icon, image/vnd.microsoft.icon" href="/favicon.ico">
+  <link rel="stylesheet" href="https://at.alicdn.com/t/font_1911880_c1nvbyezg17.css">
+  <link href="https://unpkg.com/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet">
+  <link href="/js/swiper/swiper@5.4.1.min.css" rel="stylesheet">
+  
+  
+  
+  
+<link rel="stylesheet" href="/css/animate.min.css">
+
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+  
+    
+<link rel="stylesheet" href="/js/fancybox/jquery.fancybox.min.css">
+
+  
+  
+    
+<link rel="stylesheet" href="/js/shareJs/share.min.css">
+
+  
+  <style>
+        @media (max-width: 992px) {
+            #waifu {
+                display: none;
+            }
+        }
+    </style>
+    <script src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
+    <link href="//cdn.bootcss.com/pace/1.0.2/themes/pink/pace-theme-flash.css" rel="stylesheet">
+
+    
+
+    <!-- import link -->
+    
+        
+            
+        
+            
+        
+    
+    <!-- import script -->
+    
+        
+            
+        
+            
+        
+    
+
+<meta name="generator" content="Hexo 6.2.0"></head>
+
+  
+  <!-- 依赖于jquery和vue -->
+  
+    
+<script src="https://unpkg.com/jquery@3.5.1/dist/jquery.min.js"></script>
+
+  
+
+  
+    
+<script src="https://unpkg.com/vue@2.6.11/dist/vue.min.js"></script>
+
+  
+  
+  <body>
+    <!-- 预加载动画 -->
+    <!-- 页面预加载动画 -->
+
+<div id='loader'>
+  <link rel="stylesheet" href="/js/loaded/index.css" >
+  <div class="loading-left-bg"></div>
+  <div class="loading-right-bg"></div>
+  <div class="spinner-box">
+    <div class="configure-border-1">
+      <div class="configure-core"></div>
+    </div>
+    <div class="configure-border-2">
+      <div class="configure-core"></div>
+    </div>
+    <div class="loading-word">loading...</div>
+  </div>
+</div>
+
+<script>
+  var endLoading = function () {
+    document.body.style.overflow = 'auto';
+    document.getElementById('loader').classList.add("loading");
+  }
+  window.addEventListener('DOMContentLoaded',endLoading);
+  
+</script>
+
+    
+    <!-- 判断是否为暗黑风格 -->
+    <!-- 判断是否为黑夜模式 -->
+<script>
+  let isDark = JSON.parse(localStorage.getItem('dark')) || JSON.parse('false');
+
+  if (isDark) {
+    $(document.body).addClass('darkModel');
+  }
+</script>
+
+    <!-- 需要在上面加载的js -->
+    <script>
+  function loadScript(src, cb) {
+    return new Promise(resolve => {
+      setTimeout(function () {
+        var HEAD = document.getElementsByTagName("head")[0] || document.documentElement;
+        var script = document.createElement("script");
+        script.setAttribute("type", "text/javascript");
+        if (cb) {
+          if (JSON.stringify(cb)) {
+            for (let p in cb) {
+              if (p == "onload") {
+                script[p] = () => {
+                  cb[p]()
+                  resolve()
+                }
+              } else {
+                script[p] = cb[p]
+                script.onload = resolve
+              }
+            }
+          } else {
+            script.onload = () => {
+              cb()
+              resolve()
+            };
+          }
+        } else {
+          script.onload = resolve
+        }
+        script.setAttribute("src", src);
+        HEAD.appendChild(script);
+      });
+    });
+  }
+
+  //https://github.com/filamentgroup/loadCSS
+  var loadCSS = function (href, before, media, attributes) {
+    return new Promise(resolve => {
+      setTimeout(function () {
+        var link = document.createElement('link');
+        link.rel = "stylesheet";
+        link.href = src;
+        link.onload = resolve;
+        document.getElementsByTagName("head")[0].appendChild(link);
+      });
+    });
+  };
+
+</script> 
+
+<!-- 轮播图所需要的js -->
+<script src="/js/swiper/swiper.min.js"></script>
+<script src="/js/swiper/vue-awesome-swiper.js"></script>
+<script src="/js/swiper/swiper.animate1.0.3.min.js"></script>
+
+<script type="text/javascript">
+  Vue.use(window.VueAwesomeSwiper)
+</script>
+
+
+  <script src="/js/vue-typed-js/index.js"></script>
+
+
+<!-- 首页的公告滚动插件的js需要重新加载 -->
+<script src="/js/vue-seamless-scroll/index.js"></script>
+
+<!-- 打字机效果js -->
+<script src="https://unpkg.com/typed.js@2.0.11"></script>
+
+
+    <div id="safearea">
+      <main class="main" id="pjax-container">
+        <!-- 头部导航 -->
+        
+<header class="header   " 
+  id="navHeader"
+  style="position: fixed;
+  left: 0; top: 0; z-index: 10;width: 100%;"
+>
+  <div class="header-content">
+    <div class="bars">
+      <div id="appDrawer" class="sidebar-image">
+  <div class="drawer-box-icon">
+    <i class="fas fa-bars" aria-hidden="true" @click="showDialogDrawer"></i>
+  </div>
+  
+  <transition name="fade">
+    <div class="drawer-box_mask" v-cloak style="display: none;" v-show="visible" @click.self="cancelDialogDrawer">
+    </div>
+  </transition>
+  <div class="drawer-box" :class="{'active': visible}">
+    <div class="drawer-box-head bg-color">
+      <img class="drawer-box-head_logo lazyload placeholder" src="/medias/logo.png" class="lazyload placeholder" data-srcset="/medias/logo.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="logo">
+      <h3 class="drawer-box-head_title">Hexo</h3>
+      <h5 class="drawer-box-head_desc"></h5>
+    </div>
+    
+    <div class="drawer-box-content">
+      <ul class="drawer-box-content_menu">
+        
+        
+          <li class="drawer-box-content_item">
+            <a target="_blank" rel="noopener" href="https://github.com/yuang01/hexo-theme-bamboo">
+              <i class="fas fa-github" aria-hidden="true"></i>
+              <span>Github</span>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</div>
+
+<script>
+  var body = document.body || document.documentElement || window;
+  var vm = new Vue({
+    el: '#appDrawer',
+    data: {
+      visible: false,
+      top: 0,
+      openArr: [],
+    },
+    computed: {
+    },
+    mounted() {
+    },
+    methods: {
+      isOpen(index) {
+        if (this.openArr.includes(index)) {
+          return true;
+        } else {
+          return false;
+        }
+      },
+      openOrCloseMenu(curIndex) {
+        const index = this.openArr.indexOf(curIndex);
+        if (index !== -1) {
+          this.openArr.splice(index, 1);
+        } else {
+          this.openArr.push(curIndex);
+        }
+      },
+      showDialogDrawer() {
+        this.visible = true;
+        // 防止页面滚动，只能让弹框滚动
+        this.top = $(document).scrollTop()
+        body.style.cssText = 'width: 100%; height: 100%;overflow: hidden;';
+      },
+      cancelDialogDrawer() {
+        this.visible = false;
+        body.removeAttribute('style');
+        $(document).scrollTop(this.top)
+      }
+    },
+    created() {}
+  })
+</script>
+
+    </div>
+    <div class="blog-title" id="author-avatar">
+      
+        <div class="avatar">
+          <img src="/medias/logo.png" class="lazyload placeholder" data-srcset="/medias/logo.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="logo">
+        </div>
+      
+      <a href="/" class="logo">Hexo</a>
+    </div>
+    <nav class="navbar">
+      <ul class="menu">
+        
+      </ul>
+      
+      
+        <div id="appSearch">
+  <div class="search"  @click="showDialog()"><i class="fas fa-search" aria-hidden="true"></i></div>
+  <transition name="fade">
+    <div class="message-box_wrapper" style="display: none;" v-cloak v-show="dialogVisible" @click.self="cancelDialogVisible()">
+      <div class="message-box animated bounceInDown">
+        <h2>
+          <span>
+            <i class="fas fa-search" aria-hidden="true"></i>
+            <span class="title">Search</span>
+          </span>
+          <i class="fas fa-times close" pointer style="float:right;" aria-hidden="true" @click.self="cancelDialogVisible()"></i>
+        </h2>
+        <form class="site-search-form">
+          <input type="text"
+            placeholder="Please enter keywords"
+            id="local-search-input" 
+            @click="getSearchFile()"
+            class="st-search-input"
+            v-model="searchInput"
+          />
+        </form>
+        <div class="result-wrapper">
+          <div id="local-search-result" class="local-search-result-cls"></div>
+        </div>
+      </div>
+    </div>
+  </transition>
+</div>
+<script src="/js/local_search.js"></script>
+<script>
+  var body = document.body || document.documentElement || window;
+  var vm = new Vue({
+    el: '#appSearch',
+    data: {
+      dialogVisible: false,
+      searchInput: '',
+      top: 0,
+    },
+    computed: {
+    },
+    mounted() {
+      window.addEventListener('pjax:complete', () => {
+        this.cancelDialogVisible();
+      })
+    },
+    methods: {
+      showDialog() {
+        this.dialogVisible = true;
+        // 防止页面滚动，只能让弹框滚动
+        this.top = $(document).scrollTop()
+        body.style.cssText = 'overflow: hidden;';
+      },
+      getSearchFile() {
+        if (!this.searchInput) {
+          getSearchFile("/search.xml");
+        }
+      },
+      cancelDialogVisible() {
+        this.dialogVisible = false;
+        body.removeAttribute('style');
+        $(document).scrollTop(this.top)
+      },
+    },
+    created() {}
+  })
+</script>
+<!-- 解决刷新页面闪烁问题，可以在元素上添加display: none, 或者用vue.extend方法，详情：https://blog.csdn.net/qq_31393401/article/details/81017912 -->
+<!-- 下面是搜索基本写法 -->
+<!-- <script type="text/javascript" id="local.search.active">
+  var inputArea = document.querySelector("#local-search-input");
+  inputArea.onclick   = function(){ getSearchFile(); this.onclick = null }
+  inputArea.onkeydown = function(){ if(event.keyCode == 13) return false }
+</script> -->
+
+      
+
+    </nav>
+  </div>
+  
+    <a target="_blank" rel="noopener" href="https://github.com/yuang01/hexo-theme-bamboo" class="github-corner color-primary" aria-label="View source on GitHub"><svg width="60" height="60" viewBox="0 0 250 250" style="fill:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+  
+  
+</header>
+        <!-- 内容区域 -->
+        
+ <!-- prismjs 代码高亮 -->
+ 
+
+
+<div class="bg-dark-floor" style="position: fixed;left: 0;top: 0;width: 100%;height: 100%;z-index: -1;"></div>
+
+
+  <!-- 文章详情页顶部图片和标题 -->
+
+
+
+
+<div class="post-detail-header" id="thumbnail_canvas" style="background-repeat: no-repeat; background-size: cover; 
+  background-position: center center;position: relative;background-image:url('/medias/7.jpg')">
+  <div class="post-detail-header-mask"></div>
+  <canvas id="header_canvas"style="position:absolute;bottom:0;pointer-events:none;"></canvas>
+  
+  <div class="post-detail-header_info-box">
+    <div class="title-box">
+      <span class="title">
+        Linux 常用命令整合
+      </span>
+    </div>
+    
+    
+      
+        <span class="post-detail-header_date">
+          <i class="fas fa-calendar"></i> Published in：2022-05-03 |
+        </span>
+      
+
+      
+        <span class="post-detail-header_categories">
+          <i class="iconfont iconbookmark1"></i> category：
+          
+            <a href="/categories/Linux/" class="post-detail-header_category">
+              Linux
+            </a>
+          
+        </span>
+      
+
+      
+    
+  </div>
+  
+  
+    <script src="/js/bubble/bubble.js"></script>
+  
+</div>
+
+
+
+
+
+<div class="post-detail-content row justify-position" 
+  style="padding-top: 0px;">
+  <div class="main-content">
+    <article class="post post-detail">
+      <div class="post-content">
+        <h3 id="启动网络命令"><a href="#启动网络命令" class="headerlink" title="启动网络命令"></a>启动网络命令</h3><p>ip addr 查看网卡信息</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">service network start 启动网卡</span><br><span class="line">service network stop 关闭网卡</span><br><span class="line">service network restart 重启网络</span><br></pre></td></tr></table></figure>
+
+<h3 id="pwd命令"><a href="#pwd命令" class="headerlink" title="pwd命令"></a>pwd命令</h3><p>pwd命令，查看当前目录的路径</p>
+<p>linux下所有的绝对路径都是从根目录”&#x2F;“开始</p>
+<p>root:是linux下root用户的根目录</p>
+<p>home:是linux下其他用户的默认根目录 （例如：在linux上创建了一个bow用户，那么就会在&#x2F;home下面生成一个bow目录作为bow用户的根目录）</p>
+<p>etc:是linux下系统配置文件目录</p>
+<p>tmp:临时文件目录，所有用户都可以用</p>
+<h3 id="ls命令"><a href="#ls命令" class="headerlink" title="ls命令"></a>ls命令</h3><p>ls [参数] 目录路径<br>ls 表示查看目录下的文件</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">ls #表示查看当前目录下的文件</span><br><span class="line">ls -l #表示查看当前目录下的详细信息</span><br><span class="line">ls -a #表示查看当前目录下的所有文件(包含隐藏文件)</span><br><span class="line">ls -la #表示查看当前目录下的所有文件（包含隐藏文件）的详细信息</span><br><span class="line">ls -lh #h是以适当的单位来显示文件的大小 ls -lh表示查看当前目录下的文件的详细信息，并以合适单位显示文件大小 </span><br><span class="line"> </span><br><span class="line">ls -l / #表示查看根目录&quot;/&quot;下文件的详细信息</span><br><span class="line"> </span><br><span class="line">ls /etc #表示查看目录/etc下的文件</span><br><span class="line"> </span><br><span class="line">ls --help #查看命令的帮助文档</span><br><span class="line">--help参数：所有linux上的命令都有，但写法上有如下几种：</span><br><span class="line"> (1)--help</span><br><span class="line">  (2)--h</span><br><span class="line">  (3)-help</span><br><span class="line">  (4)-h</span><br><span class="line">ll命令:它和ls -l命令功能相同，但是不是所有的linux上都默认安装</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="cd命令"><a href="#cd命令" class="headerlink" title="cd命令"></a>cd命令</h3><p>cd 目录路径 #进入一个目录，目录路径可以是绝对路径(以&#x2F;开始的路径都是绝对路径)，也可以是相对路径<br>相对路径：以非&#x2F;开始的路径，<br>注意: “.”表示当前目录<br>“…”表示当前目录的上一级目录，它可以多个一起使用<br>“<del>“表示当前用户的根目录 例如：root用户时，</del>表示&#x2F;root目录 bow用户时，~表示&#x2F;home&#x2F;bow目录</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">cd / #表示进入系统根目录</span><br><span class="line">cd usr/ #表示进入当前目录下的usr目录</span><br><span class="line">cd local/ #表示进入当前目录下的local目录</span><br><span class="line">cd ./bin #表示进入当前目录下的bin目录</span><br><span class="line">cd .. #表示进入当前目录的上一级目录</span><br><span class="line">cd ../.. #表示进入当前目录的上级目录的上一级目录</span><br><span class="line">cd /usr/local/bin #进入/usr/local/bin目录</span><br><span class="line">cd ../etc #表示进入和当前目录同级的etc目录 #..表示当前目录的上一级目录 ../etc表示当前目录上级目录下的etc目录（和当前目录同级）</span><br><span class="line">cd ~ #表示进入当前用户的根目录（cd ~ 和直接执行cd后不加目录的效果相同）</span><br><span class="line"> #例如：root用户进入/root目录，bow用户进入/home/bow目录</span><br><span class="line"> </span><br><span class="line">cd ~/data #表示进入当前用户根目录下的data目录 例如：root用户则进入了/root/data目录</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="mkdir命令"><a href="#mkdir命令" class="headerlink" title="mkdir命令"></a>mkdir命令</h3><p>mkdir 目录路径 #创建一个目录，目录路径可以是绝对路径也可以是相对路径</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">mkdir data #在当前目录下创建一个data目录</span><br><span class="line">mkdir ./dir #在当前目录下创建一个dir目录</span><br><span class="line">mkdir /root/tmp #在/root目录下创建一个tmp目录</span><br></pre></td></tr></table></figure>
+
+<p>mkdir创建目录时，只有在目录的上级目录存在时，才会创建</p>
+<p>mkdir -p 目录#创建目录时，如果没有父目录，会创建父目录，递归地创建目录<br>mkdir -p a&#x2F;b&#x2F;c #在当前目录下创建3级目录</p>
+<h3 id="rmdir命令"><a href="#rmdir命令" class="headerlink" title="rmdir命令"></a>rmdir命令</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">rmdir [参数] 目录路径 #删除目录命令，rmdir默认只能删除空目录</span><br><span class="line"> </span><br><span class="line">rmdir ./dir #删除当前目录下的dir目录</span><br><span class="line"> </span><br><span class="line">rmdir -p 目录路径 #表示删除目录和它的父目录（目录要是一个空目录）</span><br><span class="line">rmdir -p a/b/c #删除当前目录下的a/b/c目录</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="touch命令"><a href="#touch命令" class="headerlink" title="touch命令"></a>touch命令</h3><p>touch 命令 #创建文件命令</p>
+<p>touch 文件路径</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">touch 1.txt #在当前目录下创建一个1.txt文件</span><br><span class="line">touch /root/2.txt #在/root目录下创建一个2.txt文件</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="rm命令"><a href="#rm命令" class="headerlink" title="rm命令"></a>rm命令</h3><p>rm [参数] 路径 #删除命令</p>
+<p>rm 1.txt #删除当前目录下的1.txt文件，删除时会提示，是否删除如果输入y表示删除，输入n表示不删除</p>
+<p>rm -f &#x2F;root&#x2F;2.txt #-f表示强制删除，不会提示,强制删除&#x2F;root目录下的2.txt</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">rm -r a/ #递归的删除当前目录下a目录下的所有内容</span><br><span class="line">[root@bow ~]# rm -r a/</span><br><span class="line">rm：是否进入目录&quot;a/&quot;? y</span><br><span class="line">rm：是否进入目录&quot;a/b&quot;? y</span><br><span class="line">rm：是否进入目录&quot;a/b/c&quot;? y</span><br><span class="line">rm：是否删除普通空文件 &quot;a/b/c/3.txt&quot;？y</span><br><span class="line">rm：是否删除目录 &quot;a/b/c&quot;？y</span><br><span class="line">rm：是否删除普通空文件 &quot;a/b/2.txt&quot;？y</span><br><span class="line">rm：是否删除目录 &quot;a/b&quot;？y</span><br><span class="line">rm：是否删除普通空文件 &quot;a/1.txt&quot;？y</span><br><span class="line">rm：是否删除目录 &quot;a/&quot;？y</span><br><span class="line">rm -rf a/ #强制删除当前目录下a目录及a目录下的所有内容</span><br><span class="line"> </span><br><span class="line">rm -rf * #删除当前目录下的所有内容</span><br><span class="line">rm -rf a/* #删除当前目录下a目录下的所有内容</span><br><span class="line">rm -rf *.txt #删除当前目录下的所有txt文件</span><br><span class="line">rm -rf *s* #删除当前目录下所有名字中包含s的文件或文件夹</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="echo命令"><a href="#echo命令" class="headerlink" title="echo命令"></a>echo命令</h3><p>echo #输出命令，可以输入变量，字符串的值</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">echo Hello World #打印Hello World</span><br><span class="line">echo $PATH #打印环境变量PATH的值,其中$是取变量值的符号，用法：$变量名 或者 $&#123;变量名&#125;</span><br><span class="line"> </span><br><span class="line">echo -n #打印内容但不换行</span><br><span class="line">echo -n Hello World</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="gt-和-gt-gt-命令"><a href="#gt-和-gt-gt-命令" class="headerlink" title="&gt;和&gt;&gt;命令"></a>&gt;和&gt;&gt;命令</h3><p>和&gt;&gt;:输出符号，将内容输出到文件中，&gt;表示覆盖(会删除原文件内容) &gt;&gt;表示追加</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">echo Hello World &gt; 1.txt #将Hello World输出到当前目录下的1.txt文件</span><br><span class="line"> #如果当前目录下没有1.txt文件会创建一个新文件，</span><br><span class="line">  #如果当前目录下有1.txt，则会删除原文件内容，写入Hello World</span><br><span class="line">echo 1234 &gt;&gt; 1.txt #将1234追加到当前目录下的1.txt中，如果文件不存在会创建新文件</span><br></pre></td></tr></table></figure>
+
+<p>通过&gt;和&gt;&gt;都可以创建文件</p>
+<h3 id="文件查看命令"><a href="#文件查看命令" class="headerlink" title="文件查看命令"></a>文件查看命令</h3><p>cat 文件路径 #查看文件的所有内容</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cat 1.txt #查看当前目录下1.txt的内容</span><br><span class="line">cat /root/1.txt #查看/root目录下的1.txt文件内容</span><br></pre></td></tr></table></figure>
+
+<p>more 文件路径 #分页查看文件内容</p>
+<p>more linux常用命令.txt #分页查看当前目录下linux常用命令.txt文件的内容<br>#按空格或回车，会继续加载文件内容，按q退出查看<br>#当加载到文件末尾时，会自动退出查看</p>
+<p>less 文件路径 #分页查看文件内容<br>less linux常用命令.txt #分页查看文件内容，按空格继续加载文件，按q退出查看，不会自动退出查看</p>
+<p>head [参数] 文件路径 #从文件开始查看文件</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">head linux常用命令.txt #查看文件的前10行内容</span><br><span class="line"> </span><br><span class="line">head -n 文件路径 # n是一个正整数，表示查看文件的前n行数据</span><br><span class="line">head -20 linux常用命令.txt #查看文件的前20行内容</span><br></pre></td></tr></table></figure>
+
+<p>tail [参数] 文件路径 #从文件的末尾查看文件内容<br>tail linux常用命令.txt #查看文件的后10行内容</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">tail -n 文件路径 # n是一个正整数，表示查看文件的后n行数据</span><br><span class="line">tail -15 linux常用命令.txt #查看文件后15行内容</span><br><span class="line"> </span><br><span class="line">tail -f 文件路径 #动态的查看文件的最后几行内容(查看文件时，等待文件更新，如果文件更新了，会显示出新的内容)</span><br></pre></td></tr></table></figure>
+
+<p>tail -f 1.txt #查看文件1.txt的最新内容，tail -f 一般用来查看日志文件 按CTRL+C或才CTRL+Z退出查看</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">CTRL+C：表示暂停进程</span><br><span class="line">CTRL+Z: 表示停止进程</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="文件编辑命令"><a href="#文件编辑命令" class="headerlink" title="文件编辑命令"></a>文件编辑命令</h3><p>vi&#x2F;vim命令：这两个命令在使用上几乎完全一样（个人喜欢vim命令）</p>
+<p>安装vim命令：（安装是需要网络的）</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum -y install vim</span><br></pre></td></tr></table></figure>
+
+<p>yum命令是centos和red hat系统上使用官方资源包去安装软件的命令</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">yum -y install 软件名</span><br><span class="line">yum -y remove 软件名</span><br></pre></td></tr></table></figure>
+
+<p>查看虚拟机能不能上外网：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ping www.baidu.com</span><br><span class="line">CTRL+C或者CTRL+Z退出</span><br></pre></td></tr></table></figure>
+
+<p>vim命令总体分为两类</p>
+<p>vim 文件路径 –进入非编辑模式</p>
+<p>非编辑模式命令：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">yy：复制光标当前行</span><br><span class="line">p：粘贴</span><br><span class="line">dd:删除光标当前行</span><br><span class="line">$:光标跳到当前行的行尾</span><br><span class="line">^:光标跳到当前行的行首</span><br><span class="line"> </span><br><span class="line">:s/原字符串/新字符串/:替换光标当前行内容</span><br><span class="line">:%s/原字符串/新字符串/g:全文替换 #g表示global i表示ignore忽略大小写</span><br><span class="line"> </span><br><span class="line">/要查找的内容:从光标当前行向后查找内容</span><br><span class="line">/d #在文件中查找d字母</span><br><span class="line">?要查找的内容：从光标当前位置向前查找内容</span><br><span class="line">?d #查找文件中的d字母</span><br><span class="line">CTRL+F:向下翻1页</span><br><span class="line">CTRL+B:向上翻1页</span><br><span class="line"> </span><br><span class="line">:set nu：显示文件的行号</span><br><span class="line">:set nonu: 去掉行号显示</span><br><span class="line">u:撤消</span><br><span class="line"> </span><br><span class="line">**:set ff :显示文件的格式 #unix表示在unix上的文件 dos表示文件是windows上的文件**</span><br><span class="line">:w ：表示保存文件</span><br><span class="line">:q :表示退出vim命令</span><br><span class="line">:wq:保存并退出</span><br><span class="line">:w!:强制保存</span><br><span class="line">:q!:强制退出但不保存</span><br><span class="line">:wq!:强制保存并退出</span><br><span class="line">i:表示进入编辑模式，并且光标在当前行</span><br><span class="line">o：表示进入编辑模式，并且光标出现的当前行的下一行(新行)</span><br></pre></td></tr></table></figure>
+
+<p>编辑模式命令：</p>
+<p>编辑模式下可以能过方向键控制光标的位置，并且可以输入文件到光标当前位置</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ESC:退出编辑模式</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="cp命令"><a href="#cp命令" class="headerlink" title="cp命令"></a>cp命令</h3><p>cp 拷贝命令</p>
+<p>cp [参数] 原文件路径 目标文件路径</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">cp 1.txt a/ #将1.txt文件拷贝到a目录下</span><br><span class="line">cp 1.txt 2.txt #将1.txt拷贝到2.txt</span><br><span class="line">cp -r a data #-r参数表示将目录和目录下的文件一起拷贝，将a目录拷贝到data目录</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="scp命令"><a href="#scp命令" class="headerlink" title="scp命令"></a>scp命令</h3><p>scp 远程拷贝命令，它可以将本地文件拷贝到远程服务器，也可以将远程服务器的文件拷贝到本地，也可以将一台服务器文件拷贝到另一台</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">scp -r 本地文件路径 用户名@ip[:port]:远程路径 #将本地文件拷贝到远程服务器</span><br><span class="line">scp -r 2.txt root@192.168.5.105:/root/data/ #将本地的2.txt拷贝到192.168.5.105的/root/data目录下</span><br><span class="line"> </span><br><span class="line">scp -r 用户名@ip[:port]:远程文件路径 本地路径 #将远程文件拷贝到本地</span><br><span class="line">scp -r root@192.168.5.105:/root/3.bak /root/data #将远程的/root/3.bak文件拷贝到本地的/root/data目录</span><br></pre></td></tr></table></figure>
+
+<p>scp -r 用户名@ip[:port]:远程文件路径 用户名@ip[:port]:远程文件路径 #将文件从一台服务器拷贝到另一台服务器</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">scp -r root@192.168.5.105:/root/tmp root@192.168.5.105:/root/data/ #将/root/tmp拷贝到远程的/root/data目录下</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="mv命令"><a href="#mv命令" class="headerlink" title="mv命令"></a>mv命令</h3><p>mv 移动命令,它可以移动文件,也可以给文件改名</p>
+<p>mv 原文件路径 目标文件路径 #将文件从一个地方拷贝到另一个地方</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">mv 1.txt 12.txt #将文件1.txt改名为12.txt</span><br><span class="line">mv tmp tmp #将tmp目录改名为tm</span><br><span class="line">mv 12.txt tm #将文件12.txt移动到tm目录下</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="man命令"><a href="#man命令" class="headerlink" title="man命令"></a>man命令</h3><p>man 命令,查看命令的命令,查看命令帮助文档(显示的信息最详细)</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">man mv #查看mv命令的文件</span><br><span class="line"> </span><br><span class="line">man命令和命令的 --help参数结果相似(man命令只适用于linux本身的命令)</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="free命令"><a href="#free命令" class="headerlink" title="free命令"></a>free命令</h3><p>free命令,它是用来查看系统内存的命令</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">free #查看系统内存使用情况</span><br><span class="line">free -h #查看内存使用情况,并且以合适的单位显示大小</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="df命令"><a href="#df命令" class="headerlink" title="df命令"></a>df命令</h3><p>df命令,它是查看系统硬盘的命令</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">df #查看系统硬盘使用情况</span><br><span class="line">df -h #查看硬盘使用,并以合适单位显示大小</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="wc命令"><a href="#wc命令" class="headerlink" title="wc命令"></a>wc命令</h3><p>wc 命令,word count的缩写,它是查看文件的单词个数</p>
+<p>wc [参数] 文件</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">wc -l linux常用命令.txt #-l表示line行数 计算文件的行数</span><br><span class="line">wc -w linux常用命令.txt #-w表示word单词个数 计算文件的单词个数</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="ps命令"><a href="#ps命令" class="headerlink" title="ps命令"></a>ps命令</h3><p>ps命令,它是查看系统进程的命令</p>
+<p>ps -aux</p>
+<p>ps -ef</p>
+<p>jps 查看java进程</p>
+<h3 id="kill命令"><a href="#kill命令" class="headerlink" title="kill命令"></a>kill命令</h3><p>kill 进程id #结束进程</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">root 21752 1.6 0.5 158800 5532 ? Ss 08:34 0:00 sshd: root@pts/0</span><br></pre></td></tr></table></figure>
+
+<p>kill 21752 #结束ssh登陆的进程</p>
+<p>kill -9 进程id #强制结束进程</p>
+<h3 id="用户和权限命令"><a href="#用户和权限命令" class="headerlink" title="用户和权限命令"></a>用户和权限命令</h3><p>创建用户组:</p>
+<p>groupadd 用户组名称 #创建一个用户组</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">groupadd bows #创建一个叫bows的用户组</span><br><span class="line">删除用户组:</span><br><span class="line">groupdel 用户组名称 #删除一个用户组(删除时必须是用户组下没有用户时)</span><br><span class="line">groupdel bows #删除用户组</span><br></pre></td></tr></table></figure>
+
+<p>创建用户:</p>
+<p>useradd 用户名 [-g 用户组名 -G 用户组名] #创建一个用户,-g指定用户的主用户组,-G指定用户的其他用户组</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">useradd bow -g bows #创建bow用户,并指定它的主用户组是bows</span><br><span class="line">id 用户名 #查看用户的id</span><br><span class="line">id bow #查看用户bow的id</span><br></pre></td></tr></table></figure>
+
+<p>删除用户:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">userdel 用户名 #删除用户</span><br><span class="line">userdel bow #删除用户bow</span><br></pre></td></tr></table></figure>
+
+<p>切换用户:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">su 用户名 #切换用户,但不加载用户的环境变量</span><br><span class="line">su - 用户名 #切换用户,并加载用户的环境变量(建议使用这种方式切换用户)</span><br><span class="line">su bow #切换到bow用户(root用户切换到其他用户是不需要输入密码的,其他用户切换到root用户是要输入root用户密码的,其他用户之间的切换也是需要密码)</span><br><span class="line">exit #退出当前用户的登陆</span><br></pre></td></tr></table></figure>
+
+<p>修改用户密码:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">passwd 用户名 #修改用户密码</span><br><span class="line">passwd bow #修改bow用户的密码</span><br></pre></td></tr></table></figure>
+
+<p>权限:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">文件类型        用户权限       用户组权限       其他用户权限</span><br><span class="line">-                 rw-              r--             r--                . 1 root </span><br><span class="line">root 5890 3月 23 14:11 linux常用命令.txt</span><br><span class="line">d                 rwx              r-x             r-x                . 4 root </span><br><span class="line">root  81 3月 24 08:06 data</span><br><span class="line">d表示文件夹    u表示用户权限   g表示用户组权限   o表示其他用户权限</span><br><span class="line"> </span><br><span class="line">r:表示读权限 数字表示为4</span><br><span class="line">w:表示写权限 数字表示为2</span><br><span class="line">x:表示执行权限 数字表示为1</span><br><span class="line">-:表示没有权限</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="chmod-赋权限命令"><a href="#chmod-赋权限命令" class="headerlink" title="chmod 赋权限命令"></a>chmod 赋权限命令</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">chmod 权限 文件路径</span><br><span class="line">-rw-r--r--. 1 root root   31 3月  24 07:46 2.txt</span><br><span class="line">chmod u+x 2.txt #给用户加上执行权限</span><br><span class="line">-rwxr--r--. 1 root root   31 3月  24 07:46 2.txt</span><br><span class="line">chmod g+w 2.txt #给用户组加写权限</span><br><span class="line">-rwxrw-r--. 1 root root   31 3月  24 07:46 2.txt</span><br><span class="line">chmod o+x 2.txt #给其他用户加执行权限</span><br><span class="line">-rwxrw-r-x. 1 root root   31 3月  24 07:46 2.txt</span><br><span class="line">chmod g-w 2.txt #去掉用户的写权限 </span><br><span class="line">-rwxr--r-x. 1 root root   31 3月  24 07:46 2.txt</span><br></pre></td></tr></table></figure>
+
+<p>用3个数字来设置文件或目录的权限,第1个数字表示用户权限,第2数字表示用户组权限,第3个数字表示其他用户权限</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">chmod 755 2.txt #设置用户的权限为rwx,用户组的权限r-x,其他用户的权限r-x</span><br><span class="line">-rwxr-xr-x. 1 root root 31 3月 24 07:46 2.txt</span><br><span class="line">chmod 766 2.txt #设置用户权限为rwx,用户组权限rw-,其他用户的权限rw-</span><br><span class="line">-rwxrw-rw-. 1 root root 31 3月 24 07:46 2.txt</span><br></pre></td></tr></table></figure>
+
+<p>设置目录权限时,要使用-R参数,保证目录下的所有文件和目录的权限相同</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">drwxr-xr-x. 4 root root 81 3月 24 08:06 data</span><br><span class="line">chmod -R 777 data #将data目录以及它下面的所有文件的权限设置为rwxrwxrwx</span><br><span class="line">drwxrwxrwx. 4 root root 81 3月 24 08:06 data</span><br></pre></td></tr></table></figure>
+
+<p>chown 命令,它是更改文件所属用户</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">chown -R 用户[:用户组] 目录或文件</span><br><span class="line">-rwxrw-rw-. 1 root root 31 3月 24 07:46 2.txt</span><br><span class="line">chown bow 2.txt #将2.txt的所属用户改为bow</span><br><span class="line">-rwxrw-rw-. 1 bow root 31 3月 24 07:46 2.txt</span><br><span class="line">chown bow:bows 2.txt #将2.txt所属的用户改为bow,用户组改为bows</span><br><span class="line">-rwxrw-rw-. 1 bow bows 31 3月 24 07:46 2.txt</span><br><span class="line">drwxr--r--. 4 root root 81 3月 24 08:06 data</span><br><span class="line">chown -R bow:bows data #将data目录及它子目录文件的所属用户改为bow,用户组改为bows</span><br><span class="line">drwxr--r--. 4 bow bows 81 3月 24 08:06 data</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="查找命令"><a href="#查找命令" class="headerlink" title="查找命令"></a>查找命令</h3><p>find命令,可以根据文件的时间,名称等查找文件</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">find *.txt #查找txt文件</span><br></pre></td></tr></table></figure>
+
+<p>grep 命令,查找内容</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">grep cat linux常用命令.txt #在linux常用命令.txt文件中查询包含cat的行,查找文件内容</span><br></pre></td></tr></table></figure>
+
+<p>| 通道符号,连接两个命令的,将前一个命令的查询结果传给后一个命令</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">ps -ef | grep sshd #查看系统中sshd的进程 </span><br><span class="line">ps -ef | grep java #查看所有java进程</span><br><span class="line">grep -v #-v参数表示查询不包含查找条件的行</span><br><span class="line">grep -v cat linux常用命令.txt #查找linux常用命令.txt中不包含cat的行</span><br><span class="line"> </span><br><span class="line">ps -ef | grep sshd | grep -v grep #查询sshd的进程,不包括grep的行</span><br></pre></td></tr></table></figure>
+
+<p>–了解性查询命令</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">who命令 #查询系统中的用户(登陆的用户)</span><br><span class="line">whoami命令 #查看系统当前用户名</span><br><span class="line">whereis命令 #查看系统安装的某个软件的路径</span><br><span class="line">whereis python #查看python的安装路径</span><br><span class="line">which 命令 #查找软件的可执行文件路径 </span><br><span class="line">which python #查看python可执行文件路径</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="压缩命令"><a href="#压缩命令" class="headerlink" title="压缩命令"></a>压缩命令</h3><p>安装zip和unzip命令:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum -y install zip unzip</span><br></pre></td></tr></table></figure>
+
+<p>zip压缩命令</p>
+<p>zip 压缩文件名 要压缩的文件路径</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">zip 2.zip 2.txt #将2.txt压缩到2.zip中</span><br><span class="line"> </span><br><span class="line">zip data.zip data #只会压缩文件夹,不会压缩文件夹下的内容</span><br><span class="line"> </span><br><span class="line">zip da.zip da/* #压缩文件夹和文件夹内的文件(压缩文件夹和它的下一级文件) </span><br><span class="line"> </span><br><span class="line">zip -r data.zip date #-r表示递归地将文件夹及它的子目录文件全部压缩</span><br></pre></td></tr></table></figure>
+
+<p>unzip解压命令</p>
+<p>unzip 压缩文件路径</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">unzip 2.zip #将2.zip压缩包解压到当前目录下</span><br><span class="line">unzip -l 压缩文件名 #不解压文件,查看压缩包内的文件</span><br><span class="line">unzip -l da.zip #查看da.zip压缩文件中包含的文件</span><br><span class="line">unzip da.zip -d 目标目录 #将压缩文件解压到指定目录 </span><br><span class="line">unzip da.zip -d tm/ #将压缩文件da.zip解压到tm目录下</span><br></pre></td></tr></table></figure>
+
+<p>tar命令,用来压缩和解压缩.tar和.tar.gz包</p>
+<p>压缩.tar包:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">tar cvf 压缩文件名 要压缩的文件或目录</span><br><span class="line">tar cvf 2.tar 2.txt #将2.txt压缩为2.tar包</span><br><span class="line">tar cvf data.tar data #将data目录夸张到data.tar包中</span><br></pre></td></tr></table></figure>
+
+<p>解压.tar包:</p>
+<p>tar xvf 压缩文件名 [-C 指定解压目录]</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">tar xvf 2.tar #将2.tar解压到当前目录</span><br><span class="line">tar xvf 2.tar -C a/ #将2.tar解压到a目录</span><br><span class="line">tar xvf data.tar #解压data.tar到当前目录</span><br></pre></td></tr></table></figure>
+
+<p>压缩.tar.gz包:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">tar zcvf 压缩文件名 要压缩的文件</span><br><span class="line">tar zcvf tm.tar.gz tm #将当前目录下的tm目录压缩为tm.tar.gz</span><br></pre></td></tr></table></figure>
+
+<p>解压.tar.gz包:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">tar zxvf 压缩文件名</span><br><span class="line">tar zxvf tm.tar.gz #将tm.tar.gz解压到当前目录</span><br><span class="line">gzip命令,将文件压缩为.gz包(可以用来压缩.tar文件)</span><br><span class="line">gzip 要压缩的文件 </span><br><span class="line">gzip 2.txt #将2.txt压缩为2.txt.gz</span><br><span class="line">gzip data.tar #将data.tar压缩为data.tar.gz</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="source命令"><a href="#source命令" class="headerlink" title="source命令"></a>source命令</h3><p>source 文件路径 #让配置文件修改结果立即生效,(还可以在shell脚本中引用其他的shell脚本)</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">/etc/profile #linux上的系统环境变量配置文件</span><br><span class="line">source /etc/profile #将系统环境变量生效</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="export命令"><a href="#export命令" class="headerlink" title="export命令"></a>export命令</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">export 导入全局变量(环境变量)</span><br><span class="line"> </span><br><span class="line">export 变量名=变量值</span><br><span class="line">export 变量名</span><br><span class="line"> </span><br><span class="line">变量的赋值:</span><br><span class="line">变量名=变量值</span><br></pre></td></tr></table></figure>
+
+<p>&lt;&lt;EOF</p>
+<p>&lt;&lt;EOF … EOF:将&lt;&lt;EOF和EOF之间的多行内容传给前面的命令,<br>其中EOF可以是任意字符串,但约定都使用EOF</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">[root@bow ~]# cat &lt;&lt;EOF</span><br><span class="line">&gt; HELLO</span><br><span class="line">&gt; WORD</span><br><span class="line">&gt; JOB</span><br><span class="line">&gt; SMITH</span><br><span class="line">&gt; EOF</span><br><span class="line">HELLO</span><br><span class="line">WORD</span><br><span class="line">JOB</span><br><span class="line">SMITH</span><br></pre></td></tr></table></figure>
+
+<p>&lt;&lt;EOF是shell脚本中使用sqlplus的基础</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">[root@bow ~]# cat &lt;&lt;A</span><br><span class="line">&gt; 11234</span><br><span class="line">&gt; 1234</span><br><span class="line">&gt; 1234</span><br><span class="line">&gt; 1253</span><br><span class="line">&gt; 1253</span><br><span class="line">&gt; A</span><br><span class="line">11234</span><br><span class="line">1234</span><br><span class="line">1234</span><br><span class="line">1253</span><br><span class="line">1253</span><br></pre></td></tr></table></figure>
+
+<p>注意:EOF必须顶行写</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[root@bow ~]# cat &lt;&lt;EOF</span><br><span class="line">&gt; ASDF</span><br><span class="line">&gt; EOF</span><br><span class="line">&gt; ASDFASDF</span><br><span class="line">&gt; EOF</span><br><span class="line">ASDF</span><br><span class="line"> EOF</span><br><span class="line">ASDFASDF</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="cut命令"><a href="#cut命令" class="headerlink" title="cut命令"></a>cut命令</h3><p>cut 截取命令</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">-f 参数,指定列</span><br><span class="line">-d 参数指定列和列之间的分隔符,默认的分隔符是\t(行向制表符)</span><br><span class="line">cut -f 1 1.txt #取1.txt文件中的第1列内容(列分隔符默认为\t)</span><br><span class="line">cut -f 2 1.txt #取1.txt文件中的第2列内容</span><br><span class="line">cut -f 1 -d &#x27;,&#x27; 3.txt #取3.txt文件中的第1列(列分隔符为,)</span><br><span class="line">cut -f 2 -d &#x27;,&#x27; 3.txt #取3.txt第2列</span><br></pre></td></tr></table></figure>
+
+<p>wc -l linux常用命令.txt | cut -f 1 -d ’ ’ #取文件linux常用命令.txt的行数(分隔符是空格)</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[root@bow ~]# cut -f 1 -d &#x27;,&#x27; &lt;&lt;EOF</span><br><span class="line">&gt; A,B,C</span><br><span class="line">&gt; D,E,F</span><br><span class="line">&gt; EOF</span><br><span class="line">A</span><br><span class="line">D</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="printf命令"><a href="#printf命令" class="headerlink" title="printf命令"></a>printf命令</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">%ns　　输出字符串，n是数字，指代输出几个字符</span><br><span class="line">%ni　　输出整数。n是数字，指代输出几个数字</span><br><span class="line">%m.nf　　位数和小数位数。例如：%8.2f 代表输出8位数，其中2位是小数，6位是整数</span><br></pre></td></tr></table></figure>
+
+<p>printf 格式字符串 内容</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">[root@bow ~]# printf &#x27;%s,%s,%s\n&#x27; abc def ghj klj klo qer #一行单词第三个打印成一行,单词和单词之间用逗号隔开</span><br><span class="line">abc,def,ghj</span><br><span class="line">klj,klo,qer</span><br><span class="line">[root@bow ~]# printf &#x27;%s %s\n&#x27; $(cat 4.txt) #将文件4.txt中的一行内容中的单词划分为两个一组打印 cat 合作查看文件内容 $(cat 4.txt)表示取cat命令的执行结果</span><br><span class="line">empno ename</span><br><span class="line">job sal</span><br><span class="line">comm depno</span><br><span class="line">5.txt内容</span><br><span class="line">A B C D E</span><br><span class="line">F G H</span><br><span class="line">[root@bow ~]# printf &#x27;%s,%s\n&#x27; $(cat 5.txt)</span><br><span class="line">A,B</span><br><span class="line">C,D</span><br><span class="line">E,F</span><br><span class="line">G,H</span><br><span class="line">[root@bow ~]# printf &#x27;%5.2f\n&#x27; 12.1 #%5.2f表示输出一个小数,数的长度是5,其中有两个小数</span><br><span class="line">12.10</span><br><span class="line">[root@bow ~]# printf &#x27;%5.2f\n&#x27; 121234.116134 #如果输出的值最大长度超出5,那么整数部分不变量,小数部分会按照四舍五入的方法保存两位</span><br><span class="line">121234.12</span><br><span class="line">[root@bow ~]# printf &#x27;%i\n&#x27; 1234.5678  #%i只取数字的整数部分</span><br><span class="line">-bash: printf: 1234.5678: 无效数字</span><br><span class="line">1234</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="awk命令"><a href="#awk命令" class="headerlink" title="awk命令"></a>awk命令</h3><p>awk 命令字符串 要处理的内容</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[root@bow ~]# awk &#x27;&#123;printf $1 &quot;\n&quot;&#125;&#x27; 1.txt #printf 打印 $n 表示取第几列 $1表示取第1列 </span><br><span class="line">Hello</span><br><span class="line">smith</span><br><span class="line">tomcat</span><br></pre></td></tr></table></figure>
+
+<p>awk ‘{print $2}’ 1.txt #取1.txt的第2列,print和printf功能相同是打印,比printf多一个换行功能</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">[root@bow ~]# awk &#x27;&#123;printf $1 &quot;,&quot;&#125;&#x27; 1.txt</span><br><span class="line">Hello,smith,tomcat,[root@bow ~]#</span><br><span class="line">[root@bow ~]# awk &#x27;&#123;printf $1&#125;&#x27; 1.txt</span><br><span class="line">Hellosmithtomcat</span><br><span class="line">[root@bow ~]# awk &#x27;&#123;printf $1 &quot;\v&quot;&#125;&#x27; 1.txt</span><br><span class="line">Hello</span><br><span class="line">     smith</span><br><span class="line">          tomcat</span><br><span class="line">[root@bow ~]# awk &#x27;&#123;printf $1 &quot;,&quot;&#125;&#x27; 1.txt</span><br><span class="line">Hello,smith,tomcat,</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="sed命令"><a href="#sed命令" class="headerlink" title="sed命令"></a>sed命令</h3><p>sed 参数 命令 要处理的内容</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line">-n　　一般sed命令会把所有数据都输出到屏幕。如果加入此选择，则只会把经过sed命令处理的行输出到屏幕。</span><br><span class="line">-e　　允许对输入数据应用多条sed命令编辑</span><br><span class="line">-i　　用sed的修改结果直接修改读取的数据的文件，而不是修改屏幕输出</span><br><span class="line">[root@bow ~]# sed &#x27;2p&#x27; 1.txt #查询第2行</span><br><span class="line">Hello world</span><br><span class="line">smith 18</span><br><span class="line">smith 18</span><br><span class="line">tomcat etl</span><br><span class="line">[root@bow ~]# sed -n &#x27;2p&#x27; 1.txt</span><br><span class="line">smith 18</span><br><span class="line">[root@bow ~]# sed -i &#x27;s/18/20/g&#x27; 1.txt 使用sed命令修改1.txt内容,将1.txt中18替换为20</span><br><span class="line">[root@bow ~]# cat 1.txt</span><br><span class="line">Hello world</span><br><span class="line">smith 20</span><br><span class="line">tomcat etl</span><br><span class="line">a\　　追加，在当前行后添加一行或多行。添加多行时除最后一行外，每行末尾需要用&quot;\&quot;代表数据未完结。</span><br><span class="line">d　　删除，删除指定的</span><br><span class="line">p　　打印，输出指定的行</span><br><span class="line">[root@bow ~]# sed -i &#x27;2a !&#x27; 1.txt #在第2行后面追加一行 !</span><br><span class="line">[root@bow ~]# cat 1.txt</span><br><span class="line">Hello world</span><br><span class="line">smith 20</span><br><span class="line">!</span><br><span class="line">tomcat etl</span><br><span class="line">[root@bow ~]# sed -i &#x27;3d&#x27; 1.txt #删除文件的第3行内容</span><br><span class="line">[root@bow ~]# cat 1.txt</span><br><span class="line">Hello world</span><br><span class="line">smith 20</span><br><span class="line">tomcat etl</span><br><span class="line">[root@bow ~]# vim 6.txt</span><br><span class="line">[root@bow ~]# cat 6.txt</span><br><span class="line">abcd/home/bow</span><br><span class="line">if ad</span><br><span class="line"> -e /home/bow</span><br><span class="line">abcd/home/bow</span><br><span class="line">if ad</span><br><span class="line"> -e /home/bow</span><br><span class="line">abcd/home/bow</span><br><span class="line">if ad</span><br><span class="line"> -e /home/bow</span><br><span class="line">#将6.txt文件中的/home/bow修改为/user/bw</span><br><span class="line">#注意:替换时,的符号是根据/来判断 s/原字符串/目标字符串/g 如果原字符串或新的字符串中有/时,需要使用\来转义</span><br><span class="line"># 错误写法:s//home/bow//user/bw/g 正确写法 s/\/home\/bow/\/user\/bw/g</span><br><span class="line">[root@bow ~]# sed -i &#x27;s/\/home\/bow/\/user\/bw/g&#x27; 6.txt</span><br><span class="line">[root@bow ~]# cat 6.txt</span><br><span class="line">abcd/user/bw</span><br><span class="line">if ad</span><br><span class="line"> -e /user/bw</span><br><span class="line">abcd/user/bw</span><br><span class="line">if ad</span><br><span class="line"> -e /user/bw</span><br><span class="line">abcd/user/bw</span><br><span class="line">if ad</span><br><span class="line"> -e /user/bw</span><br></pre></td></tr></table></figure>
+
+<p>注意:linux中字符串的下标是从0开始的</p>
+<h3 id="service命令"><a href="#service命令" class="headerlink" title="service命令"></a>service命令</h3><p>service服务命令</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">ervice 服务名 [命令]</span><br><span class="line">命令:enable|disable|start|stop|restart|status</span><br><span class="line">start:启动服务</span><br><span class="line">stop:关闭服务</span><br><span class="line">restart:重启服务</span><br><span class="line">status:查看服务状态</span><br><span class="line">service network start #遍历网络</span><br><span class="line">service network stop #关闭网络</span><br><span class="line">service network restart #重启网络</span><br><span class="line">service network status #查看网络状态</span><br><span class="line">service iptables start #centos6及6以下版本,启动防火墙的命令</span><br><span class="line">service iptables stop #centos6及6以下版本,关闭防火墙(注意,关闭防火墙,只是临时关闭,下次重启之后防火墙依然会启动)</span><br><span class="line">service iptables restart #重启防火墙</span><br><span class="line">service mysqld start #启动mysql数据库</span><br><span class="line">service mysqld restart #启动mysql数据库</span><br><span class="line">service mysqld stop #关闭mysql数据库</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="chkconfig命令"><a href="#chkconfig命令" class="headerlink" title="chkconfig命令"></a>chkconfig命令</h3><p>chkconfig命令检查，设置系统的各种服务</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">chkconfig 服务名 on|off #on表示打开服务 off表示关闭服务 通过chkconfig设置的服务是永久生效</span><br><span class="line">centos6及以下版本永久关闭或打开防火墙</span><br><span class="line">chkconfig iptables on #打开防火墙</span><br><span class="line">chkconfig iptables off #永久地关闭防火墙</span><br></pre></td></tr></table></figure>
+
+<p>防火墙:</p>
+<p>centos7以上:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">systemctl start firewalld #启动防火墙</span><br><span class="line">systemctl stop firewalld #关闭防火墙(临时关闭)</span><br><span class="line">systemctl status firewalld #查看防火墙状态</span><br><span class="line">systemctl disable firewalld #永久关闭防火墙</span><br><span class="line">systemctl enable firewalld #打开防火墙(不是启动防火墙)</span><br><span class="line">通过firewall-cmd来配置防火墙</span><br></pre></td></tr></table></figure>
+
+<p>centos6及以下:</p>
+<p>防火墙配置文件:&#x2F;etc&#x2F;iptables,这个文件可以详细的配置防火墙,如果没有&#x2F;etc&#x2F;iptables文件可以使用iptables save可以生成该文件</p>
+<p>iptables 命令配置防火墙</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">service iptables start #centos6及6以下版本,启动防火墙的命令</span><br><span class="line">     service iptables stop #centos6及6以下版本,关闭防火墙(注意,关闭防火墙,只是临时关闭,下次重启之后防火墙依然会启动)</span><br><span class="line">     service iptables restart #重启防火墙</span><br></pre></td></tr></table></figure>
+
+<p>环境变量配置文件</p>
+<p>&#x2F;etc&#x2F;profile是linux系统上配置系统环境变量的一个文件(针对所有用户的配置)<br>用户根目录下的.bash_profile:是用户环境变量的配置(针对当前用户有效)</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">su - 用户名 #切换用户时,会加载用户根目录下的.bash_profile环境变量配置文件</span><br><span class="line">su 用户名 #不会加载.bash_profile</span><br></pre></td></tr></table></figure>
+
+<p>网络配置文件</p>
+<p>网卡配置文件目录:&#x2F;etc&#x2F;sysconfig&#x2F;network-scripts</p>
+<p>网卡配置文件名都是以ifcfg-开头,其中ifcfg-lo是本地网卡,是不需要配置的</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">vim /etc/sysconfig/network-scripts/ifcfg-enp0s3</span><br><span class="line">#网卡类型</span><br><span class="line">TYPE=&quot;Ethernet&quot;</span><br><span class="line">#协议 dhcp表示:ip地址是自动分配的,static表示静态ip(手动配置ip地址),none表示没有协议(也是需要手动配置ip地址)</span><br><span class="line">BOOTPROTO=&quot;dhcp&quot;</span><br><span class="line">DEFROUTE=&quot;yes&quot;</span><br><span class="line">#网卡名称</span><br><span class="line">NAME=&quot;enp0s3&quot;</span><br><span class="line">UUID=&quot;deed3fd2-bd67-459b-8a49-ef0dd6e575a2&quot;</span><br><span class="line">DEVICE=&quot;enp0s3&quot;</span><br><span class="line">#配置网卡是否随机启动,yes:表示随机启动,no:表示需要手动启动</span><br><span class="line">ONBOOT=&quot;yes&quot;</span><br><span class="line">#配置静态ip,BOOTPROTO必须是static或none</span><br><span class="line">#ip地址配置</span><br><span class="line">IPADDR=192.168.1.106</span><br><span class="line">#配置子网掩码</span><br><span class="line">NETMASTER=255.255.255.0</span><br><span class="line">#配置网关</span><br><span class="line">GATEWAY=192.168.1.1</span><br><span class="line">#配置dns:域名解析服务器可以配置多个</span><br><span class="line">DNS1=192.168.1.1</span><br><span class="line">DNS2=192.168.5.1</span><br></pre></td></tr></table></figure>
+
+<p>修改完网卡文件之后,<em>重启网络</em>即可</p>
+<h3 id="sudo命令"><a href="#sudo命令" class="headerlink" title="sudo命令"></a>sudo命令</h3><p>sudo命令,它在非root用户下,去调用一些root用户的命令,或者修改一些文件<br>sudo命令是需要配置的,sudo的配置文件是&#x2F;etc&#x2F;sudoers</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">#给bow用户配置sudo权限</span><br><span class="line">[root@bow ~]# vim /etc/sudoers</span><br><span class="line">##</span><br><span class="line">## Allow root to run any commands anywhere </span><br><span class="line">root ALL=(ALL) ALL</span><br><span class="line">#给bow用户设置sudo命令权限</span><br><span class="line">bow ALL=(ALL) ALL</span><br></pre></td></tr></table></figure>
+
+<p>sudo命令的使用:</p>
+<p>sudo 命令</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[root@bow ~]# su - bow</span><br><span class="line">上一次登录：四 3月 26 07:30:53 CST 2020pts/0 上</span><br><span class="line">[bow@bow ~]$ sudo vim /etc/profile</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="ping命令"><a href="#ping命令" class="headerlink" title="ping命令"></a>ping命令</h3><p>ping命令查看网络连通性的命令和windows上的功能一样</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ping ip（0.0.0.100）</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="ifconfig命令"><a href="#ifconfig命令" class="headerlink" title="ifconfig命令"></a>ifconfig命令</h3><p>ifconfig命令属于net-tools软件包,使用前需要安装net-tools</p>
+<p>net-tools的安装:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">yum -y install net-tools</span><br><span class="line">ifconfig查看ip地址</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="netstat命令"><a href="#netstat命令" class="headerlink" title="netstat命令"></a>netstat命令</h3><p>netstat命令也属于net-tools软件包</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">netstat -tulp | grep 1521 #查看oracle监听器程序是否正常启动</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="rpm命令"><a href="#rpm命令" class="headerlink" title="rpm命令"></a>rpm命令</h3><p>rpm是linux上的安装命令，用来安装.rpm格式的安装包</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">rpm -ivh .rpm文件的路径 #表示安装软件包</span><br><span class="line"> </span><br><span class="line">rpm -qa #查看已安装的软件 </span><br><span class="line">rpm -qa | grep mysql #查看已经安装的mysql软件包</span><br><span class="line"> </span><br><span class="line">rpm -e --nodeps 安装包名 #卸载软件包 -e表示卸载 --nodeps表示不理会的依赖关系</span><br><span class="line">OK，本文就这样。</span><br></pre></td></tr></table></figure>
+      </div>
+      <div class="post-tags-categories">
+        
+        <div class="tags">
+          
+            <a href="/tags/Linux/" class="">
+              Linux
+            </a>
+          
+        </div>
+        
+      </div>
+      
+        <div class="copyright">
+  <ul class="post-copyright">
+    <li class="post-copyright-author">
+    <strong>author:  </strong>John Doe</a>
+    </li>
+    <li class="post-copyright-link">
+    <strong>link:  </strong>
+    <a href="/2022/05/03/Linux-常用命令整合/" target="_blank" title="Linux 常用命令整合">http://example.com/2022/05/03/Linux-常用命令整合/</a>
+    </li>
+    <li class="post-copyright-license">
+      <strong>Copyright notice:   </strong>
+      All articles on this website, unless otherwise stated, adopt <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">CC BY-NC-ND 4.0</a>
+      reprint policy. If reproduced, please indicate source!
+    </li>
+  </ul>
+<div>
+      
+    </article>
+    <!-- 上一篇文章和下一篇文章 -->
+    
+      <!-- 文章详情页的上一页和下一页 -->
+<div class="post-nav">
+
+
+
+  
+  <div class="post-nav-prev post-nav-item">
+    <div class="post-nav-img" style="background-size: cover; 
+      background-position: center center;">
+      <img class="lazyload lazyload placeholder" src="/medias/10.jpg" class="lazyload placeholder" data-srcset="/medias/10.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="">
+    </div>
+    <a href="/2022/05/03/Linux%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E5%9F%BA%E7%A1%80/" class="post-nav-link">
+      <div class="title">
+        <i class="fas fa-angle-left"></i> Prev:
+        <div class="title-text">Linux操作系统基础</div>
+      </div>
+      
+      <!-- <div class="content">
+        命令格式： 命令  [选项]  [参数]
+ls -a  -l  -lh  -ld
+Linux操作系统快捷键1234567
+      </div> -->
+    </a>
+  </div>
+
+
+
+  
+  <div class="post-nav-next post-nav-item">
+    <div class="post-nav-img" style="background-size: cover; 
+      background-position: center center;">
+      <img class="lazyload lazyload placeholder" src="/medias/1.jpg" class="lazyload placeholder" data-srcset="/medias/1.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" src="" alt="">
+    </div>
+    <a href="/2022/05/03/Docker/" class="post-nav-link">
+      <div class="title">
+        Next: <i class="fas fa-angle-right"></i>
+        <div class="title-text">Docker</div>
+      </div>
+      <!-- <div class="content">
+        DockerDocker 是目前火热的容器化虚拟化技术，每一个 Docker 容器都是一个精简的 Linux 虚拟机，通
+      </div> -->
+    </a>
+  </div>
+
+</div>
+
+    
+    
+
+    <!-- 打赏 -->
+    
+      <div id="appDonate" class="post-donate">
+  <div id="donate_board" class="donate_bar center" ref="donate">
+    <a id="btn_donate" class="btn_donate" href="javascript:;" title="打赏" @click="showDialogDrawer()"></a>
+  </div>
+  <transition name="fade">
+    <div 
+      class="donate-box-mask"
+      v-cloak 
+      v-show="visible"
+      @click="cancelDialogDrawer()"
+    >
+    </div>
+  </transition>
+  <transition name="bounce">
+    <div class="donate-box" v-cloak v-show="visible">
+      <div class="donate-box_close">
+        <i class="fas fa-times" aria-hidden="true" @click="cancelDialogDrawer" pointer></i>
+      </div>
+      <div class="donate-box_title">
+        <h4>
+          你的赏识是我前进的动力
+        </h4>
+      </div>
+      <div class="donate-box_tab">
+        <div class="Alipay" pointer :class="{'active': tabActive === 'Alipay'}" @click="changeTabActive('Alipay')">
+          支付宝
+        </div>
+        <div class="WeChatpay" pointer :class="{'active': tabActive === 'WeChatpay'}" @click="changeTabActive('WeChatpay')">
+          微信
+        </div>
+      </div>
+      <div class="donate-box_img">
+        <div class="AlipayImg" v-show="tabActive === 'Alipay'">
+          <img src="/medias/1.jpg" class="lazyload placeholder" data-srcset="/medias/1.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="支付宝打赏" />
+        </div> 
+        <div class="WeChatpayImg" v-show="tabActive === 'WeChatpay'">
+          <img src="/medias/2.jpg" class="lazyload placeholder" data-srcset="/medias/2.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="微信打赏" />
+        </div>
+      </div>
+    </div>
+  </transition>
+</div>
+
+<script>
+  var body = document.body || document.documentElement || window;
+  var vm = new Vue({
+    el: '#appDonate',
+    data: {
+      visible: false,
+      tabActive: 'Alipay',
+      top: 0,
+    },
+    computed: {
+    },
+    mounted() {
+    },
+    methods: {
+      showDialogDrawer() {
+        this.visible = true;
+        // 防止页面滚动，只能让弹框滚动
+        // function getScroll() {
+        //   return {
+        //     left: window.pageXOffset || document.documentElement.scrollLeft || document.body.scrollLeft || 0,
+        //     top: window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0
+        //   };
+        // }
+        this.top = $(document).scrollTop() // or getScroll().top
+        // console.log('aa', $('.main-content'));
+        body.style.cssText = 'overflow: hidden;';
+      },
+      cancelDialogDrawer() {
+        this.visible = false;
+        body.removeAttribute('style');
+        $(document).scrollTop(this.top)
+      },
+      changeTabActive(name) {
+        this.tabActive = name;
+      }
+    },
+    created() {}
+  })
+</script>
+    
+
+    <!-- 分享 -->
+    
+      <!-- https://github.com/overtrue/share.js -->
+<!-- 文章详情页的分享 -->
+<div class="social-share" data-sites="twitter,facebook,google,qq,qzone,wechat,weibo,douban,linkedin" data-wechat-qrcode-helper="<p>微信扫一扫即可分享！</p>"></div>
+
+<script src="/js/shareJs/social-share.min.js"></script>
+</script>
+
+<style>
+  .social-share {
+    margin: 20px 0;
+  }
+</style>
+
+
+    
+    
+    <!-- 评论 -->
+    <!-- 评论 -->
+
+  <div id="myComment">
+    
+      <div id="gitment-container"></div>
+
+    
+  </div>
+
+<!-- comment script in themes\hexo-theme-bamboo\layout\_partial\scripts\index.ejs -->
+
+
+  </div>
+
+  <!-- 目录 -->
+  <!-- 文章详情页右侧目录 -->
+
+  <div class="toc-aside">
+    <div class="toc-main">
+      <div class="toc-aside-title">
+        <i class="fas fa-list-ul" aria-hidden="true"></i><span>catalog</span>
+        
+          <div class="toc-open-close">catalog</div>
+        
+      </div>
+      <div class="toc-content">
+        <div class="toc"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 手机端目录按钮 -->
+  <div id="toc-mobile-btn">
+    <i class="fas fa-list-ul" aria-hidden="true"></i>
+  </div>
+
+
+<script>
+  function closeToc(init) {
+    $(".toc-aside").css({'width': 0, 'padding': 0, 'transition': init ?  'noe' : 'width 0.3s' });
+    $(".toc-content").css({'width': 0});
+    $(".toc-aside-title span, .toc-aside-title i").css({'display': 'none'});
+    $(".main-content").css({'width': '75%', 'margin-left': 'auto', 'margin-right': 'auto',});
+  };
+  function openToc() {
+    $(".main-content").css({'width': '65%', 'margin-right': '10px', 'margin-left': 'calc(35% - 350px)'});
+    $(".toc-aside").css({'width': '300px', 'padding': '0 10px', 'transition': 'width 0.3s'});
+    $(".toc-content").css({'width': '300px'});
+    $(".toc-aside-title span, .toc-aside-title i").css({'display': 'inline-block'});
+  }
+  function openBtnClickFn () {
+    let openOrCloseBtn = $('.toc-aside .toc-aside-title .toc-open-close');
+    let open = eval('' || 'true');
+    openOrCloseBtn.click(function() {
+      if (open) {
+        closeToc();
+        open = false;
+      } else {
+        openToc();
+        open = true;
+      }
+    });
+  };
+  openBtnClickFn();
+  initCloseTocWidth(true);
+
+  function initCloseTocWidth(init) {
+    if (window.innerWidth >= 992) {
+      let isClose = false;
+      isClose && closeToc(init)
+    }
+  }
+
+  document.addEventListener('pjax:complete', function () {
+    $(".toc-aside").css({'transition': 'no'});
+  })
+  document.addEventListener('pjax:complete', function () {
+    openBtnClickFn();
+  })
+  
+</script>
+
+  <!-- 图片放大 Wrap images with fancybox support -->
+  <script src="/js/wrapImage.js"></script>
+</div>
+
+<!-- 文章详情页背景图 -->
+<div id="appBgSwiper" style="position: fixed;left: 0;top: 0;width: 100%;height: 100%;z-index: -2;"
+	:style="{'background-color': bgColor ? bgColor : 'transparent'}">
+	<transition-group tag="ul" :name="names">
+		<li v-for='(image,index) in img' :key='index' v-show="index === mark" class="bg-swiper-box">
+			<img :src="image" class="bg-swiper-img no-lazy">
+		</li>
+	</transition-group>
+</div>
+<script>
+	var vm = new Vue({
+		el: '#appBgSwiper',
+		data: {
+			names: '' || 'fade' || 'fade', // translate-fade fade
+			mark: 0,
+			img: [],
+			bgColor: '',
+			time: null
+		},
+		methods: {   //添加方法
+			change(i, m) {
+				if (i > m) {
+					// this.names = 'fade';
+				} else if (i < m) {
+					// this.names = 'fade';
+				} else {
+					return;
+				}
+				this.mark = i;
+			},
+			prev() {
+				// this.names = 'fade';
+				this.mark--;
+				if (this.mark === -1) {
+					this.mark = 3;
+					return
+				}
+			},
+			next() {
+				// this.names = 'fade';
+				this.mark++;
+				if (this.mark === this.img.length) {
+					this.mark = 0;
+					return
+				}
+			},
+			autoPlay() {
+				// this.names = 'fade';
+				this.mark++;
+				if (this.mark === this.img.length) {
+					this.mark = 0;
+					return
+				}
+			},
+			play() {
+				let bgImgDelay = '' || '180000'
+				let delay = parseInt(bgImgDelay) || 180000;
+				this.time = setInterval(this.autoPlay, delay);
+			},
+			enter() {
+				clearInterval(this.time);
+			},
+			leave() {
+				this.play();
+			}
+		},
+		created() {
+			this.play()
+		},
+		beforeDestroy() {
+			clearInterval(this.time);
+		},
+		mounted() {
+			let prop = '' || '';
+			let isImg = prop.includes('.bmp') || prop.includes('.jpg') || prop.includes('.png') || prop.includes('.tif') || prop.includes('.gif') || prop.includes('.pcx') || prop.includes('.tga') || prop.includes('.exif') || prop.includes('.fpx') || prop.includes('.psd') || prop.includes('.cdr') || prop.includes('.pcd') || prop.includes('.dxf') || prop.includes('.ufo') || prop.includes('.eps') || prop.includes('.ai') || prop.includes('.raw') || prop.includes('.WMF') || prop.includes('.webp') || prop.includes('.jpeg') || prop.includes('http://') || prop.includes('https://')
+			if (isImg) {
+				let img = prop.split(',');
+				let configRoot = '/'
+				let arrImg = [];
+				img.forEach(el => {
+					var Expression = /http(s)?:\/\/([\w-]+\.)+[\w-]+(\/[\w- .\/?%&=]*)?/;
+					var objExp = new RegExp(Expression);
+
+					if (objExp.test(el)) {
+						// http or https
+						arrImg.push(el);
+					} else {
+						// 非http or https开头
+						// 本地文件
+						let firstStr = el.charAt(0);
+						if (firstStr == '/') {
+							el = el.substr(1); // 删除第一个字符 '/',因为 configRoot最后一个字符为 /
+						}
+						el = configRoot + el;
+						arrImg.push(el);
+					}
+				})
+				this.img = arrImg;
+			} else {
+				this.bgColor = prop;
+			}
+		}
+	})
+</script>
+
+<style>
+	.bg-swiper-box {
+		position: absolute;
+		display: block;
+		width: 100%;
+		height: 100%;
+	}
+
+	.bg-swiper-img {
+		object-fit: cover;
+		width: 100%;
+		height: 100%;
+	}
+</style>
+
+
+
+
+  <script>
+  function loadMermaid() {
+    if (document.getElementsByClassName('mermaid').length) {
+      if (window.mermaidJsLoad) mermaid.init()
+      else {
+        loadScript('https://unpkg.com/mermaid/dist/mermaid.min.js').then(() => {
+          window.mermaidJsLoad = true
+          mermaid.initialize({
+            theme: 'default',
+          })
+          if ('true') {
+            mermaid.init();
+          }
+        })
+      }
+    }
+  };
+  document.addEventListener("DOMContentLoaded", function () {
+    loadMermaid();
+  })
+
+  document.addEventListener('pjax:complete', function () {
+    loadMermaid();
+  })
+  
+</script>
+
+
+      </main>
+    </div>
+
+    <!-- 页脚 -->
+    
+  
+  
+    <!-- 底部鱼儿跳动效果，依赖于jquery-->
+<div id="j-fish-skip" style=" position: relative;height: 153px;width: auto;"></div>
+<script>
+  var RENDERER = {
+    POINT_INTERVAL: 5,
+    FISH_COUNT: 3,
+    MAX_INTERVAL_COUNT: 50,
+    INIT_HEIGHT_RATE: .5,
+    THRESHOLD: 50,
+    FISH_COLOR: '',
+    init: function () {
+      this.setFishColor(); this.setParameters(), this.reconstructMethods(), this.setup(), this.bindEvent(), this.render()
+    },
+    setFishColor: function () {
+      let isDark = JSON.parse(localStorage.getItem('dark')) || JSON.parse('false');
+      if (isDark) {
+        this.FISH_COLOR = '#222'; // 暗黑色，有时间把这整成一个变量
+      } else {
+        this.FISH_COLOR = '' || '#42b983';
+      }
+    },
+    setParameters: function () {
+      this.$window = $(window), this.$container = $("#j-fish-skip"), this.$canvas = $("<canvas />"), this.context = this.$canvas.appendTo(this.$container).get(0).getContext("2d"), this.points = [], this.fishes = [], this.watchIds = []
+    },
+    createSurfacePoints: function () {
+      var t = Math.round(this.width / this.POINT_INTERVAL);
+      this.pointInterval = this.width / (t - 1), this.points.push(new SURFACE_POINT(this, 0));
+      for (var i = 1; i < t; i++) {
+        var e = new SURFACE_POINT(this, i * this.pointInterval),
+          h = this.points[i - 1];
+        e.setPreviousPoint(h), h.setNextPoint(e), this.points.push(e)
+      }
+    },
+    reconstructMethods: function () {
+      this.watchWindowSize = this.watchWindowSize.bind(this), this.jdugeToStopResize = this.jdugeToStopResize.bind(this), this.startEpicenter = this.startEpicenter.bind(this), this.moveEpicenter = this.moveEpicenter.bind(this), this.reverseVertical = this.reverseVertical.bind(this), this.render = this.render.bind(this)
+    },
+    setup: function () {
+      this.points.length = 0, this.fishes.length = 0, this.watchIds.length = 0, this.intervalCount = this.MAX_INTERVAL_COUNT, this.width = this.$container.width(), this.height = this.$container.height(), this.fishCount = this.FISH_COUNT * this.width / 500 * this.height / 500, this.$canvas.attr({
+        width: this.width,
+        height: this.height
+      }), this.reverse = !1, this.fishes.push(new FISH(this)), this.createSurfacePoints()
+    },
+    watchWindowSize: function () {
+      this.clearTimer(), this.tmpWidth = this.$window.width(), this.tmpHeight = this.$window.height(), this.watchIds.push(setTimeout(this.jdugeToStopResize, this.WATCH_INTERVAL))
+    },
+    clearTimer: function () {
+      for (; this.watchIds.length > 0;) clearTimeout(this.watchIds.pop())
+    },
+    jdugeToStopResize: function () {
+      var t = this.$window.width(),
+        i = this.$window.height(),
+        e = t == this.tmpWidth && i == this.tmpHeight;
+      this.tmpWidth = t, this.tmpHeight = i, e && this.setup()
+    },
+    bindEvent: function () {
+      this.$window.on("resize", this.watchWindowSize), this.$container.on("mouseenter", this.startEpicenter), this.$container.on("mousemove", this.moveEpicenter)
+    },
+    getAxis: function (t) {
+      var i = this.$container.offset();
+      return {
+        x: t.clientX - i.left + this.$window.scrollLeft(),
+        y: t.clientY - i.top + this.$window.scrollTop()
+      }
+    },
+    startEpicenter: function (t) {
+      this.axis = this.getAxis(t)
+    },
+    moveEpicenter: function (t) {
+      var i = this.getAxis(t);
+      this.axis || (this.axis = i), this.generateEpicenter(i.x, i.y, i.y - this.axis.y), this.axis = i
+    },
+    generateEpicenter: function (t, i, e) {
+      if (!(i < this.height / 2 - this.THRESHOLD || i > this.height / 2 + this.THRESHOLD)) {
+        var h = Math.round(t / this.pointInterval);
+        h < 0 || h >= this.points.length || this.points[h].interfere(i, e)
+      }
+    },
+    reverseVertical: function () {
+      this.reverse = !this.reverse;
+      for (var t = 0, i = this.fishes.length; t < i; t++) this.fishes[t].reverseVertical()
+    },
+    controlStatus: function () {
+      for (var t = 0, i = this.points.length; t < i; t++) this.points[t].updateSelf();
+      for (t = 0, i = this.points.length; t < i; t++) this.points[t].updateNeighbors();
+      this.fishes.length < this.fishCount && 0 == --this.intervalCount && (this.intervalCount = this.MAX_INTERVAL_COUNT, this.fishes.push(new FISH(this)))
+    },
+    render: function () {
+      requestAnimationFrame(this.render), this.controlStatus(), this.context.clearRect(0, 0, this.width, this.height), this.context.fillStyle = this.FISH_COLOR;
+      for (var t = 0, i = this.fishes.length; t < i; t++) this.fishes[t].render(this.context);
+      this.context.save(), this.context.globalCompositeOperation = "xor", this.context.beginPath(), this.context.moveTo(0, this.reverse ? 0 : this.height);
+      for (t = 0, i = this.points.length; t < i; t++) this.points[t].render(this.context);
+      this.context.lineTo(this.width, this.reverse ? 0 : this.height), this.context.closePath(), this.context.fill(), this.context.restore()
+    }
+  },
+  SURFACE_POINT = function (t, i) {
+    this.renderer = t, this.x = i, this.init()
+  };
+  SURFACE_POINT.prototype = {
+    SPRING_CONSTANT: .03,
+    SPRING_FRICTION: .9,
+    WAVE_SPREAD: .3,
+    ACCELARATION_RATE: .01,
+    init: function () {
+      this.initHeight = this.renderer.height * this.renderer.INIT_HEIGHT_RATE, this.height = this.initHeight, this.fy = 0, this.force = {
+        previous: 0,
+        next: 0
+      }
+    },
+    setPreviousPoint: function (t) {
+      this.previous = t
+    },
+    setNextPoint: function (t) {
+      this.next = t
+    },
+    interfere: function (t, i) {
+      this.fy = this.renderer.height * this.ACCELARATION_RATE * (this.renderer.height - this.height - t >= 0 ? -1 : 1) * Math.abs(i)
+    },
+    updateSelf: function () {
+      this.fy += this.SPRING_CONSTANT * (this.initHeight - this.height), this.fy *= this.SPRING_FRICTION, this.height += this.fy
+    },
+    updateNeighbors: function () {
+      this.previous && (this.force.previous = this.WAVE_SPREAD * (this.height - this.previous.height)), this.next && (this.force.next = this.WAVE_SPREAD * (this.height - this.next.height))
+    },
+    render: function (t) {
+      this.previous && (this.previous.height += this.force.previous, this.previous.fy += this.force.previous), this.next && (this.next.height += this.force.next, this.next.fy += this.force.next), t.lineTo(this.x, this.renderer.height - this.height)
+    }
+  };
+  var FISH = function (t) {
+    this.renderer = t, this.init()
+  };
+  FISH.prototype = {
+    GRAVITY: .4,
+    init: function () {
+      this.direction = Math.random() < .5, this.x = this.direction ? this.renderer.width + this.renderer.THRESHOLD : -this.renderer.THRESHOLD, this.previousY = this.y, this.vx = this.getRandomValue(4, 10) * (this.direction ? -1 : 1), this.renderer.reverse ? (this.y = this.getRandomValue(1 * this.renderer.height / 10, 4 * this.renderer.height / 10), this.vy = this.getRandomValue(2, 5), this.ay = this.getRandomValue(.05, .2)) : (this.y = this.getRandomValue(6 * this.renderer.height / 10, 9 * this.renderer.height / 10), this.vy = this.getRandomValue(-5, -2), this.ay = this.getRandomValue(-.2, -.05)), this.isOut = !1, this.theta = 0, this.phi = 0
+    },
+    getRandomValue: function (t, i) {
+      return t + (i - t) * Math.random()
+    },
+    reverseVertical: function () {
+      this.isOut = !this.isOut, this.ay *= -1
+    },
+    controlStatus: function (t) {
+      this.previousY = this.y, this.x += this.vx, this.y += this.vy, this.vy += this.ay, this.renderer.reverse ? this.y > this.renderer.height * this.renderer.INIT_HEIGHT_RATE ? (this.vy -= this.GRAVITY, this.isOut = !0) : (this.isOut && (this.ay = this.getRandomValue(.05, .2)), this.isOut = !1) : this.y < this.renderer.height * this.renderer.INIT_HEIGHT_RATE ? (this.vy += this.GRAVITY, this.isOut = !0) : (this.isOut && (this.ay = this.getRandomValue(-.2, -.05)), this.isOut = !1), this.isOut || (this.theta += Math.PI / 20, this.theta %= 2 * Math.PI, this.phi += Math.PI / 30, this.phi %= 2 * Math.PI), this.renderer.generateEpicenter(this.x + (this.direction ? -1 : 1) * this.renderer.THRESHOLD, this.y, this.y - this.previousY), (this.vx > 0 && this.x > this.renderer.width + this.renderer.THRESHOLD || this.vx < 0 && this.x < -this.renderer.THRESHOLD) && this.init()
+    },
+    render: function (t) {
+      t.save(), t.translate(this.x, this.y), t.rotate(Math.PI + Math.atan2(this.vy, this.vx)), t.scale(1, this.direction ? 1 : -1), t.beginPath(), t.moveTo(-30, 0), t.bezierCurveTo(-20, 15, 15, 10, 40, 0), t.bezierCurveTo(15, -10, -20, -15, -30, 0), t.fill(), t.save(), t.translate(40, 0), t.scale(.9 + .2 * Math.sin(this.theta), 1), t.beginPath(), t.moveTo(0, 0), t.quadraticCurveTo(5, 10, 20, 8), t.quadraticCurveTo(12, 5, 10, 0), t.quadraticCurveTo(12, -5, 20, -8), t.quadraticCurveTo(5, -10, 0, 0), t.fill(), t.restore(), t.save(), t.translate(-3, 0), t.rotate((Math.PI / 3 + Math.PI / 10 * Math.sin(this.phi)) * (this.renderer.reverse ? -1 : 1)), t.beginPath(), this.renderer.reverse ? (t.moveTo(5, 0), t.bezierCurveTo(10, 10, 10, 30, 0, 40), t.bezierCurveTo(-12, 25, -8, 10, 0, 0)) : (t.moveTo(-5, 0), t.bezierCurveTo(-10, -10, -10, -30, 0, -40), t.bezierCurveTo(12, -25, 8, -10, 0, 0)), t.closePath(), t.fill(), t.restore(), t.restore(), this.controlStatus(t)
+    }
+  }, $(function () {
+    RENDERER.init()
+    $('.dark').click(function () {
+      setTimeout(() => {
+        RENDERER.setFishColor();
+        RENDERER.context.fill();
+      });
+    })
+  });
+</script>
+  
+  <div class="footer bg-color">
+    <div class="footer-main">
+      
+        
+          <div class="link">
+            
+          </div>
+        
+      
+        
+          <div class="footer-copyright">
+            <p>Copyright © 2019 - 2020 <a target="_blank" rel="noopener" href="https://github.com/yuang01">yuang01</a> | Powered by <a target="_blank" rel="noopener" href="https://hexo.io/zh-cn/docs/">Hexo</a> | Theme <a target="_blank" rel="noopener" href="https://github.com/yuang01/theme">Bamboo</a> </p>
+
+          </div>
+        
+      
+        
+          
+            <!-- 不蒜子统计 -->
+            <!-- 不蒜子统计 -->
+<span id="busuanzi_container_site_pv">
+      <i class="fas fa-eye" aria-hidden="true"></i>Total visits：<span id="busuanzi_value_site_pv"></span> times
+</span>
+<span class="post-meta-divider">|</span>
+<span id="busuanzi_container_site_uv" style='display:none'>
+      <i class="fas fa-users" aria-hidden="true"></i>Number of visitors：<span id="busuanzi_value_site_uv"></span> people
+</span>
+
+          
+        
+      
+        
+          <div class="footer-custom">
+            
+          </div>
+        
+      
+    </div>
+  </div>
+
+
+
+    <!-- 渲染暗黑按钮 -->
+    
+      <div class="dark">
+  <div class="dark-content">
+    <i class="fas fa-moon" aria-hidden="true"></i>
+    <!-- <span>关灯</span> -->
+  </div>
+  
+</div>
+
+<script>
+  $(function() {
+    let isDark = JSON.parse(localStorage.getItem('dark'))  || JSON.parse('false');
+    if (isDark) {
+      $(".dark-content").replaceWith(
+          `
+          <div class='dark-content'>
+            <i class="fas fa-lightbulb" aria-hidden="true"></i>
+          </div>
+          `
+        );
+    }
+    $('.dark').click(function() {
+      if ($(document.body).is('.darkModel')) {
+        $(document.body).removeClass('darkModel');
+        localStorage.setItem('dark', false);
+        $(".dark-content").replaceWith(
+          `
+          <div class='dark-content'>
+            <i class="fas fa-moon" aria-hidden="true"></i>
+          </div>
+          `
+        );
+      } else {
+        $(document.body).addClass('darkModel');
+        localStorage.setItem('dark', true);
+        $(".dark-content").replaceWith(
+          `
+          <div class='dark-content'>
+            <i class="fas fa-lightbulb" aria-hidden="true"></i>
+          </div>
+          `
+        );
+      }
+    })
+  })
+</script>
+    
+    <!-- 渲染回到顶部按钮 -->
+    
+      <div class="goTop top-btn-color" pointer>
+  <i class="fas fa-arrow-up" aria-hidden="true"></i>
+</div>
+<script src="/js/goTop.js"></script>
+
+    
+    <!-- 渲染左下角音乐播放器 -->
+    
+      <link rel="stylesheet" href="/js/aplayer/APlayer@1.10.1.min.css">
+<style>
+.aplayer .aplayer-lrc p {
+  
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 16px !important;
+}
+
+.aplayer .aplayer-lrc p.aplayer-lrc-current {
+  
+  font-size: 15px;
+  color: #42b983;
+}
+
+
+.aplayer.aplayer-fixed.aplayer-narrow .aplayer-body {
+  left: -66px !important;
+}
+
+.aplayer.aplayer-fixed.aplayer-narrow .aplayer-body:hover {
+  left: 0px !important;
+}
+
+
+</style>
+<meting-js  
+  class=""
+  server="tencent"
+  type="playlist"
+  id="8062553743"
+  fixed='true'
+  autoplay='false'
+  theme='#42b983'
+  loop='all'
+  order='random'
+  preload='auto'
+  volume='0.7'
+  list-folded='true'
+>
+</meting-js>
+
+<!-- <style>
+  #aplayer {
+    position: fixed;
+    left: 0;
+    bottom: 300px;
+  }
+</style> -->
+<script src="https://unpkg.com/aplayer@1.10.1/dist/APlayer.min.js"></script>
+<script src="https://unpkg.com/meting@2/dist/Meting.min.js"></script>
+    
+
+    <!-- 图片放大 -->
+    
+      <script src="/js/fancybox/jquery.fancybox.min.js"></script>
+    
+
+    <!-- 百度解析 -->
+    <!-- Baidu Analytics -->
+
+    <!-- Baidu Push -->
+
+<script>
+    (function () {
+        var bp = document.createElement('script');
+        var curProtocol = window.location.protocol.split(':')[0];
+        if (curProtocol === 'https') {
+            bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+        } else {
+            bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+        }
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(bp, s);
+    })();
+</script>
+
+    
+    <!-- 背景彩带 -->
+    
+      <script type="text/javascript" size="100" alpha='0.4' zIndex="-1" src="/js/ribbon.min.js"></script>
+    
+
+    <script src="/js/utils/index.js"></script>
+    <script src="/js/app.js"></script>
+    
+    <!-- 文章目录所需js -->
+<link href="/js/tocbot/tocbot.css" rel="stylesheet">
+<script src="/js/tocbot/tocbot.min.js"></script>
+
+<script>
+  var headerEl = 'h2, h3, h4',  //headers 
+    content = '.post-detail',//文章容器
+    idArr = {};  //标题数组以确定是否增加索引id
+  //add #id
+  var option = {
+    // Where to render the table of contents.
+    tocSelector: '.toc',
+    // Where to grab the headings to build the table of contents.
+    contentSelector: content,
+    // Which headings to grab inside of the contentSelector element.
+    headingSelector: headerEl,
+    scrollSmooth: true,
+    scrollSmoothOffset: -80,
+    headingsOffset: -($(window).height() * 0.4 - 45),
+    positionFixedSelector: '.toc-main',
+    positionFixedClass: 'is-position-fixed',
+    fixedSidebarOffset: 'auto',
+    activeLinkClass: 'is-active-link',
+    // onClick: function (e) {},
+  }
+  if ($('.toc').length > 0) {
+
+    $(content).children(headerEl).each(function () {
+      //去除空格以及多余标点
+      var headerId = $(this).text().replace(/[\s|\~|`|\!|\@|\#|\$|\%|\^|\&|\*|\(|\)|\_|\+|\=|\||\|\[|\]|\{|\}|\;|\:|\"|\'|\,|\<|\.|\>|\/|\?|\：|\，|\。]/g, '');
+
+      headerId = headerId.toLowerCase();
+      if (idArr[headerId]) {
+        //id已经存在
+        $(this).attr('id', headerId + '-' + idArr[headerId]);
+        idArr[headerId]++;
+      }
+      else {
+        //id未存在
+        idArr[headerId] = 1;
+        $(this).attr('id', headerId);
+      }
+    });
+
+    document.addEventListener("DOMContentLoaded", function () {
+      tocbot.init(option);
+      mobileTocClick();
+    });
+
+  }
+
+  window.tocScrollFn = function () {
+    return bamboo.throttle(function () {
+      findHeadPosition();
+    }, 100)()
+  }
+  window.addEventListener('scroll', tocScrollFn);
+
+  const findHeadPosition = function (top) {
+    if ($('.toc-list').length <= 0) {
+      return false;
+    }
+    setTimeout(() => {  // or DOMContentLoaded 
+      autoScrollToc();
+    }, 0);
+  }
+
+  const autoScrollToc = function () {
+    const $activeItem = document.querySelector('.is-active-link');
+    const $cardToc = document.querySelector('.toc-content');
+    const activePosition = $activeItem.getBoundingClientRect().top
+    const sidebarScrollTop = $cardToc.scrollTop
+    if (activePosition > (document.documentElement.clientHeight - 100)) {
+      $cardToc.scrollTop = sidebarScrollTop + 150
+    }
+    if (activePosition < 100) {
+      $cardToc.scrollTop = sidebarScrollTop - 150
+    }
+  }
+
+  document.addEventListener('pjax:send', function () {
+    if ($('.toc').length) {
+      tocbot.destroy();
+    }
+  });
+
+  document.addEventListener('pjax:complete', function () {
+    if ($('.toc').length) {
+      tocbot.init(option);
+      mobileTocClick();
+    }
+  });
+  
+  // 手机端toc按钮点击出现目录
+  const mobileTocClick = function () {
+    const $cardTocLayout = document.getElementsByClassName('toc-aside')[0];
+    const $cardToc = $cardTocLayout.getElementsByClassName('toc-content')[0];
+    let right = '45px';
+    if (window.innerWidth >= 551 && window.innerWidth <= 992) {
+      right = '100px'
+    }
+    const mobileToc = {
+      open: () => {
+        $cardTocLayout.style.cssText = 'animation: toc-open .3s; opacity: 1; right: ' + right
+      },
+
+      close: () => {
+        $cardTocLayout.style.animation = 'toc-close .2s'
+        setTimeout(() => {
+          $cardTocLayout.style.cssText = "opacity:''; animation: ''; right: ''"
+        }, 100)
+      }
+    }
+    document.getElementById('toc-mobile-btn').addEventListener('click', () => {
+      if (window.getComputedStyle($cardTocLayout).getPropertyValue('opacity') === '0') mobileToc.open()
+      else mobileToc.close()
+    })
+
+    $cardToc.addEventListener('click', (e) => {
+      if (window.innerWidth < 992) { // 小于992px的时候
+        mobileToc.close()
+      }
+    })
+  }
+</script>
+
+<style>
+  .is-position-fixed {
+    position: sticky !important;
+    top: 74px;
+  }
+
+  .toc-main ul {
+    counter-reset: show-list;
+  }
+
+  .toc-main ul li::before {
+    content: counter(item)".";
+    display: block;
+    position: absolute;
+    left: 12px;
+    top: 0;
+  }
+</style> 
+
+<!-- 设置导航背景 -->
+<script>
+  let setHeaderClass = () => {
+    const headerMenuTransparent = true;
+    if (!headerMenuTransparent) { return; }
+    const nav = $('#navHeader');
+    const navTop = nav.outerHeight();
+    const winTop = $(window).scrollTop();
+    if(winTop > navTop) {
+      nav.addClass('header-bg-color');
+    }
+    else {
+      nav.removeClass('header-bg-color');
+    }
+  };
+
+  let scrollCollect = () => {
+    return bamboo.throttle(function (e) {
+      setHeaderClass();
+    }, 200)()
+  }
+
+  let initHeaderBg = () => {
+    setHeaderClass();
+  }
+
+  setHeaderClass();
+  window.addEventListener('scroll', scrollCollect);
+
+  document.addEventListener('pjax:send', function () {
+    window.removeEventListener('scroll', scrollCollect)
+  })
+  document.addEventListener('pjax:complete', function () {
+    window.addEventListener('scroll', scrollCollect);
+    setHeaderClass();
+  })
+</script> 
+
+<!-- 渲染issues标签里的内容 -->
+<script>
+  function loadIssuesJS() {
+    if ($(".post-detail").find(".issues-api").length == 0) {
+      return;
+    } 
+    loadScript('/js/issues/index.js');
+  };
+  $(function () {
+    loadIssuesJS();
+  });
+  document.addEventListener('pjax:complete', function () {
+    if (typeof IssuesAPI == "undefined") {
+      loadIssuesJS();
+    }
+  })
+</script>
+
+<!-- 输入框打字特效 -->
+<!-- 输入框打字特效 -->
+
+  <script src="/js/activate-power-mode.js"></script>
+  <script>
+    POWERMODE.colorful = true;  // 打开随机颜色特效
+    POWERMODE.shake = false;    // 关闭输入框抖动
+    document.body.addEventListener('input', POWERMODE);//监听打字事件
+  </script>
+
+
+<!-- markdown代码一键复制功能 -->
+
+  <link rel="stylesheet" href="https://unpkg.com/v-plugs-ayu/lib/ayu.css">
+  <script src="https://unpkg.com/v-plugs-ayu/lib/ayu.umd.min.js"></script>
+  <script src="/js/clipboard/clipboard.min.js"></script>
+  <div id="appCopy">
+  </div>
+  <script data-pjax>
+    var vm = new Vue({
+      el: '#appCopy',
+      data: {
+      },
+      computed: {
+      },
+      mounted() {
+        const that = this;
+        var copy = 'copy';
+        /* code */
+        var initCopyCode = function () {
+          var copyHtml = '';
+          copyHtml += '<button class="btn-copy" data-clipboard-snippet="" style="position:absolute;top:0;right:0;z-index:1;">';
+          copyHtml += '<i class="fas fa-copy"></i><span>' + copy + '</span>';
+          copyHtml += '</button>';
+          $(".post-detail pre").not('.gutter pre').wrap("<div class='codeBox' style='position:relative;width:100%;'></div>")
+          $(".post-detail pre").not('.gutter pre').before(copyHtml);
+          new ClipboardJS('.btn-copy', {
+            target: function (trigger) {
+              return trigger.nextElementSibling;
+            }
+          });
+        }
+        initCopyCode();
+        $('.btn-copy').unbind('click').bind('click', function () {
+          doSomething();
+        })
+        $(document).unbind('keypress').bind('keypress', function (e) {
+          if (e.ctrlKey && e.keyCode == 67) {
+            doSomething();
+          }
+        })
+
+        function doSomething() {
+          that.$notify({
+            title: "成功",
+            content: "代码已复制，请遵守相关授权协议。",
+            type: 'success'
+          })
+        }
+      },
+      methods: {
+      },
+      created() { }
+    })
+  </script>
+  
+
+<!-- 图片懒加载 -->
+<script defer src="https://unpkg.com/vanilla-lazyload@17.1.0/dist/lazyload.min.js"></script>
+<script>
+  // https://www.npmjs.com/package/vanilla-lazyload
+  // Set the options globally
+  // to make LazyLoad self-initialize
+  window.lazyLoadOptions = {
+    elements_selector: ".lazyload",
+    threshold: 0
+  };
+  // Listen to the initialization event
+  // and get the instance of LazyLoad
+  window.addEventListener(
+    "LazyLoad::Initialized",
+    function (event) {
+      window.lazyLoadInstance = event.detail.instance;
+    },
+    false
+  );
+  document.addEventListener('DOMContentLoaded', function () {
+    lazyLoadInstance.update();
+  });
+  document.addEventListener('pjax:complete', function () {
+    lazyLoadInstance.update();
+  });
+</script>
+
+
+<!-- 卡片滚动动画 -->
+   
+
+<!-- 评论所需js -->
+
+  
+    <script type="text/javascript">
+  var utteranceCommon = {};
+
+  function check_utterance() {
+    let isDark = JSON.parse(localStorage.getItem('dark')) || JSON.parse('false');
+    if (isDark) {
+      utteranceCommon.Theme = 'github-dark';
+    } else {
+      utteranceCommon.Theme = 'github-light';
+    }
+
+    return document.getElementById("gitment-container");
+  }
+  comment_el = '#gitment-container';
+  load_utterance = function () {
+    if ($(comment_el).length) {
+      // 匿名函数，防止污染全局变量
+      const HEAD = check_utterance();
+
+      var utterances = document.createElement('script');
+      utterances.type = 'text/javascript';
+      utterances.async = true;
+      utterances.setAttribute('issue-term', 'pathname')
+      utterances.setAttribute('theme', utteranceCommon.Theme)
+      utterances.setAttribute('repo', '')
+      utterances.crossorigin = 'anonymous';
+      utterances.src = 'https://utteranc.es/client.js';
+      // content 是要插入评论的地方
+      document.getElementById('gitment-container').appendChild(utterances);
+
+    }
+  }
+
+  function dark_utterance() {
+    const HEAD = check_utterance();
+    if (!HEAD) return;
+    const message = {
+      type: 'set-theme',
+      theme: utteranceCommon.Theme
+    };
+    const utteranceIframe = document.querySelector('iframe');
+    utteranceIframe.contentWindow.postMessage(message, 'https://utteranc.es');
+  }
+
+  $(document).ready(load_utterance);
+  document.addEventListener('pjax:complete', function () {
+    load_utterance();
+  });
+
+  $('.dark').click(function () {
+    setTimeout(() => {
+      dark_utterance();
+    });
+  })
+
+</script>
+
+<style>
+  .utterances {
+    max-width: inherit !important;
+  }
+</style>
+  
+
+
+<!-- 鼠标点击特效 -->
+<!-- 爱心点击 -->
+
+  
+    <canvas class="fireworks" style="position: fixed;left: 0;top: 0;z-index: 999; pointer-events: none;" ></canvas>
+    <script src="//cdn.bootcss.com/animejs/2.2.0/anime.min.js"></script>
+    <script src="/js/cursor/explosion.min.js"></script>
+  
+
+
+
+
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" data-pjax></script>
+
+
+    <!-- pjax -->
+    
+
+<!-- pjax -->
+
+
+  <script src="/js/pjax@0.2.8/index.js"></script>
+  
+    <!-- 样式位于：source/css/_third-party/pjaxanimate.styl -->
+
+<div class="pjax-animate">
+  
+    <div class="loading-circle"><div id="loader-circle"></div></div>
+    <script>
+      window.ShowLoading = function() {
+        $(".loading-circle").css("display", "block");
+      };
+      window.HideLoading = function() {
+        $(".loading-circle").css("display", "none");
+      }
+    </script>
+  
+	<script>
+    document.addEventListener('pjax:complete', function () {
+      window.HideLoading();
+    })
+    document.addEventListener('pjax:send', function () {
+      window.ShowLoading();
+    })
+    document.addEventListener('pjax:error', function () {
+      window.HideLoading();
+    })
+	</script>
+</div>
+
+  
+
+  <script>
+    var pjax = new Pjax({
+      elements: 'a[href]:not([href^="#"]):not([href="javascript:void(0)"]):not([no-pjax])',   // 拦截正常带链接的 a 标签
+      selectors: ["#pjax-container","title"],                                   // 根据实际需要确认重载区域
+      cacheBust: false,   // url 地址追加时间戳，用以避免浏览器缓存
+      timeout: 5000
+    });
+
+    document.addEventListener('pjax:send', function (e) {
+
+      try {
+        var currentUrl = window.location.pathname;
+        var targetUrl = e.triggerElement.href;
+        var banUrl = [""];
+        if (banUrl[0] != "") {
+          banUrl.forEach(item => {
+            if(currentUrl.indexOf(item) != -1 || targetUrl.indexOf(item) != -1) {
+              window.location.href = targetUrl;
+            }
+          });
+        }
+      } catch (error) {}
+
+      $(window).unbind('resize');
+      $(window).unbind('scroll');
+      $(document).unbind('scroll');
+      $(document).unbind('click');
+      $('body').unbind('click');
+
+    })
+    
+    document.addEventListener('pjax:complete', function () {
+      $('script[data-pjax], .pjax-reload script').each(function () {
+        $(this).parent().append($(this).remove());
+      });
+    });
+
+    document.addEventListener('pjax:error', function (e) {
+      window.location.href = e.triggerElement.href;
+    })
+    
+    // 刷新不从顶部开始
+    document.addEventListener("DOMContentLoaded", function () {
+      history.scrollRestoration = 'auto';
+    })
+  </script>
+
+
+
+  </body>
+</html>

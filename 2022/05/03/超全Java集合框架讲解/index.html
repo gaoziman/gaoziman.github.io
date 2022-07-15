@@ -1,0 +1,2212 @@
+<!DOCTYPE html>
+<html>
+  <!-- meta/link... -->
+  
+
+
+
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport">
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+
+
+  <title>超全Java集合框架讲解 | Hexo</title>
+
+  <link rel="icon" type="image/x-icon, image/vnd.microsoft.icon" href="/favicon.ico">
+  <link rel="stylesheet" href="https://at.alicdn.com/t/font_1911880_c1nvbyezg17.css">
+  <link href="https://unpkg.com/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet">
+  <link href="/js/swiper/swiper@5.4.1.min.css" rel="stylesheet">
+  
+  
+  
+  
+<link rel="stylesheet" href="/css/animate.min.css">
+
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+  
+    
+<link rel="stylesheet" href="/js/fancybox/jquery.fancybox.min.css">
+
+  
+  
+    
+<link rel="stylesheet" href="/js/shareJs/share.min.css">
+
+  
+  <style>
+        @media (max-width: 992px) {
+            #waifu {
+                display: none;
+            }
+        }
+    </style>
+    <script src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
+    <link href="//cdn.bootcss.com/pace/1.0.2/themes/pink/pace-theme-flash.css" rel="stylesheet">
+
+    
+
+    <!-- import link -->
+    
+        
+            
+        
+            
+        
+    
+    <!-- import script -->
+    
+        
+            
+        
+            
+        
+    
+
+<meta name="generator" content="Hexo 6.2.0"></head>
+
+  
+  <!-- 依赖于jquery和vue -->
+  
+    
+<script src="https://unpkg.com/jquery@3.5.1/dist/jquery.min.js"></script>
+
+  
+
+  
+    
+<script src="https://unpkg.com/vue@2.6.11/dist/vue.min.js"></script>
+
+  
+  
+  <body>
+    <!-- 预加载动画 -->
+    <!-- 页面预加载动画 -->
+
+<div id='loader'>
+  <link rel="stylesheet" href="/js/loaded/index.css" >
+  <div class="loading-left-bg"></div>
+  <div class="loading-right-bg"></div>
+  <div class="spinner-box">
+    <div class="configure-border-1">
+      <div class="configure-core"></div>
+    </div>
+    <div class="configure-border-2">
+      <div class="configure-core"></div>
+    </div>
+    <div class="loading-word">loading...</div>
+  </div>
+</div>
+
+<script>
+  var endLoading = function () {
+    document.body.style.overflow = 'auto';
+    document.getElementById('loader').classList.add("loading");
+  }
+  window.addEventListener('DOMContentLoaded',endLoading);
+  
+</script>
+
+    
+    <!-- 判断是否为暗黑风格 -->
+    <!-- 判断是否为黑夜模式 -->
+<script>
+  let isDark = JSON.parse(localStorage.getItem('dark')) || JSON.parse('false');
+
+  if (isDark) {
+    $(document.body).addClass('darkModel');
+  }
+</script>
+
+    <!-- 需要在上面加载的js -->
+    <script>
+  function loadScript(src, cb) {
+    return new Promise(resolve => {
+      setTimeout(function () {
+        var HEAD = document.getElementsByTagName("head")[0] || document.documentElement;
+        var script = document.createElement("script");
+        script.setAttribute("type", "text/javascript");
+        if (cb) {
+          if (JSON.stringify(cb)) {
+            for (let p in cb) {
+              if (p == "onload") {
+                script[p] = () => {
+                  cb[p]()
+                  resolve()
+                }
+              } else {
+                script[p] = cb[p]
+                script.onload = resolve
+              }
+            }
+          } else {
+            script.onload = () => {
+              cb()
+              resolve()
+            };
+          }
+        } else {
+          script.onload = resolve
+        }
+        script.setAttribute("src", src);
+        HEAD.appendChild(script);
+      });
+    });
+  }
+
+  //https://github.com/filamentgroup/loadCSS
+  var loadCSS = function (href, before, media, attributes) {
+    return new Promise(resolve => {
+      setTimeout(function () {
+        var link = document.createElement('link');
+        link.rel = "stylesheet";
+        link.href = src;
+        link.onload = resolve;
+        document.getElementsByTagName("head")[0].appendChild(link);
+      });
+    });
+  };
+
+</script> 
+
+<!-- 轮播图所需要的js -->
+<script src="/js/swiper/swiper.min.js"></script>
+<script src="/js/swiper/vue-awesome-swiper.js"></script>
+<script src="/js/swiper/swiper.animate1.0.3.min.js"></script>
+
+<script type="text/javascript">
+  Vue.use(window.VueAwesomeSwiper)
+</script>
+
+
+  <script src="/js/vue-typed-js/index.js"></script>
+
+
+<!-- 首页的公告滚动插件的js需要重新加载 -->
+<script src="/js/vue-seamless-scroll/index.js"></script>
+
+<!-- 打字机效果js -->
+<script src="https://unpkg.com/typed.js@2.0.11"></script>
+
+
+    <div id="safearea">
+      <main class="main" id="pjax-container">
+        <!-- 头部导航 -->
+        
+<header class="header   " 
+  id="navHeader"
+  style="position: fixed;
+  left: 0; top: 0; z-index: 10;width: 100%;"
+>
+  <div class="header-content">
+    <div class="bars">
+      <div id="appDrawer" class="sidebar-image">
+  <div class="drawer-box-icon">
+    <i class="fas fa-bars" aria-hidden="true" @click="showDialogDrawer"></i>
+  </div>
+  
+  <transition name="fade">
+    <div class="drawer-box_mask" v-cloak style="display: none;" v-show="visible" @click.self="cancelDialogDrawer">
+    </div>
+  </transition>
+  <div class="drawer-box" :class="{'active': visible}">
+    <div class="drawer-box-head bg-color">
+      <img class="drawer-box-head_logo lazyload placeholder" src="/medias/logo.png" class="lazyload placeholder" data-srcset="/medias/logo.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="logo">
+      <h3 class="drawer-box-head_title">Hexo</h3>
+      <h5 class="drawer-box-head_desc"></h5>
+    </div>
+    
+    <div class="drawer-box-content">
+      <ul class="drawer-box-content_menu">
+        
+        
+          <li class="drawer-box-content_item">
+            <a target="_blank" rel="noopener" href="https://github.com/yuang01/hexo-theme-bamboo">
+              <i class="fas fa-github" aria-hidden="true"></i>
+              <span>Github</span>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</div>
+
+<script>
+  var body = document.body || document.documentElement || window;
+  var vm = new Vue({
+    el: '#appDrawer',
+    data: {
+      visible: false,
+      top: 0,
+      openArr: [],
+    },
+    computed: {
+    },
+    mounted() {
+    },
+    methods: {
+      isOpen(index) {
+        if (this.openArr.includes(index)) {
+          return true;
+        } else {
+          return false;
+        }
+      },
+      openOrCloseMenu(curIndex) {
+        const index = this.openArr.indexOf(curIndex);
+        if (index !== -1) {
+          this.openArr.splice(index, 1);
+        } else {
+          this.openArr.push(curIndex);
+        }
+      },
+      showDialogDrawer() {
+        this.visible = true;
+        // 防止页面滚动，只能让弹框滚动
+        this.top = $(document).scrollTop()
+        body.style.cssText = 'width: 100%; height: 100%;overflow: hidden;';
+      },
+      cancelDialogDrawer() {
+        this.visible = false;
+        body.removeAttribute('style');
+        $(document).scrollTop(this.top)
+      }
+    },
+    created() {}
+  })
+</script>
+
+    </div>
+    <div class="blog-title" id="author-avatar">
+      
+        <div class="avatar">
+          <img src="/medias/logo.png" class="lazyload placeholder" data-srcset="/medias/logo.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="logo">
+        </div>
+      
+      <a href="/" class="logo">Hexo</a>
+    </div>
+    <nav class="navbar">
+      <ul class="menu">
+        
+      </ul>
+      
+      
+        <div id="appSearch">
+  <div class="search"  @click="showDialog()"><i class="fas fa-search" aria-hidden="true"></i></div>
+  <transition name="fade">
+    <div class="message-box_wrapper" style="display: none;" v-cloak v-show="dialogVisible" @click.self="cancelDialogVisible()">
+      <div class="message-box animated bounceInDown">
+        <h2>
+          <span>
+            <i class="fas fa-search" aria-hidden="true"></i>
+            <span class="title">Search</span>
+          </span>
+          <i class="fas fa-times close" pointer style="float:right;" aria-hidden="true" @click.self="cancelDialogVisible()"></i>
+        </h2>
+        <form class="site-search-form">
+          <input type="text"
+            placeholder="Please enter keywords"
+            id="local-search-input" 
+            @click="getSearchFile()"
+            class="st-search-input"
+            v-model="searchInput"
+          />
+        </form>
+        <div class="result-wrapper">
+          <div id="local-search-result" class="local-search-result-cls"></div>
+        </div>
+      </div>
+    </div>
+  </transition>
+</div>
+<script src="/js/local_search.js"></script>
+<script>
+  var body = document.body || document.documentElement || window;
+  var vm = new Vue({
+    el: '#appSearch',
+    data: {
+      dialogVisible: false,
+      searchInput: '',
+      top: 0,
+    },
+    computed: {
+    },
+    mounted() {
+      window.addEventListener('pjax:complete', () => {
+        this.cancelDialogVisible();
+      })
+    },
+    methods: {
+      showDialog() {
+        this.dialogVisible = true;
+        // 防止页面滚动，只能让弹框滚动
+        this.top = $(document).scrollTop()
+        body.style.cssText = 'overflow: hidden;';
+      },
+      getSearchFile() {
+        if (!this.searchInput) {
+          getSearchFile("/search.xml");
+        }
+      },
+      cancelDialogVisible() {
+        this.dialogVisible = false;
+        body.removeAttribute('style');
+        $(document).scrollTop(this.top)
+      },
+    },
+    created() {}
+  })
+</script>
+<!-- 解决刷新页面闪烁问题，可以在元素上添加display: none, 或者用vue.extend方法，详情：https://blog.csdn.net/qq_31393401/article/details/81017912 -->
+<!-- 下面是搜索基本写法 -->
+<!-- <script type="text/javascript" id="local.search.active">
+  var inputArea = document.querySelector("#local-search-input");
+  inputArea.onclick   = function(){ getSearchFile(); this.onclick = null }
+  inputArea.onkeydown = function(){ if(event.keyCode == 13) return false }
+</script> -->
+
+      
+
+    </nav>
+  </div>
+  
+    <a target="_blank" rel="noopener" href="https://github.com/yuang01/hexo-theme-bamboo" class="github-corner color-primary" aria-label="View source on GitHub"><svg width="60" height="60" viewBox="0 0 250 250" style="fill:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+  
+  
+</header>
+        <!-- 内容区域 -->
+        
+ <!-- prismjs 代码高亮 -->
+ 
+
+
+<div class="bg-dark-floor" style="position: fixed;left: 0;top: 0;width: 100%;height: 100%;z-index: -1;"></div>
+
+
+  <!-- 文章详情页顶部图片和标题 -->
+
+
+
+
+<div class="post-detail-header" id="thumbnail_canvas" style="background-repeat: no-repeat; background-size: cover; 
+  background-position: center center;position: relative;background-image:url('/medias/15.jpg')">
+  <div class="post-detail-header-mask"></div>
+  <canvas id="header_canvas"style="position:absolute;bottom:0;pointer-events:none;"></canvas>
+  
+  <div class="post-detail-header_info-box">
+    <div class="title-box">
+      <span class="title">
+        超全Java集合框架讲解
+      </span>
+    </div>
+    
+    
+      
+        <span class="post-detail-header_date">
+          <i class="fas fa-calendar"></i> Published in：2022-05-03 |
+        </span>
+      
+
+      
+        <span class="post-detail-header_categories">
+          <i class="iconfont iconbookmark1"></i> category：
+          
+            <a href="/categories/Java-Basic/" class="post-detail-header_category">
+              Java-Basic
+            </a>
+          
+        </span>
+      
+
+      
+    
+  </div>
+  
+  
+    <script src="/js/bubble/bubble.js"></script>
+  
+</div>
+
+
+
+
+
+<div class="post-detail-content row justify-position" 
+  style="padding-top: 0px;">
+  <div class="main-content">
+    <article class="post post-detail">
+      <div class="post-content">
+        <h1 id="超全Java集合框架讲解"><a href="#超全Java集合框架讲解" class="headerlink" title="超全Java集合框架讲解"></a>超全Java集合框架讲解</h1><p>集合在我们日常开发使用的次数数不胜数，<code>ArrayList</code>&#x2F;<code>LinkedList</code>&#x2F;<code>HashMap</code>&#x2F;<code>HashSet</code>······信手拈来，抬手就拿来用，在 IDE 上龙飞凤舞，但是作为一名合格的优雅的程序猿，仅仅了解怎么使用<code>API</code>是远远不够的，如果在调用<code>API</code>时，知道它内部发生了什么事情，就像开了<code>透视</code>外挂一样，洞穿一切，这种感觉才真的爽，而且这样就<strong>不是集合提供什么功能给我们使用，而是我们选择使用它的什么功能了</strong>。</p>
+<p><img src="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/1596208672973-ae64a99f-3831-4b18-b4f4-c69237eba98a.png" class="lazyload placeholder" data-srcset="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/1596208672973-ae64a99f-3831-4b18-b4f4-c69237eba98a.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="img"></p>
+<h2 id="集合框架总览"><a href="#集合框架总览" class="headerlink" title="集合框架总览"></a>集合框架总览</h2><p>下图堪称集合框架的<strong>上帝视角</strong>，讲到集合框架不得不看的就是这幅图，当然，你会觉得眼花缭乱，不知如何看起，这篇文章带你一步一步地秒杀上面的每一个接口、抽象类和具体类。我们将会从最顶层的接口开始讲起，一步一步往下深入，帮助你把对集合的认知构建起一个知识网络。</p>
+<p><img src="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/1596110252275-7ae0c7a7-b8a9-4e36-bc2f-d651c6e0ae23.jpeg" class="lazyload placeholder" data-srcset="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/1596110252275-7ae0c7a7-b8a9-4e36-bc2f-d651c6e0ae23.jpeg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="collection.jpeg"></p>
+<p>工欲善其事必先利其器，让我们先来过一遍整个集合框架的组成部分：</p>
+<ol>
+<li>集合框架提供了两个遍历接口：<code>Iterator</code>和<code>ListIterator</code>，其中后者是前者的<code>优化版</code>，支持在任意一个位置进行<strong>前后双向遍历</strong>。注意图中的<code>Collection</code>应当继承的是<code>Iterable</code>而不是<code>Iterator</code>，后面会解释<code>Iterable</code>和<code>Iterator</code>的区别</li>
+<li>整个集合框架分为两个门派（类型）：<code>Collection</code>和<code>Map</code>，前者是一个容器，存储一系列的<strong>对象</strong>；后者是键值对<code>&lt;key, value&gt;</code>，存储一系列的<strong>键值对</strong></li>
+<li>在集合框架体系下，衍生出四种具体的集合类型：<code>Map</code>、<code>Set</code>、<code>List</code>、<code>Queue</code></li>
+<li><code>Map</code>存储<code>&lt;key,value&gt;</code>键值对，查找元素时通过<code>key</code>查找<code>value</code></li>
+<li><code>Set</code>内部存储一系列<strong>不可重复</strong>的对象，且是一个<strong>无序</strong>集合，对象排列顺序不一</li>
+<li><code>List</code>内部存储一系列<strong>可重复</strong>的对象，是一个<strong>有序</strong>集合，对象按插入顺序排列</li>
+<li><code>Queue</code>是一个<strong>队列</strong>容器，其特性与<code>List</code>相同，但只能从<code>队头</code>和<code>队尾</code>操作元素</li>
+<li>JDK 为集合的各种操作提供了两个工具类<code>Collections</code>和<code>Arrays</code>，之后会讲解工具类的常用方法</li>
+<li>四种抽象集合类型内部也会衍生出许多具有不同特性的集合类，<strong>不同场景下择优使用，没有最佳的集合</strong></li>
+</ol>
+<p>上面了解了整个集合框架体系的组成部分，接下来的章节会严格按照上面罗列的顺序进行讲解，每一步都会有<code>承上启下</code>的作用</p>
+<blockquote>
+<p>学习<code>Set</code>前，最好最好要先学习<code>Map</code>，因为<code>Set</code>的操作本质上是对<code>Map</code>的操作，往下看准没错</p>
+</blockquote>
+<h3 id="Iterator-Iterable-ListIterator"><a href="#Iterator-Iterable-ListIterator" class="headerlink" title="Iterator  Iterable ListIterator"></a>Iterator  Iterable ListIterator</h3><p>在第一次看这两个接口，真以为是一模一样的，没发现里面有啥不同，<strong>存在即合理</strong>，它们两个还是有本质上的区别的。</p>
+<p>首先来看<code>Iterator</code>接口：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title class_">Iterator</span>&lt;E&gt; &#123;</span><br><span class="line">    <span class="type">boolean</span> <span class="title function_">hasNext</span><span class="params">()</span>;</span><br><span class="line">    E <span class="title function_">next</span><span class="params">()</span>;</span><br><span class="line">    <span class="keyword">void</span> <span class="title function_">remove</span><span class="params">()</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>提供的API接口含义如下：</p>
+<ul>
+<li><code>hasNext()</code>：判断集合中是否存在下一个对象</li>
+<li><code>next()</code>：返回集合中的下一个对象，并将访问指针移动一位</li>
+<li><code>remove()</code>：删除集合中调用<code>next()</code>方法返回的对象</li>
+</ul>
+<p>在早期，遍历集合的方式只有一种，通过<code>Iterator</code>迭代器操作</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">List&lt;Integer&gt; list = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;&gt;();</span><br><span class="line">list.add(<span class="number">1</span>);</span><br><span class="line">list.add(<span class="number">2</span>);</span><br><span class="line">list.add(<span class="number">3</span>);</span><br><span class="line"><span class="type">Iterator</span> <span class="variable">iter</span> <span class="operator">=</span> list.iterator();</span><br><span class="line"><span class="keyword">while</span> (iter.hasNext()) &#123;</span><br><span class="line">    <span class="type">Integer</span> <span class="variable">next</span> <span class="operator">=</span> iter.next();</span><br><span class="line">    System.out.println(next);</span><br><span class="line">    <span class="keyword">if</span> (next == <span class="number">2</span>) &#123; iter.remove(); &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>再来看<code>Iterable</code>接口：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title class_">Iterable</span>&lt;T&gt; &#123;</span><br><span class="line">    Iterator&lt;T&gt; <span class="title function_">iterator</span><span class="params">()</span>;</span><br><span class="line">    <span class="comment">// JDK 1.8</span></span><br><span class="line">    <span class="keyword">default</span> <span class="keyword">void</span> <span class="title function_">forEach</span><span class="params">(Consumer&lt;? <span class="built_in">super</span> T&gt; action)</span> &#123;</span><br><span class="line">        Objects.requireNonNull(action);</span><br><span class="line">        <span class="keyword">for</span> (T t : <span class="built_in">this</span>) &#123;</span><br><span class="line">            action.accept(t);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>可以看到<code>Iterable</code>接口里面提供了<code>Iterator</code>接口，所以实现了<code>Iterable</code>接口的集合依旧可以使用<code>迭代器</code>遍历和操作集合中的对象；</p>
+<p>而在 <code>JDK 1.8</code>中，<code>Iterable</code>提供了一个新的方法<code>forEach()</code>，它允许使用增强 for 循环遍历对象。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">List&lt;Integer&gt; list = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;&gt;();</span><br><span class="line"><span class="keyword">for</span> (Integer num : list) &#123;</span><br><span class="line">    System.out.println(num);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>我们通过命令：<code>javap -c</code>反编译上面的这段代码后，发现它只是 Java 中的一个<code>语法糖</code>，本质上还是调用<code>Iterator</code>去遍历。</p>
+<img src="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/1596110168937-9464cc3c-9198-4ef0-ada3-97c86cfaf175.png" class="lazyload placeholder" data-srcset="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/1596110168937-9464cc3c-9198-4ef0-ada3-97c86cfaf175.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20200729000858377.png" style="zoom:67%;" />
+
+<p>翻译成代码，就和一开始的<code>Iterator</code>迭代器遍历方式基本相同了。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">Iterator</span> <span class="variable">iter</span> <span class="operator">=</span> list.iterator();</span><br><span class="line"><span class="keyword">while</span> (iter.hasNext()) &#123;</span><br><span class="line">    <span class="type">Integer</span> <span class="variable">num</span> <span class="operator">=</span> iter.next();</span><br><span class="line">    System.out.println(num);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>还有更深层次的探讨：为什么要设计两个接口<code>Iterable</code>和<code>Iterator</code>，而不是保留其中一个就可以了。</p>
+<p>简单讲解：<code>Iterator</code>的保留可以让子类去<strong>实现自己的迭代器</strong>，而<code>Iterable</code>接口更加关注于<code>for-each</code>的增强语法。具体可参考：<a target="_blank" rel="noopener" href="https://www.cnblogs.com/litexy/p/9744241.html">Java中的Iterable与Iterator详解</a></p>
+</blockquote>
+<p>关于<code>Iterator</code>和<code>Iterable</code>的讲解告一段落，下面来总结一下它们的重点：</p>
+<ol>
+<li><code>Iterator</code>是提供集合操作内部对象的一个迭代器，它可以<strong>遍历、移除</strong>对象，且只能够<strong>单向移动</strong></li>
+<li><code>Iterable</code>是对<code>Iterator</code>的封装，在<code>JDK 1.8</code>时，实现了<code>Iterable</code>接口的集合可以使用<strong>增强 for 循环</strong>遍历集合对象，我们通过<strong>反编译</strong>后发现底层还是使用<code>Iterator</code>迭代器进行遍历</li>
+</ol>
+<p>等等，这一章还没完，还有一个<code>ListIterator</code>。它继承 Iterator 接口，在遍历<code>List</code>集合时可以从<strong>任意索引下标</strong>开始遍历，而且支持<strong>双向遍历</strong>。</p>
+<p>ListIterator 存在于 List 集合之中，通过调用方法可以返回<strong>起始下标</strong>为 <code>index</code>的迭代器</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">List&lt;Integer&gt; list = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;&gt;();</span><br><span class="line"><span class="comment">// 返回下标为0的迭代器</span></span><br><span class="line">ListIterator&lt;Integer&gt; listIter1 = list.listIterator(); </span><br><span class="line"><span class="comment">// 返回下标为5的迭代器</span></span><br><span class="line">ListIterator&lt;Integer&gt; listIter2 = list.listIterator(<span class="number">5</span>); </span><br></pre></td></tr></table></figure>
+
+<p>ListIterator 中有几个重要方法，大多数方法与 Iterator 中定义的含义相同，但是比 Iterator 强大的地方是可以在<strong>任意一个下标位置</strong>返回该迭代器，且可以实现<strong>双向遍历</strong>。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title class_">ListIterator</span>&lt;E&gt; <span class="keyword">extends</span> <span class="title class_">Iterator</span>&lt;E&gt; &#123;</span><br><span class="line">    <span class="type">boolean</span> <span class="title function_">hasNext</span><span class="params">()</span>;</span><br><span class="line">    E <span class="title function_">next</span><span class="params">()</span>;</span><br><span class="line">    <span class="type">boolean</span> <span class="title function_">hasPrevious</span><span class="params">()</span>;</span><br><span class="line">    E <span class="title function_">previous</span><span class="params">()</span>;</span><br><span class="line">    <span class="type">int</span> <span class="title function_">nextIndex</span><span class="params">()</span>;</span><br><span class="line">    <span class="type">int</span> <span class="title function_">previousIndex</span><span class="params">()</span>;</span><br><span class="line">    <span class="keyword">void</span> <span class="title function_">remove</span><span class="params">()</span>;</span><br><span class="line">    <span class="comment">// 替换当前下标的元素,即访问过的最后一个元素</span></span><br><span class="line">    <span class="keyword">void</span> <span class="title function_">set</span><span class="params">(E e)</span>;</span><br><span class="line">    <span class="keyword">void</span> <span class="title function_">add</span><span class="params">(E e)</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="Map-和-Collection-接口"><a href="#Map-和-Collection-接口" class="headerlink" title="Map 和 Collection 接口"></a>Map 和 Collection 接口</h3><p>Map 接口和 Collection 接口是集合框架体系的两大门派，Collection 是存储元素本身，而 Map 是存储<code>&lt;key, value&gt;</code>键值对，在 Collection 门派下有一小部分弟子去<code>偷师</code>，利用 Map 门派下的弟子来修炼自己。</p>
+<p>是不是听的一头雾水哈哈哈，举个例子你就懂了：<code>HashSet</code>底层利用了<code>HashMap</code>，<code>TreeSet</code>底层用了<code>TreeMap</code>，<code>LinkedHashSet</code>底层用了<code>LinkedHashMap</code>。</p>
+<p>下面我会详细讲到各个具体集合类哦，所以在这里，我们先从整体上了解这两个<code>门派</code>的特点和区别。</p>
+<p><img src="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/1595998378619-e54eb2d1-128a-448e-98c6-4941d81546b5.png" class="lazyload placeholder" data-srcset="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/1595998378619-e54eb2d1-128a-448e-98c6-4941d81546b5.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="img"></p>
+<p><code>Map</code>接口定义了存储的数据结构是<code>&lt;key, value&gt;</code>形式，根据 key 映射到 value，一个 key 对应一个 value ，所以<code>key</code>不可重复，而<code>value</code>可重复。</p>
+<p>在<code>Map</code>接口下会将存储的方式细分为不同的种类：</p>
+<ul>
+<li><code>SortedMap</code>接口：该类映射可以对<code>&lt;key, value&gt;</code>按照自己的规则进行<strong>排序</strong>，具体实现有 TreeMap</li>
+<li><code>AbsractMap</code>：它为子类提供好一些<strong>通用的API实现</strong>，所有的具体Map如<code>HashMap</code>都会继承它</li>
+</ul>
+<p>而<code>Collection</code>接口提供了所有集合的<strong>通用方法</strong>（注意这里不包括<code>Map</code>）：</p>
+<ul>
+<li>添加方法：<code>add(E e)</code> &#x2F; <code>addAll(Collection&lt;? extends E&gt; var1)</code></li>
+<li>删除方法：<code>remove(Object var1)</code> &#x2F; <code>removeAll(Collection&lt;?&gt; var1)</code></li>
+<li>查找方法：<code>contains(Object var1)</code> &#x2F; <code>containsAll(Collection&lt;?&gt; var1);</code></li>
+<li>查询集合自身信息：<code>size()</code> &#x2F; <code>isEmpty()</code></li>
+<li>···</li>
+</ul>
+<p>在<code>Collection</code>接口下，同样会将集合细分为不同的种类：</p>
+<ul>
+<li><code>Set</code>接口：一个<strong>不允许存储重复元素</strong>的<strong>无序</strong>集合，具体实现有<code>HashSet</code> &#x2F; <code>TreeSet</code>···</li>
+<li><code>List</code>接口：一个<strong>可存储重复元素</strong>的<strong>有序</strong>集合，具体实现有<code>ArrayList</code> &#x2F; <code>LinkedList</code>···</li>
+<li><code>Queue</code>接口：一个<strong>可存储重复元素</strong>的<strong>队列</strong>，具体实现有<code>PriorityQueue</code> &#x2F; <code>ArrayDeque</code>···</li>
+</ul>
+<h2 id="Map-集合体系详解"><a href="#Map-集合体系详解" class="headerlink" title="Map 集合体系详解"></a>Map 集合体系详解</h2><p><code>Map</code>接口是由<code>&lt;key, value&gt;</code>组成的集合，由<code>key</code>映射到<strong>唯一</strong>的<code>value</code>，所以<code>Map</code>不能包含重复的<code>key</code>，每个键<strong>至多</strong>映射一个值。下图是整个 Map 集合体系的主要组成部分，我将会按照日常使用频率从高到低一一讲解。</p>
+<p>不得不提的是 Map 的设计理念：<strong>定位元素</strong>的时间复杂度优化到 <code>O(1)</code></p>
+<p>Map 体系下主要分为 AbstractMap 和 SortedMap两类集合</p>
+<p><code>AbstractMap</code>是对 Map 接口的扩展，它定义了普通的 Map 集合具有的<strong>通用行为</strong>，可以避免子类重复编写大量相同的代码，子类继承 AbstractMap 后可以重写它的方法，<strong>实现额外的逻辑</strong>，对外提供更多的功能。</p>
+<p><code>SortedMap</code> 定义了该类 Map 具有 <code>排序</code>行为，同时它在内部定义好有关排序的抽象方法，当子类实现它时，必须重写所有方法，对外提供排序功能。</p>
+<img src="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/1596032812883-d74e0796-09ad-41cd-8c7c-46e01775ec75.png" class="lazyload placeholder" data-srcset="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/1596032812883-d74e0796-09ad-41cd-8c7c-46e01775ec75.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image.png" style="zoom:67%;" />
+
+<h3 id="HashMap"><a href="#HashMap" class="headerlink" title="HashMap"></a>HashMap</h3><p>HashMap 是一个<strong>最通用的</strong>利用哈希表存储元素的集合，将元素放入 HashMap 时，将<code>key</code>的哈希值转换为数组的<code>索引</code>下标<strong>确定存放位置</strong>，查找时，根据<code>key</code>的哈希地址转换成数组的<code>索引</code>下标<strong>确定查找位置</strong>。</p>
+<p>HashMap 底层是用数组 + 链表 + 红黑树这三种数据结构实现，它是<strong>非线程安全</strong>的集合。</p>
+<p><img src="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/1595419821508-67e5c9e1-ab2a-4f96-9df7-7a37658e564a.png" class="lazyload placeholder" data-srcset="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/1595419821508-67e5c9e1-ab2a-4f96-9df7-7a37658e564a.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="img"></p>
+<p>发送哈希冲突时，HashMap 的解决方法是将相同映射地址的元素连成一条<code>链表</code>，如果链表的长度大于<code>8</code>时，且数组的长度大于<code>64</code>则会转换成<code>红黑树</code>数据结构。</p>
+<p>关于 HashMap 的简要总结：</p>
+<ol>
+<li>它是集合中最常用的<code>Map</code>集合类型，底层由<code>数组 + 链表 + 红黑树</code>组成</li>
+<li>HashMap不是线程安全的</li>
+<li>插入元素时，通过计算元素的<code>哈希值</code>，通过<strong>哈希映射函数</strong>转换为<code>数组下标</code>；查找元素时，同样通过哈希映射函数得到数组下标<code>定位元素的位置</code></li>
+</ol>
+<h3 id="LinkedHashMap"><a href="#LinkedHashMap" class="headerlink" title="LinkedHashMap"></a>LinkedHashMap</h3><p>LinkedHashMap 可以看作是 <code>HashMap</code> 和 <code>LinkedList</code> 的结合：它在 HashMap 的基础上添加了一条双向链表，<code>默认</code>存储各个元素的插入顺序，但由于这条双向链表，使得 LinkedHashMap 可以实现 <code>LRU</code>缓存淘汰策略，因为我们可以设置这条双向链表按照<code>元素的访问次序</code>进行排序</p>
+<img src="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/1596103017691-7eb35af1-3fde-46b8-aa56-31df67c1b3de.png" class="lazyload placeholder" data-srcset="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/1596103017691-7eb35af1-3fde-46b8-aa56-31df67c1b3de.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="img" style="zoom:67%;" />
+
+<p>LinkedHashMap 是 HashMap 的子类，所以它具备 HashMap 的所有特点，其次，它在 HashMap 的基础上维护了一条<code>双向链表</code>，该链表存储了<strong>所有元素</strong>，<code>默认</code>元素的顺序与插入顺序<strong>一致</strong>。若<code>accessOrder</code>属性为<code>true</code>，则遍历顺序按元素的访问次序进行排序。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 头节点</span></span><br><span class="line"><span class="keyword">transient</span> LinkedHashMap.Entry&lt;K, V&gt; head;</span><br><span class="line"><span class="comment">// 尾结点</span></span><br><span class="line"><span class="keyword">transient</span> LinkedHashMap.Entry&lt;K, V&gt; tail;</span><br></pre></td></tr></table></figure>
+
+<p>利用 LinkedHashMap  可以实现 <code>LRU</code> 缓存淘汰策略，因为它提供了一个方法：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">protected</span> <span class="type">boolean</span> <span class="title function_">removeEldestEntry</span><span class="params">(java.util.Map.Entry&lt;K, V&gt; eldest)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>该方法可以移除<code>最靠近链表头部</code>的一个节点，而在<code>get()</code>方法中可以看到下面这段代码，其作用是挪动结点的位置：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (<span class="built_in">this</span>.accessOrder) &#123;</span><br><span class="line">    <span class="built_in">this</span>.afterNodeAccess(e);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>只要调用了<code>get()</code>且<code>accessOrder = true</code>，则会将该节点更新到链表<code>尾部</code>，具体的逻辑在<code>afterNodeAccess()</code>中，感兴趣的可翻看源码，篇幅原因这里不再展开。</p>
+<p>现在如果要实现一个<code>LRU</code>缓存策略，则需要做两件事情：</p>
+<ul>
+<li>指定<code>accessOrder = true</code>可以设定链表按照访问顺序排列，通过提供的构造器可以设定<code>accessOrder</code></li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="title function_">LinkedHashMap</span><span class="params">(<span class="type">int</span> initialCapacity, <span class="type">float</span> loadFactor, <span class="type">boolean</span> accessOrder)</span> &#123;</span><br><span class="line">    <span class="built_in">super</span>(initialCapacity, loadFactor);</span><br><span class="line">    <span class="built_in">this</span>.accessOrder = accessOrder;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>重写<code>removeEldestEntry()</code>方法，内部定义逻辑，通常是判断<code>容量</code>是否达到上限，若是则执行淘汰。</li>
+</ul>
+<p>这里就要贴出一道大厂面试必考题目：<a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/lru-cache/">146. LRU缓存机制</a>，只要跟着我的步骤，就能顺利完成这道大厂题了。</p>
+<p>关于 LinkedHashMap 主要介绍两点：</p>
+<ol>
+<li>它底层维护了一条<code>双向链表</code>，因为继承了 HashMap，所以它也不是线程安全的</li>
+<li>LinkedHashMap 可实现<code>LRU</code>缓存淘汰策略，其原理是通过设置<code>accessOrder</code>为<code>true</code>并重写<code>removeEldestEntry</code>方法定义淘汰元素时需满足的条件</li>
+</ol>
+<h3 id="TreeMap"><a href="#TreeMap" class="headerlink" title="TreeMap"></a>TreeMap</h3><p>TreeMap 是 <code>SortedMap</code> 的子类，所以它具有<strong>排序</strong>功能。它是基于<code>红黑树</code>数据结构实现的，每一个键值对<code>&lt;key, value&gt;</code>都是一个结点，默认情况下按照<code>key</code>自然排序，另一种是可以通过传入定制的<code>Comparator</code>进行自定义规则排序。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 按照 key 自然排序，Integer 的自然排序是升序</span></span><br><span class="line">TreeMap&lt;Integer, Object&gt; naturalSort = <span class="keyword">new</span> <span class="title class_">TreeMap</span>&lt;&gt;();</span><br><span class="line"><span class="comment">// 定制排序，按照 key 降序排序</span></span><br><span class="line">TreeMap&lt;Integer, Object&gt; customSort = <span class="keyword">new</span> <span class="title class_">TreeMap</span>&lt;&gt;((o1, o2) -&gt; Integer.compare(o2, o1));</span><br></pre></td></tr></table></figure>
+
+<p>TreeMap 底层使用了数组+红黑树实现，所以里面的存储结构可以理解成下面这幅图哦。</p>
+<p><img src="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/1596103385086-d684f26e-dabd-44b7-bab8-151af172496a.png" class="lazyload placeholder" data-srcset="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/1596103385086-d684f26e-dabd-44b7-bab8-151af172496a.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20200730180101883.png"></p>
+<p>图中红黑树的每一个节点都是一个<code>Entry</code>，在这里为了图片的简洁性，就不标明 key 和 value 了，注意这些元素都是已经按照<code>key</code>排好序了，整个数据结构都是保持着<code>有序</code> 的状态！</p>
+<p>关于<code>自然</code>排序与<code>定制</code>排序：</p>
+<ul>
+<li>自然排序：要求<code>key</code>必须实现<code>Comparable</code>接口。</li>
+</ul>
+<p>由于<code>Integer</code>类实现了 Comparable 接口，按照自然排序规则是按照<code>key</code>从小到大排序。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">TreeMap&lt;Integer, String&gt; treeMap = <span class="keyword">new</span> <span class="title class_">TreeMap</span>&lt;&gt;();</span><br><span class="line">treeMap.put(<span class="number">2</span>, <span class="string">&quot;TWO&quot;</span>);</span><br><span class="line">treeMap.put(<span class="number">1</span>, <span class="string">&quot;ONE&quot;</span>);</span><br><span class="line">System.out.print(treeMap);</span><br><span class="line"><span class="comment">// &#123;1=ONE, 2=TWO&#125;</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>定制排序：在初始化 TreeMap 时传入新的<code>Comparator</code>，<strong>不</strong>要求<code>key</code>实现 Comparable 接口</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">TreeMap&lt;Integer, String&gt; treeMap = <span class="keyword">new</span> <span class="title class_">TreeMap</span>&lt;&gt;((o1, o2) -&gt; Integer.compare(o2, o1));</span><br><span class="line">treeMap.put(<span class="number">1</span>, <span class="string">&quot;ONE&quot;</span>);</span><br><span class="line">treeMap.put(<span class="number">2</span>, <span class="string">&quot;TWO&quot;</span>);</span><br><span class="line">treeMap.put(<span class="number">4</span>, <span class="string">&quot;FOUR&quot;</span>);</span><br><span class="line">treeMap.put(<span class="number">3</span>, <span class="string">&quot;THREE&quot;</span>);</span><br><span class="line">System.out.println(treeMap);</span><br><span class="line"><span class="comment">// &#123;4=FOUR, 3=THREE, 2=TWO, 1=ONE&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>通过传入新的<code>Comparator</code>比较器，可以覆盖默认的排序规则，上面的代码按照<code>key</code>降序排序，在实际应用中还可以按照其它规则自定义排序。</p>
+<p><code>compare()</code>方法的返回值有三种，分别是：<code>0</code>，<code>-1</code>，<code>+1</code></p>
+<p>（1）如果返回<code>0</code>，代表两个元素相等，不需要调换顺序</p>
+<p>（2）如果返回<code>+1</code>，代表前面的元素需要与后面的元素调换位置</p>
+<p>（3）如果返回<code>-1</code>，代表前面的元素不需要与后面的元素调换位置</p>
+<p>而何时返回<code>+1</code>和<code>-1</code>，则由我们自己去定义，JDK默认是按照<strong>自然排序</strong>，而我们可以根据<code>key</code>的不同去定义降序还是升序排序。</p>
+<p>关于 TreeMap 主要介绍了两点：</p>
+<ol>
+<li>它底层是由<code>红黑树</code>这种数据结构实现的，所以操作的时间复杂度恒为<code>O(logN)</code></li>
+<li>TreeMap 可以对<code>key</code>进行自然排序或者自定义排序，自定义排序时需要传入<code>Comparator</code>，而自然排序要求<code>key</code>实现了<code>Comparable</code>接口</li>
+<li>TreeMap 不是线程安全的。</li>
+</ol>
+<h3 id="WeakHashMap"><a href="#WeakHashMap" class="headerlink" title="WeakHashMap"></a>WeakHashMap</h3><p>WeakHashMap 日常开发中比较少见，它是基于普通的<code>Map</code>实现的，而里面<code>Entry</code>中的键在每一次的<code>垃圾回收</code>都会被清除掉，所以非常适合用于<strong>短暂访问、仅访问一次</strong>的元素，缓存在<code>WeakHashMap</code>中，并尽早地把它回收掉。</p>
+<p>当<code>Entry</code>被<code>GC</code>时，WeakHashMap 是如何感知到某个元素被回收的呢？</p>
+<p>在 WeakHashMap 内部维护了一个引用队列<code>queue</code></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">final</span> ReferenceQueue&lt;Object&gt; queue = <span class="keyword">new</span> <span class="title class_">ReferenceQueue</span>&lt;&gt;();</span><br></pre></td></tr></table></figure>
+
+<p>这个 queue 里包含了所有被<code>GC</code>掉的键，当JVM开启<code>GC</code>后，如果回收掉 WeakHashMap 中的 key，会将 key 放入queue 中，在<code>expungeStaleEntries()</code>中遍历 queue，把 queue 中的所有<code>key</code>拿出来，并在 WeakHashMap 中删除掉，以达到<strong>同步</strong>。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title function_">expungeStaleEntries</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="keyword">for</span> (Object x; (x = queue.poll()) != <span class="literal">null</span>; ) &#123;</span><br><span class="line">        <span class="keyword">synchronized</span> (queue) &#123;</span><br><span class="line">            <span class="comment">// 去 WeakHashMap 中删除该键值对</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>再者，需要注意 WeakHashMap 底层存储的元素的数据结构是<code>数组 + 链表</code>，<strong>没有红黑树</strong>哦，可以换一个角度想，如果还有红黑树，那干脆直接继承 HashMap ，然后再扩展就完事了嘛，然而它并没有这样做：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">WeakHashMap</span>&lt;K, V&gt; <span class="keyword">extends</span> <span class="title class_">AbstractMap</span>&lt;K, V&gt; <span class="keyword">implements</span> <span class="title class_">Map</span>&lt;K, V&gt; &#123;</span><br><span class="line">    </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>所以，WeakHashMap 的数据结构图我也为你准备好啦。</p>
+<img src="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/1596106079292-a74fb47e-bb54-47e2-81ac-1254428e73b7.png" class="lazyload placeholder" data-srcset="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/1596106079292-a74fb47e-bb54-47e2-81ac-1254428e73b7.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image.png" style="zoom:67%;" />
+
+<p>图中被虚线标识的元素将会在下一次访问 WeakHashMap 时被删除掉，WeakHashMap 内部会做好一系列的调整工作，所以记住队列的作用就是标志那些已经被<code>GC</code>回收掉的元素。</p>
+<p>关于 WeakHashMap 需要注意两点：</p>
+<ol>
+<li>它的键是一种<strong>弱键</strong>，放入 WeakHashMap 时，随时会被回收掉，所以不能确保某次访问元素一定存在</li>
+<li>它依赖普通的<code>Map</code>进行实现，是一个非线程安全的集合</li>
+<li>WeakHashMap 通常作为<strong>缓存</strong>使用，适合存储那些<strong>只需访问一次</strong>、或<strong>只需保存短暂时间</strong>的键值对</li>
+</ol>
+<h3 id="Hashtable"><a href="#Hashtable" class="headerlink" title="Hashtable"></a>Hashtable</h3><p>Hashtable 底层的存储结构是<code>数组 + 链表</code>，而它是一个<strong>线程安全</strong>的集合，但是因为这个线程安全，它就被淘汰掉了。</p>
+<p>下面是Hashtable存储元素时的数据结构图，它只会存在数组+链表，当链表过长时，查询的效率过低，而且会长时间<strong>锁住</strong> Hashtable。</p>
+<img src="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/1596106328540-e1acec81-7896-45be-85c4-c93e142ef610.png" class="lazyload placeholder" data-srcset="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/1596106328540-e1acec81-7896-45be-85c4-c93e142ef610.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image.png" style="zoom: 80%;" />
+
+<blockquote>
+<p>这幅图是否有点眼熟哈哈哈哈，本质上就是 WeakHashMap 的底层存储结构了。你千万别问为什么 WeakHashMap 不继承 Hashtable 哦，Hashtable 的<code>性能</code>在并发环境下非常差，在非并发环境下可以用<code>HashMap</code>更优。</p>
+</blockquote>
+<p>HashTable 本质上是 HashMap 的前辈，它被淘汰的原因也主要因为两个字：<strong>性能</strong></p>
+<p>HashTable 是一个 <strong>线程安全</strong> 的 Map，它所有的方法都被加上了 <strong>synchronized</strong> 关键字，也是因为这个关键字，它注定成为了时代的弃儿。</p>
+<p>HashTable 底层采用 <strong>数组+链表</strong> 存储键值对，由于被弃用，后人也没有对它进行任何改进</p>
+<p>HashTable 默认长度为 <code>11</code>，负载因子为 <code>0.75F</code>，即元素个数达到数组长度的 75% 时，会进行一次扩容，每次扩容为原来数组长度的 <code>2</code> 倍</p>
+<p>HashTable 所有的操作都是线程安全的。</p>
+<h2 id="Collection-集合体系详解"><a href="#Collection-集合体系详解" class="headerlink" title="Collection 集合体系详解"></a>Collection 集合体系详解</h2><p>Collection 集合体系的顶层接口就是<code>Collection</code>，它规定了该集合下的一系列行为约定。</p>
+<p>该集合下可以分为三大类集合：List，Set和Queue</p>
+<p><code>Set</code>接口定义了该类集合<strong>不允许存储重复</strong>的元素，且任何操作时均需要通过<strong>哈希函数映射</strong>到集合内部定位元素，集合内部的元素<strong>默认</strong>是<strong>无序</strong>的。</p>
+<p><code>List</code>接口定义了该类集合<strong>允许存储重复</strong>的元素，且集合内部的元素按照元素插入的顺序<strong>有序排列</strong>，可以通过<strong>索引</strong>访问元素。</p>
+<p><code>Queue</code>接口定义了该类集合是以<code>队列</code>作为存储结构，所以集合内部的元素<strong>有序排列</strong>，仅可以操作<strong>头结点</strong>元素，无法访问队列中间的元素。</p>
+<p>上面三个接口是<strong>最普通，最抽象</strong>的实现，而在各个集合接口内部，还会有更加具体的表现，衍生出各种不同的<strong>额外功能</strong>，使开发者能够对比各个集合的优势，<strong>择优使用</strong>。</p>
+<img src="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/1595682008755-6f1e6c3c-920e-427b-9c00-a4164026f181.png" class="lazyload placeholder" data-srcset="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/1595682008755-6f1e6c3c-920e-427b-9c00-a4164026f181.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image.png" style="zoom:67%;" />
+
+<h3 id="Set-接口"><a href="#Set-接口" class="headerlink" title="Set 接口"></a>Set 接口</h3><p><code>Set</code>接口继承了<code>Collection</code>接口，是一个不包括重复元素的集合，更确切地说，Set 中任意两个元素不会出现 <code>o1.equals(o2)</code>，而且 Set <strong>至多</strong>只能存储一个 <code>NULL</code> 值元素，Set 集合的组成部分可以用下面这张图概括：</p>
+<p><img src="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/1596107343106-b98a8b29-06ba-4f6f-ab14-7a139e506dd5.png" class="lazyload placeholder" data-srcset="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/1596107343106-b98a8b29-06ba-4f6f-ab14-7a139e506dd5.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="1595682050240-6c6946f2-9dd4-4e5b-a006-39144184e2f1.png"></p>
+<p>在 Set 集合体系中，我们需要着重关注两点：</p>
+<ul>
+<li><p>存入<strong>可变元素</strong>时，必须非常小心，因为任意时候元素状态的改变都有可能使得 Set 内部出现两个<strong>相等</strong>的元素，即 <code>o1.equals(o2) = true</code>，所以一般不要更改存入 Set 中的元素，否则将会破坏了 <code>equals()</code> 的作用！</p>
+</li>
+<li><p>Set 的最大作用就是判重，在项目中最大的作用也是<strong>判重</strong>！</p>
+</li>
+</ul>
+<p>接下来我们去看它的实现类和子类： <code>AbstractSet</code> 和 <code>SortedSet</code></p>
+<h3 id="AbstractSet-抽象类"><a href="#AbstractSet-抽象类" class="headerlink" title="AbstractSet 抽象类"></a>AbstractSet 抽象类</h3><p><code>AbstractSet</code> 是一个实现 Set 的一个抽象类，定义在这里可以将所有具体 Set 集合的<strong>相同行为</strong>在这里实现，<strong>避免子类包含大量的重复代码</strong></p>
+<p>所有的 Set 也应该要有相同的 <code>hashCode()</code> 和 <code>equals()</code> 方法，所以使用抽象类把该方法重写后，子类无需关心这两个方法。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">class</span> <span class="title class_">AbstractSet</span>&lt;E&gt; <span class="keyword">implements</span> <span class="title class_">Set</span>&lt;E&gt; &#123;</span><br><span class="line">    <span class="comment">// 判断两个 set 是否相等</span></span><br><span class="line">    <span class="keyword">public</span> <span class="type">boolean</span> <span class="title function_">equals</span><span class="params">(Object o)</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (o == <span class="built_in">this</span>) &#123; <span class="comment">// 集合本身</span></span><br><span class="line">            <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (!(o <span class="keyword">instanceof</span> Set)) &#123; <span class="comment">// 集合不是 set</span></span><br><span class="line">            <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="comment">// 比较两个集合的元素是否全部相同</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 计算所有元素的 hashcode 总和</span></span><br><span class="line">    <span class="keyword">public</span> <span class="type">int</span> <span class="title function_">hashCode</span><span class="params">()</span> &#123; </span><br><span class="line">        <span class="type">int</span> <span class="variable">h</span> <span class="operator">=</span> <span class="number">0</span>;</span><br><span class="line">        <span class="type">Iterator</span> <span class="variable">i</span> <span class="operator">=</span> <span class="built_in">this</span>.iterator();</span><br><span class="line">        <span class="keyword">while</span>(i.hasNext()) &#123;</span><br><span class="line">            <span class="type">E</span> <span class="variable">obj</span> <span class="operator">=</span> i.next();</span><br><span class="line">            <span class="keyword">if</span> (obj != <span class="literal">null</span>) &#123;</span><br><span class="line">                h += obj.hashCode();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> h;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="SortedSet-接口"><a href="#SortedSet-接口" class="headerlink" title="SortedSet 接口"></a>SortedSet 接口</h3><p><code>SortedSet</code> 是一个接口，它在 Set 的基础上扩展了<strong>排序</strong>的行为，所以所有实现它的子类都会拥有排序功能。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title class_">SortedSet</span>&lt;E&gt; <span class="keyword">extends</span> <span class="title class_">Set</span>&lt;E&gt; &#123;</span><br><span class="line">    <span class="comment">// 元素的比较器,决定元素的排列顺序</span></span><br><span class="line">    Comparator&lt;? <span class="built_in">super</span> E&gt; comparator(); </span><br><span class="line">    <span class="comment">// 获取 [var1, var2] 之间的 set</span></span><br><span class="line">    SortedSet&lt;E&gt; <span class="title function_">subSet</span><span class="params">(E var1, E var2)</span>; </span><br><span class="line">    <span class="comment">// 获取以 var1 开头的 Set</span></span><br><span class="line">    SortedSet&lt;E&gt; <span class="title function_">headSet</span><span class="params">(E var1)</span>; </span><br><span class="line">    <span class="comment">// 获取以 var1 结尾的 Set</span></span><br><span class="line">    SortedSet&lt;E&gt; <span class="title function_">tailSet</span><span class="params">(E var1)</span>; </span><br><span class="line">    <span class="comment">// 获取首个元素</span></span><br><span class="line">    E <span class="title function_">first</span><span class="params">()</span>; </span><br><span class="line">    <span class="comment">// 获取最后一个元素</span></span><br><span class="line">    E <span class="title function_">last</span><span class="params">()</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="HashSet"><a href="#HashSet" class="headerlink" title="HashSet"></a>HashSet</h3><p>HashSet 底层借助 <code>HashMap</code> 实现，我们可以观察它的多个构造方法，本质上都是 new 一个 HashMap</p>
+<blockquote>
+<p>这也是这篇文章为什么先讲解 Map 再讲解 Set 的原因！先学习 Map，有助于理解 Set</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">HashSet</span>&lt;E&gt; <span class="keyword">extends</span> <span class="title class_">AbstractSet</span>&lt;E&gt; <span class="keyword">implements</span> <span class="title class_">Set</span>&lt;E&gt;, Cloneable, Serializable &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">HashSet</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="built_in">this</span>.map = <span class="keyword">new</span> <span class="title class_">HashMap</span>();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">HashSet</span><span class="params">(<span class="type">int</span> initialCapacity, <span class="type">float</span> loadFactor)</span> &#123;</span><br><span class="line">        <span class="built_in">this</span>.map = <span class="keyword">new</span> <span class="title class_">HashMap</span>(initialCapacity, loadFactor);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">HashSet</span><span class="params">(<span class="type">int</span> initialCapacity)</span> &#123;</span><br><span class="line">        <span class="built_in">this</span>.map = <span class="keyword">new</span> <span class="title class_">HashMap</span>(initialCapacity);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>我们可以观察 <code>add()</code> 方法和<code>remove()</code>方法是如何将 HashSet 的操作嫁接到 HashMap 的。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">Object</span> <span class="variable">PRESENT</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Object</span>();</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="type">boolean</span> <span class="title function_">add</span><span class="params">(E e)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">this</span>.map.put(e, PRESENT) == <span class="literal">null</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">public</span> <span class="type">boolean</span> <span class="title function_">remove</span><span class="params">(Object o)</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">this</span>.map.remove(o) == PRESENT;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>我们看到 <code>PRESENT</code> 就是一个<strong>静态常量</strong>：使用 PRESENT 作为 HashMap 的 value 值，使用HashSet的开发者只需<strong>关注</strong>于需要插入的 <code>key</code>，<strong>屏蔽</strong>了 HashMap 的 <code>value</code></p>
+<p><img src="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/1596109695209-9cd36cf2-1b1f-44db-94ee-71d60348d257.png" class="lazyload placeholder" data-srcset="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/1596109695209-9cd36cf2-1b1f-44db-94ee-71d60348d257.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image.png"></p>
+<p>上图可以观察到每个<code>Entry</code>的<code>value</code>都是 PRESENT 空对象，我们就不用再理会它了。</p>
+<p>HashSet 在 HashMap 基础上实现，所以很多地方可以联系到 HashMap：</p>
+<ul>
+<li>底层数据结构：HashSet 也是采用<code>数组 + 链表 + 红黑树</code>实现</li>
+<li>线程安全性：由于采用 HashMap 实现，而 HashMap 本身线程不安全，在HashSet 中没有添加额外的同步策略，所以 HashSet 也<strong>线程不安全</strong></li>
+<li>存入 HashSet 的对象的状态<strong>最好不要发生变化</strong>，因为有可能改变状态后，在集合内部出现两个元素<code>o1.equals(o2)</code>，破坏了 <code>equals()</code>的语义。</li>
+</ul>
+<h3 id="LinkedHashSet"><a href="#LinkedHashSet" class="headerlink" title="LinkedHashSet"></a>LinkedHashSet</h3><p>LinkedHashSet 的代码少的可怜，不信我给你我粘出来</p>
+<p><img src="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/1596108598046-702b165f-6aa0-463e-b87b-de9305acb693.png" class="lazyload placeholder" data-srcset="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/1596108598046-702b165f-6aa0-463e-b87b-de9305acb693.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image.png"></p>
+<p>少归少，还是不能闹，<code>LinkedHashSet</code>继承了<code>HashSet</code>，我们跟随到父类 HashSet 的构造方法看看</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">HashSet(<span class="type">int</span> initialCapacity, <span class="type">float</span> loadFactor, <span class="type">boolean</span> dummy) &#123;</span><br><span class="line">    <span class="built_in">this</span>.map = <span class="keyword">new</span> <span class="title class_">LinkedHashMap</span>(initialCapacity, loadFactor);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>发现父类中 map 的实现采用<code>LinkedHashMap</code>，这里注意不是<code>HashMap</code>，而 LinkedHashMap 底层又采用 HashMap + 双向链表 实现的，所以本质上 LinkedHashSet 还是使用 HashMap 实现的。</p>
+<blockquote>
+<p>LinkedHashSet -&gt; LinkedHashMap -&gt; HashMap + 双向链表</p>
+</blockquote>
+<p><img src="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/1596110006108-d064aa74-d71c-401a-94b9-83caef7cdbc7.png" class="lazyload placeholder" data-srcset="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/1596110006108-d064aa74-d71c-401a-94b9-83caef7cdbc7.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image.png"></p>
+<p>而 LinkedHashMap 是采用 <code>HashMap</code>和<code>双向链表</code>实现的，这条双向链表中保存了元素的插入顺序。所以 LinkedHashSet 可以按照元素的插入顺序遍历元素，如果你熟悉<code>LinkedHashMap</code>，那 LinkedHashSet 也就更不在话下了。</p>
+<p>关于 LinkedHashSet 需要注意几个地方：</p>
+<ul>
+<li>它继承了 <code>HashSet</code>，而 HashSet 默认是采用 HashMap 存储数据的，但是 LinkedHashSet 调用父类构造方法初始化 map 时是 LinkedHashMap 而不是 HashMap，这个要额外注意一下</li>
+<li>由于 LinkedHashMap 不是线程安全的，且在 LinkedHashSet 中没有添加额外的同步策略，所以 LinkedHashSet 集合<strong>也不是线程安全</strong>的</li>
+</ul>
+<h3 id="TreeSet"><a href="#TreeSet" class="headerlink" title="TreeSet"></a>TreeSet</h3><p>TreeSet 是基于 TreeMap 的实现，所以存储的元素是<strong>有序</strong>的，底层的数据结构是<code>数组 + 红黑树</code>。</p>
+<p><img src="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/1596126807774-1a122d9e-4210-4708-8328-c23f65bc55dd.png" class="lazyload placeholder" data-srcset="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/1596126807774-1a122d9e-4210-4708-8328-c23f65bc55dd.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="img"></p>
+<p>而元素的排列顺序有<code>2</code>种，和 TreeMap 相同：自然排序和定制排序，常用的构造方法已经在下面展示出来了，TreeSet 默认按照自然排序，如果需要定制排序，需要传入<code>Comparator</code>。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="title function_">TreeSet</span><span class="params">()</span> &#123; </span><br><span class="line">    <span class="built_in">this</span>(<span class="keyword">new</span> <span class="title class_">TreeMap</span>&lt;E,Object&gt;());</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">public</span> <span class="title function_">TreeSet</span><span class="params">(Comparator&lt;? <span class="built_in">super</span> E&gt; comparator)</span> &#123;</span><br><span class="line">    <span class="built_in">this</span>(<span class="keyword">new</span> <span class="title class_">TreeMap</span>&lt;&gt;(comparator));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>TreeSet 应用场景有很多，像在游戏里的玩家战斗力排行榜</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Player</span> <span class="keyword">implements</span> <span class="title class_">Comparable</span>&lt;Integer&gt; &#123;</span><br><span class="line">    <span class="keyword">public</span> String name;</span><br><span class="line">    <span class="keyword">public</span> <span class="type">int</span> score;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="type">int</span> <span class="title function_">compareTo</span><span class="params">(Student o)</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> Integer.compareTo(<span class="built_in">this</span>.score, o.score);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">    <span class="type">Player</span> <span class="variable">s1</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Player</span>(<span class="string">&quot;张三&quot;</span>, <span class="number">100</span>);</span><br><span class="line">    <span class="type">Player</span> <span class="variable">s2</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Player</span>(<span class="string">&quot;李四&quot;</span>, <span class="number">90</span>);</span><br><span class="line">    <span class="type">Player</span> <span class="variable">s3</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Player</span>(<span class="string">&quot;王五&quot;</span>, <span class="number">80</span>);</span><br><span class="line">    TreeSet&lt;Player&gt; set = <span class="keyword">new</span> <span class="title class_">TreeSet</span>();</span><br><span class="line">    set.add(s2); set.add(s1); set.add(s3);</span><br><span class="line">    System.out.println(set);</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// [Student&#123;name=&#x27;王五&#x27;, score=80&#125;, Student&#123;name=&#x27;李四&#x27;, score=90&#125;, Student&#123;name=&#x27;张三&#x27;, score=100&#125;]</span></span><br></pre></td></tr></table></figure>
+
+<p>对 TreeSet 介绍了它的主要实现方式和应用场景，有几个值得注意的点。</p>
+<ul>
+<li>TreeSet 的所有操作都会转换为对 TreeMap 的操作，TreeMap 采用<strong>红黑树</strong>实现，任意操作的平均时间复杂度为 <code>O(logN)</code></li>
+<li>TreeSet 是一个<strong>线程不安全</strong>的集合</li>
+<li>TreeSet 常应用于对<strong>不重复</strong>的元素<strong>定制排序</strong>，例如玩家战力排行榜</li>
+</ul>
+<blockquote>
+<p>注意:TreeSet判断元素是否重复的方法是判断compareTo()方法是否返回0，而不是调用 hashcode() 和 equals() 方法，如果返回 0 则认为集合内已经存在相同的元素，不会再加入到集合当中。</p>
+</blockquote>
+<h2 id="List-接口"><a href="#List-接口" class="headerlink" title="List 接口"></a>List 接口</h2><p>List 接口和 Set 接口齐头并进，是我们日常开发中接触的很多的一种集合类型了。整个 List 集合的组成部分如下图</p>
+<img src="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/1596123811338-4c47cdc8-bac9-4670-91ee-6d8a82159bc6.png" class="lazyload placeholder" data-srcset="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/1596123811338-4c47cdc8-bac9-4670-91ee-6d8a82159bc6.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="img" style="zoom:67%;" />
+
+<p><code>List</code> 接口直接继承 Collection 接口，它定义为可以存储<strong>重复</strong>元素的集合，并且元素按照插入顺序<strong>有序排列</strong>，且可以通过<strong>索引</strong>访问指定位置的元素。常见的实现有：ArrayList、LinkedList、Vector和Stack</p>
+<h3 id="AbstractList-和-AbstractSequentialList"><a href="#AbstractList-和-AbstractSequentialList" class="headerlink" title="AbstractList  和 AbstractSequentialList"></a>AbstractList  和 AbstractSequentialList</h3><p>AbstractList 抽象类实现了 List 接口，其内部实现了所有的 List 都需具备的功能，子类可以专注于实现自己具体的操作逻辑。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 查找元素 o 第一次出现的索引位置</span></span><br><span class="line"><span class="keyword">public</span> <span class="type">int</span> <span class="title function_">indexOf</span><span class="params">(Object o)</span></span><br><span class="line"><span class="comment">// 查找元素 o 最后一次出现的索引位置</span></span><br><span class="line"><span class="keyword">public</span> <span class="type">int</span> <span class="title function_">lastIndexOf</span><span class="params">(Object o)</span></span><br><span class="line"><span class="comment">//···</span></span><br></pre></td></tr></table></figure>
+
+<p>AbstractSequentialList 抽象类继承了 AbstractList，在原基础上限制了访问元素的顺序<strong>只能够按照顺序访问</strong>，而<strong>不支持随机访问</strong>，如果需要满足随机访问的特性，则继承 AbstractList。子类 LinkedList 使用链表实现，所以仅能支持<strong>顺序访问</strong>，顾继承了 <code>AbstractSequentialList</code>而不是 AbstractList。</p>
+<h3 id="Vector"><a href="#Vector" class="headerlink" title="Vector"></a>Vector</h3><p><img src="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/1595375364068-c2c49168-a2f4-4a06-97c0-eb3446d60a68.png" class="lazyload placeholder" data-srcset="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/1595375364068-c2c49168-a2f4-4a06-97c0-eb3446d60a68.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image.png"></p>
+<p><code>Vector</code> 在现在已经是一种过时的集合了，包括继承它的 <code>Stack</code> 集合也如此，它们被淘汰的原因都是因为<strong>性能</strong>低下。</p>
+<blockquote>
+<p>JDK 1.0 时代，ArrayList 还没诞生，大家都是使用 Vector 集合，但由于 Vector 的<strong>每个操作</strong>都被 <strong>synchronized</strong> 关键字修饰，即使在线程安全的情况下，仍然<strong>进行无意义的加锁与释放锁</strong>，造成额外的性能开销，做了无用功。</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="type">boolean</span> <span class="title function_">add</span><span class="params">(E e)</span>;</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">synchronized</span> E <span class="title function_">get</span><span class="params">(<span class="type">int</span> index)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>在 JDK 1.2 时，Collection 家族出现了，它提供了大量<strong>高性能、适用於不同场合</strong>的集合，而 Vector 也是其中一员，但由于 Vector 在每个方法上都加了锁，由于需要兼容许多老的项目，很难在此基础上优化<code>Vector</code>了，所以渐渐地也就被历史淘汰了。</p>
+<p>现在，在<strong>线程安全</strong>的情况下，不需要选用 Vector 集合，取而代之的是 <strong>ArrayList</strong> 集合；在并发环境下，出现了 <code>CopyOnWriteArrayList</code>，Vector 完全被弃用了。</p>
+<h3 id="Stack"><a href="#Stack" class="headerlink" title="Stack"></a>Stack</h3><p><img src="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/1596126551356-dc1af780-2fe9-4d04-8351-e70637ecdab5.png" class="lazyload placeholder" data-srcset="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/1596126551356-dc1af780-2fe9-4d04-8351-e70637ecdab5.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="img"></p>
+<p><code>Stack</code>是一种<code>后入先出（LIFO）</code>型的集合容器，如图中所示，<code>大雄</code>是最后一个进入容器的，top指针指向大雄，那么弹出元素时，大雄也是第一个被弹出去的。</p>
+<p>Stack 继承了 Vector 类，提供了栈顶的压入元素操作（push）和弹出元素操作（pop），以及查看栈顶元素的方法（peek）等等，但由于继承了 Vector，正所谓跟错老大没福报，Stack 也渐渐被淘汰了。</p>
+<p>取而代之的是后起之秀 <code>Deque</code>接口，其实现有 <code>ArrayDeque</code>，该数据结构更加完善、可靠性更好，依靠队列也可以实现<code>LIFO</code>的栈操作，所以优先选择 ArrayDeque 实现栈。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Deque&lt;Integer&gt; stack = <span class="keyword">new</span> <span class="title class_">ArrayDeque</span>&lt;Integer&gt;();</span><br></pre></td></tr></table></figure>
+
+<p>ArrayDeque 的数据结构是：<code>数组</code>，并提供<strong>头尾指针下标</strong>对数组元素进行操作。本文也会讲到哦，客官请继续往下看，莫着急！:smile:</p>
+<h3 id="ArrayList"><a href="#ArrayList" class="headerlink" title="ArrayList"></a>ArrayList</h3><p>ArrayList 以<strong>数组</strong>作为存储结构，它是<strong>线程不安全</strong>的集合；具有<strong>查询快、在数组中间或头部增删慢</strong>的特点，所以它除了线程不安全这一点，其余可以替代<code>Vector</code>，而且线程安全的 ArrayList 可以使用 <code>CopyOnWriteArrayList</code>代替 Vector。</p>
+<p><img src="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/1595375364068-c2c49168-a2f4-4a06-97c0-eb3446d60a68.png" class="lazyload placeholder" data-srcset="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/1595375364068-c2c49168-a2f4-4a06-97c0-eb3446d60a68.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image.png"></p>
+<p>关于 ArrayList 有几个重要的点需要注意的：</p>
+<ul>
+<li><p>具备<strong>随机访问</strong>特点，<strong>访问元素的效率</strong>较高，ArrayList 在<strong>频繁插入、删除</strong>集合元素的场景下效率较<code>低</code>。</p>
+</li>
+<li><p>底层数据结构：ArrayList 底层使用数组作为存储结构，具备<strong>查找快、增删慢</strong>的特点</p>
+</li>
+<li><p>线程安全性：ArrayList 是<strong>线程不安全</strong>的集合</p>
+</li>
+<li><p>ArrayList <strong>首次扩容</strong>后的长度为 <code>10</code>，调用 <code>add()</code> 时需要计算容器的最小容量。可以看到如果数组<code>elementData</code>为空数组，会将最小容量设置为<code>10</code>，之后会将数组长度完成首次扩容到 10。</p>
+</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// new ArrayList 时的默认空数组</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Object[] DEFAULTCAPACITY_EMPTY_ELEMENTDATA = &#123;&#125;;</span><br><span class="line"><span class="comment">// 默认容量</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">int</span> <span class="variable">DEFAULT_CAPACITY</span> <span class="operator">=</span> <span class="number">10</span>;</span><br><span class="line"><span class="comment">// 计算该容器应该满足的最小容量</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="type">int</span> <span class="title function_">calculateCapacity</span><span class="params">(Object[] elementData, <span class="type">int</span> minCapacity)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (elementData == DEFAULTCAPACITY_EMPTY_ELEMENTDATA) &#123;</span><br><span class="line">        <span class="keyword">return</span> Math.max(DEFAULT_CAPACITY, minCapacity);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> minCapacity;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>集合从<strong>第二次扩容</strong>开始，数组长度将扩容为原来的 <code>1.5</code> 倍，即：<code>newLength = oldLength * 1.5</code></li>
+</ul>
+<p><img src="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/1595724934991-c2f12445-bc9e-4e1c-b965-04f2ef9d3d79.png" class="lazyload placeholder" data-srcset="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/1595724934991-c2f12445-bc9e-4e1c-b965-04f2ef9d3d79.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image.png"></p>
+<h3 id="LinkedList"><a href="#LinkedList" class="headerlink" title="LinkedList"></a>LinkedList</h3><p>LinkedList 底层采用<code>双向链表</code>数据结构存储元素，由于链表的内存地址<code>非连续</code>，所以它不具备随机访问的特点，但由于它利用指针连接各个元素，所以插入、删除元素只需要<code>操作指针</code>，不需要<code>移动元素</code>，故具有<strong>增删快、查询慢</strong>的特点。它也是一个非线程安全的集合。</p>
+<p><img src="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/1595393003456-d37281f4-8332-46b4-9d81-e1f0c24dc060.png" class="lazyload placeholder" data-srcset="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/1595393003456-d37281f4-8332-46b4-9d81-e1f0c24dc060.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image.png"></p>
+<p>由于以双向链表作为数据结构，它是<strong>线程不安全</strong>的集合；存储的每个节点称为一个<code>Node</code>，下图可以看到 Node 中保存了<code>next</code>和<code>prev</code>指针，<code>item</code>是该节点的值。在插入和删除时，时间复杂度都保持为 <code>O(1)</code></p>
+<p><img src="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/1595725358023-1f64f780-9dd0-47ff-a84c-d4101d16c1e1.png" class="lazyload placeholder" data-srcset="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/1595725358023-1f64f780-9dd0-47ff-a84c-d4101d16c1e1.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image.png"></p>
+<p>关于 LinkedList，除了它是以链表实现的集合外，还有一些特殊的特性需要注意的。</p>
+<ul>
+<li>优势：LinkedList 底层没有<code>扩容机制</code>，使用<code>双向链表</code>存储元素，所以插入和删除元素效率较高，适用于频繁操作元素的场景</li>
+<li>劣势：LinkedList 不具备<code>随机访问</code>的特点，查找某个元素只能从 <code>head</code> 或 <code>tail</code> 指针一个一个比较，所以<strong>查找中间的元素时效率很低</strong></li>
+<li>查找优化：LinkedList 查找某个下标 <code>index</code> 的元素时<strong>做了优化</strong>，若 <code>index &gt; (size / 2)</code>，则从 <code>head</code> 往后查找，否则从 <code>tail</code> 开始往前查找，代码如下所示：</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">LinkedList.Node&lt;E&gt; <span class="title function_">node</span><span class="params">(<span class="type">int</span> index)</span> &#123;</span><br><span class="line">    LinkedList.Node x;</span><br><span class="line">    <span class="type">int</span> i;</span><br><span class="line">    <span class="keyword">if</span> (index &lt; <span class="built_in">this</span>.size &gt;&gt; <span class="number">1</span>) &#123; <span class="comment">// 查找的下标处于链表前半部分则从头找</span></span><br><span class="line">        x = <span class="built_in">this</span>.first;</span><br><span class="line">        <span class="keyword">for</span>(i = <span class="number">0</span>; i &lt; index; ++i) &#123; x = x.next; &#125;</span><br><span class="line">        <span class="keyword">return</span> x;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123; <span class="comment">// 查找的下标处于数组的后半部分则从尾开始找</span></span><br><span class="line">        x = <span class="built_in">this</span>.last;</span><br><span class="line">        <span class="keyword">for</span>(i = <span class="built_in">this</span>.size - <span class="number">1</span>; i &gt; index; --i) &#123; x = x.prev; &#125;</span><br><span class="line">        <span class="keyword">return</span> x;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>双端队列：使用双端链表实现，并且实现了 <code>Deque</code> 接口，使得 LinkedList 可以用作<strong>双端队列</strong>。下图可以看到 Node 是集合中的元素，提供了前驱指针和后继指针，还提供了一系列操作<code>头结点</code>和<code>尾结点</code>的方法，具有双端队列的特性。</li>
+</ul>
+<p><img src="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/1595693779116-a8156f03-36fa-4557-892e-ea5103b06136.png" class="lazyload placeholder" data-srcset="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/1595693779116-a8156f03-36fa-4557-892e-ea5103b06136.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image.png"></p>
+<p>LinkedList 集合最让人树枝的是它的链表结构，但是我们同时也要注意它是一个双端队列型的集合。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Deque&lt;Object&gt; deque = <span class="keyword">new</span> <span class="title class_">LinkedList</span>&lt;&gt;();	</span><br></pre></td></tr></table></figure>
+
+<h2 id="Queue接口"><a href="#Queue接口" class="headerlink" title="Queue接口"></a>Queue接口</h2><p><code>Queue</code>队列，在 JDK 中有两种不同类型的集合实现：<strong>单向队列</strong>（AbstractQueue） 和 <strong>双端队列</strong>（Deque）</p>
+<p><img src="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/1595684241064-e863aeca-6a95-4423-92c4-762f56be1dbe.png" class="lazyload placeholder" data-srcset="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/1595684241064-e863aeca-6a95-4423-92c4-762f56be1dbe.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="img"></p>
+<p>Queue 中提供了两套增加、删除元素的 API，当插入或删除元素失败时，会有<strong>两种不同的失败处理策略</strong>。</p>
+<table>
+<thead>
+<tr>
+<th align="left">方法及失败策略</th>
+<th align="left">插入方法</th>
+<th align="left">删除方法</th>
+<th>查找方法</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">抛出异常</td>
+<td align="left">add()</td>
+<td align="left">remove()</td>
+<td>get()</td>
+</tr>
+<tr>
+<td align="left">返回失败默认值</td>
+<td align="left">offer()</td>
+<td align="left">poll()</td>
+<td>peek()</td>
+</tr>
+</tbody></table>
+<p>选取哪种方法的决定因素：插入和删除元素失败时，希望<code>抛出异常</code>还是返回<code>布尔值</code></p>
+<p><code>add()</code> 和 <code>offer()</code> 对比：</p>
+<p>在队列长度大小确定的场景下，队列放满元素后，添加下一个元素时，add() 会抛出 <code>IllegalStateException</code>异常，而 <code>offer()</code> 会返回 <code>false</code> 。</p>
+<p>但是它们两个方法在插入<strong>某些不合法的元素</strong>时都会抛出三个相同的异常。</p>
+<p><img src="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/1595691512036-ed9fd3ea-5432-4105-a3fb-a5374d571971.png" class="lazyload placeholder" data-srcset="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/1595691512036-ed9fd3ea-5432-4105-a3fb-a5374d571971.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image.png"></p>
+<p><code>remove()</code> 和 <code>poll()</code> 对比：</p>
+<p>在<strong>队列为空</strong>的场景下， <code>remove()</code> 会抛出 <code>NoSuchElementException</code>异常，而 <code>poll()</code> 则返回 <code>null</code> 。</p>
+<p><code>get()</code>和<code>peek()</code>对比：</p>
+<p>在队列为空的情况下，<code>get()</code>会抛出<code>NoSuchElementException</code>异常，而<code>peek()</code>则返回<code>null</code>。</p>
+<h3 id="Deque-接口"><a href="#Deque-接口" class="headerlink" title="Deque 接口"></a>Deque 接口</h3><p><code>Deque</code> 接口的实现非常好理解：从<strong>单向</strong>队列演变为<strong>双向</strong>队列，内部额外提供<strong>双向队列的操作方法</strong>即可：</p>
+<p><img src="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/1596166722772-975ff644-6abf-441b-b678-4a6de5b0eef1.png" class="lazyload placeholder" data-srcset="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/1596166722772-975ff644-6abf-441b-b678-4a6de5b0eef1.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image.png"></p>
+<p>Deque 接口额外提供了<strong>针对队列的头结点和尾结点</strong>操作的方法，而<strong>插入、删除方法同样也提供了两套不同的失败策略</strong>。除了<code>add()</code>和<code>offer()</code>，<code>remove()</code>和<code>poll()</code>以外，还有<code>get()</code>和<code>peek()</code>出现了不同的策略</p>
+<h3 id="AbstractQueue-抽象类"><a href="#AbstractQueue-抽象类" class="headerlink" title="AbstractQueue 抽象类"></a>AbstractQueue 抽象类</h3><p>AbstractQueue 类中提供了各个 API 的基本实现，主要针对各个不同的处理策略给出基本的方法实现，定义在这里的作用是让<code>子类</code>根据其<code>方法规范</code>（操作失败时抛出异常还是返回默认值）实现具体的业务逻辑。</p>
+<p><img src="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/1596167156067-36121579-8127-4019-ba47-e4de73f05cda.png" class="lazyload placeholder" data-srcset="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/1596167156067-36121579-8127-4019-ba47-e4de73f05cda.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image.png"></p>
+<h3 id="LinkedList-1"><a href="#LinkedList-1" class="headerlink" title="LinkedList"></a>LinkedList</h3><p>LinkedList 在上面已经详细解释了，它实现了 <code>Deque</code> 接口，提供了针对头结点和尾结点的操作，并且每个结点都有<strong>前驱</strong>和<strong>后继</strong>指针，具备了双向队列的所有特性。</p>
+<h3 id="ArrayDeque"><a href="#ArrayDeque" class="headerlink" title="ArrayDeque"></a>ArrayDeque</h3><p>使用<strong>数组</strong>实现的双端队列，它是<strong>无界</strong>的双端队列，最小的容量是<code>8</code>（JDK 1.8）。在 JDK 11 看到它默认容量已经是 <code>16</code>了。</p>
+<p><img src="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/1595695213834-cb4f1c3a-e07a-42aa-981f-31a896febe26.png" class="lazyload placeholder" data-srcset="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/1595695213834-cb4f1c3a-e07a-42aa-981f-31a896febe26.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image.png"></p>
+<p><code>ArrayDeque</code> 在日常使用得不多，值得注意的是它与 <code>LinkedList</code> 的对比：<code>LinkedList</code> 采用<strong>链表</strong>实现双端队列，而 <code>ArrayDeque</code> 使用<strong>数组</strong>实现双端队列。</p>
+<blockquote>
+<p>在文档中作者写到：<strong>ArrayDeque 作为栈时比 Stack 性能好，作为队列时比 LinkedList 性能好</strong></p>
+</blockquote>
+<p>由于双端队列<strong>只能在头部和尾部</strong>操作元素，所以删除元素和插入元素的时间复杂度大部分都稳定在 <code>O(1)</code> ，除非在扩容时会涉及到元素的批量复制操作。但是在大多数情况下，使用它时应该指定一个大概的数组长度，避免频繁的扩容。</p>
+<blockquote>
+<p>个人观点：链表的插入、删除操作涉及到<strong>指针的操作，我个人认为作者是觉得数组下标的移动要比指针的操作要廉价，而且数组</strong>采用<strong>连续</strong>的内存地址空间，而<strong>链表</strong>元素的内存地址是<strong>不连续</strong>的，所以数组操作元素的效率在<strong>寻址上</strong>会比链表要快。请批判看待观点。</p>
+</blockquote>
+<h3 id="PriorityQueue"><a href="#PriorityQueue" class="headerlink" title="PriorityQueue"></a>PriorityQueue</h3><p>PriorityQueue 基于<strong>优先级堆实现</strong>的优先级队列，而堆是采用<strong>数组</strong>实现：</p>
+<p><img src="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/1595727271522-d144468c-041e-4721-a786-9f952f06fafe.png" class="lazyload placeholder" data-srcset="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/1595727271522-d144468c-041e-4721-a786-9f952f06fafe.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image.png"></p>
+<p>文档中的描述告诉我们：该数组中的元素通过传入 <code>Comparator</code> 进行定制排序，如果不传入<code>Comparator</code>时，则按照元素本身<code>自然排序</code>，但要求元素实现了<code>Comparable</code>接口，所以 PriorityQueue <strong>不允许存储 NULL 元素</strong>。</p>
+<p>PriorityQueue 应用场景：元素本身具有优先级，需要按照<strong>优先级处理元素</strong></p>
+<ul>
+<li>例如游戏中的VIP玩家与普通玩家，VIP 等级越高的玩家越先安排进入服务器玩耍，减少玩家流失。</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">    <span class="type">Student</span> <span class="variable">vip1</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Student</span>(<span class="string">&quot;张三&quot;</span>, <span class="number">1</span>);</span><br><span class="line">    <span class="type">Student</span> <span class="variable">vip3</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Student</span>(<span class="string">&quot;洪七&quot;</span>, <span class="number">2</span>);</span><br><span class="line">    <span class="type">Student</span> <span class="variable">vip4</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Student</span>(<span class="string">&quot;老八&quot;</span>, <span class="number">4</span>);</span><br><span class="line">    <span class="type">Student</span> <span class="variable">vip2</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Student</span>(<span class="string">&quot;李四&quot;</span>, <span class="number">1</span>);</span><br><span class="line">    <span class="type">Student</span> <span class="variable">normal1</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Student</span>(<span class="string">&quot;王五&quot;</span>, <span class="number">0</span>);</span><br><span class="line">    <span class="type">Student</span> <span class="variable">normal2</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Student</span>(<span class="string">&quot;赵六&quot;</span>, <span class="number">0</span>);</span><br><span class="line">    <span class="comment">// 根据玩家的 VIP 等级进行降序排序</span></span><br><span class="line">    PriorityQueue&lt;Student&gt; queue = <span class="keyword">new</span> <span class="title class_">PriorityQueue</span>&lt;&gt;((o1, o2) -&gt;  o2.getScore().compareTo(o1.getScore()));</span><br><span class="line">    queue.add(vip1);queue.add(vip4);queue.add(vip3);</span><br><span class="line">    queue.add(normal1);queue.add(normal2);queue.add(vip2);</span><br><span class="line">    <span class="keyword">while</span> (!queue.isEmpty()) &#123;</span><br><span class="line">        <span class="type">Student</span> <span class="variable">s1</span> <span class="operator">=</span> queue.poll();</span><br><span class="line">        System.out.println(s1.getName() + <span class="string">&quot;进入游戏; &quot;</span> + <span class="string">&quot;VIP等级: &quot;</span> + s1.getScore());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"> <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">class</span> <span class="title class_">Student</span> <span class="keyword">implements</span> <span class="title class_">Comparable</span>&lt;Student&gt; &#123;</span><br><span class="line">     <span class="keyword">private</span> String name;</span><br><span class="line">     <span class="keyword">private</span> Integer score;</span><br><span class="line">     <span class="keyword">public</span> <span class="title function_">Student</span><span class="params">(String name, Integer score)</span> &#123;</span><br><span class="line">         <span class="built_in">this</span>.name = name;</span><br><span class="line">         <span class="built_in">this</span>.score = score;</span><br><span class="line">     &#125;</span><br><span class="line">     <span class="meta">@Override</span></span><br><span class="line">     <span class="keyword">public</span> <span class="type">int</span> <span class="title function_">compareTo</span><span class="params">(Student o)</span> &#123;</span><br><span class="line">         <span class="keyword">return</span> <span class="built_in">this</span>.score.compareTo(o.getScore());</span><br><span class="line">     &#125;</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+
+<p>执行上面的代码可以得到下面这种有趣的结果，可以看到<code>氪金</code>使人带来快乐。</p>
+<img src="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/1595727945968-768b45bb-96dc-4850-8759-f07776107a23.png" class="lazyload placeholder" data-srcset="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/1595727945968-768b45bb-96dc-4850-8759-f07776107a23.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image.png" style="zoom:67%;" />
+
+<p>VIP 等级越高（优先级越高）就越优先安排进入游戏（优先处理），类似这种有优先级的场景还有非常多，各位可以发挥自己的想象力。</p>
+<p>PriorityQueue 总结：</p>
+<ul>
+<li><p>PriorityQueue 是基于<strong>优先级堆</strong>实现的优先级队列，而堆是用<strong>数组</strong>维护的</p>
+</li>
+<li><p>PriorityQueue 适用于<strong>元素按优先级处理</strong>的业务场景，例如用户在请求人工客服需要排队时，根据用户的<strong>VIP等级</strong>进行 <code>插队</code> 处理，等级越高，越先安排客服。</p>
+</li>
+</ul>
+<p>章节结束各集合总结：（以 JDK1.8 为例）</p>
+<table>
+<thead>
+<tr>
+<th align="left">数据类型</th>
+<th align="left">插入、删除时间复杂度</th>
+<th align="left">查询时间复杂度</th>
+<th align="left">底层数据结构</th>
+<th align="left">是否线程安全</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">Vector</td>
+<td align="left">O(N)</td>
+<td align="left">O(1)</td>
+<td align="left">数组</td>
+<td align="left">是（已淘汰）</td>
+</tr>
+<tr>
+<td align="left">ArrayList</td>
+<td align="left">O(N)</td>
+<td align="left">O(1)</td>
+<td align="left">数组</td>
+<td align="left">否</td>
+</tr>
+<tr>
+<td align="left">LinkedList</td>
+<td align="left">O(1)</td>
+<td align="left">O(N)</td>
+<td align="left">双向链表</td>
+<td align="left">否</td>
+</tr>
+<tr>
+<td align="left">HashSet</td>
+<td align="left">O(1)</td>
+<td align="left">O(1)</td>
+<td align="left">数组+链表+红黑树</td>
+<td align="left">否</td>
+</tr>
+<tr>
+<td align="left">TreeSet</td>
+<td align="left">O(logN)</td>
+<td align="left">O(logN)</td>
+<td align="left">红黑树</td>
+<td align="left">否</td>
+</tr>
+<tr>
+<td align="left">LinkedHashSet</td>
+<td align="left">O(1)</td>
+<td align="left">O(1)~O(N)</td>
+<td align="left">数组 + 链表 + 红黑树</td>
+<td align="left">否</td>
+</tr>
+<tr>
+<td align="left">ArrayDeque</td>
+<td align="left">O(N)</td>
+<td align="left">O(1)</td>
+<td align="left">数组</td>
+<td align="left">否</td>
+</tr>
+<tr>
+<td align="left">PriorityQueue</td>
+<td align="left">O(logN)</td>
+<td align="left">O(logN)</td>
+<td align="left">堆（数组实现）</td>
+<td align="left">否</td>
+</tr>
+<tr>
+<td align="left">HashMap</td>
+<td align="left">O(1) ~ O(N)</td>
+<td align="left">O(1) ~ O(N)</td>
+<td align="left">数组+链表+红黑树</td>
+<td align="left">否</td>
+</tr>
+<tr>
+<td align="left">TreeMap</td>
+<td align="left">O(logN)</td>
+<td align="left">O(logN)</td>
+<td align="left">数组+红黑树</td>
+<td align="left">否</td>
+</tr>
+<tr>
+<td align="left">HashTable</td>
+<td align="left">O(1) &#x2F; O(N)</td>
+<td align="left">O(1) &#x2F; O(N)</td>
+<td align="left">数组+链表</td>
+<td align="left">是（已淘汰）</td>
+</tr>
+</tbody></table>
+<h2 id="文末总结"><a href="#文末总结" class="headerlink" title="文末总结"></a>文末总结</h2><p>这一篇文章对各个集合都有些<code>点到即止</code>的味道，此文的目的是对整个集合框架有一个较为整体的了解，分析了最常用的集合的相关特性，以及某些特殊集合的应用场景例如<code>TreeSet</code>、<code>TreeMap</code>这种可定制排序的集合。</p>
+<ul>
+<li><p><code>Collection</code> 接口提供了整个集合框架<strong>最通用</strong>的增删改查以及集合自身操作的抽象方法，让子类去实现</p>
+</li>
+<li><p><code>Set</code> 接口决定了它的子类都是<strong>无序、无重复元素</strong>的集合，其主要实现有HashSet、TreeSet、LinkedHashSet。</p>
+<ul>
+<li><code>HashSet</code> 底层采用 <code>HashMap</code> 实现，而 <code>TreeSet</code> 底层使用 <code>TreeMap</code> 实现，大部分 Set 集合的操作都会转换为 Map 的操作，TreeSet 可以将元素按照规则进行<strong>排序</strong>。</li>
+</ul>
+</li>
+<li><p><code>List</code> 接口决定了它的子类都是<strong>有序、可存储重复元素</strong>的集合，常见的实现有 ArrayList，LinkedList，Vector</p>
+<ul>
+<li><code>ArrayList</code> 使用<strong>数组</strong>实现，而 LinkedList 使用<strong>链表</strong>实现，所以它们两个的使用场景几乎是相反的，<strong>频繁查询</strong>的场景使用 ArrayList，而<strong>频繁插入删除</strong>的场景最好使用 LinkedList</li>
+<li><code>LinkedList</code> 和 <code>ArrayDeque</code> 都可用于<strong>双端队列</strong>，而 <em>Josh Bloch and Doug Lea</em> 认为 <code>ArrayDeque</code> 具有比 <code>LinkedList</code> 更好的性能，<code>ArrayDeque</code>使用<strong>数组</strong>实现双端队列，<code>LinkedList</code>使用<strong>链表</strong>实现双端队列。</li>
+</ul>
+</li>
+<li><p><code>Queue</code> 接口定义了队列的基本操作，子类集合都会拥有队列的特性：<strong>先进先出</strong>，主要实现有：LinkedList，ArrayDeque</p>
+<ul>
+<li><code>PriorityQueue</code> 底层使用<strong>二叉堆</strong>维护的优先级队列，而二叉堆是由<strong>数组</strong>实现的，它可以按照元素的优先级进行排序，<strong>优先级越高的元素，排在队列前面，优先被弹出处理</strong>。</li>
+</ul>
+</li>
+<li><p><code>Map</code>接口定义了该种集合类型是以<code>&lt;key,value&gt;</code>键值对形式保存，其主要实现有：HashMap，TreeMap，LinkedHashMap，Hashtable</p>
+<ul>
+<li>LinkedHashMap 底层多加了一条双向链表，设置<code>accessOrder</code>为<code>true</code>并重写方法则可以实现<code>LRU</code>缓存</li>
+<li>TreeMap 底层采用数组+红黑树实现，集合内的元素默认按照自然排序，也可以传入<code>Comparator</code>定制排序</li>
+</ul>
+</li>
+</ul>
+<p>看到这里非常不容易，感谢你愿意阅读我的文章，希望能对你有所帮助，你可以参考着文末总结的顺序，每当我提到一个集合时，回想它的重要知识点是什么，主要就是<code>底层数据结构</code>，<code>线程安全性</code>，<code>该集合的一两个特有性质</code>，只要能够回答出来个大概，我相信之后运用这些数据结构，你能够熟能生巧。</p>
+<p>本文对整个集合体系的所有常用的集合类都分析了，这里并没有对集合内部的实现深入剖析，我想先从最宏观的角度让大家了解每个集合的的作用，应用场景，以及简单的对比，之后会抽时间对常见的集合进行源码剖析，尽情期待，感谢阅读！</p>
+
+      </div>
+      <div class="post-tags-categories">
+        
+        <div class="tags">
+          
+            <a href="/tags/Java/" class="">
+              Java
+            </a>
+          
+            <a href="/tags/Java-Basic/" class="">
+              Java-Basic
+            </a>
+          
+        </div>
+        
+      </div>
+      
+        <div class="copyright">
+  <ul class="post-copyright">
+    <li class="post-copyright-author">
+    <strong>author:  </strong>John Doe</a>
+    </li>
+    <li class="post-copyright-link">
+    <strong>link:  </strong>
+    <a href="/2022/05/03/超全Java集合框架讲解/" target="_blank" title="超全Java集合框架讲解">http://example.com/2022/05/03/超全Java集合框架讲解/</a>
+    </li>
+    <li class="post-copyright-license">
+      <strong>Copyright notice:   </strong>
+      All articles on this website, unless otherwise stated, adopt <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">CC BY-NC-ND 4.0</a>
+      reprint policy. If reproduced, please indicate source!
+    </li>
+  </ul>
+<div>
+      
+    </article>
+    <!-- 上一篇文章和下一篇文章 -->
+    
+      <!-- 文章详情页的上一页和下一页 -->
+<div class="post-nav">
+
+
+
+  
+  <div class="post-nav-prev post-nav-item">
+    <div class="post-nav-img" style="background-size: cover; 
+      background-position: center center;">
+      <img class="lazyload lazyload placeholder" src="/medias/3.jpg" class="lazyload placeholder" data-srcset="/medias/3.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="">
+    </div>
+    <a href="/2022/05/03/Java%E4%B8%ADComparable-%E5%92%8C-Comparator%E7%9A%84%E7%90%86%E8%A7%A3/" class="post-nav-link">
+      <div class="title">
+        <i class="fas fa-angle-left"></i> Prev:
+        <div class="title-text">Java中Comparable 和 Comparator的理解</div>
+      </div>
+      
+      <!-- <div class="content">
+        Java中Comparable 和 Comparator的理解
+Comparable 和 Comparator的理解
+对
+      </div> -->
+    </a>
+  </div>
+
+
+
+  
+  <div class="post-nav-next post-nav-item">
+    <div class="post-nav-img" style="background-size: cover; 
+      background-position: center center;">
+      <img class="lazyload lazyload placeholder" src="/medias/9.jpg" class="lazyload placeholder" data-srcset="/medias/9.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" src="" alt="">
+    </div>
+    <a href="/2022/05/03/Java%E7%BB%86%E6%95%B0%E6%B5%85%E6%8B%B7%E8%B4%9D%E5%92%8C%E6%B7%B1%E6%8B%B7%E8%B4%9D/" class="post-nav-link">
+      <div class="title">
+        Next: <i class="fas fa-angle-right"></i>
+        <div class="title-text">Java细数浅拷贝和深拷贝</div>
+      </div>
+      <!-- <div class="content">
+        细数浅拷贝和深拷贝Java 对象拷贝是为对象赋值的一种方式，简单来说就是创建一个和原对象相同的对象，新创建的对象是原对象
+      </div> -->
+    </a>
+  </div>
+
+</div>
+
+    
+    
+
+    <!-- 打赏 -->
+    
+      <div id="appDonate" class="post-donate">
+  <div id="donate_board" class="donate_bar center" ref="donate">
+    <a id="btn_donate" class="btn_donate" href="javascript:;" title="打赏" @click="showDialogDrawer()"></a>
+  </div>
+  <transition name="fade">
+    <div 
+      class="donate-box-mask"
+      v-cloak 
+      v-show="visible"
+      @click="cancelDialogDrawer()"
+    >
+    </div>
+  </transition>
+  <transition name="bounce">
+    <div class="donate-box" v-cloak v-show="visible">
+      <div class="donate-box_close">
+        <i class="fas fa-times" aria-hidden="true" @click="cancelDialogDrawer" pointer></i>
+      </div>
+      <div class="donate-box_title">
+        <h4>
+          你的赏识是我前进的动力
+        </h4>
+      </div>
+      <div class="donate-box_tab">
+        <div class="Alipay" pointer :class="{'active': tabActive === 'Alipay'}" @click="changeTabActive('Alipay')">
+          支付宝
+        </div>
+        <div class="WeChatpay" pointer :class="{'active': tabActive === 'WeChatpay'}" @click="changeTabActive('WeChatpay')">
+          微信
+        </div>
+      </div>
+      <div class="donate-box_img">
+        <div class="AlipayImg" v-show="tabActive === 'Alipay'">
+          <img src="/medias/1.jpg" class="lazyload placeholder" data-srcset="/medias/1.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="支付宝打赏" />
+        </div> 
+        <div class="WeChatpayImg" v-show="tabActive === 'WeChatpay'">
+          <img src="/medias/2.jpg" class="lazyload placeholder" data-srcset="/medias/2.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="微信打赏" />
+        </div>
+      </div>
+    </div>
+  </transition>
+</div>
+
+<script>
+  var body = document.body || document.documentElement || window;
+  var vm = new Vue({
+    el: '#appDonate',
+    data: {
+      visible: false,
+      tabActive: 'Alipay',
+      top: 0,
+    },
+    computed: {
+    },
+    mounted() {
+    },
+    methods: {
+      showDialogDrawer() {
+        this.visible = true;
+        // 防止页面滚动，只能让弹框滚动
+        // function getScroll() {
+        //   return {
+        //     left: window.pageXOffset || document.documentElement.scrollLeft || document.body.scrollLeft || 0,
+        //     top: window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0
+        //   };
+        // }
+        this.top = $(document).scrollTop() // or getScroll().top
+        // console.log('aa', $('.main-content'));
+        body.style.cssText = 'overflow: hidden;';
+      },
+      cancelDialogDrawer() {
+        this.visible = false;
+        body.removeAttribute('style');
+        $(document).scrollTop(this.top)
+      },
+      changeTabActive(name) {
+        this.tabActive = name;
+      }
+    },
+    created() {}
+  })
+</script>
+    
+
+    <!-- 分享 -->
+    
+      <!-- https://github.com/overtrue/share.js -->
+<!-- 文章详情页的分享 -->
+<div class="social-share" data-sites="twitter,facebook,google,qq,qzone,wechat,weibo,douban,linkedin" data-wechat-qrcode-helper="<p>微信扫一扫即可分享！</p>"></div>
+
+<script src="/js/shareJs/social-share.min.js"></script>
+</script>
+
+<style>
+  .social-share {
+    margin: 20px 0;
+  }
+</style>
+
+
+    
+    
+    <!-- 评论 -->
+    <!-- 评论 -->
+
+  <div id="myComment">
+    
+      <div id="gitment-container"></div>
+
+    
+  </div>
+
+<!-- comment script in themes\hexo-theme-bamboo\layout\_partial\scripts\index.ejs -->
+
+
+  </div>
+
+  <!-- 目录 -->
+  <!-- 文章详情页右侧目录 -->
+
+  <div class="toc-aside">
+    <div class="toc-main">
+      <div class="toc-aside-title">
+        <i class="fas fa-list-ul" aria-hidden="true"></i><span>catalog</span>
+        
+          <div class="toc-open-close">catalog</div>
+        
+      </div>
+      <div class="toc-content">
+        <div class="toc"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 手机端目录按钮 -->
+  <div id="toc-mobile-btn">
+    <i class="fas fa-list-ul" aria-hidden="true"></i>
+  </div>
+
+
+<script>
+  function closeToc(init) {
+    $(".toc-aside").css({'width': 0, 'padding': 0, 'transition': init ?  'noe' : 'width 0.3s' });
+    $(".toc-content").css({'width': 0});
+    $(".toc-aside-title span, .toc-aside-title i").css({'display': 'none'});
+    $(".main-content").css({'width': '75%', 'margin-left': 'auto', 'margin-right': 'auto',});
+  };
+  function openToc() {
+    $(".main-content").css({'width': '65%', 'margin-right': '10px', 'margin-left': 'calc(35% - 350px)'});
+    $(".toc-aside").css({'width': '300px', 'padding': '0 10px', 'transition': 'width 0.3s'});
+    $(".toc-content").css({'width': '300px'});
+    $(".toc-aside-title span, .toc-aside-title i").css({'display': 'inline-block'});
+  }
+  function openBtnClickFn () {
+    let openOrCloseBtn = $('.toc-aside .toc-aside-title .toc-open-close');
+    let open = eval('' || 'true');
+    openOrCloseBtn.click(function() {
+      if (open) {
+        closeToc();
+        open = false;
+      } else {
+        openToc();
+        open = true;
+      }
+    });
+  };
+  openBtnClickFn();
+  initCloseTocWidth(true);
+
+  function initCloseTocWidth(init) {
+    if (window.innerWidth >= 992) {
+      let isClose = false;
+      isClose && closeToc(init)
+    }
+  }
+
+  document.addEventListener('pjax:complete', function () {
+    $(".toc-aside").css({'transition': 'no'});
+  })
+  document.addEventListener('pjax:complete', function () {
+    openBtnClickFn();
+  })
+  
+</script>
+
+  <!-- 图片放大 Wrap images with fancybox support -->
+  <script src="/js/wrapImage.js"></script>
+</div>
+
+<!-- 文章详情页背景图 -->
+<div id="appBgSwiper" style="position: fixed;left: 0;top: 0;width: 100%;height: 100%;z-index: -2;"
+	:style="{'background-color': bgColor ? bgColor : 'transparent'}">
+	<transition-group tag="ul" :name="names">
+		<li v-for='(image,index) in img' :key='index' v-show="index === mark" class="bg-swiper-box">
+			<img :src="image" class="bg-swiper-img no-lazy">
+		</li>
+	</transition-group>
+</div>
+<script>
+	var vm = new Vue({
+		el: '#appBgSwiper',
+		data: {
+			names: '' || 'fade' || 'fade', // translate-fade fade
+			mark: 0,
+			img: [],
+			bgColor: '',
+			time: null
+		},
+		methods: {   //添加方法
+			change(i, m) {
+				if (i > m) {
+					// this.names = 'fade';
+				} else if (i < m) {
+					// this.names = 'fade';
+				} else {
+					return;
+				}
+				this.mark = i;
+			},
+			prev() {
+				// this.names = 'fade';
+				this.mark--;
+				if (this.mark === -1) {
+					this.mark = 3;
+					return
+				}
+			},
+			next() {
+				// this.names = 'fade';
+				this.mark++;
+				if (this.mark === this.img.length) {
+					this.mark = 0;
+					return
+				}
+			},
+			autoPlay() {
+				// this.names = 'fade';
+				this.mark++;
+				if (this.mark === this.img.length) {
+					this.mark = 0;
+					return
+				}
+			},
+			play() {
+				let bgImgDelay = '' || '180000'
+				let delay = parseInt(bgImgDelay) || 180000;
+				this.time = setInterval(this.autoPlay, delay);
+			},
+			enter() {
+				clearInterval(this.time);
+			},
+			leave() {
+				this.play();
+			}
+		},
+		created() {
+			this.play()
+		},
+		beforeDestroy() {
+			clearInterval(this.time);
+		},
+		mounted() {
+			let prop = '' || '';
+			let isImg = prop.includes('.bmp') || prop.includes('.jpg') || prop.includes('.png') || prop.includes('.tif') || prop.includes('.gif') || prop.includes('.pcx') || prop.includes('.tga') || prop.includes('.exif') || prop.includes('.fpx') || prop.includes('.psd') || prop.includes('.cdr') || prop.includes('.pcd') || prop.includes('.dxf') || prop.includes('.ufo') || prop.includes('.eps') || prop.includes('.ai') || prop.includes('.raw') || prop.includes('.WMF') || prop.includes('.webp') || prop.includes('.jpeg') || prop.includes('http://') || prop.includes('https://')
+			if (isImg) {
+				let img = prop.split(',');
+				let configRoot = '/'
+				let arrImg = [];
+				img.forEach(el => {
+					var Expression = /http(s)?:\/\/([\w-]+\.)+[\w-]+(\/[\w- .\/?%&=]*)?/;
+					var objExp = new RegExp(Expression);
+
+					if (objExp.test(el)) {
+						// http or https
+						arrImg.push(el);
+					} else {
+						// 非http or https开头
+						// 本地文件
+						let firstStr = el.charAt(0);
+						if (firstStr == '/') {
+							el = el.substr(1); // 删除第一个字符 '/',因为 configRoot最后一个字符为 /
+						}
+						el = configRoot + el;
+						arrImg.push(el);
+					}
+				})
+				this.img = arrImg;
+			} else {
+				this.bgColor = prop;
+			}
+		}
+	})
+</script>
+
+<style>
+	.bg-swiper-box {
+		position: absolute;
+		display: block;
+		width: 100%;
+		height: 100%;
+	}
+
+	.bg-swiper-img {
+		object-fit: cover;
+		width: 100%;
+		height: 100%;
+	}
+</style>
+
+
+
+
+  <script>
+  function loadMermaid() {
+    if (document.getElementsByClassName('mermaid').length) {
+      if (window.mermaidJsLoad) mermaid.init()
+      else {
+        loadScript('https://unpkg.com/mermaid/dist/mermaid.min.js').then(() => {
+          window.mermaidJsLoad = true
+          mermaid.initialize({
+            theme: 'default',
+          })
+          if ('true') {
+            mermaid.init();
+          }
+        })
+      }
+    }
+  };
+  document.addEventListener("DOMContentLoaded", function () {
+    loadMermaid();
+  })
+
+  document.addEventListener('pjax:complete', function () {
+    loadMermaid();
+  })
+  
+</script>
+
+
+      </main>
+    </div>
+
+    <!-- 页脚 -->
+    
+  
+  
+    <!-- 底部鱼儿跳动效果，依赖于jquery-->
+<div id="j-fish-skip" style=" position: relative;height: 153px;width: auto;"></div>
+<script>
+  var RENDERER = {
+    POINT_INTERVAL: 5,
+    FISH_COUNT: 3,
+    MAX_INTERVAL_COUNT: 50,
+    INIT_HEIGHT_RATE: .5,
+    THRESHOLD: 50,
+    FISH_COLOR: '',
+    init: function () {
+      this.setFishColor(); this.setParameters(), this.reconstructMethods(), this.setup(), this.bindEvent(), this.render()
+    },
+    setFishColor: function () {
+      let isDark = JSON.parse(localStorage.getItem('dark')) || JSON.parse('false');
+      if (isDark) {
+        this.FISH_COLOR = '#222'; // 暗黑色，有时间把这整成一个变量
+      } else {
+        this.FISH_COLOR = '' || '#42b983';
+      }
+    },
+    setParameters: function () {
+      this.$window = $(window), this.$container = $("#j-fish-skip"), this.$canvas = $("<canvas />"), this.context = this.$canvas.appendTo(this.$container).get(0).getContext("2d"), this.points = [], this.fishes = [], this.watchIds = []
+    },
+    createSurfacePoints: function () {
+      var t = Math.round(this.width / this.POINT_INTERVAL);
+      this.pointInterval = this.width / (t - 1), this.points.push(new SURFACE_POINT(this, 0));
+      for (var i = 1; i < t; i++) {
+        var e = new SURFACE_POINT(this, i * this.pointInterval),
+          h = this.points[i - 1];
+        e.setPreviousPoint(h), h.setNextPoint(e), this.points.push(e)
+      }
+    },
+    reconstructMethods: function () {
+      this.watchWindowSize = this.watchWindowSize.bind(this), this.jdugeToStopResize = this.jdugeToStopResize.bind(this), this.startEpicenter = this.startEpicenter.bind(this), this.moveEpicenter = this.moveEpicenter.bind(this), this.reverseVertical = this.reverseVertical.bind(this), this.render = this.render.bind(this)
+    },
+    setup: function () {
+      this.points.length = 0, this.fishes.length = 0, this.watchIds.length = 0, this.intervalCount = this.MAX_INTERVAL_COUNT, this.width = this.$container.width(), this.height = this.$container.height(), this.fishCount = this.FISH_COUNT * this.width / 500 * this.height / 500, this.$canvas.attr({
+        width: this.width,
+        height: this.height
+      }), this.reverse = !1, this.fishes.push(new FISH(this)), this.createSurfacePoints()
+    },
+    watchWindowSize: function () {
+      this.clearTimer(), this.tmpWidth = this.$window.width(), this.tmpHeight = this.$window.height(), this.watchIds.push(setTimeout(this.jdugeToStopResize, this.WATCH_INTERVAL))
+    },
+    clearTimer: function () {
+      for (; this.watchIds.length > 0;) clearTimeout(this.watchIds.pop())
+    },
+    jdugeToStopResize: function () {
+      var t = this.$window.width(),
+        i = this.$window.height(),
+        e = t == this.tmpWidth && i == this.tmpHeight;
+      this.tmpWidth = t, this.tmpHeight = i, e && this.setup()
+    },
+    bindEvent: function () {
+      this.$window.on("resize", this.watchWindowSize), this.$container.on("mouseenter", this.startEpicenter), this.$container.on("mousemove", this.moveEpicenter)
+    },
+    getAxis: function (t) {
+      var i = this.$container.offset();
+      return {
+        x: t.clientX - i.left + this.$window.scrollLeft(),
+        y: t.clientY - i.top + this.$window.scrollTop()
+      }
+    },
+    startEpicenter: function (t) {
+      this.axis = this.getAxis(t)
+    },
+    moveEpicenter: function (t) {
+      var i = this.getAxis(t);
+      this.axis || (this.axis = i), this.generateEpicenter(i.x, i.y, i.y - this.axis.y), this.axis = i
+    },
+    generateEpicenter: function (t, i, e) {
+      if (!(i < this.height / 2 - this.THRESHOLD || i > this.height / 2 + this.THRESHOLD)) {
+        var h = Math.round(t / this.pointInterval);
+        h < 0 || h >= this.points.length || this.points[h].interfere(i, e)
+      }
+    },
+    reverseVertical: function () {
+      this.reverse = !this.reverse;
+      for (var t = 0, i = this.fishes.length; t < i; t++) this.fishes[t].reverseVertical()
+    },
+    controlStatus: function () {
+      for (var t = 0, i = this.points.length; t < i; t++) this.points[t].updateSelf();
+      for (t = 0, i = this.points.length; t < i; t++) this.points[t].updateNeighbors();
+      this.fishes.length < this.fishCount && 0 == --this.intervalCount && (this.intervalCount = this.MAX_INTERVAL_COUNT, this.fishes.push(new FISH(this)))
+    },
+    render: function () {
+      requestAnimationFrame(this.render), this.controlStatus(), this.context.clearRect(0, 0, this.width, this.height), this.context.fillStyle = this.FISH_COLOR;
+      for (var t = 0, i = this.fishes.length; t < i; t++) this.fishes[t].render(this.context);
+      this.context.save(), this.context.globalCompositeOperation = "xor", this.context.beginPath(), this.context.moveTo(0, this.reverse ? 0 : this.height);
+      for (t = 0, i = this.points.length; t < i; t++) this.points[t].render(this.context);
+      this.context.lineTo(this.width, this.reverse ? 0 : this.height), this.context.closePath(), this.context.fill(), this.context.restore()
+    }
+  },
+  SURFACE_POINT = function (t, i) {
+    this.renderer = t, this.x = i, this.init()
+  };
+  SURFACE_POINT.prototype = {
+    SPRING_CONSTANT: .03,
+    SPRING_FRICTION: .9,
+    WAVE_SPREAD: .3,
+    ACCELARATION_RATE: .01,
+    init: function () {
+      this.initHeight = this.renderer.height * this.renderer.INIT_HEIGHT_RATE, this.height = this.initHeight, this.fy = 0, this.force = {
+        previous: 0,
+        next: 0
+      }
+    },
+    setPreviousPoint: function (t) {
+      this.previous = t
+    },
+    setNextPoint: function (t) {
+      this.next = t
+    },
+    interfere: function (t, i) {
+      this.fy = this.renderer.height * this.ACCELARATION_RATE * (this.renderer.height - this.height - t >= 0 ? -1 : 1) * Math.abs(i)
+    },
+    updateSelf: function () {
+      this.fy += this.SPRING_CONSTANT * (this.initHeight - this.height), this.fy *= this.SPRING_FRICTION, this.height += this.fy
+    },
+    updateNeighbors: function () {
+      this.previous && (this.force.previous = this.WAVE_SPREAD * (this.height - this.previous.height)), this.next && (this.force.next = this.WAVE_SPREAD * (this.height - this.next.height))
+    },
+    render: function (t) {
+      this.previous && (this.previous.height += this.force.previous, this.previous.fy += this.force.previous), this.next && (this.next.height += this.force.next, this.next.fy += this.force.next), t.lineTo(this.x, this.renderer.height - this.height)
+    }
+  };
+  var FISH = function (t) {
+    this.renderer = t, this.init()
+  };
+  FISH.prototype = {
+    GRAVITY: .4,
+    init: function () {
+      this.direction = Math.random() < .5, this.x = this.direction ? this.renderer.width + this.renderer.THRESHOLD : -this.renderer.THRESHOLD, this.previousY = this.y, this.vx = this.getRandomValue(4, 10) * (this.direction ? -1 : 1), this.renderer.reverse ? (this.y = this.getRandomValue(1 * this.renderer.height / 10, 4 * this.renderer.height / 10), this.vy = this.getRandomValue(2, 5), this.ay = this.getRandomValue(.05, .2)) : (this.y = this.getRandomValue(6 * this.renderer.height / 10, 9 * this.renderer.height / 10), this.vy = this.getRandomValue(-5, -2), this.ay = this.getRandomValue(-.2, -.05)), this.isOut = !1, this.theta = 0, this.phi = 0
+    },
+    getRandomValue: function (t, i) {
+      return t + (i - t) * Math.random()
+    },
+    reverseVertical: function () {
+      this.isOut = !this.isOut, this.ay *= -1
+    },
+    controlStatus: function (t) {
+      this.previousY = this.y, this.x += this.vx, this.y += this.vy, this.vy += this.ay, this.renderer.reverse ? this.y > this.renderer.height * this.renderer.INIT_HEIGHT_RATE ? (this.vy -= this.GRAVITY, this.isOut = !0) : (this.isOut && (this.ay = this.getRandomValue(.05, .2)), this.isOut = !1) : this.y < this.renderer.height * this.renderer.INIT_HEIGHT_RATE ? (this.vy += this.GRAVITY, this.isOut = !0) : (this.isOut && (this.ay = this.getRandomValue(-.2, -.05)), this.isOut = !1), this.isOut || (this.theta += Math.PI / 20, this.theta %= 2 * Math.PI, this.phi += Math.PI / 30, this.phi %= 2 * Math.PI), this.renderer.generateEpicenter(this.x + (this.direction ? -1 : 1) * this.renderer.THRESHOLD, this.y, this.y - this.previousY), (this.vx > 0 && this.x > this.renderer.width + this.renderer.THRESHOLD || this.vx < 0 && this.x < -this.renderer.THRESHOLD) && this.init()
+    },
+    render: function (t) {
+      t.save(), t.translate(this.x, this.y), t.rotate(Math.PI + Math.atan2(this.vy, this.vx)), t.scale(1, this.direction ? 1 : -1), t.beginPath(), t.moveTo(-30, 0), t.bezierCurveTo(-20, 15, 15, 10, 40, 0), t.bezierCurveTo(15, -10, -20, -15, -30, 0), t.fill(), t.save(), t.translate(40, 0), t.scale(.9 + .2 * Math.sin(this.theta), 1), t.beginPath(), t.moveTo(0, 0), t.quadraticCurveTo(5, 10, 20, 8), t.quadraticCurveTo(12, 5, 10, 0), t.quadraticCurveTo(12, -5, 20, -8), t.quadraticCurveTo(5, -10, 0, 0), t.fill(), t.restore(), t.save(), t.translate(-3, 0), t.rotate((Math.PI / 3 + Math.PI / 10 * Math.sin(this.phi)) * (this.renderer.reverse ? -1 : 1)), t.beginPath(), this.renderer.reverse ? (t.moveTo(5, 0), t.bezierCurveTo(10, 10, 10, 30, 0, 40), t.bezierCurveTo(-12, 25, -8, 10, 0, 0)) : (t.moveTo(-5, 0), t.bezierCurveTo(-10, -10, -10, -30, 0, -40), t.bezierCurveTo(12, -25, 8, -10, 0, 0)), t.closePath(), t.fill(), t.restore(), t.restore(), this.controlStatus(t)
+    }
+  }, $(function () {
+    RENDERER.init()
+    $('.dark').click(function () {
+      setTimeout(() => {
+        RENDERER.setFishColor();
+        RENDERER.context.fill();
+      });
+    })
+  });
+</script>
+  
+  <div class="footer bg-color">
+    <div class="footer-main">
+      
+        
+          <div class="link">
+            
+          </div>
+        
+      
+        
+          <div class="footer-copyright">
+            <p>Copyright © 2019 - 2020 <a target="_blank" rel="noopener" href="https://github.com/yuang01">yuang01</a> | Powered by <a target="_blank" rel="noopener" href="https://hexo.io/zh-cn/docs/">Hexo</a> | Theme <a target="_blank" rel="noopener" href="https://github.com/yuang01/theme">Bamboo</a> </p>
+
+          </div>
+        
+      
+        
+          
+            <!-- 不蒜子统计 -->
+            <!-- 不蒜子统计 -->
+<span id="busuanzi_container_site_pv">
+      <i class="fas fa-eye" aria-hidden="true"></i>Total visits：<span id="busuanzi_value_site_pv"></span> times
+</span>
+<span class="post-meta-divider">|</span>
+<span id="busuanzi_container_site_uv" style='display:none'>
+      <i class="fas fa-users" aria-hidden="true"></i>Number of visitors：<span id="busuanzi_value_site_uv"></span> people
+</span>
+
+          
+        
+      
+        
+          <div class="footer-custom">
+            
+          </div>
+        
+      
+    </div>
+  </div>
+
+
+
+    <!-- 渲染暗黑按钮 -->
+    
+      <div class="dark">
+  <div class="dark-content">
+    <i class="fas fa-moon" aria-hidden="true"></i>
+    <!-- <span>关灯</span> -->
+  </div>
+  
+</div>
+
+<script>
+  $(function() {
+    let isDark = JSON.parse(localStorage.getItem('dark'))  || JSON.parse('false');
+    if (isDark) {
+      $(".dark-content").replaceWith(
+          `
+          <div class='dark-content'>
+            <i class="fas fa-lightbulb" aria-hidden="true"></i>
+          </div>
+          `
+        );
+    }
+    $('.dark').click(function() {
+      if ($(document.body).is('.darkModel')) {
+        $(document.body).removeClass('darkModel');
+        localStorage.setItem('dark', false);
+        $(".dark-content").replaceWith(
+          `
+          <div class='dark-content'>
+            <i class="fas fa-moon" aria-hidden="true"></i>
+          </div>
+          `
+        );
+      } else {
+        $(document.body).addClass('darkModel');
+        localStorage.setItem('dark', true);
+        $(".dark-content").replaceWith(
+          `
+          <div class='dark-content'>
+            <i class="fas fa-lightbulb" aria-hidden="true"></i>
+          </div>
+          `
+        );
+      }
+    })
+  })
+</script>
+    
+    <!-- 渲染回到顶部按钮 -->
+    
+      <div class="goTop top-btn-color" pointer>
+  <i class="fas fa-arrow-up" aria-hidden="true"></i>
+</div>
+<script src="/js/goTop.js"></script>
+
+    
+    <!-- 渲染左下角音乐播放器 -->
+    
+      <link rel="stylesheet" href="/js/aplayer/APlayer@1.10.1.min.css">
+<style>
+.aplayer .aplayer-lrc p {
+  
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 16px !important;
+}
+
+.aplayer .aplayer-lrc p.aplayer-lrc-current {
+  
+  font-size: 15px;
+  color: #42b983;
+}
+
+
+.aplayer.aplayer-fixed.aplayer-narrow .aplayer-body {
+  left: -66px !important;
+}
+
+.aplayer.aplayer-fixed.aplayer-narrow .aplayer-body:hover {
+  left: 0px !important;
+}
+
+
+</style>
+<meting-js  
+  class=""
+  server="tencent"
+  type="playlist"
+  id="8062553743"
+  fixed='true'
+  autoplay='false'
+  theme='#42b983'
+  loop='all'
+  order='random'
+  preload='auto'
+  volume='0.7'
+  list-folded='true'
+>
+</meting-js>
+
+<!-- <style>
+  #aplayer {
+    position: fixed;
+    left: 0;
+    bottom: 300px;
+  }
+</style> -->
+<script src="https://unpkg.com/aplayer@1.10.1/dist/APlayer.min.js"></script>
+<script src="https://unpkg.com/meting@2/dist/Meting.min.js"></script>
+    
+
+    <!-- 图片放大 -->
+    
+      <script src="/js/fancybox/jquery.fancybox.min.js"></script>
+    
+
+    <!-- 百度解析 -->
+    <!-- Baidu Analytics -->
+
+    <!-- Baidu Push -->
+
+<script>
+    (function () {
+        var bp = document.createElement('script');
+        var curProtocol = window.location.protocol.split(':')[0];
+        if (curProtocol === 'https') {
+            bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+        } else {
+            bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+        }
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(bp, s);
+    })();
+</script>
+
+    
+    <!-- 背景彩带 -->
+    
+      <script type="text/javascript" size="100" alpha='0.4' zIndex="-1" src="/js/ribbon.min.js"></script>
+    
+
+    <script src="/js/utils/index.js"></script>
+    <script src="/js/app.js"></script>
+    
+    <!-- 文章目录所需js -->
+<link href="/js/tocbot/tocbot.css" rel="stylesheet">
+<script src="/js/tocbot/tocbot.min.js"></script>
+
+<script>
+  var headerEl = 'h2, h3, h4',  //headers 
+    content = '.post-detail',//文章容器
+    idArr = {};  //标题数组以确定是否增加索引id
+  //add #id
+  var option = {
+    // Where to render the table of contents.
+    tocSelector: '.toc',
+    // Where to grab the headings to build the table of contents.
+    contentSelector: content,
+    // Which headings to grab inside of the contentSelector element.
+    headingSelector: headerEl,
+    scrollSmooth: true,
+    scrollSmoothOffset: -80,
+    headingsOffset: -($(window).height() * 0.4 - 45),
+    positionFixedSelector: '.toc-main',
+    positionFixedClass: 'is-position-fixed',
+    fixedSidebarOffset: 'auto',
+    activeLinkClass: 'is-active-link',
+    // onClick: function (e) {},
+  }
+  if ($('.toc').length > 0) {
+
+    $(content).children(headerEl).each(function () {
+      //去除空格以及多余标点
+      var headerId = $(this).text().replace(/[\s|\~|`|\!|\@|\#|\$|\%|\^|\&|\*|\(|\)|\_|\+|\=|\||\|\[|\]|\{|\}|\;|\:|\"|\'|\,|\<|\.|\>|\/|\?|\：|\，|\。]/g, '');
+
+      headerId = headerId.toLowerCase();
+      if (idArr[headerId]) {
+        //id已经存在
+        $(this).attr('id', headerId + '-' + idArr[headerId]);
+        idArr[headerId]++;
+      }
+      else {
+        //id未存在
+        idArr[headerId] = 1;
+        $(this).attr('id', headerId);
+      }
+    });
+
+    document.addEventListener("DOMContentLoaded", function () {
+      tocbot.init(option);
+      mobileTocClick();
+    });
+
+  }
+
+  window.tocScrollFn = function () {
+    return bamboo.throttle(function () {
+      findHeadPosition();
+    }, 100)()
+  }
+  window.addEventListener('scroll', tocScrollFn);
+
+  const findHeadPosition = function (top) {
+    if ($('.toc-list').length <= 0) {
+      return false;
+    }
+    setTimeout(() => {  // or DOMContentLoaded 
+      autoScrollToc();
+    }, 0);
+  }
+
+  const autoScrollToc = function () {
+    const $activeItem = document.querySelector('.is-active-link');
+    const $cardToc = document.querySelector('.toc-content');
+    const activePosition = $activeItem.getBoundingClientRect().top
+    const sidebarScrollTop = $cardToc.scrollTop
+    if (activePosition > (document.documentElement.clientHeight - 100)) {
+      $cardToc.scrollTop = sidebarScrollTop + 150
+    }
+    if (activePosition < 100) {
+      $cardToc.scrollTop = sidebarScrollTop - 150
+    }
+  }
+
+  document.addEventListener('pjax:send', function () {
+    if ($('.toc').length) {
+      tocbot.destroy();
+    }
+  });
+
+  document.addEventListener('pjax:complete', function () {
+    if ($('.toc').length) {
+      tocbot.init(option);
+      mobileTocClick();
+    }
+  });
+  
+  // 手机端toc按钮点击出现目录
+  const mobileTocClick = function () {
+    const $cardTocLayout = document.getElementsByClassName('toc-aside')[0];
+    const $cardToc = $cardTocLayout.getElementsByClassName('toc-content')[0];
+    let right = '45px';
+    if (window.innerWidth >= 551 && window.innerWidth <= 992) {
+      right = '100px'
+    }
+    const mobileToc = {
+      open: () => {
+        $cardTocLayout.style.cssText = 'animation: toc-open .3s; opacity: 1; right: ' + right
+      },
+
+      close: () => {
+        $cardTocLayout.style.animation = 'toc-close .2s'
+        setTimeout(() => {
+          $cardTocLayout.style.cssText = "opacity:''; animation: ''; right: ''"
+        }, 100)
+      }
+    }
+    document.getElementById('toc-mobile-btn').addEventListener('click', () => {
+      if (window.getComputedStyle($cardTocLayout).getPropertyValue('opacity') === '0') mobileToc.open()
+      else mobileToc.close()
+    })
+
+    $cardToc.addEventListener('click', (e) => {
+      if (window.innerWidth < 992) { // 小于992px的时候
+        mobileToc.close()
+      }
+    })
+  }
+</script>
+
+<style>
+  .is-position-fixed {
+    position: sticky !important;
+    top: 74px;
+  }
+
+  .toc-main ul {
+    counter-reset: show-list;
+  }
+
+  .toc-main ul li::before {
+    content: counter(item)".";
+    display: block;
+    position: absolute;
+    left: 12px;
+    top: 0;
+  }
+</style> 
+
+<!-- 设置导航背景 -->
+<script>
+  let setHeaderClass = () => {
+    const headerMenuTransparent = true;
+    if (!headerMenuTransparent) { return; }
+    const nav = $('#navHeader');
+    const navTop = nav.outerHeight();
+    const winTop = $(window).scrollTop();
+    if(winTop > navTop) {
+      nav.addClass('header-bg-color');
+    }
+    else {
+      nav.removeClass('header-bg-color');
+    }
+  };
+
+  let scrollCollect = () => {
+    return bamboo.throttle(function (e) {
+      setHeaderClass();
+    }, 200)()
+  }
+
+  let initHeaderBg = () => {
+    setHeaderClass();
+  }
+
+  setHeaderClass();
+  window.addEventListener('scroll', scrollCollect);
+
+  document.addEventListener('pjax:send', function () {
+    window.removeEventListener('scroll', scrollCollect)
+  })
+  document.addEventListener('pjax:complete', function () {
+    window.addEventListener('scroll', scrollCollect);
+    setHeaderClass();
+  })
+</script> 
+
+<!-- 渲染issues标签里的内容 -->
+<script>
+  function loadIssuesJS() {
+    if ($(".post-detail").find(".issues-api").length == 0) {
+      return;
+    } 
+    loadScript('/js/issues/index.js');
+  };
+  $(function () {
+    loadIssuesJS();
+  });
+  document.addEventListener('pjax:complete', function () {
+    if (typeof IssuesAPI == "undefined") {
+      loadIssuesJS();
+    }
+  })
+</script>
+
+<!-- 输入框打字特效 -->
+<!-- 输入框打字特效 -->
+
+  <script src="/js/activate-power-mode.js"></script>
+  <script>
+    POWERMODE.colorful = true;  // 打开随机颜色特效
+    POWERMODE.shake = false;    // 关闭输入框抖动
+    document.body.addEventListener('input', POWERMODE);//监听打字事件
+  </script>
+
+
+<!-- markdown代码一键复制功能 -->
+
+  <link rel="stylesheet" href="https://unpkg.com/v-plugs-ayu/lib/ayu.css">
+  <script src="https://unpkg.com/v-plugs-ayu/lib/ayu.umd.min.js"></script>
+  <script src="/js/clipboard/clipboard.min.js"></script>
+  <div id="appCopy">
+  </div>
+  <script data-pjax>
+    var vm = new Vue({
+      el: '#appCopy',
+      data: {
+      },
+      computed: {
+      },
+      mounted() {
+        const that = this;
+        var copy = 'copy';
+        /* code */
+        var initCopyCode = function () {
+          var copyHtml = '';
+          copyHtml += '<button class="btn-copy" data-clipboard-snippet="" style="position:absolute;top:0;right:0;z-index:1;">';
+          copyHtml += '<i class="fas fa-copy"></i><span>' + copy + '</span>';
+          copyHtml += '</button>';
+          $(".post-detail pre").not('.gutter pre').wrap("<div class='codeBox' style='position:relative;width:100%;'></div>")
+          $(".post-detail pre").not('.gutter pre').before(copyHtml);
+          new ClipboardJS('.btn-copy', {
+            target: function (trigger) {
+              return trigger.nextElementSibling;
+            }
+          });
+        }
+        initCopyCode();
+        $('.btn-copy').unbind('click').bind('click', function () {
+          doSomething();
+        })
+        $(document).unbind('keypress').bind('keypress', function (e) {
+          if (e.ctrlKey && e.keyCode == 67) {
+            doSomething();
+          }
+        })
+
+        function doSomething() {
+          that.$notify({
+            title: "成功",
+            content: "代码已复制，请遵守相关授权协议。",
+            type: 'success'
+          })
+        }
+      },
+      methods: {
+      },
+      created() { }
+    })
+  </script>
+  
+
+<!-- 图片懒加载 -->
+<script defer src="https://unpkg.com/vanilla-lazyload@17.1.0/dist/lazyload.min.js"></script>
+<script>
+  // https://www.npmjs.com/package/vanilla-lazyload
+  // Set the options globally
+  // to make LazyLoad self-initialize
+  window.lazyLoadOptions = {
+    elements_selector: ".lazyload",
+    threshold: 0
+  };
+  // Listen to the initialization event
+  // and get the instance of LazyLoad
+  window.addEventListener(
+    "LazyLoad::Initialized",
+    function (event) {
+      window.lazyLoadInstance = event.detail.instance;
+    },
+    false
+  );
+  document.addEventListener('DOMContentLoaded', function () {
+    lazyLoadInstance.update();
+  });
+  document.addEventListener('pjax:complete', function () {
+    lazyLoadInstance.update();
+  });
+</script>
+
+
+<!-- 卡片滚动动画 -->
+   
+
+<!-- 评论所需js -->
+
+  
+    <script type="text/javascript">
+  var utteranceCommon = {};
+
+  function check_utterance() {
+    let isDark = JSON.parse(localStorage.getItem('dark')) || JSON.parse('false');
+    if (isDark) {
+      utteranceCommon.Theme = 'github-dark';
+    } else {
+      utteranceCommon.Theme = 'github-light';
+    }
+
+    return document.getElementById("gitment-container");
+  }
+  comment_el = '#gitment-container';
+  load_utterance = function () {
+    if ($(comment_el).length) {
+      // 匿名函数，防止污染全局变量
+      const HEAD = check_utterance();
+
+      var utterances = document.createElement('script');
+      utterances.type = 'text/javascript';
+      utterances.async = true;
+      utterances.setAttribute('issue-term', 'pathname')
+      utterances.setAttribute('theme', utteranceCommon.Theme)
+      utterances.setAttribute('repo', '')
+      utterances.crossorigin = 'anonymous';
+      utterances.src = 'https://utteranc.es/client.js';
+      // content 是要插入评论的地方
+      document.getElementById('gitment-container').appendChild(utterances);
+
+    }
+  }
+
+  function dark_utterance() {
+    const HEAD = check_utterance();
+    if (!HEAD) return;
+    const message = {
+      type: 'set-theme',
+      theme: utteranceCommon.Theme
+    };
+    const utteranceIframe = document.querySelector('iframe');
+    utteranceIframe.contentWindow.postMessage(message, 'https://utteranc.es');
+  }
+
+  $(document).ready(load_utterance);
+  document.addEventListener('pjax:complete', function () {
+    load_utterance();
+  });
+
+  $('.dark').click(function () {
+    setTimeout(() => {
+      dark_utterance();
+    });
+  })
+
+</script>
+
+<style>
+  .utterances {
+    max-width: inherit !important;
+  }
+</style>
+  
+
+
+<!-- 鼠标点击特效 -->
+<!-- 爱心点击 -->
+
+  
+    <canvas class="fireworks" style="position: fixed;left: 0;top: 0;z-index: 999; pointer-events: none;" ></canvas>
+    <script src="//cdn.bootcss.com/animejs/2.2.0/anime.min.js"></script>
+    <script src="/js/cursor/explosion.min.js"></script>
+  
+
+
+
+
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" data-pjax></script>
+
+
+    <!-- pjax -->
+    
+
+<!-- pjax -->
+
+
+  <script src="/js/pjax@0.2.8/index.js"></script>
+  
+    <!-- 样式位于：source/css/_third-party/pjaxanimate.styl -->
+
+<div class="pjax-animate">
+  
+    <div class="loading-circle"><div id="loader-circle"></div></div>
+    <script>
+      window.ShowLoading = function() {
+        $(".loading-circle").css("display", "block");
+      };
+      window.HideLoading = function() {
+        $(".loading-circle").css("display", "none");
+      }
+    </script>
+  
+	<script>
+    document.addEventListener('pjax:complete', function () {
+      window.HideLoading();
+    })
+    document.addEventListener('pjax:send', function () {
+      window.ShowLoading();
+    })
+    document.addEventListener('pjax:error', function () {
+      window.HideLoading();
+    })
+	</script>
+</div>
+
+  
+
+  <script>
+    var pjax = new Pjax({
+      elements: 'a[href]:not([href^="#"]):not([href="javascript:void(0)"]):not([no-pjax])',   // 拦截正常带链接的 a 标签
+      selectors: ["#pjax-container","title"],                                   // 根据实际需要确认重载区域
+      cacheBust: false,   // url 地址追加时间戳，用以避免浏览器缓存
+      timeout: 5000
+    });
+
+    document.addEventListener('pjax:send', function (e) {
+
+      try {
+        var currentUrl = window.location.pathname;
+        var targetUrl = e.triggerElement.href;
+        var banUrl = [""];
+        if (banUrl[0] != "") {
+          banUrl.forEach(item => {
+            if(currentUrl.indexOf(item) != -1 || targetUrl.indexOf(item) != -1) {
+              window.location.href = targetUrl;
+            }
+          });
+        }
+      } catch (error) {}
+
+      $(window).unbind('resize');
+      $(window).unbind('scroll');
+      $(document).unbind('scroll');
+      $(document).unbind('click');
+      $('body').unbind('click');
+
+    })
+    
+    document.addEventListener('pjax:complete', function () {
+      $('script[data-pjax], .pjax-reload script').each(function () {
+        $(this).parent().append($(this).remove());
+      });
+    });
+
+    document.addEventListener('pjax:error', function (e) {
+      window.location.href = e.triggerElement.href;
+    })
+    
+    // 刷新不从顶部开始
+    document.addEventListener("DOMContentLoaded", function () {
+      history.scrollRestoration = 'auto';
+    })
+  </script>
+
+
+
+  </body>
+</html>

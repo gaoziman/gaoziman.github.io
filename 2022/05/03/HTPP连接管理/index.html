@@ -1,0 +1,1864 @@
+<!DOCTYPE html>
+<html>
+  <!-- meta/link... -->
+  
+
+
+
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport">
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+
+
+  <title>HTPP连接管理 | Hexo</title>
+
+  <link rel="icon" type="image/x-icon, image/vnd.microsoft.icon" href="/favicon.ico">
+  <link rel="stylesheet" href="https://at.alicdn.com/t/font_1911880_c1nvbyezg17.css">
+  <link href="https://unpkg.com/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet">
+  <link href="/js/swiper/swiper@5.4.1.min.css" rel="stylesheet">
+  
+  
+  
+  
+<link rel="stylesheet" href="/css/animate.min.css">
+
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+  
+    
+<link rel="stylesheet" href="/js/fancybox/jquery.fancybox.min.css">
+
+  
+  
+    
+<link rel="stylesheet" href="/js/shareJs/share.min.css">
+
+  
+  <style>
+        @media (max-width: 992px) {
+            #waifu {
+                display: none;
+            }
+        }
+    </style>
+    <script src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
+    <link href="//cdn.bootcss.com/pace/1.0.2/themes/pink/pace-theme-flash.css" rel="stylesheet">
+
+    
+
+    <!-- import link -->
+    
+        
+            
+        
+            
+        
+    
+    <!-- import script -->
+    
+        
+            
+        
+            
+        
+    
+
+<meta name="generator" content="Hexo 6.2.0"></head>
+
+  
+  <!-- 依赖于jquery和vue -->
+  
+    
+<script src="https://unpkg.com/jquery@3.5.1/dist/jquery.min.js"></script>
+
+  
+
+  
+    
+<script src="https://unpkg.com/vue@2.6.11/dist/vue.min.js"></script>
+
+  
+  
+  <body>
+    <!-- 预加载动画 -->
+    <!-- 页面预加载动画 -->
+
+<div id='loader'>
+  <link rel="stylesheet" href="/js/loaded/index.css" >
+  <div class="loading-left-bg"></div>
+  <div class="loading-right-bg"></div>
+  <div class="spinner-box">
+    <div class="configure-border-1">
+      <div class="configure-core"></div>
+    </div>
+    <div class="configure-border-2">
+      <div class="configure-core"></div>
+    </div>
+    <div class="loading-word">loading...</div>
+  </div>
+</div>
+
+<script>
+  var endLoading = function () {
+    document.body.style.overflow = 'auto';
+    document.getElementById('loader').classList.add("loading");
+  }
+  window.addEventListener('DOMContentLoaded',endLoading);
+  
+</script>
+
+    
+    <!-- 判断是否为暗黑风格 -->
+    <!-- 判断是否为黑夜模式 -->
+<script>
+  let isDark = JSON.parse(localStorage.getItem('dark')) || JSON.parse('false');
+
+  if (isDark) {
+    $(document.body).addClass('darkModel');
+  }
+</script>
+
+    <!-- 需要在上面加载的js -->
+    <script>
+  function loadScript(src, cb) {
+    return new Promise(resolve => {
+      setTimeout(function () {
+        var HEAD = document.getElementsByTagName("head")[0] || document.documentElement;
+        var script = document.createElement("script");
+        script.setAttribute("type", "text/javascript");
+        if (cb) {
+          if (JSON.stringify(cb)) {
+            for (let p in cb) {
+              if (p == "onload") {
+                script[p] = () => {
+                  cb[p]()
+                  resolve()
+                }
+              } else {
+                script[p] = cb[p]
+                script.onload = resolve
+              }
+            }
+          } else {
+            script.onload = () => {
+              cb()
+              resolve()
+            };
+          }
+        } else {
+          script.onload = resolve
+        }
+        script.setAttribute("src", src);
+        HEAD.appendChild(script);
+      });
+    });
+  }
+
+  //https://github.com/filamentgroup/loadCSS
+  var loadCSS = function (href, before, media, attributes) {
+    return new Promise(resolve => {
+      setTimeout(function () {
+        var link = document.createElement('link');
+        link.rel = "stylesheet";
+        link.href = src;
+        link.onload = resolve;
+        document.getElementsByTagName("head")[0].appendChild(link);
+      });
+    });
+  };
+
+</script> 
+
+<!-- 轮播图所需要的js -->
+<script src="/js/swiper/swiper.min.js"></script>
+<script src="/js/swiper/vue-awesome-swiper.js"></script>
+<script src="/js/swiper/swiper.animate1.0.3.min.js"></script>
+
+<script type="text/javascript">
+  Vue.use(window.VueAwesomeSwiper)
+</script>
+
+
+  <script src="/js/vue-typed-js/index.js"></script>
+
+
+<!-- 首页的公告滚动插件的js需要重新加载 -->
+<script src="/js/vue-seamless-scroll/index.js"></script>
+
+<!-- 打字机效果js -->
+<script src="https://unpkg.com/typed.js@2.0.11"></script>
+
+
+    <div id="safearea">
+      <main class="main" id="pjax-container">
+        <!-- 头部导航 -->
+        
+<header class="header   " 
+  id="navHeader"
+  style="position: fixed;
+  left: 0; top: 0; z-index: 10;width: 100%;"
+>
+  <div class="header-content">
+    <div class="bars">
+      <div id="appDrawer" class="sidebar-image">
+  <div class="drawer-box-icon">
+    <i class="fas fa-bars" aria-hidden="true" @click="showDialogDrawer"></i>
+  </div>
+  
+  <transition name="fade">
+    <div class="drawer-box_mask" v-cloak style="display: none;" v-show="visible" @click.self="cancelDialogDrawer">
+    </div>
+  </transition>
+  <div class="drawer-box" :class="{'active': visible}">
+    <div class="drawer-box-head bg-color">
+      <img class="drawer-box-head_logo lazyload placeholder" src="/medias/logo.png" class="lazyload placeholder" data-srcset="/medias/logo.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="logo">
+      <h3 class="drawer-box-head_title">Hexo</h3>
+      <h5 class="drawer-box-head_desc"></h5>
+    </div>
+    
+    <div class="drawer-box-content">
+      <ul class="drawer-box-content_menu">
+        
+        
+          <li class="drawer-box-content_item">
+            <a target="_blank" rel="noopener" href="https://github.com/yuang01/hexo-theme-bamboo">
+              <i class="fas fa-github" aria-hidden="true"></i>
+              <span>Github</span>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</div>
+
+<script>
+  var body = document.body || document.documentElement || window;
+  var vm = new Vue({
+    el: '#appDrawer',
+    data: {
+      visible: false,
+      top: 0,
+      openArr: [],
+    },
+    computed: {
+    },
+    mounted() {
+    },
+    methods: {
+      isOpen(index) {
+        if (this.openArr.includes(index)) {
+          return true;
+        } else {
+          return false;
+        }
+      },
+      openOrCloseMenu(curIndex) {
+        const index = this.openArr.indexOf(curIndex);
+        if (index !== -1) {
+          this.openArr.splice(index, 1);
+        } else {
+          this.openArr.push(curIndex);
+        }
+      },
+      showDialogDrawer() {
+        this.visible = true;
+        // 防止页面滚动，只能让弹框滚动
+        this.top = $(document).scrollTop()
+        body.style.cssText = 'width: 100%; height: 100%;overflow: hidden;';
+      },
+      cancelDialogDrawer() {
+        this.visible = false;
+        body.removeAttribute('style');
+        $(document).scrollTop(this.top)
+      }
+    },
+    created() {}
+  })
+</script>
+
+    </div>
+    <div class="blog-title" id="author-avatar">
+      
+        <div class="avatar">
+          <img src="/medias/logo.png" class="lazyload placeholder" data-srcset="/medias/logo.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="logo">
+        </div>
+      
+      <a href="/" class="logo">Hexo</a>
+    </div>
+    <nav class="navbar">
+      <ul class="menu">
+        
+      </ul>
+      
+      
+        <div id="appSearch">
+  <div class="search"  @click="showDialog()"><i class="fas fa-search" aria-hidden="true"></i></div>
+  <transition name="fade">
+    <div class="message-box_wrapper" style="display: none;" v-cloak v-show="dialogVisible" @click.self="cancelDialogVisible()">
+      <div class="message-box animated bounceInDown">
+        <h2>
+          <span>
+            <i class="fas fa-search" aria-hidden="true"></i>
+            <span class="title">Search</span>
+          </span>
+          <i class="fas fa-times close" pointer style="float:right;" aria-hidden="true" @click.self="cancelDialogVisible()"></i>
+        </h2>
+        <form class="site-search-form">
+          <input type="text"
+            placeholder="Please enter keywords"
+            id="local-search-input" 
+            @click="getSearchFile()"
+            class="st-search-input"
+            v-model="searchInput"
+          />
+        </form>
+        <div class="result-wrapper">
+          <div id="local-search-result" class="local-search-result-cls"></div>
+        </div>
+      </div>
+    </div>
+  </transition>
+</div>
+<script src="/js/local_search.js"></script>
+<script>
+  var body = document.body || document.documentElement || window;
+  var vm = new Vue({
+    el: '#appSearch',
+    data: {
+      dialogVisible: false,
+      searchInput: '',
+      top: 0,
+    },
+    computed: {
+    },
+    mounted() {
+      window.addEventListener('pjax:complete', () => {
+        this.cancelDialogVisible();
+      })
+    },
+    methods: {
+      showDialog() {
+        this.dialogVisible = true;
+        // 防止页面滚动，只能让弹框滚动
+        this.top = $(document).scrollTop()
+        body.style.cssText = 'overflow: hidden;';
+      },
+      getSearchFile() {
+        if (!this.searchInput) {
+          getSearchFile("/search.xml");
+        }
+      },
+      cancelDialogVisible() {
+        this.dialogVisible = false;
+        body.removeAttribute('style');
+        $(document).scrollTop(this.top)
+      },
+    },
+    created() {}
+  })
+</script>
+<!-- 解决刷新页面闪烁问题，可以在元素上添加display: none, 或者用vue.extend方法，详情：https://blog.csdn.net/qq_31393401/article/details/81017912 -->
+<!-- 下面是搜索基本写法 -->
+<!-- <script type="text/javascript" id="local.search.active">
+  var inputArea = document.querySelector("#local-search-input");
+  inputArea.onclick   = function(){ getSearchFile(); this.onclick = null }
+  inputArea.onkeydown = function(){ if(event.keyCode == 13) return false }
+</script> -->
+
+      
+
+    </nav>
+  </div>
+  
+    <a target="_blank" rel="noopener" href="https://github.com/yuang01/hexo-theme-bamboo" class="github-corner color-primary" aria-label="View source on GitHub"><svg width="60" height="60" viewBox="0 0 250 250" style="fill:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+  
+  
+</header>
+        <!-- 内容区域 -->
+        
+ <!-- prismjs 代码高亮 -->
+ 
+
+
+<div class="bg-dark-floor" style="position: fixed;left: 0;top: 0;width: 100%;height: 100%;z-index: -1;"></div>
+
+
+  <!-- 文章详情页顶部图片和标题 -->
+
+
+
+
+<div class="post-detail-header" id="thumbnail_canvas" style="background-repeat: no-repeat; background-size: cover; 
+  background-position: center center;position: relative;background-image:url('/medias/3.jpg')">
+  <div class="post-detail-header-mask"></div>
+  <canvas id="header_canvas"style="position:absolute;bottom:0;pointer-events:none;"></canvas>
+  
+  <div class="post-detail-header_info-box">
+    <div class="title-box">
+      <span class="title">
+        HTPP连接管理
+      </span>
+    </div>
+    
+    
+      
+        <span class="post-detail-header_date">
+          <i class="fas fa-calendar"></i> Published in：2022-05-03 |
+        </span>
+      
+
+      
+        <span class="post-detail-header_categories">
+          <i class="iconfont iconbookmark1"></i> category：
+          
+            <a href="/categories/HTTP/" class="post-detail-header_category">
+              HTTP
+            </a>
+          
+        </span>
+      
+
+      
+    
+  </div>
+  
+  
+    <script src="/js/bubble/bubble.js"></script>
+  
+</div>
+
+
+
+
+
+<div class="post-detail-content row justify-position" 
+  style="padding-top: 0px;">
+  <div class="main-content">
+    <article class="post post-detail">
+      <div class="post-content">
+        <h1 id="HTTP-连接管理"><a href="#HTTP-连接管理" class="headerlink" title="HTTP 连接管理"></a>HTTP 连接管理</h1><ul>
+<li><a href="#http-%E8%BF%9E%E6%8E%A5%E7%AE%A1%E7%90%86">HTTP 连接管理</a><ul>
+<li><a href="#%E6%90%AD%E8%BD%BD-http-%E7%9A%84-tcp">搭载 HTTP 的 TCP</a><ul>
+<li><a href="#http-%E6%97%B6%E5%BB%B6%E6%8D%9F%E8%80%97">HTTP 时延损耗</a></li>
+</ul>
+</li>
+<li><a href="#http-%E8%BF%9E%E6%8E%A5%E7%AE%A1%E7%90%86-1">HTTP 连接管理</a><ul>
+<li><a href="#%E5%B9%B6%E8%A1%8C%E8%BF%9E%E6%8E%A5">并行连接</a></li>
+<li><a href="#%E6%8C%81%E4%B9%85%E8%BF%9E%E6%8E%A5">持久连接</a><ul>
+<li><a href="#connection-%E6%A0%87%E5%A4%B4">Connection 标头</a></li>
+<li><a href="#keep-alive-%E4%BD%BF%E7%94%A8%E9%99%90%E5%88%B6%E5%92%8C%E8%A7%84%E5%88%99">Keep-Alive 使用限制和规则</a></li>
+<li><a href="#keep-alive-%E5%92%8C%E5%93%91%E4%BB%A3%E7%90%86%E9%97%AE%E9%A2%98">Keep-Alive 和哑代理问题</a></li>
+<li><a href="#proxy-connection-%E8%A7%A3%E5%86%B3%E5%93%91%E4%BB%A3%E7%90%86">Proxy-Connection 解决哑代理</a></li>
+<li><a href="#http11-%E6%8C%81%E4%B9%85%E8%BF%9E%E6%8E%A5">HTTP&#x2F;1.1 持久连接</a></li>
+</ul>
+</li>
+<li><a href="#%E7%AE%A1%E9%81%93%E5%8C%96%E8%BF%9E%E6%8E%A5">管道化连接</a></li>
+</ul>
+</li>
+<li><a href="#http-%E5%85%B3%E9%97%AD%E8%BF%9E%E6%8E%A5">HTTP 关闭连接</a></li>
+</ul>
+</li>
+</ul>
+<p>熟悉我的小伙伴都知道，我之前肝了本《HTTP 核心总结》的 PDF，这本 PDF 是取自我 HTTP 系列文章的汇总，然而我写的 HTTP 相关内容都是一年前了，我回头看了一下这本 PDF，虽然内容不少，但是很多内容缺少系统性，看起来不爽，这个有悖于我的初心，所以我打算重新搞一搞 HTTP 协议，HTTP 协议对我们程序员来说太重要了，不管你使用的是哪个语言，HTTP 都是你需要知道的重点。</p>
+<p>这不是一篇简单介绍 HTTP 基本概念的文章，如果你对 HTTP 基本概念不是很熟悉，推荐你去读 cxuan 写的关于 HTTP 基础文章 - <a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s?__biz=MzkwMDE1MzkwNQ==&mid=2247496030&idx=1&sn=82f56874f82f372af71e23a8e385f8cd&chksm=c04ae600f73d6f16d707c1d32b00e3f0d47e893c9cf59a2eb60ace418943aeb5c5c679cb27ea&token=2134956547&lang=zh_CN#rd">看完这篇HTTP，跟面试官扯皮就没问题了</a></p>
+<blockquote>
+<p>所以我们假定在做的各位对 HTTP 有一定的了解和认识。</p>
+</blockquote>
+<p>下面开始我们这篇文章。</p>
+<h2 id="搭载-HTTP-的-TCP"><a href="#搭载-HTTP-的-TCP" class="headerlink" title="搭载 HTTP 的 TCP"></a>搭载 HTTP 的 TCP</h2><p>我们大家都知道，HTTP 这个应用层协议是以 TCP 为基础来传输数据的。当你想访问一个资源（资源在网络中就是一个 URL）时，你需要先解析这个资源的 IP 地址和端口号，从而和这个 IP 和端口号所在的服务器建立 TCP 连接，然后 HTTP 客户端发起服务请求（GET）报文，服务器对服务器的请求报文做出响应，等到不需要交换报文时，客户端会关闭连接，下面我用图很好的说明了这个过程。</p>
+<p><img src="https://tva1.sinaimg.cn/large/008i3skNly1gss5l85aedj30ls0koadh.jpg" class="lazyload placeholder" data-srcset="https://tva1.sinaimg.cn/large/008i3skNly1gss5l85aedj30ls0koadh.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20210724171103538"></p>
+<p>上面这幅图很好的说明了 HTTP 从建立连接开始 -&gt; 发起请求报文 -&gt; 关闭连接的全过程，但是上面这个过程还忽略了一个很重要的点，那就是<strong>TCP 建立连接的过程</strong>。</p>
+<p>TCP 建立连接需要经过三次握手，交换三个报文，我相信大家都对这个过程了然于胸了，如果你还不清楚 TCP 建立连接的过程，可以先阅读 cxuan 的这篇文章 <a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s?__biz=MzI0ODk2NDIyMQ==&mid=2247491621&idx=1&sn=78a182f89093ef1cc807bdef21cdcb4d&chksm=e99a1537deed9c2169257574c17877933b68fadd061f371c2f53a50e7f640d52f5f1667c895c&token=554661702&lang=zh_CN#rd">TCP 连接管理</a>。</p>
+<p>由于 HTTP 位于 TCP 的上层，所以 HTTP 的请求 -&gt; 响应过程的时效性（性能）很大程度上取决于底层 TCP 的性能，只有在了解了 TCP 连接的性能之后，才可以更好的理解 HTTP 连接的性能，从而才能够实现高性能的 HTTP 应用程序。</p>
+<blockquote>
+<p>我们通常把一次完整的请求 -&gt; 相应过程称之为 HTTP 事务。</p>
+<p>所以我后面一般会写为 HTTP 事务，你理解怎么回事就好。</p>
+</blockquote>
+<p>我们接下来的重点要先从 TCP 的性能入手。</p>
+<h3 id="HTTP-时延损耗"><a href="#HTTP-时延损耗" class="headerlink" title="HTTP 时延损耗"></a>HTTP 时延损耗</h3><p>再来回顾一下上面的 HTTP 事务的过程，你觉得有哪几个过程会造成 HTTP 事务时延呢？如下图所示</p>
+<p><img src="https://tva1.sinaimg.cn/large/008i3skNly1gssf9wweeaj30jq0910ts.jpg" class="lazyload placeholder" data-srcset="https://tva1.sinaimg.cn/large/008i3skNly1gssf9wweeaj30jq0910ts.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20210724224611391"></p>
+<p>从图中可以看出，主要是有下面这几个因素影响 HTTP 事务的时延</p>
+<ol>
+<li>客户端会根据 URL 确定服务器的 IP 和端口号，这里主要是 DNS 把域名转换为 IP 地址的时延，DNS 会发起 DNS 查询，查询服务器的 IP 地址。</li>
+<li>第二个时延是 TCP 建立连接时会由客户端向服务器发送连接请求报文，并等待服务器回送响应报文的时延。每条新的 TCP 连接建立都会有建立时延。</li>
+<li>一旦连接建立后，客户端就会向服务器请求数据，这个时延主要是服务器从 TCP 连接中读取请求报文，并对请求进行处理的时延。</li>
+<li>服务器会向客户端传输响应报文的时延。</li>
+<li>最后一个时延是 TCP 连接关闭的时延。</li>
+</ol>
+<p>其中最后一点的优化也是本文想要讨论的一个重点。</p>
+<h2 id="HTTP-连接管理-1"><a href="#HTTP-连接管理-1" class="headerlink" title="HTTP 连接管理"></a>HTTP 连接管理</h2><p>试想一个问题，假设一个页面有五个资源（元素），每个资源都需要客户端打开一个 TCP 连接、获取资源、断开连接，而且每个连接都是串行打开的，如下图所示：</p>
+<p><img src="https://tva1.sinaimg.cn/large/008i3skNly1gsurdxw2ptj60kt09875k02.jpg" class="lazyload placeholder" data-srcset="https://tva1.sinaimg.cn/large/008i3skNly1gsurdxw2ptj60kt09875k02.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20210726231625034"></p>
+<p>串行的意思就是，这五个连接必须是有先后顺序，不会出现同时有两个以上的连接同时打开的情况。</p>
+<p>上面五个资源就需要打开五条连接，资源少还好说，CPU 能够处理，如果页面资源达到上百或者更多的时候呢？每个资源还需要单独再打开一条连接吗？这样显然会急剧增加 CPU 的处理压力，造成大量的时延，显然是没有必要的。</p>
+<p>串行还有一个缺点就是，有些浏览器在对象加载完毕之前是无法知道对象的尺寸（size）的，并且浏览器需要对象尺寸信息来将他们放在屏幕中合理的位置上，所以在加载了足够多的对象之前，屏幕是不会显示任何内容的，这就回造成，其实对象一直在加载，但是我们以为浏览器<strong>卡住了</strong>。</p>
+<p>所以，有没有能够优化 HTTP 性能的方式呢？这个问题问得好，当然是有的。</p>
+<h3 id="并行连接"><a href="#并行连接" class="headerlink" title="并行连接"></a>并行连接</h3><p>这是一种最常见的，也是最容易想到的一种连接方式，HTTP 允许客户端打开多条连接，并行执行多个 HTTP 事务，加入并行连接后，整个 HTTP 事务的请求过程是这样的。</p>
+<p><img src="https://tva1.sinaimg.cn/large/008i3skNly1gsvxpbxqh9j30c70lk760.jpg" class="lazyload placeholder" data-srcset="https://tva1.sinaimg.cn/large/008i3skNly1gsvxpbxqh9j30c70lk760.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20210727234028172"></p>
+<p>采用并行连接这种方式会克服单条连接的空载时间和带宽限制，因为每个事务都有连接，因此时延能够重叠起来，会提高页面的加载速度。</p>
+<p>但是并行连接并不一定快，如果带宽不够的情况下，甚至页面响应速度还不如串行连接，因为在并行连接中，每个连接都会去竞争使用有效的带宽，每个对象都会以较慢的速度加载，有可能连接 1 加载了 95% ，连接 2 占用带宽加载了 80%，连接 3 ，连接 4 。。。。。。 虽然每个对象都在加载，但是页面上却没有任何响应。</p>
+<p>而且，打开大量连接会消耗很多内存资源，从而出现性能问题，上面讨论的就五个连接，这个还比较少，复杂的 web 页面有可能会有数十甚至数百个内嵌对象，也就是说，客户端可以打开数百个连接，而且有许多的客户端同时发出申请，这样很容易会成为性能瓶颈。</p>
+<p>这样看来，并行连接并不一定”快”，实际上并行连接并没有加快页面的传输速度，并行连接也只是造成了一种<code>假象</code>，这是一切并行的通病。</p>
+<h3 id="持久连接"><a href="#持久连接" class="headerlink" title="持久连接"></a>持久连接</h3><p>Web 客户端通常会打开到同一个站点的连接，而且初始化了对某服务器请求的应用程序很可能会在不久的将来对这台服务器发起更多的请求，比如获取更多的图片。这种特性被称为<code>站点局部性(site locality)</code>。</p>
+<p>因此，HTTP 1.1 以及 HTTP1.0 的允许 HTTP 在执行完一次事务之后将连接继续保持在<code>打开状态</code>，这个打开状态其实指的就是 TCP 的打开状态，以便于下一次的 HTTP 事务能够复用这条连接。</p>
+<blockquote>
+<p>在一次 HTTP 事务结束之后仍旧保持打开状态的 TCP 连接被称为<code>持久连接</code>。</p>
+</blockquote>
+<p>非持久连接会在每个事务结束之后关闭，相对的，持久连接会在每个事务结束之后继续保持打开状态。持久连接会在不同事务之间保持打开状态，直到客户端或者服务器决定将其关闭为止。</p>
+<blockquote>
+<p>长连接也是有缺点的，如果单一客户端发起请求数量不是很频繁，但是连接的客户端却有很多的话，服务器早晚会有崩溃的时候。</p>
+</blockquote>
+<p>持久连接一般有两种选型方式，一种是 HTTP 1.0 + <code>keep-alive</code> ；一种是 HTTP 1.1 + <code>persistent</code>。</p>
+<p>HTTP 1.1 之前的版本默认连接都是<strong>非持久连接</strong>，如果想要在旧版本的 HTTP 上使用持久连接，需要指定 Connection 的值为 Keep-Alive。</p>
+<p>HTTP 1.1 版本都是持久性连接，如果想要断开连接时，需要指定 Connection 的值为 close，这也是我们上面说的两种选型方式的版本因素。</p>
+<p>下面是使用了持久连接之后的 HTTP 事务与使用串行 HTTP 事务连接的对比图</p>
+<p><img src="https://tva1.sinaimg.cn/large/008i3skNly1gsy7ezalgoj30yn0u0454.jpg" class="lazyload placeholder" data-srcset="https://tva1.sinaimg.cn/large/008i3skNly1gsy7ezalgoj30yn0u0454.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20210729224744113"></p>
+<p>这张图对比了 HTTP 事务在串行连接上和持久连接的时间损耗图，可以看到，HTTP 持久连接省去了<strong>连接打开 - 连接关闭</strong>的时间，所以在时间损耗上有所缩减。</p>
+<p>在持久性连接中，还有一个非常有意思的地方，就是 Connection 选项，Connection 是一个<strong>通用选项</strong>，也就是客户端和服务端都具有的一个标头，下面是一个具有持久性连接的客户端和服务端的请求-响应图</p>
+<p><img src="https://tva1.sinaimg.cn/large/008i3skNly1gsy80yq6bfj30k4095aar.jpg" class="lazyload placeholder" data-srcset="https://tva1.sinaimg.cn/large/008i3skNly1gsy80yq6bfj30k4095aar.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20210729230851879"></p>
+<p>从这张图可以看出，持久连接主要使用的就是 Connection 标头，这也就意味着，Connection 就是持久性连接的实现方式。所以下面我们主要讨论一下 Connection 这个大佬。</p>
+<h4 id="Connection-标头"><a href="#Connection-标头" class="headerlink" title="Connection 标头"></a>Connection 标头</h4><p>Connection 标头具有两种作用</p>
+<ul>
+<li>和 Upgrade 一起使用进行协议升级</li>
+<li>管理持久连接</li>
+</ul>
+<p><strong>和 Upgrade 一起使用进行协议升级</strong></p>
+<p>HTTP 提供了一种特殊的机制，这一机制允许将一个已建立的连接升级成新的协议，一般写法如下</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">GET</span> <span class="string">/index.html</span> <span class="meta">HTTP/1.1</span></span><br><span class="line"><span class="attribute">Host</span><span class="punctuation">: </span>www.example.com</span><br><span class="line"><span class="attribute">Connection</span><span class="punctuation">: </span>upgrade</span><br><span class="line"><span class="attribute">Upgrade</span><span class="punctuation">: </span>example/1, foo/2</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>HTTP&#x2F;2 明确禁止使用此机制，这个机制只属于HTTP&#x2F;1.1</p>
+</blockquote>
+<p>也就是说，客户端发起 Connection:upgrade 就表明这是一个连接升级的请求，如果服务器决定升级这次连接，就会返回一个 101 Switching Protocols 响应状态码，和一个要切换到的协议的头部字段 Upgrade。 如果服务器没有（或者不能）升级这次连接，它会忽略客户端发送的 Upgrade 头部字段，返回一个常规的响应：例如返回 200。</p>
+<p><strong>管理持久连接</strong></p>
+<p>我们上面说持久连接有两种方式，一种是 HTTP 1.0 + <code>Keep-Alive</code> ；一种是 HTTP 1.1 + <code>persistent</code>。</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">Connection</span><span class="punctuation">: </span>Keep-Alive</span><br><span class="line"><span class="attribute">Keep-Alive</span><span class="punctuation">: </span>timeout=10,max=500</span><br></pre></td></tr></table></figure>
+
+<p>在 HTTP 1.0 + Keep-Alive 这种方式下，客户端可以通过包含 Connection：Keep-Alive 首部请求将一条连接保持在打开状态。</p>
+<blockquote>
+<p>这里需要注意⚠️一点：Keep-Alive 首部只是将请求保持在活跃状态，发出 Keep-Alive 请求之后，客户端和服务器不一定会同意进行 Keep-Alive 会话。它们可以在任何时刻关闭空闲的 Keep-Alive 连接，并且客户端和服务器可以限制 Keep-Alive 连接所处理事务的数量。</p>
+</blockquote>
+<p>Keep-Alive 这个标头有下面几种选项：</p>
+<ul>
+<li><code>timeout</code>：这个参数估计了服务器希望将连接保持在活跃状态的时间。</li>
+<li><code>max</code> ：这个参数是跟在 timeout 参数后面的，它表示的是服务器还能够为多少个事务打开持久连接。</li>
+</ul>
+<p>Keep-Alive 这个首部是可选的，但是只有在提供 Connection：Keep-Alive 时才能使用它。</p>
+<p>Keep-Alive 的使用有一定限制，下面我们就来讨论一下 Keep-Alive 的使用限制问题。</p>
+<h4 id="Keep-Alive-使用限制和规则"><a href="#Keep-Alive-使用限制和规则" class="headerlink" title="Keep-Alive 使用限制和规则"></a>Keep-Alive 使用限制和规则</h4><ul>
+<li><p>在 HTTP&#x2F;1.0 中，Keep-Alive 并不是默认使用的，客户端必须发送一个 Connection：Keep-Alive 请求首部来激活 Keep-Alive 连接。</p>
+</li>
+<li><p>通过检测响应中是否含有 Connection：Keep-Alive 首部字段，客户端可以判断服务器是否在发出响应之后关闭连接。</p>
+</li>
+<li><p>代理和网管必须执行 Connection 首部规则，它们必须在将豹纹转发出去或者将缓存之前，删除 Connection 首部中的首部字段和 Connection 首部自身，因为 Connection 是一个 <code>Hop-by-Hop</code> 首部，这个首部说的<strong>是只对单次转发有效，会因为转发给缓存&#x2F;代理服务器而失效</strong>。</p>
+</li>
+<li><p>严格来说，不应该与无法确定是否支持 Connection 首部的代理服务器建立 Keep-Alive 连接，以防止出现<code>哑代理</code>问题，哑代理问题我们下面会说。</p>
+</li>
+</ul>
+<h4 id="Keep-Alive-和哑代理问题"><a href="#Keep-Alive-和哑代理问题" class="headerlink" title="Keep-Alive 和哑代理问题"></a>Keep-Alive 和哑代理问题</h4><p>这里我先解释一下什么是代理服务器，然后再说哑代理问题。</p>
+<blockquote>
+<p>什么是代理服务器？</p>
+<p>代理服务器就是代替客户端去获取网络信息的一种媒介，通俗一点就是<strong>网络信息的中转站</strong>。</p>
+<p>为什么我们需要代理服务器？</p>
+<p>最广泛的一种用处是我们需要使用代理服务器来替我们访问一些我们客户端无法直接访问的网站。除此之外，代理服务器还有很多功能，比如缓存功能，可以降低费用，节省带宽；对信息的实时监控和过滤，代理服务器相对于目标服务器（最终获取信息的服务器）来说，也是一个客户端，它能够获取服务器提供的信息，代理服务器相对于客户端来说，它是一个服务器，由它来决定提供哪些信息给客户端，以此来达到监控和过滤的功能。</p>
+</blockquote>
+<p>哑代理问题出现就出现在代理服务器上，再细致一点就是出现在<strong>不能识别 Connection 首部的代理服务器，而且不知道在发出请求之后会删除 Connection 首部的代理服务器</strong>。</p>
+<p>假设一个 Web 客户端正在通过一个哑代理服务器与 Web 服务器进行对话，如下图所示</p>
+<p><img src="https://tva1.sinaimg.cn/large/008i3skNgy1gt1a39bhttj61b60r0tgf02.jpg" class="lazyload placeholder" data-srcset="https://tva1.sinaimg.cn/large/008i3skNgy1gt1a39bhttj61b60r0tgf02.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20210801143652945"></p>
+<p>来解释一下上面这幅图</p>
+<ul>
+<li>首先，Web 客户端向代理发送了一条报文，其中包含了 Connection: Keep-Alive 首部，希望在这次 HTTP 事务之后继续保持活跃状态，然后客户端等待响应，已确定对方是否允许持久连接。</li>
+<li>哑代理（这里先界定为哑代理是不妥的，我们往往先看做的事，再给这件事定性，现在这个服务器还没做出哑代理行为呢，就给他定性了）收到了这条 HTTP 请求，但它不理解 Connection 首部，它也不知道 Keep-Alive 是什么意思，因此只是沿着转发链路将报文发送给服务器，但 Connection 首部是个 Hop-by-Hop 首部，只适用于单条链路传输，所以这个代理服务器不应该再将其发送给服务器了，但是它还是发送了，后面就会发生一些难顶的事情。</li>
+<li>经过转发的 HTTP 请求到达服务器后，会误以为对方希望保持 Keep-Alive 持久连接，经过评估后，服务器作出响应，它同意进行 Keep-Alive 对话，所以它回送了一个 Connection：Keep-Alive 响应并到达了哑代理服务器。</li>
+<li>哑代理服务器会直接将响应发送给客户端，客户端收到响应后，就知道服务器可以使用持久连接。然而，此时客户端和服务器都知道要使用 Keep-Alive 持久连接，但是哑代理服务器却对 Keep-Alive 一无所知。</li>
+<li>由于代理对 Keep-Alive 一无所知，所以会收到的所有数据都会发送给客户端，然后等待服务器关闭连接，但是代理服务器却认为应该保持打开状态，所以不会去关闭连接。这样，哑代理服务器就一直挂在那里等待连接的关闭。</li>
+<li>等到客户端发送下一个 HTTP 事务后，哑代理会直接忽视新的 HTTP 事务，因为它并不认为一条连接上还会有其他请求的到来，所以会直接忽略新的请求。</li>
+</ul>
+<p><strong>这就是 Keep-Alive 的哑代理</strong>。</p>
+<blockquote>
+<p>那么如何解决这个问题呢？用 Proxy-Connection</p>
+</blockquote>
+<h4 id="Proxy-Connection-解决哑代理"><a href="#Proxy-Connection-解决哑代理" class="headerlink" title="Proxy-Connection 解决哑代理"></a>Proxy-Connection 解决哑代理</h4><p>网景公司提出了一种使用 Proxy-Connection 标头的办法，首先浏览器会向代理发送 Proxy-Connection 扩展首部，而不是官方支持的 Connection 首部。如果代理服务器是哑代理的话，它会直接将 Proxy-Connection 发送给服务器，而服务器收到 Proxy-Connection 的话，就会忽略这个首部，这样不会带来任何问题。如果是一个聪明的代理服务器，在收到 Proxy-Connection 的时候，就会直接将 Connection 替换掉 Proxy-Connection ，再发送给服务器。</p>
+<h4 id="HTTP-x2F-1-1-持久连接"><a href="#HTTP-x2F-1-1-持久连接" class="headerlink" title="HTTP&#x2F;1.1 持久连接"></a>HTTP&#x2F;1.1 持久连接</h4><p>HTTP&#x2F;1.1 逐渐停止了对 Keep-Alive 连接的支持，用一种名为 <code>persistent connection</code> 的改进型设计取代了 Keep-Alive ，这种改进型设计也是持久连接，不过比 HTTP&#x2F;1.0 的工作机制更优。</p>
+<p>与 HTTP&#x2F;1.0 的 Keep-Alive 连接不同，HTTP&#x2F;1.1 在默认情况下使用的就是持久连接。除非特别指明，否则 HTTP&#x2F;1.1 会假定所有连接都是持久连接。如果想要在事务结束后关闭连接的话，就需要在报文中显示添加一个 Connection：close 首部。这是与以前的 HTTP 协议版本很重要的区别。</p>
+<p>使用 persistent connection 也会有一些限制和规则</p>
+<ul>
+<li>首先，发送了 Connection: close 请求后，客户端就无法在这条连接上发送更多的请求。这同时也可以说，如果客户端不想发送其他请求，就可以使用 Connection：close 关闭连接。</li>
+<li>HTTP&#x2F;1.1 的代理必须能够分别管理客户端和服务器的持久连接 ，每个持久连接都只适用于单次传输。</li>
+<li>客户端对任何服务器或者代理最好只维护两条持久连接，以防止服务器过载。</li>
+<li>只有实体部分的长度和相应的 <code>Content-Length</code>保持一致时，或者使用分块传输编码的方式时，连接才能保持长久。</li>
+</ul>
+<h3 id="管道化连接"><a href="#管道化连接" class="headerlink" title="管道化连接"></a>管道化连接</h3><p>HTTP&#x2F;1.1 允许在持久连接上使用<strong>请求管道</strong>。这是相对于 Keep-Alive 连接的又一个性能优化。管道就是一个承载 HTTP 请求的载体，我们可以将多个 HTTP 请求放入管道，这样能够降低网络的环回时间，提升性能。下图是使用串行连接、并行连接、管道化连接的示意图：</p>
+<p><img src="https://tva1.sinaimg.cn/large/008i3skNly1gt1f4i0241j30u00w90zr.jpg" class="lazyload placeholder" data-srcset="https://tva1.sinaimg.cn/large/008i3skNly1gt1f4i0241j30u00w90zr.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20210801173109348"></p>
+<p>使用管道化的连接也有几处限制：</p>
+<ul>
+<li>如果 HTTP 客户端无法确认连接是持久的，就不应该使用管道。</li>
+<li>必须按照与请求的相同顺序回送 HTTP 响应，因为 HTTP 没有序号这个概念，所以一旦响应失序，就没办法将其与请求匹配起来了。</li>
+<li>HTTP 客户端必须做好连接会在任何时刻关闭的准备，还要准备好重发所有未完成的管道化请求。</li>
+</ul>
+<h2 id="HTTP-关闭连接"><a href="#HTTP-关闭连接" class="headerlink" title="HTTP 关闭连接"></a>HTTP 关闭连接</h2><p>所有 HTTP 客户端、服务器或者代理都可以在任意时刻关闭一条 HTTP 传输连接。通常情况下会在一次响应后关闭连接，但是保不准也会在 HTTP 事务的过程中出现。</p>
+<p>但是，服务器无法确定在关闭的那一刻，客户端有没有数据要发送，如果出现这种情况，客户端就会在进行数据传输的过程中发生了写入错误。</p>
+<p>即使在不出错的情况下，连接也可以在任意时刻关闭。如果在事务传输的过程中出现了连接关闭情况，就需要重新打开连接进行重试。如果是单条连接还好说，如果是管道化连接，就比较糟糕，因为管道化连接会把大量的连接丢在管道中，此时如果服务器关闭，就会造成大量的连接未响应，需要重新调度。</p>
+<p>如果一个 HTTP 事务不管执行一次还是执行 n 次，它得到的结果始终是一样的，那么我们就认为这个事务是<code>幂等</code>的，一般 <strong>GET、HEAD、PUT、DELETE、TRACE 和 OPTIONS</strong>方法都认为是幂等的。客户端不应该以管道化的方式发送任何<strong>非幂等请求</strong>，比如 POST，否则就会造成不确定的后果。</p>
+<p>由于 HTTP 使用 TCP 作为传输层的协议，所以 HTTP 关闭连接其实还是 TCP 关闭连接的过程。</p>
+<p>HTTP 关闭连接一共分为三种情况：<strong>完全关闭、半关闭和正常关闭</strong>。</p>
+<p>应用程序可以关闭 TCP 输入和输出信道中的任何一个，或者将二者同时关闭。调用套接字 close() 方法会讲输入和输出同时关闭，这就被称为<strong>完全关闭</strong>。还可以调用套接字的 shutdown 方法单独关闭输入或者输出信道，这被称为<strong>半关闭</strong>。HTTP 规范建议当客户端和服务器突然需要关闭连接的时候，应该<strong>正常关闭</strong>，但是它没有说如何去做。</p>
+<p>关于 TCP 一些关闭问题的深入研究，你可以阅读 cxuan 的另一篇文章 <a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s?__biz=MzI0ODk2NDIyMQ==&mid=2247491621&idx=1&sn=78a182f89093ef1cc807bdef21cdcb4d&chksm=e99a1537deed9c2169257574c17877933b68fadd061f371c2f53a50e7f640d52f5f1667c895c&token=632815717&lang=zh_CN#rd">TCP 基础知识</a></p>
+
+      </div>
+      <div class="post-tags-categories">
+        
+        <div class="tags">
+          
+            <a href="/tags/HTTP/" class="">
+              HTTP
+            </a>
+          
+        </div>
+        
+      </div>
+      
+        <div class="copyright">
+  <ul class="post-copyright">
+    <li class="post-copyright-author">
+    <strong>author:  </strong>John Doe</a>
+    </li>
+    <li class="post-copyright-link">
+    <strong>link:  </strong>
+    <a href="/2022/05/03/HTPP连接管理/" target="_blank" title="HTPP连接管理">http://example.com/2022/05/03/HTPP连接管理/</a>
+    </li>
+    <li class="post-copyright-license">
+      <strong>Copyright notice:   </strong>
+      All articles on this website, unless otherwise stated, adopt <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">CC BY-NC-ND 4.0</a>
+      reprint policy. If reproduced, please indicate source!
+    </li>
+  </ul>
+<div>
+      
+    </article>
+    <!-- 上一篇文章和下一篇文章 -->
+    
+      <!-- 文章详情页的上一页和下一页 -->
+<div class="post-nav">
+
+
+
+  
+  <div class="post-nav-prev post-nav-item">
+    <div class="post-nav-img" style="background-size: cover; 
+      background-position: center center;">
+      <img class="lazyload lazyload placeholder" src="/medias/6.jpg" class="lazyload placeholder" data-srcset="/medias/6.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="">
+    </div>
+    <a href="/2022/05/03/MySQL-%E5%85%A5%E9%97%A8%E5%A4%A7%E5%85%A8/" class="post-nav-link">
+      <div class="title">
+        <i class="fas fa-angle-left"></i> Prev:
+        <div class="title-text">MySQL 入门大全</div>
+      </div>
+      
+      <!-- <div class="content">
+        MySQL 入门大全
+MySQL 入门大全
+SQL 基础使用
+查询语言分类
+DDL 语句
+创建数据库
+删除数据库
+创建表
+      </div> -->
+    </a>
+  </div>
+
+
+
+  
+  <div class="post-nav-next post-nav-item">
+    <div class="post-nav-img" style="background-size: cover; 
+      background-position: center center;">
+      <img class="lazyload lazyload placeholder" src="/medias/14.jpg" class="lazyload placeholder" data-srcset="/medias/14.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" src="" alt="">
+    </div>
+    <a href="/2022/05/03/%E5%B8%A6%E4%BD%A0%E4%B8%80%E6%AD%A5%E6%AD%A5%E8%A7%A3%E6%9E%90-HTTPS/" class="post-nav-link">
+      <div class="title">
+        Next: <i class="fas fa-angle-right"></i>
+        <div class="title-text">带你一步步解析 HTTPS</div>
+      </div>
+      <!-- <div class="content">
+        带你一步步解析 HTTPS
+带你一步步解析 HTTPS
+HTTPS 为什么会出现
+HTTPS 解决了什么问题
+什么是 H
+      </div> -->
+    </a>
+  </div>
+
+</div>
+
+    
+    
+
+    <!-- 打赏 -->
+    
+      <div id="appDonate" class="post-donate">
+  <div id="donate_board" class="donate_bar center" ref="donate">
+    <a id="btn_donate" class="btn_donate" href="javascript:;" title="打赏" @click="showDialogDrawer()"></a>
+  </div>
+  <transition name="fade">
+    <div 
+      class="donate-box-mask"
+      v-cloak 
+      v-show="visible"
+      @click="cancelDialogDrawer()"
+    >
+    </div>
+  </transition>
+  <transition name="bounce">
+    <div class="donate-box" v-cloak v-show="visible">
+      <div class="donate-box_close">
+        <i class="fas fa-times" aria-hidden="true" @click="cancelDialogDrawer" pointer></i>
+      </div>
+      <div class="donate-box_title">
+        <h4>
+          你的赏识是我前进的动力
+        </h4>
+      </div>
+      <div class="donate-box_tab">
+        <div class="Alipay" pointer :class="{'active': tabActive === 'Alipay'}" @click="changeTabActive('Alipay')">
+          支付宝
+        </div>
+        <div class="WeChatpay" pointer :class="{'active': tabActive === 'WeChatpay'}" @click="changeTabActive('WeChatpay')">
+          微信
+        </div>
+      </div>
+      <div class="donate-box_img">
+        <div class="AlipayImg" v-show="tabActive === 'Alipay'">
+          <img src="/medias/1.jpg" class="lazyload placeholder" data-srcset="/medias/1.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="支付宝打赏" />
+        </div> 
+        <div class="WeChatpayImg" v-show="tabActive === 'WeChatpay'">
+          <img src="/medias/2.jpg" class="lazyload placeholder" data-srcset="/medias/2.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="微信打赏" />
+        </div>
+      </div>
+    </div>
+  </transition>
+</div>
+
+<script>
+  var body = document.body || document.documentElement || window;
+  var vm = new Vue({
+    el: '#appDonate',
+    data: {
+      visible: false,
+      tabActive: 'Alipay',
+      top: 0,
+    },
+    computed: {
+    },
+    mounted() {
+    },
+    methods: {
+      showDialogDrawer() {
+        this.visible = true;
+        // 防止页面滚动，只能让弹框滚动
+        // function getScroll() {
+        //   return {
+        //     left: window.pageXOffset || document.documentElement.scrollLeft || document.body.scrollLeft || 0,
+        //     top: window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0
+        //   };
+        // }
+        this.top = $(document).scrollTop() // or getScroll().top
+        // console.log('aa', $('.main-content'));
+        body.style.cssText = 'overflow: hidden;';
+      },
+      cancelDialogDrawer() {
+        this.visible = false;
+        body.removeAttribute('style');
+        $(document).scrollTop(this.top)
+      },
+      changeTabActive(name) {
+        this.tabActive = name;
+      }
+    },
+    created() {}
+  })
+</script>
+    
+
+    <!-- 分享 -->
+    
+      <!-- https://github.com/overtrue/share.js -->
+<!-- 文章详情页的分享 -->
+<div class="social-share" data-sites="twitter,facebook,google,qq,qzone,wechat,weibo,douban,linkedin" data-wechat-qrcode-helper="<p>微信扫一扫即可分享！</p>"></div>
+
+<script src="/js/shareJs/social-share.min.js"></script>
+</script>
+
+<style>
+  .social-share {
+    margin: 20px 0;
+  }
+</style>
+
+
+    
+    
+    <!-- 评论 -->
+    <!-- 评论 -->
+
+  <div id="myComment">
+    
+      <div id="gitment-container"></div>
+
+    
+  </div>
+
+<!-- comment script in themes\hexo-theme-bamboo\layout\_partial\scripts\index.ejs -->
+
+
+  </div>
+
+  <!-- 目录 -->
+  <!-- 文章详情页右侧目录 -->
+
+  <div class="toc-aside">
+    <div class="toc-main">
+      <div class="toc-aside-title">
+        <i class="fas fa-list-ul" aria-hidden="true"></i><span>catalog</span>
+        
+          <div class="toc-open-close">catalog</div>
+        
+      </div>
+      <div class="toc-content">
+        <div class="toc"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 手机端目录按钮 -->
+  <div id="toc-mobile-btn">
+    <i class="fas fa-list-ul" aria-hidden="true"></i>
+  </div>
+
+
+<script>
+  function closeToc(init) {
+    $(".toc-aside").css({'width': 0, 'padding': 0, 'transition': init ?  'noe' : 'width 0.3s' });
+    $(".toc-content").css({'width': 0});
+    $(".toc-aside-title span, .toc-aside-title i").css({'display': 'none'});
+    $(".main-content").css({'width': '75%', 'margin-left': 'auto', 'margin-right': 'auto',});
+  };
+  function openToc() {
+    $(".main-content").css({'width': '65%', 'margin-right': '10px', 'margin-left': 'calc(35% - 350px)'});
+    $(".toc-aside").css({'width': '300px', 'padding': '0 10px', 'transition': 'width 0.3s'});
+    $(".toc-content").css({'width': '300px'});
+    $(".toc-aside-title span, .toc-aside-title i").css({'display': 'inline-block'});
+  }
+  function openBtnClickFn () {
+    let openOrCloseBtn = $('.toc-aside .toc-aside-title .toc-open-close');
+    let open = eval('' || 'true');
+    openOrCloseBtn.click(function() {
+      if (open) {
+        closeToc();
+        open = false;
+      } else {
+        openToc();
+        open = true;
+      }
+    });
+  };
+  openBtnClickFn();
+  initCloseTocWidth(true);
+
+  function initCloseTocWidth(init) {
+    if (window.innerWidth >= 992) {
+      let isClose = false;
+      isClose && closeToc(init)
+    }
+  }
+
+  document.addEventListener('pjax:complete', function () {
+    $(".toc-aside").css({'transition': 'no'});
+  })
+  document.addEventListener('pjax:complete', function () {
+    openBtnClickFn();
+  })
+  
+</script>
+
+  <!-- 图片放大 Wrap images with fancybox support -->
+  <script src="/js/wrapImage.js"></script>
+</div>
+
+<!-- 文章详情页背景图 -->
+<div id="appBgSwiper" style="position: fixed;left: 0;top: 0;width: 100%;height: 100%;z-index: -2;"
+	:style="{'background-color': bgColor ? bgColor : 'transparent'}">
+	<transition-group tag="ul" :name="names">
+		<li v-for='(image,index) in img' :key='index' v-show="index === mark" class="bg-swiper-box">
+			<img :src="image" class="bg-swiper-img no-lazy">
+		</li>
+	</transition-group>
+</div>
+<script>
+	var vm = new Vue({
+		el: '#appBgSwiper',
+		data: {
+			names: '' || 'fade' || 'fade', // translate-fade fade
+			mark: 0,
+			img: [],
+			bgColor: '',
+			time: null
+		},
+		methods: {   //添加方法
+			change(i, m) {
+				if (i > m) {
+					// this.names = 'fade';
+				} else if (i < m) {
+					// this.names = 'fade';
+				} else {
+					return;
+				}
+				this.mark = i;
+			},
+			prev() {
+				// this.names = 'fade';
+				this.mark--;
+				if (this.mark === -1) {
+					this.mark = 3;
+					return
+				}
+			},
+			next() {
+				// this.names = 'fade';
+				this.mark++;
+				if (this.mark === this.img.length) {
+					this.mark = 0;
+					return
+				}
+			},
+			autoPlay() {
+				// this.names = 'fade';
+				this.mark++;
+				if (this.mark === this.img.length) {
+					this.mark = 0;
+					return
+				}
+			},
+			play() {
+				let bgImgDelay = '' || '180000'
+				let delay = parseInt(bgImgDelay) || 180000;
+				this.time = setInterval(this.autoPlay, delay);
+			},
+			enter() {
+				clearInterval(this.time);
+			},
+			leave() {
+				this.play();
+			}
+		},
+		created() {
+			this.play()
+		},
+		beforeDestroy() {
+			clearInterval(this.time);
+		},
+		mounted() {
+			let prop = '' || '';
+			let isImg = prop.includes('.bmp') || prop.includes('.jpg') || prop.includes('.png') || prop.includes('.tif') || prop.includes('.gif') || prop.includes('.pcx') || prop.includes('.tga') || prop.includes('.exif') || prop.includes('.fpx') || prop.includes('.psd') || prop.includes('.cdr') || prop.includes('.pcd') || prop.includes('.dxf') || prop.includes('.ufo') || prop.includes('.eps') || prop.includes('.ai') || prop.includes('.raw') || prop.includes('.WMF') || prop.includes('.webp') || prop.includes('.jpeg') || prop.includes('http://') || prop.includes('https://')
+			if (isImg) {
+				let img = prop.split(',');
+				let configRoot = '/'
+				let arrImg = [];
+				img.forEach(el => {
+					var Expression = /http(s)?:\/\/([\w-]+\.)+[\w-]+(\/[\w- .\/?%&=]*)?/;
+					var objExp = new RegExp(Expression);
+
+					if (objExp.test(el)) {
+						// http or https
+						arrImg.push(el);
+					} else {
+						// 非http or https开头
+						// 本地文件
+						let firstStr = el.charAt(0);
+						if (firstStr == '/') {
+							el = el.substr(1); // 删除第一个字符 '/',因为 configRoot最后一个字符为 /
+						}
+						el = configRoot + el;
+						arrImg.push(el);
+					}
+				})
+				this.img = arrImg;
+			} else {
+				this.bgColor = prop;
+			}
+		}
+	})
+</script>
+
+<style>
+	.bg-swiper-box {
+		position: absolute;
+		display: block;
+		width: 100%;
+		height: 100%;
+	}
+
+	.bg-swiper-img {
+		object-fit: cover;
+		width: 100%;
+		height: 100%;
+	}
+</style>
+
+
+
+
+  <script>
+  function loadMermaid() {
+    if (document.getElementsByClassName('mermaid').length) {
+      if (window.mermaidJsLoad) mermaid.init()
+      else {
+        loadScript('https://unpkg.com/mermaid/dist/mermaid.min.js').then(() => {
+          window.mermaidJsLoad = true
+          mermaid.initialize({
+            theme: 'default',
+          })
+          if ('true') {
+            mermaid.init();
+          }
+        })
+      }
+    }
+  };
+  document.addEventListener("DOMContentLoaded", function () {
+    loadMermaid();
+  })
+
+  document.addEventListener('pjax:complete', function () {
+    loadMermaid();
+  })
+  
+</script>
+
+
+      </main>
+    </div>
+
+    <!-- 页脚 -->
+    
+  
+  
+    <!-- 底部鱼儿跳动效果，依赖于jquery-->
+<div id="j-fish-skip" style=" position: relative;height: 153px;width: auto;"></div>
+<script>
+  var RENDERER = {
+    POINT_INTERVAL: 5,
+    FISH_COUNT: 3,
+    MAX_INTERVAL_COUNT: 50,
+    INIT_HEIGHT_RATE: .5,
+    THRESHOLD: 50,
+    FISH_COLOR: '',
+    init: function () {
+      this.setFishColor(); this.setParameters(), this.reconstructMethods(), this.setup(), this.bindEvent(), this.render()
+    },
+    setFishColor: function () {
+      let isDark = JSON.parse(localStorage.getItem('dark')) || JSON.parse('false');
+      if (isDark) {
+        this.FISH_COLOR = '#222'; // 暗黑色，有时间把这整成一个变量
+      } else {
+        this.FISH_COLOR = '' || '#42b983';
+      }
+    },
+    setParameters: function () {
+      this.$window = $(window), this.$container = $("#j-fish-skip"), this.$canvas = $("<canvas />"), this.context = this.$canvas.appendTo(this.$container).get(0).getContext("2d"), this.points = [], this.fishes = [], this.watchIds = []
+    },
+    createSurfacePoints: function () {
+      var t = Math.round(this.width / this.POINT_INTERVAL);
+      this.pointInterval = this.width / (t - 1), this.points.push(new SURFACE_POINT(this, 0));
+      for (var i = 1; i < t; i++) {
+        var e = new SURFACE_POINT(this, i * this.pointInterval),
+          h = this.points[i - 1];
+        e.setPreviousPoint(h), h.setNextPoint(e), this.points.push(e)
+      }
+    },
+    reconstructMethods: function () {
+      this.watchWindowSize = this.watchWindowSize.bind(this), this.jdugeToStopResize = this.jdugeToStopResize.bind(this), this.startEpicenter = this.startEpicenter.bind(this), this.moveEpicenter = this.moveEpicenter.bind(this), this.reverseVertical = this.reverseVertical.bind(this), this.render = this.render.bind(this)
+    },
+    setup: function () {
+      this.points.length = 0, this.fishes.length = 0, this.watchIds.length = 0, this.intervalCount = this.MAX_INTERVAL_COUNT, this.width = this.$container.width(), this.height = this.$container.height(), this.fishCount = this.FISH_COUNT * this.width / 500 * this.height / 500, this.$canvas.attr({
+        width: this.width,
+        height: this.height
+      }), this.reverse = !1, this.fishes.push(new FISH(this)), this.createSurfacePoints()
+    },
+    watchWindowSize: function () {
+      this.clearTimer(), this.tmpWidth = this.$window.width(), this.tmpHeight = this.$window.height(), this.watchIds.push(setTimeout(this.jdugeToStopResize, this.WATCH_INTERVAL))
+    },
+    clearTimer: function () {
+      for (; this.watchIds.length > 0;) clearTimeout(this.watchIds.pop())
+    },
+    jdugeToStopResize: function () {
+      var t = this.$window.width(),
+        i = this.$window.height(),
+        e = t == this.tmpWidth && i == this.tmpHeight;
+      this.tmpWidth = t, this.tmpHeight = i, e && this.setup()
+    },
+    bindEvent: function () {
+      this.$window.on("resize", this.watchWindowSize), this.$container.on("mouseenter", this.startEpicenter), this.$container.on("mousemove", this.moveEpicenter)
+    },
+    getAxis: function (t) {
+      var i = this.$container.offset();
+      return {
+        x: t.clientX - i.left + this.$window.scrollLeft(),
+        y: t.clientY - i.top + this.$window.scrollTop()
+      }
+    },
+    startEpicenter: function (t) {
+      this.axis = this.getAxis(t)
+    },
+    moveEpicenter: function (t) {
+      var i = this.getAxis(t);
+      this.axis || (this.axis = i), this.generateEpicenter(i.x, i.y, i.y - this.axis.y), this.axis = i
+    },
+    generateEpicenter: function (t, i, e) {
+      if (!(i < this.height / 2 - this.THRESHOLD || i > this.height / 2 + this.THRESHOLD)) {
+        var h = Math.round(t / this.pointInterval);
+        h < 0 || h >= this.points.length || this.points[h].interfere(i, e)
+      }
+    },
+    reverseVertical: function () {
+      this.reverse = !this.reverse;
+      for (var t = 0, i = this.fishes.length; t < i; t++) this.fishes[t].reverseVertical()
+    },
+    controlStatus: function () {
+      for (var t = 0, i = this.points.length; t < i; t++) this.points[t].updateSelf();
+      for (t = 0, i = this.points.length; t < i; t++) this.points[t].updateNeighbors();
+      this.fishes.length < this.fishCount && 0 == --this.intervalCount && (this.intervalCount = this.MAX_INTERVAL_COUNT, this.fishes.push(new FISH(this)))
+    },
+    render: function () {
+      requestAnimationFrame(this.render), this.controlStatus(), this.context.clearRect(0, 0, this.width, this.height), this.context.fillStyle = this.FISH_COLOR;
+      for (var t = 0, i = this.fishes.length; t < i; t++) this.fishes[t].render(this.context);
+      this.context.save(), this.context.globalCompositeOperation = "xor", this.context.beginPath(), this.context.moveTo(0, this.reverse ? 0 : this.height);
+      for (t = 0, i = this.points.length; t < i; t++) this.points[t].render(this.context);
+      this.context.lineTo(this.width, this.reverse ? 0 : this.height), this.context.closePath(), this.context.fill(), this.context.restore()
+    }
+  },
+  SURFACE_POINT = function (t, i) {
+    this.renderer = t, this.x = i, this.init()
+  };
+  SURFACE_POINT.prototype = {
+    SPRING_CONSTANT: .03,
+    SPRING_FRICTION: .9,
+    WAVE_SPREAD: .3,
+    ACCELARATION_RATE: .01,
+    init: function () {
+      this.initHeight = this.renderer.height * this.renderer.INIT_HEIGHT_RATE, this.height = this.initHeight, this.fy = 0, this.force = {
+        previous: 0,
+        next: 0
+      }
+    },
+    setPreviousPoint: function (t) {
+      this.previous = t
+    },
+    setNextPoint: function (t) {
+      this.next = t
+    },
+    interfere: function (t, i) {
+      this.fy = this.renderer.height * this.ACCELARATION_RATE * (this.renderer.height - this.height - t >= 0 ? -1 : 1) * Math.abs(i)
+    },
+    updateSelf: function () {
+      this.fy += this.SPRING_CONSTANT * (this.initHeight - this.height), this.fy *= this.SPRING_FRICTION, this.height += this.fy
+    },
+    updateNeighbors: function () {
+      this.previous && (this.force.previous = this.WAVE_SPREAD * (this.height - this.previous.height)), this.next && (this.force.next = this.WAVE_SPREAD * (this.height - this.next.height))
+    },
+    render: function (t) {
+      this.previous && (this.previous.height += this.force.previous, this.previous.fy += this.force.previous), this.next && (this.next.height += this.force.next, this.next.fy += this.force.next), t.lineTo(this.x, this.renderer.height - this.height)
+    }
+  };
+  var FISH = function (t) {
+    this.renderer = t, this.init()
+  };
+  FISH.prototype = {
+    GRAVITY: .4,
+    init: function () {
+      this.direction = Math.random() < .5, this.x = this.direction ? this.renderer.width + this.renderer.THRESHOLD : -this.renderer.THRESHOLD, this.previousY = this.y, this.vx = this.getRandomValue(4, 10) * (this.direction ? -1 : 1), this.renderer.reverse ? (this.y = this.getRandomValue(1 * this.renderer.height / 10, 4 * this.renderer.height / 10), this.vy = this.getRandomValue(2, 5), this.ay = this.getRandomValue(.05, .2)) : (this.y = this.getRandomValue(6 * this.renderer.height / 10, 9 * this.renderer.height / 10), this.vy = this.getRandomValue(-5, -2), this.ay = this.getRandomValue(-.2, -.05)), this.isOut = !1, this.theta = 0, this.phi = 0
+    },
+    getRandomValue: function (t, i) {
+      return t + (i - t) * Math.random()
+    },
+    reverseVertical: function () {
+      this.isOut = !this.isOut, this.ay *= -1
+    },
+    controlStatus: function (t) {
+      this.previousY = this.y, this.x += this.vx, this.y += this.vy, this.vy += this.ay, this.renderer.reverse ? this.y > this.renderer.height * this.renderer.INIT_HEIGHT_RATE ? (this.vy -= this.GRAVITY, this.isOut = !0) : (this.isOut && (this.ay = this.getRandomValue(.05, .2)), this.isOut = !1) : this.y < this.renderer.height * this.renderer.INIT_HEIGHT_RATE ? (this.vy += this.GRAVITY, this.isOut = !0) : (this.isOut && (this.ay = this.getRandomValue(-.2, -.05)), this.isOut = !1), this.isOut || (this.theta += Math.PI / 20, this.theta %= 2 * Math.PI, this.phi += Math.PI / 30, this.phi %= 2 * Math.PI), this.renderer.generateEpicenter(this.x + (this.direction ? -1 : 1) * this.renderer.THRESHOLD, this.y, this.y - this.previousY), (this.vx > 0 && this.x > this.renderer.width + this.renderer.THRESHOLD || this.vx < 0 && this.x < -this.renderer.THRESHOLD) && this.init()
+    },
+    render: function (t) {
+      t.save(), t.translate(this.x, this.y), t.rotate(Math.PI + Math.atan2(this.vy, this.vx)), t.scale(1, this.direction ? 1 : -1), t.beginPath(), t.moveTo(-30, 0), t.bezierCurveTo(-20, 15, 15, 10, 40, 0), t.bezierCurveTo(15, -10, -20, -15, -30, 0), t.fill(), t.save(), t.translate(40, 0), t.scale(.9 + .2 * Math.sin(this.theta), 1), t.beginPath(), t.moveTo(0, 0), t.quadraticCurveTo(5, 10, 20, 8), t.quadraticCurveTo(12, 5, 10, 0), t.quadraticCurveTo(12, -5, 20, -8), t.quadraticCurveTo(5, -10, 0, 0), t.fill(), t.restore(), t.save(), t.translate(-3, 0), t.rotate((Math.PI / 3 + Math.PI / 10 * Math.sin(this.phi)) * (this.renderer.reverse ? -1 : 1)), t.beginPath(), this.renderer.reverse ? (t.moveTo(5, 0), t.bezierCurveTo(10, 10, 10, 30, 0, 40), t.bezierCurveTo(-12, 25, -8, 10, 0, 0)) : (t.moveTo(-5, 0), t.bezierCurveTo(-10, -10, -10, -30, 0, -40), t.bezierCurveTo(12, -25, 8, -10, 0, 0)), t.closePath(), t.fill(), t.restore(), t.restore(), this.controlStatus(t)
+    }
+  }, $(function () {
+    RENDERER.init()
+    $('.dark').click(function () {
+      setTimeout(() => {
+        RENDERER.setFishColor();
+        RENDERER.context.fill();
+      });
+    })
+  });
+</script>
+  
+  <div class="footer bg-color">
+    <div class="footer-main">
+      
+        
+          <div class="link">
+            
+          </div>
+        
+      
+        
+          <div class="footer-copyright">
+            <p>Copyright © 2019 - 2020 <a target="_blank" rel="noopener" href="https://github.com/yuang01">yuang01</a> | Powered by <a target="_blank" rel="noopener" href="https://hexo.io/zh-cn/docs/">Hexo</a> | Theme <a target="_blank" rel="noopener" href="https://github.com/yuang01/theme">Bamboo</a> </p>
+
+          </div>
+        
+      
+        
+          
+            <!-- 不蒜子统计 -->
+            <!-- 不蒜子统计 -->
+<span id="busuanzi_container_site_pv">
+      <i class="fas fa-eye" aria-hidden="true"></i>Total visits：<span id="busuanzi_value_site_pv"></span> times
+</span>
+<span class="post-meta-divider">|</span>
+<span id="busuanzi_container_site_uv" style='display:none'>
+      <i class="fas fa-users" aria-hidden="true"></i>Number of visitors：<span id="busuanzi_value_site_uv"></span> people
+</span>
+
+          
+        
+      
+        
+          <div class="footer-custom">
+            
+          </div>
+        
+      
+    </div>
+  </div>
+
+
+
+    <!-- 渲染暗黑按钮 -->
+    
+      <div class="dark">
+  <div class="dark-content">
+    <i class="fas fa-moon" aria-hidden="true"></i>
+    <!-- <span>关灯</span> -->
+  </div>
+  
+</div>
+
+<script>
+  $(function() {
+    let isDark = JSON.parse(localStorage.getItem('dark'))  || JSON.parse('false');
+    if (isDark) {
+      $(".dark-content").replaceWith(
+          `
+          <div class='dark-content'>
+            <i class="fas fa-lightbulb" aria-hidden="true"></i>
+          </div>
+          `
+        );
+    }
+    $('.dark').click(function() {
+      if ($(document.body).is('.darkModel')) {
+        $(document.body).removeClass('darkModel');
+        localStorage.setItem('dark', false);
+        $(".dark-content").replaceWith(
+          `
+          <div class='dark-content'>
+            <i class="fas fa-moon" aria-hidden="true"></i>
+          </div>
+          `
+        );
+      } else {
+        $(document.body).addClass('darkModel');
+        localStorage.setItem('dark', true);
+        $(".dark-content").replaceWith(
+          `
+          <div class='dark-content'>
+            <i class="fas fa-lightbulb" aria-hidden="true"></i>
+          </div>
+          `
+        );
+      }
+    })
+  })
+</script>
+    
+    <!-- 渲染回到顶部按钮 -->
+    
+      <div class="goTop top-btn-color" pointer>
+  <i class="fas fa-arrow-up" aria-hidden="true"></i>
+</div>
+<script src="/js/goTop.js"></script>
+
+    
+    <!-- 渲染左下角音乐播放器 -->
+    
+      <link rel="stylesheet" href="/js/aplayer/APlayer@1.10.1.min.css">
+<style>
+.aplayer .aplayer-lrc p {
+  
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 16px !important;
+}
+
+.aplayer .aplayer-lrc p.aplayer-lrc-current {
+  
+  font-size: 15px;
+  color: #42b983;
+}
+
+
+.aplayer.aplayer-fixed.aplayer-narrow .aplayer-body {
+  left: -66px !important;
+}
+
+.aplayer.aplayer-fixed.aplayer-narrow .aplayer-body:hover {
+  left: 0px !important;
+}
+
+
+</style>
+<meting-js  
+  class=""
+  server="tencent"
+  type="playlist"
+  id="8062553743"
+  fixed='true'
+  autoplay='false'
+  theme='#42b983'
+  loop='all'
+  order='random'
+  preload='auto'
+  volume='0.7'
+  list-folded='true'
+>
+</meting-js>
+
+<!-- <style>
+  #aplayer {
+    position: fixed;
+    left: 0;
+    bottom: 300px;
+  }
+</style> -->
+<script src="https://unpkg.com/aplayer@1.10.1/dist/APlayer.min.js"></script>
+<script src="https://unpkg.com/meting@2/dist/Meting.min.js"></script>
+    
+
+    <!-- 图片放大 -->
+    
+      <script src="/js/fancybox/jquery.fancybox.min.js"></script>
+    
+
+    <!-- 百度解析 -->
+    <!-- Baidu Analytics -->
+
+    <!-- Baidu Push -->
+
+<script>
+    (function () {
+        var bp = document.createElement('script');
+        var curProtocol = window.location.protocol.split(':')[0];
+        if (curProtocol === 'https') {
+            bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+        } else {
+            bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+        }
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(bp, s);
+    })();
+</script>
+
+    
+    <!-- 背景彩带 -->
+    
+      <script type="text/javascript" size="100" alpha='0.4' zIndex="-1" src="/js/ribbon.min.js"></script>
+    
+
+    <script src="/js/utils/index.js"></script>
+    <script src="/js/app.js"></script>
+    
+    <!-- 文章目录所需js -->
+<link href="/js/tocbot/tocbot.css" rel="stylesheet">
+<script src="/js/tocbot/tocbot.min.js"></script>
+
+<script>
+  var headerEl = 'h2, h3, h4',  //headers 
+    content = '.post-detail',//文章容器
+    idArr = {};  //标题数组以确定是否增加索引id
+  //add #id
+  var option = {
+    // Where to render the table of contents.
+    tocSelector: '.toc',
+    // Where to grab the headings to build the table of contents.
+    contentSelector: content,
+    // Which headings to grab inside of the contentSelector element.
+    headingSelector: headerEl,
+    scrollSmooth: true,
+    scrollSmoothOffset: -80,
+    headingsOffset: -($(window).height() * 0.4 - 45),
+    positionFixedSelector: '.toc-main',
+    positionFixedClass: 'is-position-fixed',
+    fixedSidebarOffset: 'auto',
+    activeLinkClass: 'is-active-link',
+    // onClick: function (e) {},
+  }
+  if ($('.toc').length > 0) {
+
+    $(content).children(headerEl).each(function () {
+      //去除空格以及多余标点
+      var headerId = $(this).text().replace(/[\s|\~|`|\!|\@|\#|\$|\%|\^|\&|\*|\(|\)|\_|\+|\=|\||\|\[|\]|\{|\}|\;|\:|\"|\'|\,|\<|\.|\>|\/|\?|\：|\，|\。]/g, '');
+
+      headerId = headerId.toLowerCase();
+      if (idArr[headerId]) {
+        //id已经存在
+        $(this).attr('id', headerId + '-' + idArr[headerId]);
+        idArr[headerId]++;
+      }
+      else {
+        //id未存在
+        idArr[headerId] = 1;
+        $(this).attr('id', headerId);
+      }
+    });
+
+    document.addEventListener("DOMContentLoaded", function () {
+      tocbot.init(option);
+      mobileTocClick();
+    });
+
+  }
+
+  window.tocScrollFn = function () {
+    return bamboo.throttle(function () {
+      findHeadPosition();
+    }, 100)()
+  }
+  window.addEventListener('scroll', tocScrollFn);
+
+  const findHeadPosition = function (top) {
+    if ($('.toc-list').length <= 0) {
+      return false;
+    }
+    setTimeout(() => {  // or DOMContentLoaded 
+      autoScrollToc();
+    }, 0);
+  }
+
+  const autoScrollToc = function () {
+    const $activeItem = document.querySelector('.is-active-link');
+    const $cardToc = document.querySelector('.toc-content');
+    const activePosition = $activeItem.getBoundingClientRect().top
+    const sidebarScrollTop = $cardToc.scrollTop
+    if (activePosition > (document.documentElement.clientHeight - 100)) {
+      $cardToc.scrollTop = sidebarScrollTop + 150
+    }
+    if (activePosition < 100) {
+      $cardToc.scrollTop = sidebarScrollTop - 150
+    }
+  }
+
+  document.addEventListener('pjax:send', function () {
+    if ($('.toc').length) {
+      tocbot.destroy();
+    }
+  });
+
+  document.addEventListener('pjax:complete', function () {
+    if ($('.toc').length) {
+      tocbot.init(option);
+      mobileTocClick();
+    }
+  });
+  
+  // 手机端toc按钮点击出现目录
+  const mobileTocClick = function () {
+    const $cardTocLayout = document.getElementsByClassName('toc-aside')[0];
+    const $cardToc = $cardTocLayout.getElementsByClassName('toc-content')[0];
+    let right = '45px';
+    if (window.innerWidth >= 551 && window.innerWidth <= 992) {
+      right = '100px'
+    }
+    const mobileToc = {
+      open: () => {
+        $cardTocLayout.style.cssText = 'animation: toc-open .3s; opacity: 1; right: ' + right
+      },
+
+      close: () => {
+        $cardTocLayout.style.animation = 'toc-close .2s'
+        setTimeout(() => {
+          $cardTocLayout.style.cssText = "opacity:''; animation: ''; right: ''"
+        }, 100)
+      }
+    }
+    document.getElementById('toc-mobile-btn').addEventListener('click', () => {
+      if (window.getComputedStyle($cardTocLayout).getPropertyValue('opacity') === '0') mobileToc.open()
+      else mobileToc.close()
+    })
+
+    $cardToc.addEventListener('click', (e) => {
+      if (window.innerWidth < 992) { // 小于992px的时候
+        mobileToc.close()
+      }
+    })
+  }
+</script>
+
+<style>
+  .is-position-fixed {
+    position: sticky !important;
+    top: 74px;
+  }
+
+  .toc-main ul {
+    counter-reset: show-list;
+  }
+
+  .toc-main ul li::before {
+    content: counter(item)".";
+    display: block;
+    position: absolute;
+    left: 12px;
+    top: 0;
+  }
+</style> 
+
+<!-- 设置导航背景 -->
+<script>
+  let setHeaderClass = () => {
+    const headerMenuTransparent = true;
+    if (!headerMenuTransparent) { return; }
+    const nav = $('#navHeader');
+    const navTop = nav.outerHeight();
+    const winTop = $(window).scrollTop();
+    if(winTop > navTop) {
+      nav.addClass('header-bg-color');
+    }
+    else {
+      nav.removeClass('header-bg-color');
+    }
+  };
+
+  let scrollCollect = () => {
+    return bamboo.throttle(function (e) {
+      setHeaderClass();
+    }, 200)()
+  }
+
+  let initHeaderBg = () => {
+    setHeaderClass();
+  }
+
+  setHeaderClass();
+  window.addEventListener('scroll', scrollCollect);
+
+  document.addEventListener('pjax:send', function () {
+    window.removeEventListener('scroll', scrollCollect)
+  })
+  document.addEventListener('pjax:complete', function () {
+    window.addEventListener('scroll', scrollCollect);
+    setHeaderClass();
+  })
+</script> 
+
+<!-- 渲染issues标签里的内容 -->
+<script>
+  function loadIssuesJS() {
+    if ($(".post-detail").find(".issues-api").length == 0) {
+      return;
+    } 
+    loadScript('/js/issues/index.js');
+  };
+  $(function () {
+    loadIssuesJS();
+  });
+  document.addEventListener('pjax:complete', function () {
+    if (typeof IssuesAPI == "undefined") {
+      loadIssuesJS();
+    }
+  })
+</script>
+
+<!-- 输入框打字特效 -->
+<!-- 输入框打字特效 -->
+
+  <script src="/js/activate-power-mode.js"></script>
+  <script>
+    POWERMODE.colorful = true;  // 打开随机颜色特效
+    POWERMODE.shake = false;    // 关闭输入框抖动
+    document.body.addEventListener('input', POWERMODE);//监听打字事件
+  </script>
+
+
+<!-- markdown代码一键复制功能 -->
+
+  <link rel="stylesheet" href="https://unpkg.com/v-plugs-ayu/lib/ayu.css">
+  <script src="https://unpkg.com/v-plugs-ayu/lib/ayu.umd.min.js"></script>
+  <script src="/js/clipboard/clipboard.min.js"></script>
+  <div id="appCopy">
+  </div>
+  <script data-pjax>
+    var vm = new Vue({
+      el: '#appCopy',
+      data: {
+      },
+      computed: {
+      },
+      mounted() {
+        const that = this;
+        var copy = 'copy';
+        /* code */
+        var initCopyCode = function () {
+          var copyHtml = '';
+          copyHtml += '<button class="btn-copy" data-clipboard-snippet="" style="position:absolute;top:0;right:0;z-index:1;">';
+          copyHtml += '<i class="fas fa-copy"></i><span>' + copy + '</span>';
+          copyHtml += '</button>';
+          $(".post-detail pre").not('.gutter pre').wrap("<div class='codeBox' style='position:relative;width:100%;'></div>")
+          $(".post-detail pre").not('.gutter pre').before(copyHtml);
+          new ClipboardJS('.btn-copy', {
+            target: function (trigger) {
+              return trigger.nextElementSibling;
+            }
+          });
+        }
+        initCopyCode();
+        $('.btn-copy').unbind('click').bind('click', function () {
+          doSomething();
+        })
+        $(document).unbind('keypress').bind('keypress', function (e) {
+          if (e.ctrlKey && e.keyCode == 67) {
+            doSomething();
+          }
+        })
+
+        function doSomething() {
+          that.$notify({
+            title: "成功",
+            content: "代码已复制，请遵守相关授权协议。",
+            type: 'success'
+          })
+        }
+      },
+      methods: {
+      },
+      created() { }
+    })
+  </script>
+  
+
+<!-- 图片懒加载 -->
+<script defer src="https://unpkg.com/vanilla-lazyload@17.1.0/dist/lazyload.min.js"></script>
+<script>
+  // https://www.npmjs.com/package/vanilla-lazyload
+  // Set the options globally
+  // to make LazyLoad self-initialize
+  window.lazyLoadOptions = {
+    elements_selector: ".lazyload",
+    threshold: 0
+  };
+  // Listen to the initialization event
+  // and get the instance of LazyLoad
+  window.addEventListener(
+    "LazyLoad::Initialized",
+    function (event) {
+      window.lazyLoadInstance = event.detail.instance;
+    },
+    false
+  );
+  document.addEventListener('DOMContentLoaded', function () {
+    lazyLoadInstance.update();
+  });
+  document.addEventListener('pjax:complete', function () {
+    lazyLoadInstance.update();
+  });
+</script>
+
+
+<!-- 卡片滚动动画 -->
+   
+
+<!-- 评论所需js -->
+
+  
+    <script type="text/javascript">
+  var utteranceCommon = {};
+
+  function check_utterance() {
+    let isDark = JSON.parse(localStorage.getItem('dark')) || JSON.parse('false');
+    if (isDark) {
+      utteranceCommon.Theme = 'github-dark';
+    } else {
+      utteranceCommon.Theme = 'github-light';
+    }
+
+    return document.getElementById("gitment-container");
+  }
+  comment_el = '#gitment-container';
+  load_utterance = function () {
+    if ($(comment_el).length) {
+      // 匿名函数，防止污染全局变量
+      const HEAD = check_utterance();
+
+      var utterances = document.createElement('script');
+      utterances.type = 'text/javascript';
+      utterances.async = true;
+      utterances.setAttribute('issue-term', 'pathname')
+      utterances.setAttribute('theme', utteranceCommon.Theme)
+      utterances.setAttribute('repo', '')
+      utterances.crossorigin = 'anonymous';
+      utterances.src = 'https://utteranc.es/client.js';
+      // content 是要插入评论的地方
+      document.getElementById('gitment-container').appendChild(utterances);
+
+    }
+  }
+
+  function dark_utterance() {
+    const HEAD = check_utterance();
+    if (!HEAD) return;
+    const message = {
+      type: 'set-theme',
+      theme: utteranceCommon.Theme
+    };
+    const utteranceIframe = document.querySelector('iframe');
+    utteranceIframe.contentWindow.postMessage(message, 'https://utteranc.es');
+  }
+
+  $(document).ready(load_utterance);
+  document.addEventListener('pjax:complete', function () {
+    load_utterance();
+  });
+
+  $('.dark').click(function () {
+    setTimeout(() => {
+      dark_utterance();
+    });
+  })
+
+</script>
+
+<style>
+  .utterances {
+    max-width: inherit !important;
+  }
+</style>
+  
+
+
+<!-- 鼠标点击特效 -->
+<!-- 爱心点击 -->
+
+  
+    <canvas class="fireworks" style="position: fixed;left: 0;top: 0;z-index: 999; pointer-events: none;" ></canvas>
+    <script src="//cdn.bootcss.com/animejs/2.2.0/anime.min.js"></script>
+    <script src="/js/cursor/explosion.min.js"></script>
+  
+
+
+
+
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" data-pjax></script>
+
+
+    <!-- pjax -->
+    
+
+<!-- pjax -->
+
+
+  <script src="/js/pjax@0.2.8/index.js"></script>
+  
+    <!-- 样式位于：source/css/_third-party/pjaxanimate.styl -->
+
+<div class="pjax-animate">
+  
+    <div class="loading-circle"><div id="loader-circle"></div></div>
+    <script>
+      window.ShowLoading = function() {
+        $(".loading-circle").css("display", "block");
+      };
+      window.HideLoading = function() {
+        $(".loading-circle").css("display", "none");
+      }
+    </script>
+  
+	<script>
+    document.addEventListener('pjax:complete', function () {
+      window.HideLoading();
+    })
+    document.addEventListener('pjax:send', function () {
+      window.ShowLoading();
+    })
+    document.addEventListener('pjax:error', function () {
+      window.HideLoading();
+    })
+	</script>
+</div>
+
+  
+
+  <script>
+    var pjax = new Pjax({
+      elements: 'a[href]:not([href^="#"]):not([href="javascript:void(0)"]):not([no-pjax])',   // 拦截正常带链接的 a 标签
+      selectors: ["#pjax-container","title"],                                   // 根据实际需要确认重载区域
+      cacheBust: false,   // url 地址追加时间戳，用以避免浏览器缓存
+      timeout: 5000
+    });
+
+    document.addEventListener('pjax:send', function (e) {
+
+      try {
+        var currentUrl = window.location.pathname;
+        var targetUrl = e.triggerElement.href;
+        var banUrl = [""];
+        if (banUrl[0] != "") {
+          banUrl.forEach(item => {
+            if(currentUrl.indexOf(item) != -1 || targetUrl.indexOf(item) != -1) {
+              window.location.href = targetUrl;
+            }
+          });
+        }
+      } catch (error) {}
+
+      $(window).unbind('resize');
+      $(window).unbind('scroll');
+      $(document).unbind('scroll');
+      $(document).unbind('click');
+      $('body').unbind('click');
+
+    })
+    
+    document.addEventListener('pjax:complete', function () {
+      $('script[data-pjax], .pjax-reload script').each(function () {
+        $(this).parent().append($(this).remove());
+      });
+    });
+
+    document.addEventListener('pjax:error', function (e) {
+      window.location.href = e.triggerElement.href;
+    })
+    
+    // 刷新不从顶部开始
+    document.addEventListener("DOMContentLoaded", function () {
+      history.scrollRestoration = 'auto';
+    })
+  </script>
+
+
+
+  </body>
+</html>

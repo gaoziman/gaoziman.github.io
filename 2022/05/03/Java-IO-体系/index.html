@@ -1,0 +1,2479 @@
+<!DOCTYPE html>
+<html>
+  <!-- meta/link... -->
+  
+
+
+
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport">
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+
+
+  <title>Java IO 体系 | Hexo</title>
+
+  <link rel="icon" type="image/x-icon, image/vnd.microsoft.icon" href="/favicon.ico">
+  <link rel="stylesheet" href="https://at.alicdn.com/t/font_1911880_c1nvbyezg17.css">
+  <link href="https://unpkg.com/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet">
+  <link href="/js/swiper/swiper@5.4.1.min.css" rel="stylesheet">
+  
+  
+  
+  
+<link rel="stylesheet" href="/css/animate.min.css">
+
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+  
+    
+<link rel="stylesheet" href="/js/fancybox/jquery.fancybox.min.css">
+
+  
+  
+    
+<link rel="stylesheet" href="/js/shareJs/share.min.css">
+
+  
+  <style>
+        @media (max-width: 992px) {
+            #waifu {
+                display: none;
+            }
+        }
+    </style>
+    <script src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
+    <link href="//cdn.bootcss.com/pace/1.0.2/themes/pink/pace-theme-flash.css" rel="stylesheet">
+
+    
+
+    <!-- import link -->
+    
+        
+            
+        
+            
+        
+    
+    <!-- import script -->
+    
+        
+            
+        
+            
+        
+    
+
+<meta name="generator" content="Hexo 6.2.0"></head>
+
+  
+  <!-- 依赖于jquery和vue -->
+  
+    
+<script src="https://unpkg.com/jquery@3.5.1/dist/jquery.min.js"></script>
+
+  
+
+  
+    
+<script src="https://unpkg.com/vue@2.6.11/dist/vue.min.js"></script>
+
+  
+  
+  <body>
+    <!-- 预加载动画 -->
+    <!-- 页面预加载动画 -->
+
+<div id='loader'>
+  <link rel="stylesheet" href="/js/loaded/index.css" >
+  <div class="loading-left-bg"></div>
+  <div class="loading-right-bg"></div>
+  <div class="spinner-box">
+    <div class="configure-border-1">
+      <div class="configure-core"></div>
+    </div>
+    <div class="configure-border-2">
+      <div class="configure-core"></div>
+    </div>
+    <div class="loading-word">loading...</div>
+  </div>
+</div>
+
+<script>
+  var endLoading = function () {
+    document.body.style.overflow = 'auto';
+    document.getElementById('loader').classList.add("loading");
+  }
+  window.addEventListener('DOMContentLoaded',endLoading);
+  
+</script>
+
+    
+    <!-- 判断是否为暗黑风格 -->
+    <!-- 判断是否为黑夜模式 -->
+<script>
+  let isDark = JSON.parse(localStorage.getItem('dark')) || JSON.parse('false');
+
+  if (isDark) {
+    $(document.body).addClass('darkModel');
+  }
+</script>
+
+    <!-- 需要在上面加载的js -->
+    <script>
+  function loadScript(src, cb) {
+    return new Promise(resolve => {
+      setTimeout(function () {
+        var HEAD = document.getElementsByTagName("head")[0] || document.documentElement;
+        var script = document.createElement("script");
+        script.setAttribute("type", "text/javascript");
+        if (cb) {
+          if (JSON.stringify(cb)) {
+            for (let p in cb) {
+              if (p == "onload") {
+                script[p] = () => {
+                  cb[p]()
+                  resolve()
+                }
+              } else {
+                script[p] = cb[p]
+                script.onload = resolve
+              }
+            }
+          } else {
+            script.onload = () => {
+              cb()
+              resolve()
+            };
+          }
+        } else {
+          script.onload = resolve
+        }
+        script.setAttribute("src", src);
+        HEAD.appendChild(script);
+      });
+    });
+  }
+
+  //https://github.com/filamentgroup/loadCSS
+  var loadCSS = function (href, before, media, attributes) {
+    return new Promise(resolve => {
+      setTimeout(function () {
+        var link = document.createElement('link');
+        link.rel = "stylesheet";
+        link.href = src;
+        link.onload = resolve;
+        document.getElementsByTagName("head")[0].appendChild(link);
+      });
+    });
+  };
+
+</script> 
+
+<!-- 轮播图所需要的js -->
+<script src="/js/swiper/swiper.min.js"></script>
+<script src="/js/swiper/vue-awesome-swiper.js"></script>
+<script src="/js/swiper/swiper.animate1.0.3.min.js"></script>
+
+<script type="text/javascript">
+  Vue.use(window.VueAwesomeSwiper)
+</script>
+
+
+  <script src="/js/vue-typed-js/index.js"></script>
+
+
+<!-- 首页的公告滚动插件的js需要重新加载 -->
+<script src="/js/vue-seamless-scroll/index.js"></script>
+
+<!-- 打字机效果js -->
+<script src="https://unpkg.com/typed.js@2.0.11"></script>
+
+
+    <div id="safearea">
+      <main class="main" id="pjax-container">
+        <!-- 头部导航 -->
+        
+<header class="header   " 
+  id="navHeader"
+  style="position: fixed;
+  left: 0; top: 0; z-index: 10;width: 100%;"
+>
+  <div class="header-content">
+    <div class="bars">
+      <div id="appDrawer" class="sidebar-image">
+  <div class="drawer-box-icon">
+    <i class="fas fa-bars" aria-hidden="true" @click="showDialogDrawer"></i>
+  </div>
+  
+  <transition name="fade">
+    <div class="drawer-box_mask" v-cloak style="display: none;" v-show="visible" @click.self="cancelDialogDrawer">
+    </div>
+  </transition>
+  <div class="drawer-box" :class="{'active': visible}">
+    <div class="drawer-box-head bg-color">
+      <img class="drawer-box-head_logo lazyload placeholder" src="/medias/logo.png" class="lazyload placeholder" data-srcset="/medias/logo.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="logo">
+      <h3 class="drawer-box-head_title">Hexo</h3>
+      <h5 class="drawer-box-head_desc"></h5>
+    </div>
+    
+    <div class="drawer-box-content">
+      <ul class="drawer-box-content_menu">
+        
+        
+          <li class="drawer-box-content_item">
+            <a target="_blank" rel="noopener" href="https://github.com/yuang01/hexo-theme-bamboo">
+              <i class="fas fa-github" aria-hidden="true"></i>
+              <span>Github</span>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</div>
+
+<script>
+  var body = document.body || document.documentElement || window;
+  var vm = new Vue({
+    el: '#appDrawer',
+    data: {
+      visible: false,
+      top: 0,
+      openArr: [],
+    },
+    computed: {
+    },
+    mounted() {
+    },
+    methods: {
+      isOpen(index) {
+        if (this.openArr.includes(index)) {
+          return true;
+        } else {
+          return false;
+        }
+      },
+      openOrCloseMenu(curIndex) {
+        const index = this.openArr.indexOf(curIndex);
+        if (index !== -1) {
+          this.openArr.splice(index, 1);
+        } else {
+          this.openArr.push(curIndex);
+        }
+      },
+      showDialogDrawer() {
+        this.visible = true;
+        // 防止页面滚动，只能让弹框滚动
+        this.top = $(document).scrollTop()
+        body.style.cssText = 'width: 100%; height: 100%;overflow: hidden;';
+      },
+      cancelDialogDrawer() {
+        this.visible = false;
+        body.removeAttribute('style');
+        $(document).scrollTop(this.top)
+      }
+    },
+    created() {}
+  })
+</script>
+
+    </div>
+    <div class="blog-title" id="author-avatar">
+      
+        <div class="avatar">
+          <img src="/medias/logo.png" class="lazyload placeholder" data-srcset="/medias/logo.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="logo">
+        </div>
+      
+      <a href="/" class="logo">Hexo</a>
+    </div>
+    <nav class="navbar">
+      <ul class="menu">
+        
+      </ul>
+      
+      
+        <div id="appSearch">
+  <div class="search"  @click="showDialog()"><i class="fas fa-search" aria-hidden="true"></i></div>
+  <transition name="fade">
+    <div class="message-box_wrapper" style="display: none;" v-cloak v-show="dialogVisible" @click.self="cancelDialogVisible()">
+      <div class="message-box animated bounceInDown">
+        <h2>
+          <span>
+            <i class="fas fa-search" aria-hidden="true"></i>
+            <span class="title">Search</span>
+          </span>
+          <i class="fas fa-times close" pointer style="float:right;" aria-hidden="true" @click.self="cancelDialogVisible()"></i>
+        </h2>
+        <form class="site-search-form">
+          <input type="text"
+            placeholder="Please enter keywords"
+            id="local-search-input" 
+            @click="getSearchFile()"
+            class="st-search-input"
+            v-model="searchInput"
+          />
+        </form>
+        <div class="result-wrapper">
+          <div id="local-search-result" class="local-search-result-cls"></div>
+        </div>
+      </div>
+    </div>
+  </transition>
+</div>
+<script src="/js/local_search.js"></script>
+<script>
+  var body = document.body || document.documentElement || window;
+  var vm = new Vue({
+    el: '#appSearch',
+    data: {
+      dialogVisible: false,
+      searchInput: '',
+      top: 0,
+    },
+    computed: {
+    },
+    mounted() {
+      window.addEventListener('pjax:complete', () => {
+        this.cancelDialogVisible();
+      })
+    },
+    methods: {
+      showDialog() {
+        this.dialogVisible = true;
+        // 防止页面滚动，只能让弹框滚动
+        this.top = $(document).scrollTop()
+        body.style.cssText = 'overflow: hidden;';
+      },
+      getSearchFile() {
+        if (!this.searchInput) {
+          getSearchFile("/search.xml");
+        }
+      },
+      cancelDialogVisible() {
+        this.dialogVisible = false;
+        body.removeAttribute('style');
+        $(document).scrollTop(this.top)
+      },
+    },
+    created() {}
+  })
+</script>
+<!-- 解决刷新页面闪烁问题，可以在元素上添加display: none, 或者用vue.extend方法，详情：https://blog.csdn.net/qq_31393401/article/details/81017912 -->
+<!-- 下面是搜索基本写法 -->
+<!-- <script type="text/javascript" id="local.search.active">
+  var inputArea = document.querySelector("#local-search-input");
+  inputArea.onclick   = function(){ getSearchFile(); this.onclick = null }
+  inputArea.onkeydown = function(){ if(event.keyCode == 13) return false }
+</script> -->
+
+      
+
+    </nav>
+  </div>
+  
+    <a target="_blank" rel="noopener" href="https://github.com/yuang01/hexo-theme-bamboo" class="github-corner color-primary" aria-label="View source on GitHub"><svg width="60" height="60" viewBox="0 0 250 250" style="fill:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+  
+  
+</header>
+        <!-- 内容区域 -->
+        
+ <!-- prismjs 代码高亮 -->
+ 
+
+
+<div class="bg-dark-floor" style="position: fixed;left: 0;top: 0;width: 100%;height: 100%;z-index: -1;"></div>
+
+
+  <!-- 文章详情页顶部图片和标题 -->
+
+
+
+
+<div class="post-detail-header" id="thumbnail_canvas" style="background-repeat: no-repeat; background-size: cover; 
+  background-position: center center;position: relative;background-image:url('/medias/6.jpg')">
+  <div class="post-detail-header-mask"></div>
+  <canvas id="header_canvas"style="position:absolute;bottom:0;pointer-events:none;"></canvas>
+  
+  <div class="post-detail-header_info-box">
+    <div class="title-box">
+      <span class="title">
+        Java IO 体系
+      </span>
+    </div>
+    
+    
+      
+        <span class="post-detail-header_date">
+          <i class="fas fa-calendar"></i> Published in：2022-05-03 |
+        </span>
+      
+
+      
+        <span class="post-detail-header_categories">
+          <i class="iconfont iconbookmark1"></i> category：
+          
+            <a href="/categories/Java-Basic/" class="post-detail-header_category">
+              Java-Basic
+            </a>
+          
+        </span>
+      
+
+      
+    
+  </div>
+  
+  
+    <script src="/js/bubble/bubble.js"></script>
+  
+</div>
+
+
+
+
+
+<div class="post-detail-content row justify-position" 
+  style="padding-top: 0px;">
+  <div class="main-content">
+    <article class="post post-detail">
+      <div class="post-content">
+        <h1 id="Java-IO-体系"><a href="#Java-IO-体系" class="headerlink" title="Java IO 体系"></a>Java IO 体系</h1><p>Java IO 是一个庞大的知识体系，很多人学着学着就会学懵了，包括我在内也是如此，所以本文将会从 Java 的 BIO 开始，一步一步深入学习，引出 JDK1.4 之后出现的 NIO 技术，对比 NIO 与 BIO 的区别，然后对 NIO 中重要的三个组成部分进行讲解（缓冲区、通道、选择器），最后实现一个<strong>简易的客户端与服务器通信功能</strong>。</p>
+<h2 id="传统的-BIO"><a href="#传统的-BIO" class="headerlink" title="传统的 BIO"></a>传统的 BIO</h2><p>Java IO流是一个庞大的生态环境，其内部提供了很多不同的<strong>输入流和输出流</strong>，细分下去还有字节流和字符流，甚至还有<strong>缓冲流</strong>提高 IO 性能，转换流将字节流转换为字符流······看到这些就已经对 IO 产生恐惧了，在日常开发中少不了对文件的 IO 操作，虽然 apache 已经提供了 <code>Commons IO</code> 这种封装好的组件，但面对特殊场景时，我们仍需要自己去封装一个高性能的文件 IO 工具类，本文将会解析 Java IO 中涉及到的各个类，以及讲解如何正确、高效地使用它们。</p>
+<h2 id="BIO-NIO-和-AIO-的区别"><a href="#BIO-NIO-和-AIO-的区别" class="headerlink" title="BIO NIO 和 AIO 的区别"></a>BIO NIO 和 AIO 的区别</h2><p>我们会以一个经典的<strong>烧开水</strong>的例子通俗地讲解它们之间的区别</p>
+<table>
+<thead>
+<tr>
+<th align="center">类型</th>
+<th align="center">烧开水</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">BIO</td>
+<td align="center">一直监测着某个水壶，该水壶烧开水后再监测下一个水壶</td>
+</tr>
+<tr>
+<td align="center">NIO</td>
+<td align="center">每隔一段时间就看看所有水壶的状态，哪个水壶烧开水就去处理哪个水壶</td>
+</tr>
+<tr>
+<td align="center">AIO</td>
+<td align="center">不用监测水壶，每个水壶烧开水后都会主动通知线程说：“我的水烧开了，来处理我吧”</td>
+</tr>
+</tbody></table>
+<p><strong>BIO (同步阻塞 I&#x2F;O)</strong></p>
+<p>这里假设一个烧开水的场景，有一排水壶在烧开水，BIO的工作模式就是， 小菠萝<strong>一直看着着这个水壶，直到这个水壶烧开，才去处理下一个水壶</strong>。线程在等待水壶烧开的时间段什么都没有做。</p>
+<p><strong>NIO（同步非阻塞 I&#x2F;O）</strong></p>
+<p>还拿烧开水来说，NIO的做法是<strong>小菠萝一边玩着手机，每隔一段时间就看一看每个水壶的状态</strong>，看看是否有水壶的状态发生了改变，如果某个水壶烧开了，可以先处理那个水壶，然后继续玩手机，继续隔一段时间又看看每个水壶的状态。</p>
+<p><strong>AIO （异步非阻塞 I&#x2F;O）</strong></p>
+<p>小菠萝觉得每隔一段时间就去看一看水壶太费劲了，于是购买了一批烧开水时可以<strong>哔哔响</strong>的水壶，于是开始烧水后，小菠萝就直接去客厅玩手机了，水烧开时，就发出“哔哔”的响声，<strong>通知小菠萝来关掉水壶</strong>。</p>
+<h2 id="什么是流"><a href="#什么是流" class="headerlink" title="什么是流"></a>什么是流</h2><p>知识科普：我们知道任何一个文件都是以<strong>二进制</strong>形式存在于设备中，计算机就只有 <code>0</code> 和 <code>1</code>，你能看见的东西全部都是由这两个数字组成，你看这篇文章时，这篇文章也是由01组成，只不过这些二进制串经过各种转换演变成一个个文字、一张张图片跃然屏幕上。</p>
+<p>而<strong>流</strong>就是将这些二进制串在各种设备之间进行传输，如果你觉得有些抽象，我举个例子就会好理解一些：</p>
+<blockquote>
+<p>下图是一张图片，它由01串组成，我们可以通过程序把一张图片拷贝到一个文件夹中，</p>
+<p>把图片转化成二进制数据集，把数据一点一点地传递到文件夹中 , 类似于水的流动 , 这样整体的数据就是一个数据流</p>
+</blockquote>
+<p><img src="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/008i3skNgy1gsk623yzlfj310w0a0q3v.jpg" class="lazyload placeholder" data-srcset="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/008i3skNgy1gsk623yzlfj310w0a0q3v.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20210717192230048"></p>
+<p>IO 流读写数据的特点：</p>
+<ul>
+<li><strong>顺序读写</strong>。读写数据时，大部分情况下都是按照顺序读写，读取时从文件开头的第一个字节到最后一个字节，写出时也是也如此（RandomAccessFile 可以实现随机读写）</li>
+<li><strong>字节数组</strong>。读写数据时本质上都是对字节数组做读取和写出操作，即使是字符流，也是在字节流基础上转化为一个个字符，所以字节数组是 IO 流读写数据的本质。</li>
+</ul>
+<h2 id="流的分类"><a href="#流的分类" class="headerlink" title="流的分类"></a>流的分类</h2><p>根据<strong>数据流向</strong>不同分类：输入流 和 输出流</p>
+<ul>
+<li><strong>输入流</strong>：从磁盘或者其它设备中将数据输入到进程中</li>
+<li><strong>输出流</strong>：将进程中的数据输出到磁盘或其它设备上保存</li>
+</ul>
+<p><img src="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/008i3skNgy1gsk62asjipj311o0awwfg.jpg" class="lazyload placeholder" data-srcset="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/008i3skNgy1gsk62asjipj311o0awwfg.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20210717192244308"></p>
+<p>图示中的硬盘只是其中一种设备，还有非常多的设备都可以应用在IO流中，例如：打印机、硬盘、显示器、手机······</p>
+<p>根据<strong>处理数据的基本单位</strong>不同分类：字节流 和 字符流</p>
+<ul>
+<li>字节流：以<strong>字节（8 bit）</strong>为单位做数据的传输</li>
+<li>字符流：以<strong>字符</strong>为单位（1字符 &#x3D; 2字节）做数据的传输</li>
+</ul>
+<blockquote>
+<p>字符流的本质也是通过字节流读取，Java 中的字符采用 Unicode 标准，在读取和输出的过程中，通过以字符为单位，查找对应的码表将字节转换为对应的字符。</p>
+</blockquote>
+<p>面对字节流和字符流，很多读者都有疑惑：<strong>什么时候需要用字节流，什么时候又要用字符流？</strong></p>
+<p>我这里做一个简单的概括，你可以按照这个标准去使用：</p>
+<p>字符流只针对字符数据进行传输，所以如果是<strong>文本数据</strong>，优先<strong>采用字符流</strong>传输；除此之外，其它类型的数据（图片、音频等），最好还是以<strong>字节流</strong>传输。</p>
+<p>根据这两种不同的分类，我们就可以做出下面这个表格，里面包含了 IO 中最核心的 4 个顶层抽象类：</p>
+<table>
+<thead>
+<tr>
+<th>数据流向 &#x2F; 数据类型</th>
+<th>字节流</th>
+<th>字符流</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>输入流</td>
+<td>InputStream</td>
+<td>Reader</td>
+</tr>
+<tr>
+<td>输出流</td>
+<td>OutputStream</td>
+<td>Writer</td>
+</tr>
+</tbody></table>
+<p>现在看 IO 是不是有一些思路了，不会觉得很混乱了，我们来看这四个类下的所有成员。</p>
+<p><img src="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/008i3skNgy1gsk62inht7j30yo0f6myz.jpg" class="lazyload placeholder" data-srcset="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/008i3skNgy1gsk62inht7j30yo0f6myz.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20210717192257484"></p>
+<p>看到这么多的类是不是又开始觉得混乱了，不要慌，字节流和字符流下的输入流和输出流大部分都是一一对应的，有了上面的表格支撑，我们不需要再担心看见某个类会懵逼的情况了。</p>
+<p>看到 <code>Stream</code> 就知道是<strong>字节流</strong>，看到 <code>Reader / Writer</code> 就知道是<strong>字符流</strong>。</p>
+<p>这里还要额外补充一点：Java IO 提供了<strong>字节流转换为字符流的转换类</strong>，称为转换流。</p>
+<table>
+<thead>
+<tr>
+<th>转换流 &#x2F; 数据类型</th>
+<th>字节流与字符流之间的转换</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>（输入）字节流 &#x3D;&gt; 字符流</td>
+<td>InputStreamReader</td>
+</tr>
+<tr>
+<td>（输出）字符流 &#x3D;&gt; 字节流</td>
+<td>OutputStreamWriter</td>
+</tr>
+</tbody></table>
+<p>注意字节流与字符流之间的转换是有严格定义的：</p>
+<ul>
+<li>输入流：可以将字节流 &#x3D;&gt; 字符流</li>
+<li>输出流：可以将字符流 &#x3D;&gt; 字节流</li>
+</ul>
+<p>为什么在输入流不能字符流 &#x3D;&gt; 字节流，输出流不能字节流 &#x3D;&gt; 字符流？</p>
+<blockquote>
+<p>在存储设备上，所有数据都是以<strong>字节</strong>为单位存储的，所以<strong>输入到内存时必定是以字节为单位输入，输出到存储设备时必须是以字节为单位输出</strong>，字节流才是计算机最根本的存储方式，而字符流是在字节流的基础上对数据进行转换，输出字符，但每个字符依旧是以字节为单位存储的。</p>
+</blockquote>
+<h2 id="节点流和处理流"><a href="#节点流和处理流" class="headerlink" title="节点流和处理流"></a>节点流和处理流</h2><p>在这里需要额外插入一个小节讲解节点流和处理流。</p>
+<ul>
+<li><strong>节点流</strong>：节点流是<strong>真正传输数据</strong>的流对象，用于向特定的一个地方（节点）读写数据，称为节点流。例如 FileInputStream</li>
+<li><strong>处理流</strong>：处理流是<strong>对节点流的封装</strong>，使用外层的处理流读写数据，本质上是利用节点流的功能，外层的处理流可以提供额外的功能。处理流的基类都是以 <code>Filter</code> 开头。</li>
+</ul>
+<p><img src="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/008i3skNgy1gsk62paeonj61180a8ab002.jpg" class="lazyload placeholder" data-srcset="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/008i3skNgy1gsk62paeonj61180a8ab002.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20210717192307633"></p>
+<p>上图将 <code>ByteArrayInputStream</code> 封装成 <code>DataInputStream</code>，可以将输入的字节数组转换为对应数据类型的数据。例如希望读入<code>int</code>类型数据，就会以<code>2</code>个字节为单位转换为一个数字。</p>
+<h2 id="Java-IO-的核心类-File"><a href="#Java-IO-的核心类-File" class="headerlink" title="Java IO 的核心类 File"></a>Java IO 的核心类 File</h2><p>Java 提供了 File类，它指向计算机操作系统中的文件和目录，通过该类只能访问文件和目录，无法访问内容。 它内部主要提供了 <code>3</code> 种操作：</p>
+<ul>
+<li><strong>访问文件的属性</strong>：绝对路径、相对路径、文件名······</li>
+<li><strong>文件检测</strong>：是否文件、是否目录、文件是否存在、文件的读&#x2F;写&#x2F;执行权限······</li>
+<li><strong>操作文件</strong>：创建目录、创建文件、删除文件······</li>
+</ul>
+<p>上面举例的操作都是在开发中非常常用的，File 类远不止这些操作，更多的操作可以直接去 API 文档中根据需求查找。</p>
+<p>访问文件的属性：</p>
+<table>
+<thead>
+<tr>
+<th align="center">API</th>
+<th align="center">功能</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">String getAbsolutePath()</td>
+<td align="center">返回该文件处于系统中的绝对路径名</td>
+</tr>
+<tr>
+<td align="center">String getPath()</td>
+<td align="center">返回该文件的相对路径，通常与 new File() 传入的路径相同</td>
+</tr>
+<tr>
+<td align="center">String getName()</td>
+<td align="center">返回该文件的文件名</td>
+</tr>
+</tbody></table>
+<p>文件检测：</p>
+<table>
+<thead>
+<tr>
+<th align="center">API</th>
+<th align="center">功能</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">boolean isFIle()</td>
+<td align="center">校验该路径指向是否一个文件</td>
+</tr>
+<tr>
+<td align="center">boolean isDirectory()</td>
+<td align="center">校验该路径指向是否一个目录</td>
+</tr>
+<tr>
+<td align="center">boolean isExist()</td>
+<td align="center">校验该路径指向的文件&#x2F;目录是否存在</td>
+</tr>
+<tr>
+<td align="center">boolean canWrite()</td>
+<td align="center">校验该文件是否可写</td>
+</tr>
+<tr>
+<td align="center">boolean canRead()</td>
+<td align="center">校验该文件是否可读</td>
+</tr>
+<tr>
+<td align="center">boolean canExecute()</td>
+<td align="center">校验该文件&#x2F;目录是否可以被执行</td>
+</tr>
+</tbody></table>
+<p>操作文件：</p>
+<table>
+<thead>
+<tr>
+<th align="center">API</th>
+<th align="center">功能</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">mkdirs()</td>
+<td align="center">递归创建多个文件夹，路径中间有可能某些文件夹不存在</td>
+</tr>
+<tr>
+<td align="center">createNewFile()</td>
+<td align="center">创建新文件，它是一个原子操作，有两步：检查文件是否存在、创建新文件</td>
+</tr>
+<tr>
+<td align="center">delete()</td>
+<td align="center">删除文件或目录，删除目录时必须保证该目录为空</td>
+</tr>
+</tbody></table>
+<p><strong>多了解一些</strong></p>
+<p>文件的读&#x2F;写&#x2F;执行权限，在 <code>Windows</code> 中通常表现不出来，而在 <code>Linux</code> 中可以很好地体现这一点，原因是 <code>Linux</code> 有严格的用户权限分组，不同分组下的用户对文件有不同的操作权限，所以这些方法在 <code>Linux</code> 下会比在 <code>Windows</code> 下更好理解。下图是 redis 文件夹中的一些文件的详细信息，被红框标注的是不同用户的执行权限：</p>
+<ul>
+<li>r（Read）：代表该文件可以被当前用户读，操作权限的序号是 <code>4</code></li>
+<li>w（Write）：代表该文件可以被当前用户写，操作权限的序号是 <code>2</code></li>
+<li>x（Execute）：该文件可以被当前用户执行，操作权限的序号是 <code>1</code></li>
+</ul>
+<img src="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/008i3skNgy1gsk638b21hj30yu0q845l.jpg" class="lazyload placeholder" data-srcset="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/008i3skNgy1gsk638b21hj30yu0q845l.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20210717192337772" style="zoom:67%;" />
+
+<p><code>root root</code> 分别代表：<strong>当前文件的所有者</strong>，<strong>当前文件所属的用户分组</strong>。Linux 下文件的操作权限分为三种用户：</p>
+<ul>
+<li><strong>文件所有者</strong>：拥有的权限是红框中的<strong>前三个字母</strong>，<code>-</code>代表没有某个权限</li>
+<li><strong>文件所在组的所有用户</strong>：拥有的权限是红框中的<strong>中间三个字母</strong></li>
+<li><strong>其它组的所有用户</strong>：拥有的权限是红框中的<strong>最后三个字母</strong></li>
+</ul>
+<h2 id="Java-IO-流对象"><a href="#Java-IO-流对象" class="headerlink" title="Java IO 流对象"></a>Java IO 流对象</h2><p>回顾流的分类有2种：</p>
+<ul>
+<li>根据<strong>数据流向</strong>分为输入流和输出流</li>
+<li>根据<strong>数据类型</strong>分为字节流和字符流</li>
+</ul>
+<p>所以，本小节将以字节流和字符流作为主要分割点，在其内部再细分为输入流和输出流进行讲解。</p>
+<p><img src="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/008i3skNgy1gsk63dnn4vj30za0f40uk.jpg" class="lazyload placeholder" data-srcset="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/008i3skNgy1gsk63dnn4vj30za0f40uk.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20210717192346921"></p>
+<h3 id="字节流对象"><a href="#字节流对象" class="headerlink" title="字节流对象"></a>字节流对象</h3><p>字节流对象大部分输入流和输出流都是<strong>成双成对地出现</strong>，所以学习的时候可以将输入流和输出流一一对应的流对象关联起来，输入流和输出流只是<strong>数据流向</strong>不同，而<strong>处理数据的方式</strong>可以是相同的。</p>
+<p>注意不要认为用什么流读入数据，就需要用对应的流写出数据，在 Java 中没有这么规定，下图只是各个对象之间的一个对应关系，<strong>不是两个类使用时必须强制关联使用</strong>。</p>
+<blockquote>
+<p>下面有非常多的类，我会介绍基类的方法，了解这些方法是<strong>非常有必要</strong>的，子类的功能基于父类去扩展，只有真正了解父类在做什么，学习子类的成本就会下降。</p>
+</blockquote>
+<p><img src="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/008i3skNgy1gsk63k5nwgj310i0patbm.jpg" class="lazyload placeholder" data-srcset="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/008i3skNgy1gsk63k5nwgj310i0patbm.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20210717192357542"></p>
+<h4 id="InputStream"><a href="#InputStream" class="headerlink" title="InputStream"></a>InputStream</h4><p>InputStream 是字节输入流的抽象基类，提供了通用的读方法，让子类使用或重写它们。下面是 InputStream 常用的重要的方法。</p>
+<table>
+<thead>
+<tr>
+<th align="center">重要方法</th>
+<th align="center">功能</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">public abstract int read()</td>
+<td align="center">从输入流中读取下一个字节，读到尾部时返回 -1</td>
+</tr>
+<tr>
+<td align="center">public int read(byte b[])</td>
+<td align="center">从输入流中读取长度为 b.length 个字节放入字节数组 b 中</td>
+</tr>
+<tr>
+<td align="center">public int read(byte b[], int off, int len)</td>
+<td align="center">从输入流中读取指定范围的字节数据放入字节数组 b 中</td>
+</tr>
+<tr>
+<td align="center">public void close()</td>
+<td align="center">关闭此输入流并释放与该输入流相关的所有资源</td>
+</tr>
+</tbody></table>
+<p>还有其它一些不太常用的方法，我也列出来了。</p>
+<table>
+<thead>
+<tr>
+<th align="center">其它方法</th>
+<th align="center">功能</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">public long skip(long n)</td>
+<td align="center">跳过接下来的 n 个字节，返回实际上跳过的字节数</td>
+</tr>
+<tr>
+<td align="center">public long available()</td>
+<td align="center">返回下一次可读取（跳过）且不会被方法阻塞的字节数的估计值</td>
+</tr>
+<tr>
+<td align="center">public synchronized void mark(int readlimit)</td>
+<td align="center">标记此输入流的当前位置，对 reset() 方法的后续调用将会重新定位在 mark() 标记的位置，可以重新读取相同的字节</td>
+</tr>
+<tr>
+<td align="center">public boolean markSupported()</td>
+<td align="center">判断该输入流是否支持 mark() 和 reset() 方法，即能否重复读取字节</td>
+</tr>
+<tr>
+<td align="center">public synchronized void reset()</td>
+<td align="center">将流的位置重新定位在最后一次调用 mark() 方法时的位置</td>
+</tr>
+</tbody></table>
+<p><img src="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/008i3skNgy1gsk63qlphpj311s0ji76l.jpg" class="lazyload placeholder" data-srcset="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/008i3skNgy1gsk63qlphpj311s0ji76l.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20210717192407909"></p>
+<p><strong>（1）ByteArrayInputStream</strong></p>
+<p>ByteArrayInputStream 内部包含一个 <code>buf</code> 字节数组缓冲区，该缓冲区可以从流中读取的字节数，使用 <code>pos</code> 指针指向读取下一个字节的下标位置，内部还维护了一个<code>count</code> 属性，代表能够读取 <code>count</code> 个字节。</p>
+<p><img src="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/image-20220715150038632.png" class="lazyload placeholder" data-srcset="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/image-20220715150038632.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20220715150038632"></p>
+<blockquote>
+<p>必须保证 pos 严格小于 count，而 count 严格小于 buf.length 时，才能够从缓冲区中读取数据</p>
+</blockquote>
+<p><strong>（2）FileInputStream</strong></p>
+<p>文件输入流，从文件中读入字节，通常对文件的拷贝、移动等操作，可以使用该输入流把文件的字节读入内存中，然后再利用输出流输出到指定的位置上。</p>
+<p><strong>（3）PipedInputStream</strong></p>
+<p>管道输入流，它与 PipedOutputStream 成对出现，可以实现多线程中的<strong>管道通信</strong>。PipedOutputStream 中指定与特定的 PipedInputStream 连接，PipedInputStream 也需要指定特定的 PipedOutputStream 连接，之后输出流不断地往输入流的 <code>buffer</code> 缓冲区写数据，而输入流可以从缓冲区中读取数据。</p>
+<p><strong>（4）ObjectInputStream</strong></p>
+<p>对象输入流，用于对象的反序列化，将读入的字节数据反序列化为一个对象，实现对象的持久化存储。</p>
+<p><strong>（5）PushBackInputStream</strong></p>
+<p>它是 FilterInputStream 的子类，是一个<strong>处理流</strong>，它内部维护了一个缓冲数组<code>buf</code>。</p>
+<ul>
+<li>在读入字节的过程中可以将<strong>读取到的字节数据回退给缓冲区中保存</strong>，下次可以再次从缓冲区中读出该字节数据。所以<strong>PushBackInputStream 允许多次读取输入流的字节数据</strong>，只要将读到的字节放回缓冲区即可。</li>
+</ul>
+<p>需要注意的是如果回推字节时，如果缓冲区已满，会抛出 <code>IOException</code> 异常。</p>
+<p>它的应用场景：<strong>对数据进行分类规整</strong>。</p>
+<p>假如一个文件中存储了<strong>数字</strong>和<strong>字母</strong>两种类型的数据，我们需要将它们交给两种线程各自去收集自己负责的数据，如果采用传统的做法，把所有的数据全部读入内存中，再将数据进行分离，面对大文件的情况下，例如<strong>1G、2G</strong>，传统的输入流在读入数组后，<strong>由于没有缓冲区，只能对数据进行抛弃，这样每个线程都要读一遍文件</strong>。</p>
+<p>使用 PushBackInputStream 可以让一个专门的线程<strong>读取</strong>文件，唤醒不同的线程读取字符：</p>
+<ul>
+<li>第一次读取缓冲区的数据，判断该数据由哪些线程读取</li>
+<li>回退数据，唤醒对应的线程读取数据</li>
+<li>重复前两步</li>
+<li>关闭输入流</li>
+</ul>
+<p>到这里，你是否会想到 <code>AQS</code> 的 <code>Condition</code> 等待队列，多个线程可以在不同的条件上等待被唤醒。</p>
+<p><strong>（6）BufferedInputStream</strong></p>
+<p>缓冲流，它是一种<strong>处理流</strong>，对节点流进行封装并增强，其内部拥有一个 <code>buffer</code> 缓冲区，用于缓存所有读入的字节，<strong>当缓冲区满时，才会将所有字节发送给客户端读取</strong>，而不是每次都只发送一部分数据，提高了效率。</p>
+<p><strong>（7）DataInputStream</strong></p>
+<p>数据输入流，它同样是一种<strong>处理流</strong>，对节点流进行封装后，能够在内部对读入的字节转换为对应的 Java 基本数据类型。</p>
+<p><strong>（8）SequenceInputStream</strong></p>
+<p>将两个或多个输入流看作是一个输入流依次读取，该类的存在与否并不影响整个 IO 生态，在程序中也能够做到这种效果</p>
+<p><strong><del>（9）StringBufferInputStream</del></strong></p>
+<p>将字符串中每个字符的低 8 位转换为字节读入到字节数组中，目前已过期</p>
+<p><strong>InputStream 总结：</strong></p>
+<ul>
+<li>InputStream 是所有输入字节流的<strong>抽象基类</strong></li>
+<li>ByteArrayInputStream 和 FileInputStream 是两种基本的节点流，他们分别从<strong>字节数组</strong> 和 <strong>本地文件</strong>中读取数据</li>
+<li>DataInputStream、BufferedInputStream 和 PushBackInputStream 都是<strong>处理流</strong>，对基本的节点流进行封装并增强</li>
+<li>PipiedInputStream 用于<strong>多线程通信</strong>，可以与其它线程公用一个管道，读取管道中的数据。</li>
+<li>ObjectInputStream 用于<strong>对象的反序列化</strong>，将对象的字节数据读入内存中，通过该流对象可以将字节数据转换成对应的对象</li>
+</ul>
+<h4 id="OutputStream"><a href="#OutputStream" class="headerlink" title="OutputStream"></a>OutputStream</h4><p>OutputStream 是字节输出流的抽象基类，提供了通用的写方法，让继承的子类重写和复用。</p>
+<table>
+<thead>
+<tr>
+<th align="left">方法</th>
+<th>功能</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">public abstract void write(int b)</td>
+<td>将指定的字节写出到输出流，写入的字节是参数 b 的低 8 位</td>
+</tr>
+<tr>
+<td align="left">public void write(byte b[])</td>
+<td>将指定字节数组中的所有字节写入到输出流当中</td>
+</tr>
+<tr>
+<td align="left">public void write(byte b[], int off, int len)</td>
+<td>指定写入的起始位置 offer，字节数为 len 的字节数组写入到输出流当中</td>
+</tr>
+<tr>
+<td align="left">public void flush()</td>
+<td>刷新此输出流，并强制写出所有缓冲的输出字节到指定位置，每次写完都要调用</td>
+</tr>
+<tr>
+<td align="left">public void close()</td>
+<td>关闭此输出流并释放与此流关联的所有系统资源</td>
+</tr>
+</tbody></table>
+<p><img src="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/008i3skNly1gsk677mqrlj311c0hyq56.jpg" class="lazyload placeholder" data-srcset="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/008i3skNly1gsk677mqrlj311c0hyq56.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20210717192728276"></p>
+<p>OutputStream 中大多数的类和 InputStream 是对应的，只不过数据的流向不同而已。从上面的图可以看出：</p>
+<ul>
+<li><p>OutputStream 是所有输出字节流的<strong>抽象基类</strong></p>
+</li>
+<li><p>ByteArrayOutputStream 和 FileOutputStream 是两种基本的节点流，它们分别向<strong>字节数组</strong>和<strong>本地文件</strong>写出数据</p>
+</li>
+<li><p>DataOutputStream、BufferedOutputStream 是<strong>处理流</strong>，前者可以将<strong>字节数据转换成基本数据类型</strong>写出到文件中；后者是缓冲字节数组，只有在缓冲区满时，才会将所有的字节写出到目的地，<strong>减少了 IO 次数</strong>。</p>
+</li>
+<li><p>PipedOutputStream 用于<strong>多线程通信</strong>，可以和其它线程共用一个管道，向管道中写入数据</p>
+</li>
+<li><p>ObjectOutputStream 用于对象的<strong>序列化</strong>，将对象转换成字节数组后，将所有的字节都写入到指定位置中</p>
+</li>
+<li><p>PrintStream 在 OutputStream 基础之上提供了增强的功能，即<strong>可以方便地输出各种类型的数据</strong>（而不仅限于byte型）的格式化表示形式，且 PrintStream 的方法从不抛出 IOEception，其原理是<strong>写出时将各个数据类型的数据统一转换为 String 类型</strong>，我会在讲解完</p>
+</li>
+</ul>
+<h3 id="字符流对象"><a href="#字符流对象" class="headerlink" title="字符流对象"></a>字符流对象</h3><p>字符流对象也会有对应关系，大多数的类可以认为是<strong>操作的数据从字节数组变为字符</strong>，类的功能和字节流对象是相似的。</p>
+<blockquote>
+<p>字符输入流和字节输入流的组成非常相似，字符输入流是对字节输入流的<strong>一层转换</strong>，所有文件的存储都是<strong>字节的存储</strong>，在磁盘上保留的不是文件的字符，而是先把字符编码成字节，再保存到文件中。在读取文件时，读入的也是一个一个字节组成的字节序列，而 Java 虚拟机通过将字节序列，按照2个字节为单位转换为 Unicode 字符，实现字节到字符的映射。</p>
+</blockquote>
+<p><img src="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/008i3skNly1gsk67es4y9j30w60lqgnn.jpg" class="lazyload placeholder" data-srcset="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/008i3skNly1gsk67es4y9j30w60lqgnn.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20210717192739866"></p>
+<h4 id="Reader"><a href="#Reader" class="headerlink" title="Reader"></a>Reader</h4><p>Reader 是字符输入流的抽象基类，它内部的重要方法如下所示。</p>
+<table>
+<thead>
+<tr>
+<th>重要方法</th>
+<th>方法功能</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>public int read(java.nio.CharBuffer target)</td>
+<td>将读入的字符存入指定的字符缓冲区中</td>
+</tr>
+<tr>
+<td>public int read()</td>
+<td>读取一个字符</td>
+</tr>
+<tr>
+<td>public int read(char cbuf[])</td>
+<td>读入字符放入整个字符数组中</td>
+</tr>
+<tr>
+<td>abstract public int read(char cbuf[], int off, int len)</td>
+<td>将字符读入字符数组中的指定范围中</td>
+</tr>
+</tbody></table>
+<p>还有其它一些额外的方法，与字节输入流基类提供的方法是相同的，只是作用的对象不再是字节，而是字符。</p>
+<p><img src="https://tva1.sinaimg.cn/large/008i3skNly1gsk67kunapj30yu0hatat.jpg" class="lazyload placeholder" data-srcset="https://tva1.sinaimg.cn/large/008i3skNly1gsk67kunapj30yu0hatat.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20210717192749564"></p>
+<ul>
+<li>Reader 是所有字符输入流的<strong>抽象基类</strong></li>
+<li>CharArrayReader 和 StringReader 是两种基本的节点流，它们分别从读取 <strong>字符数组</strong> 和 <strong>字符串</strong> 数据，StringReader 内部是一个 <code>String</code> 变量值，通过遍历该变量的字符，实现读取字符串，<strong>本质上也是在读取字符数组</strong></li>
+<li>PipedReader 用于多线程中的通信，从共用地管道中读取字符数据</li>
+<li>BufferedReader 是字符输入<strong>缓冲流</strong>，将读入的数据放入字符缓冲区中，<strong>实现高效地读取字符</strong></li>
+<li>InputStreamReader 是一种<strong>转换流</strong>，可以实现从字节流转换为字符流，将字节数据转换为字符</li>
+</ul>
+<h4 id="Writer"><a href="#Writer" class="headerlink" title="Writer"></a>Writer</h4><p>Reader 是字符输出流的抽象基类，它内部的重要方法如下所示。</p>
+<table>
+<thead>
+<tr>
+<th>重要方法</th>
+<th>方法功能</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>public void write(char cbuf[])</td>
+<td>将 cbuf 字符数组写出到输出流</td>
+</tr>
+<tr>
+<td>abstract public void write(char cbuf[], int off, int len)</td>
+<td>将指定范围的 cbuf 字符数组写出到输出流</td>
+</tr>
+<tr>
+<td>public void write(String str)</td>
+<td>将字符串 str 写出到输出流，str 内部也是字符数组</td>
+</tr>
+<tr>
+<td>public void write(String str, int off, int len)</td>
+<td>将字符串 str 的某一部分写出到输出流</td>
+</tr>
+<tr>
+<td>abstract public void flush()</td>
+<td>刷新，如果数据保存在缓冲区，调用该方法才会真正写出到指定位置</td>
+</tr>
+<tr>
+<td>abstract public void close()</td>
+<td>关闭流对象，每次 IO 执行完毕后都需要关闭流对象，释放系统资源</td>
+</tr>
+</tbody></table>
+<p><img src="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/008i3skNly1gsk67remv6j310o0ha76h.jpg" class="lazyload placeholder" data-srcset="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/008i3skNly1gsk67remv6j310o0ha76h.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20210717192759962"></p>
+<ul>
+<li><p>Writer 是所有的输出字符流的抽象基类</p>
+</li>
+<li><p><strong>CharArrayWriter、StringWriter 是两种基本的节点流，它们分别向Char 数组、字符串中写入数据。</strong>StringWriter 内部保存了 StringBuffer 对象，可以实现字符串的动态增长</p>
+</li>
+<li><p>PipedWriter 可以向共用的管道中<strong>写入字符数据</strong>，给其它线程读取。</p>
+</li>
+<li><p><strong>BufferedWriter</strong> 是<strong>缓冲输出流</strong>，可以将写出的数据缓存起来，缓冲区满时再调用 flush() 写出数据，<strong>减少 IO 次数</strong>。</p>
+</li>
+<li><p>PrintWriter 和 PrintStream 类似，功能和使用也非常相似，<strong>只是写出的数据是字符而不是字节</strong>。</p>
+</li>
+<li><p><strong>OutputStreamWriter</strong> 将<strong>字符流转换为字节流</strong>，将字符写出到指定位置</p>
+</li>
+</ul>
+<h2 id="字节流与字符流的转换"><a href="#字节流与字符流的转换" class="headerlink" title="字节流与字符流的转换"></a>字节流与字符流的转换</h2><p>从任何地方把数据读入到内存都是先以<strong>字节流</strong>形式读取，即使是使用字符流去读取数据，依然成立，因为数据永远是以字节的形式存在于互联网和硬件设备中，字符流是通过<strong>字符集</strong>的映射，才能够将字节转换为字符。</p>
+<p>所以 Java 提供了两种转换流：</p>
+<ul>
+<li>InputStreamReader：从<strong>字节流转换为字符流</strong>，将字节数据转换为字符数据读入到内存</li>
+<li>OutputStreamWriter：从<strong>字符流转换为字节流</strong>，将字符数据转换为字节数据写出到指定位置</li>
+</ul>
+<blockquote>
+<p>了解了 Java 传统的 BIO 中字符流和字节流的主要成员之后，至少要掌握以下两个关键点：</p>
+<p>（1）传统的 BIO 是以<code>流</code>为基本单位处理数据的，想象成水流，一点点地传输字节数据，IO 流传输的过程永远是以<code>字节</code>形式传输。</p>
+<p>（2）字节流和字符流的区别在于操作的数据单位不相同，字符流是通过将字节数据通过字符集映射成对应的字符，字符流本质上也是字节流。</p>
+</blockquote>
+<p>接下来我们再继续学习 NIO 知识，NIO 是当下非常火热的一种 IO 工作方式，它能够解决传统 BIO 的痛点：<strong>阻塞</strong>。</p>
+<ul>
+<li><p>BIO 如果遇到 IO 阻塞时，线程将会被挂起，直到 IO 完成后才唤醒线程，线程切换带来了额外的开销。</p>
+</li>
+<li><p>BIO 中每个 IO 都需要有对应的一个线程去专门处理该次 IO 请求，会让服务器的压力迅速提高。</p>
+</li>
+</ul>
+<p>我们希望做到的是<strong>当线程等待 IO 完成时能够去完成其它事情，当 IO 完成时线程可以回来继续处理 IO 相关操作，不必干干的坐等 IO 完成。</strong>在 IO 处理的过程中，能够有一个<strong>专门的线程负责监听这些 IO 操作，通知服务器该如何操作</strong>。所以，我们聊到 IO，不得不去接触 NIO 这一块硬骨头。</p>
+<h2 id="新潮的-NIO"><a href="#新潮的-NIO" class="headerlink" title="新潮的 NIO"></a>新潮的 NIO</h2><p>我们来看看 BIO 和 NIO 的区别，BIO 是<strong>面向流</strong>的 IO，它建立的通道都是<strong>单向</strong>的，所以输入和输出流的通道不相同，必须建立2个通道，通道内的都是传输&#x3D;&#x3D;0101001···&#x3D;&#x3D;的字节数据。</p>
+<p><img src="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/008i3skNly1gsk67xlsgoj311w0c6wga.jpg" class="lazyload placeholder" data-srcset="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/008i3skNly1gsk67xlsgoj311w0c6wga.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20210717192809741"></p>
+<p>而在 NIO 中，不再是面向流的 IO 了，而是面向<strong>缓冲区</strong>，它会建立一个<strong>通道（Channel）</strong>，该通道我们可以理解为<strong>铁路</strong>，该铁路上可以运输各种货物，而通道上会有一个<strong>缓冲区（Buffer）</strong>用于存储真正的数据，缓冲区我们可以理解为<strong>一辆火车</strong>。</p>
+<p><strong>通道（铁路）</strong>只是作为运输数据的一个连接资源，而真正存储数据的是<strong>缓冲区（火车）</strong>。即<strong>通道负责传输，缓冲区负责存储。</strong></p>
+<p><img src="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/008i3skNly1gsk681qae4j311y0bqq4e.jpg" class="lazyload placeholder" data-srcset="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/008i3skNly1gsk681qae4j311y0bqq4e.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20210717192816723"></p>
+<p>理解了上面的图之后，BIO 和 NIO 的主要区别就可以用下面这个表格简单概括。</p>
+<table>
+<thead>
+<tr>
+<th align="center">BIO</th>
+<th align="center">NIO</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">面向流（Stream）</td>
+<td align="center">面向缓冲区（Buffer）</td>
+</tr>
+<tr>
+<td align="center">单向通道</td>
+<td align="center">双向通道</td>
+</tr>
+<tr>
+<td align="center">阻塞 IO</td>
+<td align="center">非阻塞 IO</td>
+</tr>
+<tr>
+<td align="center"></td>
+<td align="center">选择器（Selectors）</td>
+</tr>
+</tbody></table>
+<h2 id="缓冲区（Buffer）"><a href="#缓冲区（Buffer）" class="headerlink" title="缓冲区（Buffer）"></a>缓冲区（Buffer）</h2><p>缓冲区是<strong>存储数据</strong>的区域，在 Java 中，缓冲区就是数组，为了可以操作不同数据类型的数据，Java 提供了许多不同类型的缓冲区，<strong>除了布尔类型以外</strong>，其它基本数据类型都有对应的缓冲区数组对象。</p>
+<p><img src="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/008i3skNly1gsk686wd71j31140jejtb.jpg" class="lazyload placeholder" data-srcset="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/008i3skNly1gsk686wd71j31140jejtb.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20210717192825029"></p>
+<blockquote>
+<p>为什么没有布尔类型的缓冲区呢？</p>
+<p>在 Java 中，boolean 类型数据只占用 <code>1 bit</code>，而在 IO 传输过程中，都是以字节为单位进行传输的，所以 boolean 的 1 bit 完全可以使用 byte 类型的某一位，或者 int 类型的某一位来表示，没有必要为了这 1 bit 而专门提供多一个缓冲区。</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th align="center">缓冲区</th>
+<th align="center">解释</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">ByteBuffer</td>
+<td align="center">存储<strong>字节数据</strong>的缓冲区</td>
+</tr>
+<tr>
+<td align="center">CharBuffer</td>
+<td align="center">存储<strong>字符数据</strong>的缓冲区</td>
+</tr>
+<tr>
+<td align="center">ShortBuffer</td>
+<td align="center">存储<strong>短整型数据</strong>的缓冲区</td>
+</tr>
+<tr>
+<td align="center">IntBuffer</td>
+<td align="center">存储<strong>整型数据</strong>的缓冲区</td>
+</tr>
+<tr>
+<td align="center">LongBuffer</td>
+<td align="center">存储<strong>长整型数据</strong>的缓冲区</td>
+</tr>
+<tr>
+<td align="center">FloatBuffer</td>
+<td align="center">存储<strong>单精度浮点型数据</strong>的缓冲区</td>
+</tr>
+<tr>
+<td align="center">DoubleBuffer</td>
+<td align="center">存储<strong>双精度浮点型数据</strong>的缓冲区</td>
+</tr>
+</tbody></table>
+<p>分配一个缓冲区的方式都高度一致：使用<code>allocate(int capacity)</code>方法。</p>
+<p>例如需要分配一个 1024 大小的字节数组，代码就是下面这样子。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">ByteBuffer</span> <span class="variable">byteBuffer</span> <span class="operator">=</span> ByteBuffer.allocate(<span class="number">1024</span>);</span><br></pre></td></tr></table></figure>
+
+<p>缓冲区<strong>读写数据</strong>的两个核心方法：</p>
+<ul>
+<li>put()：将数据写入到缓冲区中</li>
+<li>get()：从缓冲区中读取数据</li>
+</ul>
+<p>缓冲区的重要属性：</p>
+<ul>
+<li><p><strong>capacity</strong>：缓冲区中<strong>最大存储数据的容量</strong>，一旦声明则无法改变</p>
+</li>
+<li><p><strong>limit</strong>：表示缓冲区中<strong>可以操作数据的大小</strong>，limit 之后的数据无法进行读写。必须满足 limit &lt;&#x3D; capacity</p>
+</li>
+<li><p><strong>position</strong>：当前缓冲区中<strong>正在操作数据的下标位置</strong>，必须满足 position &lt;&#x3D; limit</p>
+</li>
+<li><p><strong>mark</strong>：标记位置，调用 reset() 将 position 位置调整到 mark 属性指向的下标位置，<strong>实现多次读取数据</strong></p>
+</li>
+</ul>
+<p>缓冲区为高效读写数据而提供的其它<strong>辅助方法</strong>：</p>
+<ul>
+<li>flip()：可以实现<strong>读写模式的切换</strong>，我们可以看看里面的源码</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">final</span> Buffer <span class="title function_">flip</span><span class="params">()</span> &#123;</span><br><span class="line">    limit = position;</span><br><span class="line">    position = <span class="number">0</span>;</span><br><span class="line">    mark = -<span class="number">1</span>;</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">this</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>调用 flip() 会将可操作的大小 limit 设置为当前写的位置，操作数据的起始位置 position 设置为 0，即<strong>从头开始读取数据</strong>。</p>
+<ul>
+<li>rewind()：可以将 position 位置设置为 0，再次读取缓冲区中的数据</li>
+<li>clear()：清空整个缓冲区，它会将 position 设置为 0，limit 设置为 capacity，可以<strong>写整个缓冲区</strong></li>
+</ul>
+<blockquote>
+<p>更多的方法可以去查阅 API 文档，本文碍于篇幅原因就不贴出其它方法了，主要是要<strong>理解缓冲区的作用</strong></p>
+</blockquote>
+<p>我们来看一个简单的例子</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> Class Main &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">         <span class="comment">// 分配内存大小为11的整型缓存区</span></span><br><span class="line">        <span class="type">IntBuffer</span> <span class="variable">buffer</span> <span class="operator">=</span> IntBuffer.allocate(<span class="number">11</span>);</span><br><span class="line">        <span class="comment">// 往buffer里写入2个整型数据</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; <span class="number">2</span>; ++i) &#123;</span><br><span class="line">            <span class="type">int</span> <span class="variable">randomNum</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">SecureRandom</span>().nextInt();</span><br><span class="line">            buffer.put(randomNum);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 将Buffer从写模式切换到读模式</span></span><br><span class="line">        buffer.flip();</span><br><span class="line">        System.out.println(<span class="string">&quot;position &gt;&gt; &quot;</span> + buffer.position()</span><br><span class="line">                           + <span class="string">&quot;limit &gt;&gt; &quot;</span> + buffer.limit() </span><br><span class="line">                           + <span class="string">&quot;capacity &gt;&gt; &quot;</span> + buffer.capacity());</span><br><span class="line">        <span class="comment">// 读取buffer里的数据</span></span><br><span class="line">        <span class="keyword">while</span> (buffer.hasRemaining()) &#123;</span><br><span class="line">            System.out.println(buffer.get());</span><br><span class="line">        &#125;</span><br><span class="line">        System.out.println(<span class="string">&quot;position &gt;&gt; &quot;</span> + buffer.position()</span><br><span class="line">                           + <span class="string">&quot;limit &gt;&gt; &quot;</span> + buffer.limit() </span><br><span class="line">                           + <span class="string">&quot;capacity &gt;&gt; &quot;</span> + buffer.capacity());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>执行结果如下图所示，首先我们往缓冲区中写入 2 个数据，position 在写模式下指向下标 2，然后调用 flip() 方法切换为读模式，limit 指向下标 2，position 从 0 开始读数据，读到下标为 2 时发现到达 limit 位置，不可继续读。</p>
+<p><img src="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/008i3skNly1gsk68gf423j31220ccabe.jpg" class="lazyload placeholder" data-srcset="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/008i3skNly1gsk68gf423j31220ccabe.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20210717192839444"></p>
+<p>整个过程可以用下图来理解，调用 flip() 方法以后，读出数据的同时 position 指针不断往后挪动，到达 limit 指针的位置时，该次读取操作结束。</p>
+<p><img src="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/008i3skNly1gsk68mfnfnj31180qstad.jpg" class="lazyload placeholder" data-srcset="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/008i3skNly1gsk68mfnfnj31180qstad.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20210717192849489"></p>
+<blockquote>
+<p>介绍完缓冲区后，我们知道它是存储数据的空间，进程可以将缓冲区中的数据读取出来，也可以写入新的数据到缓冲区，那缓冲区的数据从哪里来，又怎么写出去呢？接下来我们需要学习传输数据的介质：通道（Channel）</p>
+</blockquote>
+<h2 id="通道（Channel）"><a href="#通道（Channel）" class="headerlink" title="通道（Channel）"></a>通道（Channel）</h2><p>上面我们介绍过，通道是作为一种连接资源，作用是传输数据，而真正存储数据的是缓冲区，所以介绍完缓冲区后，我们来学习通道这一块。</p>
+<p>通道是可以<strong>双向读写</strong>的，传统的 BIO 需要使用输入&#x2F;输出流表示数据的流向，在 NIO 中可以减少通道资源的消耗。</p>
+<p><img src="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/008i3skNly1gsk68r10g9j312m0c0gmu.jpg" class="lazyload placeholder" data-srcset="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/008i3skNly1gsk68r10g9j312m0c0gmu.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20210717192856970"></p>
+<p>通道类都保存在 <code>java.nio.channels</code> 包下，我们日常用到的几个重要的类有 4 个：</p>
+<table>
+<thead>
+<tr>
+<th align="center">IO 通道类型</th>
+<th align="center">具体类</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">文件 IO</td>
+<td align="center">FileChannel（用于文件读写、操作文件的通道）</td>
+</tr>
+<tr>
+<td align="center">TCP 网络 IO</td>
+<td align="center">SocketChannel（用于读写数据的 TCP 通道）、ServerSocketChannel（监听客户端的连接）</td>
+</tr>
+<tr>
+<td align="center">UDP 网络 IO</td>
+<td align="center">DatagramChannel（收发 UDP 数据报的通道）</td>
+</tr>
+</tbody></table>
+<p>可以通过 <code>getChannel()</code> 方法获取一个通道，支持获取通道的类如下：</p>
+<ul>
+<li>文件 IO：FileInputStream、FileOutputStream、RandomAccessFile</li>
+<li>TCP 网络 IO：Socket、ServerSocket</li>
+<li>UDP 网络 IO：DatagramSocket</li>
+</ul>
+<h3 id="示例：文件拷贝案例"><a href="#示例：文件拷贝案例" class="headerlink" title="示例：文件拷贝案例"></a>示例：文件拷贝案例</h3><p>我们来看一个利用<strong>通道拷贝文件</strong>的例子，需要下面几个步骤：</p>
+<ul>
+<li>打开原文件的输入流通道，将字节数据读入到缓冲区中</li>
+<li>打开目的文件的输出流通道，将缓冲区中的数据写到目的地</li>
+<li>关闭所有流和通道（重要！）</li>
+</ul>
+<p>这是一张小菠萝的照片，它存在于<code>d:\小菠萝\</code>文件夹下，我们将它拷贝到 <code>d:\小菠萝分身\</code> 文件夹下。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Test</span> &#123;</span><br><span class="line">	<span class="comment">/** 缓冲区的大小 */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">int</span> <span class="variable">SIZE</span> <span class="operator">=</span> <span class="number">1024</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> IOException &#123;</span><br><span class="line">        <span class="comment">// 打开文件输入流</span></span><br><span class="line">        <span class="type">FileChannel</span> <span class="variable">inChannel</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">FileInputStream</span>(<span class="string">&quot;d:\小菠萝\小菠萝.jpg&quot;</span>).getChannel();</span><br><span class="line">        <span class="comment">// 打开文件输出流</span></span><br><span class="line">        <span class="type">FileChannel</span> <span class="variable">outChannel</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">FileOutputStream</span>(<span class="string">&quot;d:\小菠萝分身\小菠萝-拷贝.jpg&quot;</span>).getChannel();</span><br><span class="line">        <span class="comment">// 分配 1024 个字节大小的缓冲区</span></span><br><span class="line">        <span class="type">ByteBuffer</span> <span class="variable">dsts</span> <span class="operator">=</span> ByteBuffer.allocate(SIZE);</span><br><span class="line">        <span class="comment">// 将数据从通道读入缓冲区</span></span><br><span class="line">        <span class="keyword">while</span> (inChannel.read(dsts) != -<span class="number">1</span>) &#123;</span><br><span class="line">            <span class="comment">// 切换缓冲区的读写模式</span></span><br><span class="line">            dsts.flip();</span><br><span class="line">            <span class="comment">// 将缓冲区的数据通过通道写到目的地</span></span><br><span class="line">            outChannel.write(dsts);</span><br><span class="line">            <span class="comment">// 清空缓冲区，准备下一次读</span></span><br><span class="line">            dsts.clear();</span><br><span class="line">        &#125;</span><br><span class="line">        inChannel.close();</span><br><span class="line">        outChannel.close();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>我画了一张图帮助你理解上面的这一个过程。</p>
+<p><img src="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/008i3skNly1gsk68z0rv1j312c08mt9y.jpg" class="lazyload placeholder" data-srcset="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/008i3skNly1gsk68z0rv1j312c08mt9y.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20210717192910051"></p>
+<blockquote>
+<p>有人会问，NIO 的文件拷贝和传统 IO 流的文件拷贝有何不同呢？我们在编程时感觉它们没有什么区别呀，<strong>貌似只是 API 不同罢了</strong>，我们接下来就去看看这两者之间的区别吧。</p>
+</blockquote>
+<h3 id="BIO-和-NIO-拷贝文件的区别"><a href="#BIO-和-NIO-拷贝文件的区别" class="headerlink" title="BIO 和 NIO 拷贝文件的区别"></a>BIO 和 NIO 拷贝文件的区别</h3><p>这个时候就要来了解了解操作系统底层是怎么对 IO 和 NIO 进行区别的，我会用尽量通俗的文字带你理解，可能并不是那么严谨。</p>
+<p>操作系统最重要的就是<strong>内核</strong>，它既可以访问受保护的内存，也可以访问底层硬件设备，所以为了保护内核的安全，操作系统将底层的虚拟空间分为了<strong>用户空间</strong>和<strong>内核空间</strong>，其中用户空间就是给用户进程使用的，内核空间就是专门给操作系统底层去使用的。</p>
+<img src="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/008i3skNly1gsk695gi3ej31180iujv4.jpg" class="lazyload placeholder" data-srcset="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/008i3skNly1gsk695gi3ej31180iujv4.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20210717192919678" style="zoom:67%;" />
+
+<p>接下来，有一个 Java 进程希望把小菠萝这张图片从磁盘上拷贝，那么内核空间和用户空间都会有一个<strong>缓冲区</strong></p>
+<ul>
+<li>这张照片就会从磁盘中读出到<strong>内核缓冲区</strong>中保存，然后操作系统将内核缓冲区中的这张图片字节数据拷贝到用户进程的缓冲区中保存下来，对应着下面这幅图</li>
+</ul>
+<img src="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/008i3skNly1gsk699s66uj310u0hsq6d.jpg" class="lazyload placeholder" data-srcset="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/008i3skNly1gsk699s66uj310u0hsq6d.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20210717192927322" style="zoom:67%;" />
+
+<ul>
+<li>然后用户进程会希望把缓冲区中的字节数据写到磁盘上的另外一个地方，会将数据拷贝到 Socket 缓冲区中，最终操作系统再将 Socket 缓冲区的数据写到磁盘的指定位置上。</li>
+</ul>
+<img src="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/008i3skNly1gsk69el3euj310m0i8tc5.jpg" class="lazyload placeholder" data-srcset="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/008i3skNly1gsk69el3euj310m0i8tc5.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20210717192934345" style="zoom:67%;" />
+
+<p>这一轮操作下来，我们数数经过了几次数据的拷贝？<code>4</code> 次。有 2 次是<strong>内核空间和用户空间之间的数据拷贝</strong>，这两次拷贝涉及到<strong>用户态和内核态的切换</strong>，需要<strong>CPU参与进来</strong>，进行上下文切换。而另外 2 次是<strong>硬盘和内核空间之间的数据拷贝</strong>，这个过程利用到 DMA与系统内存交换数据，不需要 CPU 的参与。</p>
+<p>导致 IO 性能瓶颈的原因：<strong>内核空间与用户空间之间数据过多无意义的拷贝，以及多次上下文切换</strong></p>
+<table>
+<thead>
+<tr>
+<th>操作</th>
+<th align="left">状态</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>用户进程请求读取数据</td>
+<td align="left">用户态 -&gt; 内核态</td>
+</tr>
+<tr>
+<td>操作系统内核返回数据给用户进程</td>
+<td align="left">内核态 -&gt; 用户态</td>
+</tr>
+<tr>
+<td>用户进程请求写数据到硬盘</td>
+<td align="left">用户态 -&gt; 内核态</td>
+</tr>
+<tr>
+<td>操作系统返回操作结果给用户进程</td>
+<td align="left">内核态 -&gt; 用户态</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p>在用户空间与内核空间之间的操作，会涉及到上下文的切换，这里需要 CPU 的干预，而数据在两个空间之间来回拷贝，也需要 CPU 的干预，这无疑会增大 CPU 的压力，NIO 是如何减轻 CPU 的压力？运用操作系统的<strong>零拷贝</strong>技术。</p>
+</blockquote>
+<h3 id="操作系统的零拷贝"><a href="#操作系统的零拷贝" class="headerlink" title="操作系统的零拷贝"></a>操作系统的零拷贝</h3><p>所以，操作系统出现了一个全新的概念，解决了 IO 瓶颈：<strong>零拷贝</strong>。零拷贝指的是<strong>内核空间与用户空间之间的零次拷贝</strong>。</p>
+<p>零拷贝可以说是 IO 的一大救星，操作系统底层有许多种零拷贝机制，我这里仅针对 Java NIO 中使用到的其中一种零拷贝机制展开讲解。</p>
+<p>在 Java NIO 中，零拷贝是通过<strong>用户空间和内核空间的缓冲区共享一块物理内存</strong>实现的，也就是说上面的图可以演变成这个样子。</p>
+<img src="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/008i3skNly1gsk69jp2wkj311e0mmq72.jpg" class="lazyload placeholder" data-srcset="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/008i3skNly1gsk69jp2wkj311e0mmq72.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20210717192942792" style="zoom:50%;" />
+这时，无论是用户空间还是内核空间操作自己的缓冲区，本质上都是**操作这一块共享内存**中的缓冲区数据，**省去了用户空间和内核空间之间的数据拷贝操作**。
+
+<p>现在我们重新来拷贝文件，就会变成下面这个步骤：</p>
+<ul>
+<li>用户进程通过系统调用 <code>read()</code> 请求读取文件到用户空间缓冲区（<strong>第一次上下文切换</strong>），用户态 -&gt; 核心态，数据从硬盘读取到内核空间缓冲区中（<strong>第一次数据拷贝</strong>）</li>
+<li>系统调用返回到用户进程（<strong>第二次上下文切换</strong>），此时用户空间与内核空间共享这一块内存（缓冲区），所以<strong>不需要从内核缓冲区拷贝到用户缓冲区</strong></li>
+<li>用户进程发出 <code>write()</code> 系统调用请求写数据到硬盘上（<strong>第三次上下文切换</strong>），此时需要将内核空间缓冲区中的数据拷贝到内核的 Socket 缓冲区中（<strong>第二次数据拷贝</strong>）</li>
+<li>由 DMA 将 Socket 缓冲区的内容写到硬盘上（<strong>第三次数据拷贝</strong>），<code>write()</code> 系统调用返回（<strong>第四次上下文切换</strong>）</li>
+</ul>
+<p>整个过程就如下面这幅图所示。</p>
+<img src="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/008i3skNly1gsk69oz8snj31260oagpv.jpg" class="lazyload placeholder" data-srcset="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/008i3skNly1gsk69oz8snj31260oagpv.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20210717192951133" style="zoom:50%;" />
+
+<p>图中，<strong>需要 CPU 参与工作的步骤只有第③个步骤</strong>，对比于传统的 IO，CPU 需要在用户空间与内核空间之间参与拷贝工作，需要无意义地占用 2 次 CPU 资源，导致 CPU 资源的浪费。</p>
+<p>下面总结一下操作系统中零拷贝的优点：</p>
+<ul>
+<li><strong>降低 CPU 的压力</strong>：避免 CPU 需要参与内核空间与用户空间之间的数据拷贝工作</li>
+<li><strong>减少不必要的拷贝</strong>：避免用户空间与内核空间之间需要进行数据拷贝</li>
+</ul>
+<p>上面的图示可能并不严谨，对于你理解零拷贝会有一定的帮助，关于零拷贝的知识点可以去查阅更多资料哦，这是一门大学问。</p>
+<blockquote>
+<p>介绍完通道后，我们知道它是用于<strong>传输数据的一种介质</strong>，而且是<strong>可以双向读写</strong>的，那么如果放在网络 IO 中，这些通道如果有数据就绪时，服务器是如何发现并处理的呢？接下来我们去学习 NIO 中的最后一个重要知识点：选择器（Selector）</p>
+</blockquote>
+<h2 id="选择器（Selectors）"><a href="#选择器（Selectors）" class="headerlink" title="选择器（Selectors）"></a>选择器（Selectors）</h2><p>选择器是提升 IO 性能的灵魂之一，它底层利用了<strong>多路复用 IO</strong>机制，让选择器可以监听多个 IO 连接，根据 IO 的状态响应到服务器端进行处理。通俗地说：<strong>选择器可以监听多个 IO 连接，而传统的 BIO 每个 IO 连接都需要有一个线程去监听和处理。</strong></p>
+<p><img src="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/008i3skNly1gsk6a7nod1j312c0g2tar.jpg" class="lazyload placeholder" data-srcset="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/008i3skNly1gsk6a7nod1j312c0g2tar.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20210717193020860"></p>
+<p>图中很明显的显示了在 BIO 中，每个 Socket 都需要有一个专门的线程去处理每个请求，而在 NIO 中，只需要一个 Selector 即可监听各个 Socket 请求，而且 Selector 并不是阻塞的，所以<strong>不会因为多个线程之间切换导致上下文切换带来的开销</strong>。</p>
+<p><img src="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/008i3skNly1gsk6abpde4j310q0jmdi1.jpg" class="lazyload placeholder" data-srcset="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/008i3skNly1gsk6abpde4j310q0jmdi1.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20210717193027896"></p>
+<p>在 Java NIO 中，选择器是使用 <code>Selector</code> 类表示，Selector 可以接收各种 IO 连接，在 IO 状态准备就绪时，会通知该通道注册的 Selector，Selector 在<strong>下一次轮询</strong>时会发现该 IO 连接就绪，进而处理该连接。</p>
+<p>Selector 选择器主要用于<strong>网络 IO</strong>当中，在这里我会将传统的 BIO Socket 编程和使用 NIO 后的 Socket 编程作对比，分析 NIO 为何更受欢迎。首先先来了解 Selector 的基本结构。</p>
+<table>
+<thead>
+<tr>
+<th align="center">重要方法</th>
+<th align="center">方法解析</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">open()</td>
+<td align="center">打开一个 Selector 选择器</td>
+</tr>
+<tr>
+<td align="center">int select()</td>
+<td align="center">阻塞地等待就绪的通道</td>
+</tr>
+<tr>
+<td align="center">int select(long timeout)</td>
+<td align="center">最多阻塞 timeout 毫秒，如果是 0 则一直阻塞等待，如果是 1 则代表最多阻塞 1 毫秒</td>
+</tr>
+<tr>
+<td align="center">int selectNow()</td>
+<td align="center">非阻塞地轮询就绪的通道</td>
+</tr>
+</tbody></table>
+<p>在这里，你会看到 select() 和它的重载方法是会阻塞的，如果用户进程轮询时发现没有就绪的通道，操作系统有两种做法：</p>
+<ul>
+<li>一直等待直到一个就绪的通道，再返回给用户进程</li>
+<li>立即返回一个错误状态码给用户进程，让用户进程继续运行，不会阻塞</li>
+</ul>
+<p>这两种方法对应了<strong>同步阻塞 IO</strong> 和 <strong>同步非阻塞 IO</strong> ，这里读者的一点小的观点，请各位大神<strong>批判阅读</strong></p>
+<blockquote>
+<p>Java 中的 NIO 不能真正意义上称为 Non-Blocking IO，我们通过 API 的调用可以发现，select() 方法还是会存在阻塞的现象，根据传入的参数不同，操作系统的行为也会有所不同，不同之处就是<strong>阻塞还是非阻塞</strong>，所以我更倾向于把 NIO 称为 New IO，因为它不仅提供了 Non-Blocking IO，而且保留原有的 Blocking IO 的功能。</p>
+</blockquote>
+<p>了解了选择器之后，它的作用就是：<strong>监听多个 IO 通道，当有通道就绪时选择器会轮询发现该通道，并做相应的处理</strong>。那么 IO 状态分为很多种，我们如何去识别就绪的通道是处于哪种状态呢？在 Java 中提供了<strong>选择键（SelectionKey）</strong>。</p>
+<h3 id="选择键（SelectionKey）"><a href="#选择键（SelectionKey）" class="headerlink" title="选择键（SelectionKey）"></a>选择键（SelectionKey）</h3><p>在 Java 中提供了 4 种选择键：</p>
+<ul>
+<li>SelectionKey.OP_READ：套接字通道准备好进行<strong>读操作</strong></li>
+<li>SelectionKey.OP_WRITE：套接字通道准备好进行<strong>写操作</strong></li>
+<li>SelectionKey.OP_ACCEPT：服务器套接字通道<strong>接受其它通道</strong></li>
+<li>SelectionKey.OP_CONNECT：套接字通道准备<strong>完成连接</strong></li>
+</ul>
+<p>在 SelectionKey 中包含了许多属性</p>
+<ul>
+<li>channel：该选择键<strong>绑定的通道</strong></li>
+<li>selector：轮询到该选择键的<strong>选择器</strong></li>
+<li>readyOps：当前<strong>就绪选择键的值</strong></li>
+<li>interesOps：该选择器对该通道<strong>感兴趣的所有选择键</strong></li>
+</ul>
+<p>选择键的作用是：<strong>在选择器轮询到有就绪通道时，会返回这些通道的就绪选择键（SelectionKey），通过选择键可以获取到通道进行操作。</strong></p>
+<p>简单了解了选择器后，我们可以结合缓冲区、通道和选择器来完成一个简易的聊天室应用。</p>
+<h3 id="示例：简易的客户端服务器通信"><a href="#示例：简易的客户端服务器通信" class="headerlink" title="示例：简易的客户端服务器通信"></a>示例：简易的客户端服务器通信</h3><blockquote>
+<p>先说明，这里的代码非常的臭和长，不推荐细看，直接看注释附近的代码即可。</p>
+</blockquote>
+<p>我们在服务器端会开辟两个线程</p>
+<ul>
+<li>Thread1：专门监听客户端的连接，并把通道注册到客户端选择器上</li>
+<li>Thread2：专门监听客户端的其它 IO 状态（读状态），当客户端的 IO 状态就绪时，该选择器会轮询发现，并作相应处理</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">NIOServer</span> &#123;</span><br><span class="line">    </span><br><span class="line">	<span class="type">Selector</span> <span class="variable">serverSelector</span> <span class="operator">=</span> Selector.open();</span><br><span class="line">    <span class="type">Selector</span> <span class="variable">clientSelector</span> <span class="operator">=</span> Selector.open();</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> IOException &#123;</span><br><span class="line">        <span class="type">NIOServer</span> <span class="variable">server</span> <span class="operator">=</span> nwe <span class="title function_">NIOServer</span><span class="params">()</span>;</span><br><span class="line">        <span class="keyword">new</span> <span class="title class_">Thread</span>(() -&gt; &#123;</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                <span class="comment">// 对应IO编程中服务端启动</span></span><br><span class="line">                <span class="type">ServerSocketChannel</span> <span class="variable">listenerChannel</span> <span class="operator">=</span> ServerSocketChannel.open();</span><br><span class="line">                listenerChannel.socket().bind(<span class="keyword">new</span> <span class="title class_">InetSocketAddress</span>(<span class="number">3333</span>));</span><br><span class="line">                listenerChannel.configureBlocking(<span class="literal">false</span>);</span><br><span class="line">                listenerChannel.register(serverSelector, SelectionKey.OP_ACCEPT);</span><br><span class="line">				server.acceptListener();</span><br><span class="line">            &#125; <span class="keyword">catch</span> (IOException ignored) &#123;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;).start();</span><br><span class="line">        <span class="keyword">new</span> <span class="title class_">Thread</span>(() -&gt; &#123;</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                server.clientListener();</span><br><span class="line">            &#125; <span class="keyword">catch</span> (IOException ignored) &#123;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;).start();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 监听客户端连接</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">acceptListener</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="keyword">while</span> (<span class="literal">true</span>) &#123;</span><br><span class="line">        <span class="keyword">if</span> (serverSelector.select(<span class="number">1</span>) &gt; <span class="number">0</span>) &#123;</span><br><span class="line">            Set&lt;SelectionKey&gt; set = serverSelector.selectedKeys();</span><br><span class="line">            Iterator&lt;SelectionKey&gt; keyIterator = set.iterator();</span><br><span class="line">            <span class="keyword">while</span> (keyIterator.hasNext()) &#123;</span><br><span class="line">                <span class="type">SelectionKey</span> <span class="variable">key</span> <span class="operator">=</span> keyIterator.next();</span><br><span class="line">                <span class="keyword">if</span> (key.isAcceptable()) &#123;</span><br><span class="line">                    <span class="keyword">try</span> &#123;</span><br><span class="line">                        <span class="comment">// (1) 每来一个新连接，注册到clientSelector</span></span><br><span class="line">                        <span class="type">SocketChannel</span> <span class="variable">clientChannel</span> <span class="operator">=</span> ((ServerSocketChannel) key.channel()).accept();</span><br><span class="line">                        clientChannel.configureBlocking(<span class="literal">false</span>);</span><br><span class="line">                        clientChannel.register(clientSelector, SelectionKey.OP_READ);</span><br><span class="line">                    &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">                        <span class="comment">// 从就绪的列表中移除这个key</span></span><br><span class="line">                        keyIterator.remove();</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 监听客户端的 IO 状态就绪</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">clientListener</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="keyword">while</span> (<span class="literal">true</span>) &#123;</span><br><span class="line">        <span class="comment">// 批量轮询是否有哪些连接有数据可读</span></span><br><span class="line">        <span class="keyword">if</span> (clientSelector.select(<span class="number">1</span>) &gt; <span class="number">0</span>) &#123;</span><br><span class="line">            Set&lt;SelectionKey&gt; set = clientSelector.selectedKeys();</span><br><span class="line">            Iterator&lt;SelectionKey&gt; keyIterator = set.iterator();</span><br><span class="line">            <span class="keyword">while</span> (keyIterator.hasNext()) &#123;</span><br><span class="line">                <span class="type">SelectionKey</span> <span class="variable">key</span> <span class="operator">=</span> keyIterator.next();</span><br><span class="line">				<span class="comment">// 判断该通道是否读就绪状态</span></span><br><span class="line">                <span class="keyword">if</span> (key.isReadable()) &#123;</span><br><span class="line">                    <span class="keyword">try</span> &#123;</span><br><span class="line">                        <span class="comment">// 获取客户端通道读入数据</span></span><br><span class="line">                        <span class="type">SocketChannel</span> <span class="variable">clientChannel</span> <span class="operator">=</span> (SocketChannel) key.channel();</span><br><span class="line">                        <span class="type">ByteBuffer</span> <span class="variable">byteBuffer</span> <span class="operator">=</span> ByteBuffer.allocate(<span class="number">1024</span>);</span><br><span class="line">                        clientChannel.read(byteBuffer);</span><br><span class="line">                        byteBuffer.flip();</span><br><span class="line">                        System.out.println(</span><br><span class="line">                            LocalDateTime.now().toString() + <span class="string">&quot; Server 端接收到来自 Client 端的消息: &quot;</span> +</span><br><span class="line">                            Charset.defaultCharset().decode(byteBuffer).toString());</span><br><span class="line">                    &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">                        <span class="comment">// 从就绪的列表中移除这个key</span></span><br><span class="line">                        keyIterator.remove();</span><br><span class="line">                        key.interestOps(SelectionKey.OP_READ);</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在客户端，我们可以简单的输入一些文字，发送给服务器</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">NIOClient</span> &#123;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">int</span> <span class="variable">CAPACITY</span> <span class="operator">=</span> <span class="number">1024</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        <span class="type">ByteBuffer</span> <span class="variable">dsts</span> <span class="operator">=</span> ByteBuffer.allocate(CAPACITY);</span><br><span class="line">        <span class="type">SocketChannel</span> <span class="variable">socketChannel</span> <span class="operator">=</span> SocketChannel.open(<span class="keyword">new</span> <span class="title class_">InetSocketAddress</span>(<span class="string">&quot;127.0.0.1&quot;</span>, <span class="number">3333</span>));</span><br><span class="line">        socketChannel.configureBlocking(<span class="literal">false</span>);</span><br><span class="line">        <span class="type">Scanner</span> <span class="variable">sc</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Scanner</span>(System.in);</span><br><span class="line">        <span class="keyword">while</span> (<span class="literal">true</span>) &#123;</span><br><span class="line">            <span class="type">String</span> <span class="variable">msg</span> <span class="operator">=</span> sc.next();</span><br><span class="line">            dsts.put(msg.getBytes());</span><br><span class="line">            dsts.flip();</span><br><span class="line">            socketChannel.write(dsts);</span><br><span class="line">            dsts.clear();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>下图可以看见，在客户端给服务器端发送信息，服务器接收到消息后，可以将该条消息<strong>分发给其它客户端</strong>，就可以实现一个简单的<strong>群聊系统</strong>，我们还可以给这些客户端贴上标签例如<strong>用户姓名，聊天等级······</strong>，就可以标识每个客户端啦。在这里由于篇幅原因，我没有写出所有功能，因为使用原生的 NIO 实在是不太便捷。</p>
+<img src="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/008i3skNly1gsk6akluc5j31240gojtg.jpg" class="lazyload placeholder" data-srcset="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/008i3skNly1gsk6akluc5j31240gojtg.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20210717193042510" style="zoom:67%;" />
+
+<p>我相信你们都是直接滑下来看这里的，我在写这段代码的时候也非常痛苦，甚至有点厌烦 Java 原生的 NIO 编程。实际上我们在日常开发中很少直接用 NIO 进行编程，通常都会用 Netty，Mina 这种服务器框架，它们都是很好地 NIO 技术，对 Java 原生的 NIO 进行了上层的封装、优化，简化开发难度，但是<strong>在学习框架之前，我们需要了解它底层原生的技术，就像 Spring AOP 的动态代理，Spring IOC 容器的 Map 容器存储对象，Netty 底层的 NIO 基础······</strong></p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>NIO 的三大板块基本上都介绍完了，我没有做过多详细的 API 介绍，我希望能够通过这篇文章让你们对以下内容有所认知</p>
+<ul>
+<li>Java IO 体系的组成部分：BIO 和 NIO</li>
+<li>BIO 的基本组成部分：字节流，字符流，转换流和处理流</li>
+<li>NIO 的三大重要模块：缓冲区（Buffer），通道（Channel），选择器（Selector）以及它们的作用</li>
+<li>NIO 与 BIO 两者的对比：同步&#x2F;非同步、阻塞&#x2F;非阻塞，在文件 IO 和 网络 IO 中，使用 NIO 相对于使用 BIO 有什么优势</li>
+</ul>
+
+      </div>
+      <div class="post-tags-categories">
+        
+        <div class="tags">
+          
+            <a href="/tags/Java/" class="">
+              Java
+            </a>
+          
+            <a href="/tags/Java-Basic/" class="">
+              Java-Basic
+            </a>
+          
+        </div>
+        
+      </div>
+      
+        <div class="copyright">
+  <ul class="post-copyright">
+    <li class="post-copyright-author">
+    <strong>author:  </strong>John Doe</a>
+    </li>
+    <li class="post-copyright-link">
+    <strong>link:  </strong>
+    <a href="/2022/05/03/Java-IO-体系/" target="_blank" title="Java IO 体系">http://example.com/2022/05/03/Java-IO-体系/</a>
+    </li>
+    <li class="post-copyright-license">
+      <strong>Copyright notice:   </strong>
+      All articles on this website, unless otherwise stated, adopt <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">CC BY-NC-ND 4.0</a>
+      reprint policy. If reproduced, please indicate source!
+    </li>
+  </ul>
+<div>
+      
+    </article>
+    <!-- 上一篇文章和下一篇文章 -->
+    
+      <!-- 文章详情页的上一页和下一页 -->
+<div class="post-nav">
+
+
+
+  
+  <div class="post-nav-prev post-nav-item">
+    <div class="post-nav-img" style="background-size: cover; 
+      background-position: center center;">
+      <img class="lazyload lazyload placeholder" src="/medias/14.jpg" class="lazyload placeholder" data-srcset="/medias/14.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="">
+    </div>
+    <a href="/2022/05/03/Java%E4%BB%A3%E7%90%86/" class="post-nav-link">
+      <div class="title">
+        <i class="fas fa-angle-left"></i> Prev:
+        <div class="title-text">Java代理</div>
+      </div>
+      
+      <!-- <div class="content">
+        Java 代理说在前面：今天我们来聊一聊 Java 中的代理，先来聊聊故事背景：
+
+小明想购买法国某个牌子的香水送给女朋
+      </div> -->
+    </a>
+  </div>
+
+
+
+  
+  <div class="post-nav-next post-nav-item">
+    <div class="post-nav-img" style="background-size: cover; 
+      background-position: center center;">
+      <img class="lazyload lazyload placeholder" src="/medias/14.jpg" class="lazyload placeholder" data-srcset="/medias/14.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" src="" alt="">
+    </div>
+    <a href="/2022/05/03/Java-%E5%BC%80%E5%8F%91%E6%9C%80%E5%AE%B9%E6%98%93%E7%8A%AF%E7%9A%84-10-%E4%B8%AA%E9%94%99%E8%AF%AF/" class="post-nav-link">
+      <div class="title">
+        Next: <i class="fas fa-angle-right"></i>
+        <div class="title-text">Java 开发最容易犯的 10 个错误</div>
+      </div>
+      <!-- <div class="content">
+        Java 开发最容易犯的 10 个错误那个谁，今天又写 bug 了，没错，他说的好像就是我。。。。。。
+作为 Java 
+      </div> -->
+    </a>
+  </div>
+
+</div>
+
+    
+    
+
+    <!-- 打赏 -->
+    
+      <div id="appDonate" class="post-donate">
+  <div id="donate_board" class="donate_bar center" ref="donate">
+    <a id="btn_donate" class="btn_donate" href="javascript:;" title="打赏" @click="showDialogDrawer()"></a>
+  </div>
+  <transition name="fade">
+    <div 
+      class="donate-box-mask"
+      v-cloak 
+      v-show="visible"
+      @click="cancelDialogDrawer()"
+    >
+    </div>
+  </transition>
+  <transition name="bounce">
+    <div class="donate-box" v-cloak v-show="visible">
+      <div class="donate-box_close">
+        <i class="fas fa-times" aria-hidden="true" @click="cancelDialogDrawer" pointer></i>
+      </div>
+      <div class="donate-box_title">
+        <h4>
+          你的赏识是我前进的动力
+        </h4>
+      </div>
+      <div class="donate-box_tab">
+        <div class="Alipay" pointer :class="{'active': tabActive === 'Alipay'}" @click="changeTabActive('Alipay')">
+          支付宝
+        </div>
+        <div class="WeChatpay" pointer :class="{'active': tabActive === 'WeChatpay'}" @click="changeTabActive('WeChatpay')">
+          微信
+        </div>
+      </div>
+      <div class="donate-box_img">
+        <div class="AlipayImg" v-show="tabActive === 'Alipay'">
+          <img src="/medias/1.jpg" class="lazyload placeholder" data-srcset="/medias/1.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="支付宝打赏" />
+        </div> 
+        <div class="WeChatpayImg" v-show="tabActive === 'WeChatpay'">
+          <img src="/medias/2.jpg" class="lazyload placeholder" data-srcset="/medias/2.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="微信打赏" />
+        </div>
+      </div>
+    </div>
+  </transition>
+</div>
+
+<script>
+  var body = document.body || document.documentElement || window;
+  var vm = new Vue({
+    el: '#appDonate',
+    data: {
+      visible: false,
+      tabActive: 'Alipay',
+      top: 0,
+    },
+    computed: {
+    },
+    mounted() {
+    },
+    methods: {
+      showDialogDrawer() {
+        this.visible = true;
+        // 防止页面滚动，只能让弹框滚动
+        // function getScroll() {
+        //   return {
+        //     left: window.pageXOffset || document.documentElement.scrollLeft || document.body.scrollLeft || 0,
+        //     top: window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0
+        //   };
+        // }
+        this.top = $(document).scrollTop() // or getScroll().top
+        // console.log('aa', $('.main-content'));
+        body.style.cssText = 'overflow: hidden;';
+      },
+      cancelDialogDrawer() {
+        this.visible = false;
+        body.removeAttribute('style');
+        $(document).scrollTop(this.top)
+      },
+      changeTabActive(name) {
+        this.tabActive = name;
+      }
+    },
+    created() {}
+  })
+</script>
+    
+
+    <!-- 分享 -->
+    
+      <!-- https://github.com/overtrue/share.js -->
+<!-- 文章详情页的分享 -->
+<div class="social-share" data-sites="twitter,facebook,google,qq,qzone,wechat,weibo,douban,linkedin" data-wechat-qrcode-helper="<p>微信扫一扫即可分享！</p>"></div>
+
+<script src="/js/shareJs/social-share.min.js"></script>
+</script>
+
+<style>
+  .social-share {
+    margin: 20px 0;
+  }
+</style>
+
+
+    
+    
+    <!-- 评论 -->
+    <!-- 评论 -->
+
+  <div id="myComment">
+    
+      <div id="gitment-container"></div>
+
+    
+  </div>
+
+<!-- comment script in themes\hexo-theme-bamboo\layout\_partial\scripts\index.ejs -->
+
+
+  </div>
+
+  <!-- 目录 -->
+  <!-- 文章详情页右侧目录 -->
+
+  <div class="toc-aside">
+    <div class="toc-main">
+      <div class="toc-aside-title">
+        <i class="fas fa-list-ul" aria-hidden="true"></i><span>catalog</span>
+        
+          <div class="toc-open-close">catalog</div>
+        
+      </div>
+      <div class="toc-content">
+        <div class="toc"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 手机端目录按钮 -->
+  <div id="toc-mobile-btn">
+    <i class="fas fa-list-ul" aria-hidden="true"></i>
+  </div>
+
+
+<script>
+  function closeToc(init) {
+    $(".toc-aside").css({'width': 0, 'padding': 0, 'transition': init ?  'noe' : 'width 0.3s' });
+    $(".toc-content").css({'width': 0});
+    $(".toc-aside-title span, .toc-aside-title i").css({'display': 'none'});
+    $(".main-content").css({'width': '75%', 'margin-left': 'auto', 'margin-right': 'auto',});
+  };
+  function openToc() {
+    $(".main-content").css({'width': '65%', 'margin-right': '10px', 'margin-left': 'calc(35% - 350px)'});
+    $(".toc-aside").css({'width': '300px', 'padding': '0 10px', 'transition': 'width 0.3s'});
+    $(".toc-content").css({'width': '300px'});
+    $(".toc-aside-title span, .toc-aside-title i").css({'display': 'inline-block'});
+  }
+  function openBtnClickFn () {
+    let openOrCloseBtn = $('.toc-aside .toc-aside-title .toc-open-close');
+    let open = eval('' || 'true');
+    openOrCloseBtn.click(function() {
+      if (open) {
+        closeToc();
+        open = false;
+      } else {
+        openToc();
+        open = true;
+      }
+    });
+  };
+  openBtnClickFn();
+  initCloseTocWidth(true);
+
+  function initCloseTocWidth(init) {
+    if (window.innerWidth >= 992) {
+      let isClose = false;
+      isClose && closeToc(init)
+    }
+  }
+
+  document.addEventListener('pjax:complete', function () {
+    $(".toc-aside").css({'transition': 'no'});
+  })
+  document.addEventListener('pjax:complete', function () {
+    openBtnClickFn();
+  })
+  
+</script>
+
+  <!-- 图片放大 Wrap images with fancybox support -->
+  <script src="/js/wrapImage.js"></script>
+</div>
+
+<!-- 文章详情页背景图 -->
+<div id="appBgSwiper" style="position: fixed;left: 0;top: 0;width: 100%;height: 100%;z-index: -2;"
+	:style="{'background-color': bgColor ? bgColor : 'transparent'}">
+	<transition-group tag="ul" :name="names">
+		<li v-for='(image,index) in img' :key='index' v-show="index === mark" class="bg-swiper-box">
+			<img :src="image" class="bg-swiper-img no-lazy">
+		</li>
+	</transition-group>
+</div>
+<script>
+	var vm = new Vue({
+		el: '#appBgSwiper',
+		data: {
+			names: '' || 'fade' || 'fade', // translate-fade fade
+			mark: 0,
+			img: [],
+			bgColor: '',
+			time: null
+		},
+		methods: {   //添加方法
+			change(i, m) {
+				if (i > m) {
+					// this.names = 'fade';
+				} else if (i < m) {
+					// this.names = 'fade';
+				} else {
+					return;
+				}
+				this.mark = i;
+			},
+			prev() {
+				// this.names = 'fade';
+				this.mark--;
+				if (this.mark === -1) {
+					this.mark = 3;
+					return
+				}
+			},
+			next() {
+				// this.names = 'fade';
+				this.mark++;
+				if (this.mark === this.img.length) {
+					this.mark = 0;
+					return
+				}
+			},
+			autoPlay() {
+				// this.names = 'fade';
+				this.mark++;
+				if (this.mark === this.img.length) {
+					this.mark = 0;
+					return
+				}
+			},
+			play() {
+				let bgImgDelay = '' || '180000'
+				let delay = parseInt(bgImgDelay) || 180000;
+				this.time = setInterval(this.autoPlay, delay);
+			},
+			enter() {
+				clearInterval(this.time);
+			},
+			leave() {
+				this.play();
+			}
+		},
+		created() {
+			this.play()
+		},
+		beforeDestroy() {
+			clearInterval(this.time);
+		},
+		mounted() {
+			let prop = '' || '';
+			let isImg = prop.includes('.bmp') || prop.includes('.jpg') || prop.includes('.png') || prop.includes('.tif') || prop.includes('.gif') || prop.includes('.pcx') || prop.includes('.tga') || prop.includes('.exif') || prop.includes('.fpx') || prop.includes('.psd') || prop.includes('.cdr') || prop.includes('.pcd') || prop.includes('.dxf') || prop.includes('.ufo') || prop.includes('.eps') || prop.includes('.ai') || prop.includes('.raw') || prop.includes('.WMF') || prop.includes('.webp') || prop.includes('.jpeg') || prop.includes('http://') || prop.includes('https://')
+			if (isImg) {
+				let img = prop.split(',');
+				let configRoot = '/'
+				let arrImg = [];
+				img.forEach(el => {
+					var Expression = /http(s)?:\/\/([\w-]+\.)+[\w-]+(\/[\w- .\/?%&=]*)?/;
+					var objExp = new RegExp(Expression);
+
+					if (objExp.test(el)) {
+						// http or https
+						arrImg.push(el);
+					} else {
+						// 非http or https开头
+						// 本地文件
+						let firstStr = el.charAt(0);
+						if (firstStr == '/') {
+							el = el.substr(1); // 删除第一个字符 '/',因为 configRoot最后一个字符为 /
+						}
+						el = configRoot + el;
+						arrImg.push(el);
+					}
+				})
+				this.img = arrImg;
+			} else {
+				this.bgColor = prop;
+			}
+		}
+	})
+</script>
+
+<style>
+	.bg-swiper-box {
+		position: absolute;
+		display: block;
+		width: 100%;
+		height: 100%;
+	}
+
+	.bg-swiper-img {
+		object-fit: cover;
+		width: 100%;
+		height: 100%;
+	}
+</style>
+
+
+
+
+  <script>
+  function loadMermaid() {
+    if (document.getElementsByClassName('mermaid').length) {
+      if (window.mermaidJsLoad) mermaid.init()
+      else {
+        loadScript('https://unpkg.com/mermaid/dist/mermaid.min.js').then(() => {
+          window.mermaidJsLoad = true
+          mermaid.initialize({
+            theme: 'default',
+          })
+          if ('true') {
+            mermaid.init();
+          }
+        })
+      }
+    }
+  };
+  document.addEventListener("DOMContentLoaded", function () {
+    loadMermaid();
+  })
+
+  document.addEventListener('pjax:complete', function () {
+    loadMermaid();
+  })
+  
+</script>
+
+
+      </main>
+    </div>
+
+    <!-- 页脚 -->
+    
+  
+  
+    <!-- 底部鱼儿跳动效果，依赖于jquery-->
+<div id="j-fish-skip" style=" position: relative;height: 153px;width: auto;"></div>
+<script>
+  var RENDERER = {
+    POINT_INTERVAL: 5,
+    FISH_COUNT: 3,
+    MAX_INTERVAL_COUNT: 50,
+    INIT_HEIGHT_RATE: .5,
+    THRESHOLD: 50,
+    FISH_COLOR: '',
+    init: function () {
+      this.setFishColor(); this.setParameters(), this.reconstructMethods(), this.setup(), this.bindEvent(), this.render()
+    },
+    setFishColor: function () {
+      let isDark = JSON.parse(localStorage.getItem('dark')) || JSON.parse('false');
+      if (isDark) {
+        this.FISH_COLOR = '#222'; // 暗黑色，有时间把这整成一个变量
+      } else {
+        this.FISH_COLOR = '' || '#42b983';
+      }
+    },
+    setParameters: function () {
+      this.$window = $(window), this.$container = $("#j-fish-skip"), this.$canvas = $("<canvas />"), this.context = this.$canvas.appendTo(this.$container).get(0).getContext("2d"), this.points = [], this.fishes = [], this.watchIds = []
+    },
+    createSurfacePoints: function () {
+      var t = Math.round(this.width / this.POINT_INTERVAL);
+      this.pointInterval = this.width / (t - 1), this.points.push(new SURFACE_POINT(this, 0));
+      for (var i = 1; i < t; i++) {
+        var e = new SURFACE_POINT(this, i * this.pointInterval),
+          h = this.points[i - 1];
+        e.setPreviousPoint(h), h.setNextPoint(e), this.points.push(e)
+      }
+    },
+    reconstructMethods: function () {
+      this.watchWindowSize = this.watchWindowSize.bind(this), this.jdugeToStopResize = this.jdugeToStopResize.bind(this), this.startEpicenter = this.startEpicenter.bind(this), this.moveEpicenter = this.moveEpicenter.bind(this), this.reverseVertical = this.reverseVertical.bind(this), this.render = this.render.bind(this)
+    },
+    setup: function () {
+      this.points.length = 0, this.fishes.length = 0, this.watchIds.length = 0, this.intervalCount = this.MAX_INTERVAL_COUNT, this.width = this.$container.width(), this.height = this.$container.height(), this.fishCount = this.FISH_COUNT * this.width / 500 * this.height / 500, this.$canvas.attr({
+        width: this.width,
+        height: this.height
+      }), this.reverse = !1, this.fishes.push(new FISH(this)), this.createSurfacePoints()
+    },
+    watchWindowSize: function () {
+      this.clearTimer(), this.tmpWidth = this.$window.width(), this.tmpHeight = this.$window.height(), this.watchIds.push(setTimeout(this.jdugeToStopResize, this.WATCH_INTERVAL))
+    },
+    clearTimer: function () {
+      for (; this.watchIds.length > 0;) clearTimeout(this.watchIds.pop())
+    },
+    jdugeToStopResize: function () {
+      var t = this.$window.width(),
+        i = this.$window.height(),
+        e = t == this.tmpWidth && i == this.tmpHeight;
+      this.tmpWidth = t, this.tmpHeight = i, e && this.setup()
+    },
+    bindEvent: function () {
+      this.$window.on("resize", this.watchWindowSize), this.$container.on("mouseenter", this.startEpicenter), this.$container.on("mousemove", this.moveEpicenter)
+    },
+    getAxis: function (t) {
+      var i = this.$container.offset();
+      return {
+        x: t.clientX - i.left + this.$window.scrollLeft(),
+        y: t.clientY - i.top + this.$window.scrollTop()
+      }
+    },
+    startEpicenter: function (t) {
+      this.axis = this.getAxis(t)
+    },
+    moveEpicenter: function (t) {
+      var i = this.getAxis(t);
+      this.axis || (this.axis = i), this.generateEpicenter(i.x, i.y, i.y - this.axis.y), this.axis = i
+    },
+    generateEpicenter: function (t, i, e) {
+      if (!(i < this.height / 2 - this.THRESHOLD || i > this.height / 2 + this.THRESHOLD)) {
+        var h = Math.round(t / this.pointInterval);
+        h < 0 || h >= this.points.length || this.points[h].interfere(i, e)
+      }
+    },
+    reverseVertical: function () {
+      this.reverse = !this.reverse;
+      for (var t = 0, i = this.fishes.length; t < i; t++) this.fishes[t].reverseVertical()
+    },
+    controlStatus: function () {
+      for (var t = 0, i = this.points.length; t < i; t++) this.points[t].updateSelf();
+      for (t = 0, i = this.points.length; t < i; t++) this.points[t].updateNeighbors();
+      this.fishes.length < this.fishCount && 0 == --this.intervalCount && (this.intervalCount = this.MAX_INTERVAL_COUNT, this.fishes.push(new FISH(this)))
+    },
+    render: function () {
+      requestAnimationFrame(this.render), this.controlStatus(), this.context.clearRect(0, 0, this.width, this.height), this.context.fillStyle = this.FISH_COLOR;
+      for (var t = 0, i = this.fishes.length; t < i; t++) this.fishes[t].render(this.context);
+      this.context.save(), this.context.globalCompositeOperation = "xor", this.context.beginPath(), this.context.moveTo(0, this.reverse ? 0 : this.height);
+      for (t = 0, i = this.points.length; t < i; t++) this.points[t].render(this.context);
+      this.context.lineTo(this.width, this.reverse ? 0 : this.height), this.context.closePath(), this.context.fill(), this.context.restore()
+    }
+  },
+  SURFACE_POINT = function (t, i) {
+    this.renderer = t, this.x = i, this.init()
+  };
+  SURFACE_POINT.prototype = {
+    SPRING_CONSTANT: .03,
+    SPRING_FRICTION: .9,
+    WAVE_SPREAD: .3,
+    ACCELARATION_RATE: .01,
+    init: function () {
+      this.initHeight = this.renderer.height * this.renderer.INIT_HEIGHT_RATE, this.height = this.initHeight, this.fy = 0, this.force = {
+        previous: 0,
+        next: 0
+      }
+    },
+    setPreviousPoint: function (t) {
+      this.previous = t
+    },
+    setNextPoint: function (t) {
+      this.next = t
+    },
+    interfere: function (t, i) {
+      this.fy = this.renderer.height * this.ACCELARATION_RATE * (this.renderer.height - this.height - t >= 0 ? -1 : 1) * Math.abs(i)
+    },
+    updateSelf: function () {
+      this.fy += this.SPRING_CONSTANT * (this.initHeight - this.height), this.fy *= this.SPRING_FRICTION, this.height += this.fy
+    },
+    updateNeighbors: function () {
+      this.previous && (this.force.previous = this.WAVE_SPREAD * (this.height - this.previous.height)), this.next && (this.force.next = this.WAVE_SPREAD * (this.height - this.next.height))
+    },
+    render: function (t) {
+      this.previous && (this.previous.height += this.force.previous, this.previous.fy += this.force.previous), this.next && (this.next.height += this.force.next, this.next.fy += this.force.next), t.lineTo(this.x, this.renderer.height - this.height)
+    }
+  };
+  var FISH = function (t) {
+    this.renderer = t, this.init()
+  };
+  FISH.prototype = {
+    GRAVITY: .4,
+    init: function () {
+      this.direction = Math.random() < .5, this.x = this.direction ? this.renderer.width + this.renderer.THRESHOLD : -this.renderer.THRESHOLD, this.previousY = this.y, this.vx = this.getRandomValue(4, 10) * (this.direction ? -1 : 1), this.renderer.reverse ? (this.y = this.getRandomValue(1 * this.renderer.height / 10, 4 * this.renderer.height / 10), this.vy = this.getRandomValue(2, 5), this.ay = this.getRandomValue(.05, .2)) : (this.y = this.getRandomValue(6 * this.renderer.height / 10, 9 * this.renderer.height / 10), this.vy = this.getRandomValue(-5, -2), this.ay = this.getRandomValue(-.2, -.05)), this.isOut = !1, this.theta = 0, this.phi = 0
+    },
+    getRandomValue: function (t, i) {
+      return t + (i - t) * Math.random()
+    },
+    reverseVertical: function () {
+      this.isOut = !this.isOut, this.ay *= -1
+    },
+    controlStatus: function (t) {
+      this.previousY = this.y, this.x += this.vx, this.y += this.vy, this.vy += this.ay, this.renderer.reverse ? this.y > this.renderer.height * this.renderer.INIT_HEIGHT_RATE ? (this.vy -= this.GRAVITY, this.isOut = !0) : (this.isOut && (this.ay = this.getRandomValue(.05, .2)), this.isOut = !1) : this.y < this.renderer.height * this.renderer.INIT_HEIGHT_RATE ? (this.vy += this.GRAVITY, this.isOut = !0) : (this.isOut && (this.ay = this.getRandomValue(-.2, -.05)), this.isOut = !1), this.isOut || (this.theta += Math.PI / 20, this.theta %= 2 * Math.PI, this.phi += Math.PI / 30, this.phi %= 2 * Math.PI), this.renderer.generateEpicenter(this.x + (this.direction ? -1 : 1) * this.renderer.THRESHOLD, this.y, this.y - this.previousY), (this.vx > 0 && this.x > this.renderer.width + this.renderer.THRESHOLD || this.vx < 0 && this.x < -this.renderer.THRESHOLD) && this.init()
+    },
+    render: function (t) {
+      t.save(), t.translate(this.x, this.y), t.rotate(Math.PI + Math.atan2(this.vy, this.vx)), t.scale(1, this.direction ? 1 : -1), t.beginPath(), t.moveTo(-30, 0), t.bezierCurveTo(-20, 15, 15, 10, 40, 0), t.bezierCurveTo(15, -10, -20, -15, -30, 0), t.fill(), t.save(), t.translate(40, 0), t.scale(.9 + .2 * Math.sin(this.theta), 1), t.beginPath(), t.moveTo(0, 0), t.quadraticCurveTo(5, 10, 20, 8), t.quadraticCurveTo(12, 5, 10, 0), t.quadraticCurveTo(12, -5, 20, -8), t.quadraticCurveTo(5, -10, 0, 0), t.fill(), t.restore(), t.save(), t.translate(-3, 0), t.rotate((Math.PI / 3 + Math.PI / 10 * Math.sin(this.phi)) * (this.renderer.reverse ? -1 : 1)), t.beginPath(), this.renderer.reverse ? (t.moveTo(5, 0), t.bezierCurveTo(10, 10, 10, 30, 0, 40), t.bezierCurveTo(-12, 25, -8, 10, 0, 0)) : (t.moveTo(-5, 0), t.bezierCurveTo(-10, -10, -10, -30, 0, -40), t.bezierCurveTo(12, -25, 8, -10, 0, 0)), t.closePath(), t.fill(), t.restore(), t.restore(), this.controlStatus(t)
+    }
+  }, $(function () {
+    RENDERER.init()
+    $('.dark').click(function () {
+      setTimeout(() => {
+        RENDERER.setFishColor();
+        RENDERER.context.fill();
+      });
+    })
+  });
+</script>
+  
+  <div class="footer bg-color">
+    <div class="footer-main">
+      
+        
+          <div class="link">
+            
+          </div>
+        
+      
+        
+          <div class="footer-copyright">
+            <p>Copyright © 2019 - 2020 <a target="_blank" rel="noopener" href="https://github.com/yuang01">yuang01</a> | Powered by <a target="_blank" rel="noopener" href="https://hexo.io/zh-cn/docs/">Hexo</a> | Theme <a target="_blank" rel="noopener" href="https://github.com/yuang01/theme">Bamboo</a> </p>
+
+          </div>
+        
+      
+        
+          
+            <!-- 不蒜子统计 -->
+            <!-- 不蒜子统计 -->
+<span id="busuanzi_container_site_pv">
+      <i class="fas fa-eye" aria-hidden="true"></i>Total visits：<span id="busuanzi_value_site_pv"></span> times
+</span>
+<span class="post-meta-divider">|</span>
+<span id="busuanzi_container_site_uv" style='display:none'>
+      <i class="fas fa-users" aria-hidden="true"></i>Number of visitors：<span id="busuanzi_value_site_uv"></span> people
+</span>
+
+          
+        
+      
+        
+          <div class="footer-custom">
+            
+          </div>
+        
+      
+    </div>
+  </div>
+
+
+
+    <!-- 渲染暗黑按钮 -->
+    
+      <div class="dark">
+  <div class="dark-content">
+    <i class="fas fa-moon" aria-hidden="true"></i>
+    <!-- <span>关灯</span> -->
+  </div>
+  
+</div>
+
+<script>
+  $(function() {
+    let isDark = JSON.parse(localStorage.getItem('dark'))  || JSON.parse('false');
+    if (isDark) {
+      $(".dark-content").replaceWith(
+          `
+          <div class='dark-content'>
+            <i class="fas fa-lightbulb" aria-hidden="true"></i>
+          </div>
+          `
+        );
+    }
+    $('.dark').click(function() {
+      if ($(document.body).is('.darkModel')) {
+        $(document.body).removeClass('darkModel');
+        localStorage.setItem('dark', false);
+        $(".dark-content").replaceWith(
+          `
+          <div class='dark-content'>
+            <i class="fas fa-moon" aria-hidden="true"></i>
+          </div>
+          `
+        );
+      } else {
+        $(document.body).addClass('darkModel');
+        localStorage.setItem('dark', true);
+        $(".dark-content").replaceWith(
+          `
+          <div class='dark-content'>
+            <i class="fas fa-lightbulb" aria-hidden="true"></i>
+          </div>
+          `
+        );
+      }
+    })
+  })
+</script>
+    
+    <!-- 渲染回到顶部按钮 -->
+    
+      <div class="goTop top-btn-color" pointer>
+  <i class="fas fa-arrow-up" aria-hidden="true"></i>
+</div>
+<script src="/js/goTop.js"></script>
+
+    
+    <!-- 渲染左下角音乐播放器 -->
+    
+      <link rel="stylesheet" href="/js/aplayer/APlayer@1.10.1.min.css">
+<style>
+.aplayer .aplayer-lrc p {
+  
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 16px !important;
+}
+
+.aplayer .aplayer-lrc p.aplayer-lrc-current {
+  
+  font-size: 15px;
+  color: #42b983;
+}
+
+
+.aplayer.aplayer-fixed.aplayer-narrow .aplayer-body {
+  left: -66px !important;
+}
+
+.aplayer.aplayer-fixed.aplayer-narrow .aplayer-body:hover {
+  left: 0px !important;
+}
+
+
+</style>
+<meting-js  
+  class=""
+  server="tencent"
+  type="playlist"
+  id="8062553743"
+  fixed='true'
+  autoplay='false'
+  theme='#42b983'
+  loop='all'
+  order='random'
+  preload='auto'
+  volume='0.7'
+  list-folded='true'
+>
+</meting-js>
+
+<!-- <style>
+  #aplayer {
+    position: fixed;
+    left: 0;
+    bottom: 300px;
+  }
+</style> -->
+<script src="https://unpkg.com/aplayer@1.10.1/dist/APlayer.min.js"></script>
+<script src="https://unpkg.com/meting@2/dist/Meting.min.js"></script>
+    
+
+    <!-- 图片放大 -->
+    
+      <script src="/js/fancybox/jquery.fancybox.min.js"></script>
+    
+
+    <!-- 百度解析 -->
+    <!-- Baidu Analytics -->
+
+    <!-- Baidu Push -->
+
+<script>
+    (function () {
+        var bp = document.createElement('script');
+        var curProtocol = window.location.protocol.split(':')[0];
+        if (curProtocol === 'https') {
+            bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+        } else {
+            bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+        }
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(bp, s);
+    })();
+</script>
+
+    
+    <!-- 背景彩带 -->
+    
+      <script type="text/javascript" size="100" alpha='0.4' zIndex="-1" src="/js/ribbon.min.js"></script>
+    
+
+    <script src="/js/utils/index.js"></script>
+    <script src="/js/app.js"></script>
+    
+    <!-- 文章目录所需js -->
+<link href="/js/tocbot/tocbot.css" rel="stylesheet">
+<script src="/js/tocbot/tocbot.min.js"></script>
+
+<script>
+  var headerEl = 'h2, h3, h4',  //headers 
+    content = '.post-detail',//文章容器
+    idArr = {};  //标题数组以确定是否增加索引id
+  //add #id
+  var option = {
+    // Where to render the table of contents.
+    tocSelector: '.toc',
+    // Where to grab the headings to build the table of contents.
+    contentSelector: content,
+    // Which headings to grab inside of the contentSelector element.
+    headingSelector: headerEl,
+    scrollSmooth: true,
+    scrollSmoothOffset: -80,
+    headingsOffset: -($(window).height() * 0.4 - 45),
+    positionFixedSelector: '.toc-main',
+    positionFixedClass: 'is-position-fixed',
+    fixedSidebarOffset: 'auto',
+    activeLinkClass: 'is-active-link',
+    // onClick: function (e) {},
+  }
+  if ($('.toc').length > 0) {
+
+    $(content).children(headerEl).each(function () {
+      //去除空格以及多余标点
+      var headerId = $(this).text().replace(/[\s|\~|`|\!|\@|\#|\$|\%|\^|\&|\*|\(|\)|\_|\+|\=|\||\|\[|\]|\{|\}|\;|\:|\"|\'|\,|\<|\.|\>|\/|\?|\：|\，|\。]/g, '');
+
+      headerId = headerId.toLowerCase();
+      if (idArr[headerId]) {
+        //id已经存在
+        $(this).attr('id', headerId + '-' + idArr[headerId]);
+        idArr[headerId]++;
+      }
+      else {
+        //id未存在
+        idArr[headerId] = 1;
+        $(this).attr('id', headerId);
+      }
+    });
+
+    document.addEventListener("DOMContentLoaded", function () {
+      tocbot.init(option);
+      mobileTocClick();
+    });
+
+  }
+
+  window.tocScrollFn = function () {
+    return bamboo.throttle(function () {
+      findHeadPosition();
+    }, 100)()
+  }
+  window.addEventListener('scroll', tocScrollFn);
+
+  const findHeadPosition = function (top) {
+    if ($('.toc-list').length <= 0) {
+      return false;
+    }
+    setTimeout(() => {  // or DOMContentLoaded 
+      autoScrollToc();
+    }, 0);
+  }
+
+  const autoScrollToc = function () {
+    const $activeItem = document.querySelector('.is-active-link');
+    const $cardToc = document.querySelector('.toc-content');
+    const activePosition = $activeItem.getBoundingClientRect().top
+    const sidebarScrollTop = $cardToc.scrollTop
+    if (activePosition > (document.documentElement.clientHeight - 100)) {
+      $cardToc.scrollTop = sidebarScrollTop + 150
+    }
+    if (activePosition < 100) {
+      $cardToc.scrollTop = sidebarScrollTop - 150
+    }
+  }
+
+  document.addEventListener('pjax:send', function () {
+    if ($('.toc').length) {
+      tocbot.destroy();
+    }
+  });
+
+  document.addEventListener('pjax:complete', function () {
+    if ($('.toc').length) {
+      tocbot.init(option);
+      mobileTocClick();
+    }
+  });
+  
+  // 手机端toc按钮点击出现目录
+  const mobileTocClick = function () {
+    const $cardTocLayout = document.getElementsByClassName('toc-aside')[0];
+    const $cardToc = $cardTocLayout.getElementsByClassName('toc-content')[0];
+    let right = '45px';
+    if (window.innerWidth >= 551 && window.innerWidth <= 992) {
+      right = '100px'
+    }
+    const mobileToc = {
+      open: () => {
+        $cardTocLayout.style.cssText = 'animation: toc-open .3s; opacity: 1; right: ' + right
+      },
+
+      close: () => {
+        $cardTocLayout.style.animation = 'toc-close .2s'
+        setTimeout(() => {
+          $cardTocLayout.style.cssText = "opacity:''; animation: ''; right: ''"
+        }, 100)
+      }
+    }
+    document.getElementById('toc-mobile-btn').addEventListener('click', () => {
+      if (window.getComputedStyle($cardTocLayout).getPropertyValue('opacity') === '0') mobileToc.open()
+      else mobileToc.close()
+    })
+
+    $cardToc.addEventListener('click', (e) => {
+      if (window.innerWidth < 992) { // 小于992px的时候
+        mobileToc.close()
+      }
+    })
+  }
+</script>
+
+<style>
+  .is-position-fixed {
+    position: sticky !important;
+    top: 74px;
+  }
+
+  .toc-main ul {
+    counter-reset: show-list;
+  }
+
+  .toc-main ul li::before {
+    content: counter(item)".";
+    display: block;
+    position: absolute;
+    left: 12px;
+    top: 0;
+  }
+</style> 
+
+<!-- 设置导航背景 -->
+<script>
+  let setHeaderClass = () => {
+    const headerMenuTransparent = true;
+    if (!headerMenuTransparent) { return; }
+    const nav = $('#navHeader');
+    const navTop = nav.outerHeight();
+    const winTop = $(window).scrollTop();
+    if(winTop > navTop) {
+      nav.addClass('header-bg-color');
+    }
+    else {
+      nav.removeClass('header-bg-color');
+    }
+  };
+
+  let scrollCollect = () => {
+    return bamboo.throttle(function (e) {
+      setHeaderClass();
+    }, 200)()
+  }
+
+  let initHeaderBg = () => {
+    setHeaderClass();
+  }
+
+  setHeaderClass();
+  window.addEventListener('scroll', scrollCollect);
+
+  document.addEventListener('pjax:send', function () {
+    window.removeEventListener('scroll', scrollCollect)
+  })
+  document.addEventListener('pjax:complete', function () {
+    window.addEventListener('scroll', scrollCollect);
+    setHeaderClass();
+  })
+</script> 
+
+<!-- 渲染issues标签里的内容 -->
+<script>
+  function loadIssuesJS() {
+    if ($(".post-detail").find(".issues-api").length == 0) {
+      return;
+    } 
+    loadScript('/js/issues/index.js');
+  };
+  $(function () {
+    loadIssuesJS();
+  });
+  document.addEventListener('pjax:complete', function () {
+    if (typeof IssuesAPI == "undefined") {
+      loadIssuesJS();
+    }
+  })
+</script>
+
+<!-- 输入框打字特效 -->
+<!-- 输入框打字特效 -->
+
+  <script src="/js/activate-power-mode.js"></script>
+  <script>
+    POWERMODE.colorful = true;  // 打开随机颜色特效
+    POWERMODE.shake = false;    // 关闭输入框抖动
+    document.body.addEventListener('input', POWERMODE);//监听打字事件
+  </script>
+
+
+<!-- markdown代码一键复制功能 -->
+
+  <link rel="stylesheet" href="https://unpkg.com/v-plugs-ayu/lib/ayu.css">
+  <script src="https://unpkg.com/v-plugs-ayu/lib/ayu.umd.min.js"></script>
+  <script src="/js/clipboard/clipboard.min.js"></script>
+  <div id="appCopy">
+  </div>
+  <script data-pjax>
+    var vm = new Vue({
+      el: '#appCopy',
+      data: {
+      },
+      computed: {
+      },
+      mounted() {
+        const that = this;
+        var copy = 'copy';
+        /* code */
+        var initCopyCode = function () {
+          var copyHtml = '';
+          copyHtml += '<button class="btn-copy" data-clipboard-snippet="" style="position:absolute;top:0;right:0;z-index:1;">';
+          copyHtml += '<i class="fas fa-copy"></i><span>' + copy + '</span>';
+          copyHtml += '</button>';
+          $(".post-detail pre").not('.gutter pre').wrap("<div class='codeBox' style='position:relative;width:100%;'></div>")
+          $(".post-detail pre").not('.gutter pre').before(copyHtml);
+          new ClipboardJS('.btn-copy', {
+            target: function (trigger) {
+              return trigger.nextElementSibling;
+            }
+          });
+        }
+        initCopyCode();
+        $('.btn-copy').unbind('click').bind('click', function () {
+          doSomething();
+        })
+        $(document).unbind('keypress').bind('keypress', function (e) {
+          if (e.ctrlKey && e.keyCode == 67) {
+            doSomething();
+          }
+        })
+
+        function doSomething() {
+          that.$notify({
+            title: "成功",
+            content: "代码已复制，请遵守相关授权协议。",
+            type: 'success'
+          })
+        }
+      },
+      methods: {
+      },
+      created() { }
+    })
+  </script>
+  
+
+<!-- 图片懒加载 -->
+<script defer src="https://unpkg.com/vanilla-lazyload@17.1.0/dist/lazyload.min.js"></script>
+<script>
+  // https://www.npmjs.com/package/vanilla-lazyload
+  // Set the options globally
+  // to make LazyLoad self-initialize
+  window.lazyLoadOptions = {
+    elements_selector: ".lazyload",
+    threshold: 0
+  };
+  // Listen to the initialization event
+  // and get the instance of LazyLoad
+  window.addEventListener(
+    "LazyLoad::Initialized",
+    function (event) {
+      window.lazyLoadInstance = event.detail.instance;
+    },
+    false
+  );
+  document.addEventListener('DOMContentLoaded', function () {
+    lazyLoadInstance.update();
+  });
+  document.addEventListener('pjax:complete', function () {
+    lazyLoadInstance.update();
+  });
+</script>
+
+
+<!-- 卡片滚动动画 -->
+   
+
+<!-- 评论所需js -->
+
+  
+    <script type="text/javascript">
+  var utteranceCommon = {};
+
+  function check_utterance() {
+    let isDark = JSON.parse(localStorage.getItem('dark')) || JSON.parse('false');
+    if (isDark) {
+      utteranceCommon.Theme = 'github-dark';
+    } else {
+      utteranceCommon.Theme = 'github-light';
+    }
+
+    return document.getElementById("gitment-container");
+  }
+  comment_el = '#gitment-container';
+  load_utterance = function () {
+    if ($(comment_el).length) {
+      // 匿名函数，防止污染全局变量
+      const HEAD = check_utterance();
+
+      var utterances = document.createElement('script');
+      utterances.type = 'text/javascript';
+      utterances.async = true;
+      utterances.setAttribute('issue-term', 'pathname')
+      utterances.setAttribute('theme', utteranceCommon.Theme)
+      utterances.setAttribute('repo', '')
+      utterances.crossorigin = 'anonymous';
+      utterances.src = 'https://utteranc.es/client.js';
+      // content 是要插入评论的地方
+      document.getElementById('gitment-container').appendChild(utterances);
+
+    }
+  }
+
+  function dark_utterance() {
+    const HEAD = check_utterance();
+    if (!HEAD) return;
+    const message = {
+      type: 'set-theme',
+      theme: utteranceCommon.Theme
+    };
+    const utteranceIframe = document.querySelector('iframe');
+    utteranceIframe.contentWindow.postMessage(message, 'https://utteranc.es');
+  }
+
+  $(document).ready(load_utterance);
+  document.addEventListener('pjax:complete', function () {
+    load_utterance();
+  });
+
+  $('.dark').click(function () {
+    setTimeout(() => {
+      dark_utterance();
+    });
+  })
+
+</script>
+
+<style>
+  .utterances {
+    max-width: inherit !important;
+  }
+</style>
+  
+
+
+<!-- 鼠标点击特效 -->
+<!-- 爱心点击 -->
+
+  
+    <canvas class="fireworks" style="position: fixed;left: 0;top: 0;z-index: 999; pointer-events: none;" ></canvas>
+    <script src="//cdn.bootcss.com/animejs/2.2.0/anime.min.js"></script>
+    <script src="/js/cursor/explosion.min.js"></script>
+  
+
+
+
+
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" data-pjax></script>
+
+
+    <!-- pjax -->
+    
+
+<!-- pjax -->
+
+
+  <script src="/js/pjax@0.2.8/index.js"></script>
+  
+    <!-- 样式位于：source/css/_third-party/pjaxanimate.styl -->
+
+<div class="pjax-animate">
+  
+    <div class="loading-circle"><div id="loader-circle"></div></div>
+    <script>
+      window.ShowLoading = function() {
+        $(".loading-circle").css("display", "block");
+      };
+      window.HideLoading = function() {
+        $(".loading-circle").css("display", "none");
+      }
+    </script>
+  
+	<script>
+    document.addEventListener('pjax:complete', function () {
+      window.HideLoading();
+    })
+    document.addEventListener('pjax:send', function () {
+      window.ShowLoading();
+    })
+    document.addEventListener('pjax:error', function () {
+      window.HideLoading();
+    })
+	</script>
+</div>
+
+  
+
+  <script>
+    var pjax = new Pjax({
+      elements: 'a[href]:not([href^="#"]):not([href="javascript:void(0)"]):not([no-pjax])',   // 拦截正常带链接的 a 标签
+      selectors: ["#pjax-container","title"],                                   // 根据实际需要确认重载区域
+      cacheBust: false,   // url 地址追加时间戳，用以避免浏览器缓存
+      timeout: 5000
+    });
+
+    document.addEventListener('pjax:send', function (e) {
+
+      try {
+        var currentUrl = window.location.pathname;
+        var targetUrl = e.triggerElement.href;
+        var banUrl = [""];
+        if (banUrl[0] != "") {
+          banUrl.forEach(item => {
+            if(currentUrl.indexOf(item) != -1 || targetUrl.indexOf(item) != -1) {
+              window.location.href = targetUrl;
+            }
+          });
+        }
+      } catch (error) {}
+
+      $(window).unbind('resize');
+      $(window).unbind('scroll');
+      $(document).unbind('scroll');
+      $(document).unbind('click');
+      $('body').unbind('click');
+
+    })
+    
+    document.addEventListener('pjax:complete', function () {
+      $('script[data-pjax], .pjax-reload script').each(function () {
+        $(this).parent().append($(this).remove());
+      });
+    });
+
+    document.addEventListener('pjax:error', function (e) {
+      window.location.href = e.triggerElement.href;
+    })
+    
+    // 刷新不从顶部开始
+    document.addEventListener("DOMContentLoaded", function () {
+      history.scrollRestoration = 'auto';
+    })
+  </script>
+
+
+
+  </body>
+</html>

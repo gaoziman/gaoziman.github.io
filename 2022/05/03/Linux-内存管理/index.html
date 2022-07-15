@@ -1,0 +1,1907 @@
+<!DOCTYPE html>
+<html>
+  <!-- meta/link... -->
+  
+
+
+
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport">
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+
+
+  <title>Linux 内存管理 | Hexo</title>
+
+  <link rel="icon" type="image/x-icon, image/vnd.microsoft.icon" href="/favicon.ico">
+  <link rel="stylesheet" href="https://at.alicdn.com/t/font_1911880_c1nvbyezg17.css">
+  <link href="https://unpkg.com/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet">
+  <link href="/js/swiper/swiper@5.4.1.min.css" rel="stylesheet">
+  
+  
+  
+  
+<link rel="stylesheet" href="/css/animate.min.css">
+
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+  
+    
+<link rel="stylesheet" href="/js/fancybox/jquery.fancybox.min.css">
+
+  
+  
+    
+<link rel="stylesheet" href="/js/shareJs/share.min.css">
+
+  
+  <style>
+        @media (max-width: 992px) {
+            #waifu {
+                display: none;
+            }
+        }
+    </style>
+    <script src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
+    <link href="//cdn.bootcss.com/pace/1.0.2/themes/pink/pace-theme-flash.css" rel="stylesheet">
+
+    
+
+    <!-- import link -->
+    
+        
+            
+        
+            
+        
+    
+    <!-- import script -->
+    
+        
+            
+        
+            
+        
+    
+
+<meta name="generator" content="Hexo 6.2.0"></head>
+
+  
+  <!-- 依赖于jquery和vue -->
+  
+    
+<script src="https://unpkg.com/jquery@3.5.1/dist/jquery.min.js"></script>
+
+  
+
+  
+    
+<script src="https://unpkg.com/vue@2.6.11/dist/vue.min.js"></script>
+
+  
+  
+  <body>
+    <!-- 预加载动画 -->
+    <!-- 页面预加载动画 -->
+
+<div id='loader'>
+  <link rel="stylesheet" href="/js/loaded/index.css" >
+  <div class="loading-left-bg"></div>
+  <div class="loading-right-bg"></div>
+  <div class="spinner-box">
+    <div class="configure-border-1">
+      <div class="configure-core"></div>
+    </div>
+    <div class="configure-border-2">
+      <div class="configure-core"></div>
+    </div>
+    <div class="loading-word">loading...</div>
+  </div>
+</div>
+
+<script>
+  var endLoading = function () {
+    document.body.style.overflow = 'auto';
+    document.getElementById('loader').classList.add("loading");
+  }
+  window.addEventListener('DOMContentLoaded',endLoading);
+  
+</script>
+
+    
+    <!-- 判断是否为暗黑风格 -->
+    <!-- 判断是否为黑夜模式 -->
+<script>
+  let isDark = JSON.parse(localStorage.getItem('dark')) || JSON.parse('false');
+
+  if (isDark) {
+    $(document.body).addClass('darkModel');
+  }
+</script>
+
+    <!-- 需要在上面加载的js -->
+    <script>
+  function loadScript(src, cb) {
+    return new Promise(resolve => {
+      setTimeout(function () {
+        var HEAD = document.getElementsByTagName("head")[0] || document.documentElement;
+        var script = document.createElement("script");
+        script.setAttribute("type", "text/javascript");
+        if (cb) {
+          if (JSON.stringify(cb)) {
+            for (let p in cb) {
+              if (p == "onload") {
+                script[p] = () => {
+                  cb[p]()
+                  resolve()
+                }
+              } else {
+                script[p] = cb[p]
+                script.onload = resolve
+              }
+            }
+          } else {
+            script.onload = () => {
+              cb()
+              resolve()
+            };
+          }
+        } else {
+          script.onload = resolve
+        }
+        script.setAttribute("src", src);
+        HEAD.appendChild(script);
+      });
+    });
+  }
+
+  //https://github.com/filamentgroup/loadCSS
+  var loadCSS = function (href, before, media, attributes) {
+    return new Promise(resolve => {
+      setTimeout(function () {
+        var link = document.createElement('link');
+        link.rel = "stylesheet";
+        link.href = src;
+        link.onload = resolve;
+        document.getElementsByTagName("head")[0].appendChild(link);
+      });
+    });
+  };
+
+</script> 
+
+<!-- 轮播图所需要的js -->
+<script src="/js/swiper/swiper.min.js"></script>
+<script src="/js/swiper/vue-awesome-swiper.js"></script>
+<script src="/js/swiper/swiper.animate1.0.3.min.js"></script>
+
+<script type="text/javascript">
+  Vue.use(window.VueAwesomeSwiper)
+</script>
+
+
+  <script src="/js/vue-typed-js/index.js"></script>
+
+
+<!-- 首页的公告滚动插件的js需要重新加载 -->
+<script src="/js/vue-seamless-scroll/index.js"></script>
+
+<!-- 打字机效果js -->
+<script src="https://unpkg.com/typed.js@2.0.11"></script>
+
+
+    <div id="safearea">
+      <main class="main" id="pjax-container">
+        <!-- 头部导航 -->
+        
+<header class="header   " 
+  id="navHeader"
+  style="position: fixed;
+  left: 0; top: 0; z-index: 10;width: 100%;"
+>
+  <div class="header-content">
+    <div class="bars">
+      <div id="appDrawer" class="sidebar-image">
+  <div class="drawer-box-icon">
+    <i class="fas fa-bars" aria-hidden="true" @click="showDialogDrawer"></i>
+  </div>
+  
+  <transition name="fade">
+    <div class="drawer-box_mask" v-cloak style="display: none;" v-show="visible" @click.self="cancelDialogDrawer">
+    </div>
+  </transition>
+  <div class="drawer-box" :class="{'active': visible}">
+    <div class="drawer-box-head bg-color">
+      <img class="drawer-box-head_logo lazyload placeholder" src="/medias/logo.png" class="lazyload placeholder" data-srcset="/medias/logo.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="logo">
+      <h3 class="drawer-box-head_title">Hexo</h3>
+      <h5 class="drawer-box-head_desc"></h5>
+    </div>
+    
+    <div class="drawer-box-content">
+      <ul class="drawer-box-content_menu">
+        
+        
+          <li class="drawer-box-content_item">
+            <a target="_blank" rel="noopener" href="https://github.com/yuang01/hexo-theme-bamboo">
+              <i class="fas fa-github" aria-hidden="true"></i>
+              <span>Github</span>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</div>
+
+<script>
+  var body = document.body || document.documentElement || window;
+  var vm = new Vue({
+    el: '#appDrawer',
+    data: {
+      visible: false,
+      top: 0,
+      openArr: [],
+    },
+    computed: {
+    },
+    mounted() {
+    },
+    methods: {
+      isOpen(index) {
+        if (this.openArr.includes(index)) {
+          return true;
+        } else {
+          return false;
+        }
+      },
+      openOrCloseMenu(curIndex) {
+        const index = this.openArr.indexOf(curIndex);
+        if (index !== -1) {
+          this.openArr.splice(index, 1);
+        } else {
+          this.openArr.push(curIndex);
+        }
+      },
+      showDialogDrawer() {
+        this.visible = true;
+        // 防止页面滚动，只能让弹框滚动
+        this.top = $(document).scrollTop()
+        body.style.cssText = 'width: 100%; height: 100%;overflow: hidden;';
+      },
+      cancelDialogDrawer() {
+        this.visible = false;
+        body.removeAttribute('style');
+        $(document).scrollTop(this.top)
+      }
+    },
+    created() {}
+  })
+</script>
+
+    </div>
+    <div class="blog-title" id="author-avatar">
+      
+        <div class="avatar">
+          <img src="/medias/logo.png" class="lazyload placeholder" data-srcset="/medias/logo.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="logo">
+        </div>
+      
+      <a href="/" class="logo">Hexo</a>
+    </div>
+    <nav class="navbar">
+      <ul class="menu">
+        
+      </ul>
+      
+      
+        <div id="appSearch">
+  <div class="search"  @click="showDialog()"><i class="fas fa-search" aria-hidden="true"></i></div>
+  <transition name="fade">
+    <div class="message-box_wrapper" style="display: none;" v-cloak v-show="dialogVisible" @click.self="cancelDialogVisible()">
+      <div class="message-box animated bounceInDown">
+        <h2>
+          <span>
+            <i class="fas fa-search" aria-hidden="true"></i>
+            <span class="title">Search</span>
+          </span>
+          <i class="fas fa-times close" pointer style="float:right;" aria-hidden="true" @click.self="cancelDialogVisible()"></i>
+        </h2>
+        <form class="site-search-form">
+          <input type="text"
+            placeholder="Please enter keywords"
+            id="local-search-input" 
+            @click="getSearchFile()"
+            class="st-search-input"
+            v-model="searchInput"
+          />
+        </form>
+        <div class="result-wrapper">
+          <div id="local-search-result" class="local-search-result-cls"></div>
+        </div>
+      </div>
+    </div>
+  </transition>
+</div>
+<script src="/js/local_search.js"></script>
+<script>
+  var body = document.body || document.documentElement || window;
+  var vm = new Vue({
+    el: '#appSearch',
+    data: {
+      dialogVisible: false,
+      searchInput: '',
+      top: 0,
+    },
+    computed: {
+    },
+    mounted() {
+      window.addEventListener('pjax:complete', () => {
+        this.cancelDialogVisible();
+      })
+    },
+    methods: {
+      showDialog() {
+        this.dialogVisible = true;
+        // 防止页面滚动，只能让弹框滚动
+        this.top = $(document).scrollTop()
+        body.style.cssText = 'overflow: hidden;';
+      },
+      getSearchFile() {
+        if (!this.searchInput) {
+          getSearchFile("/search.xml");
+        }
+      },
+      cancelDialogVisible() {
+        this.dialogVisible = false;
+        body.removeAttribute('style');
+        $(document).scrollTop(this.top)
+      },
+    },
+    created() {}
+  })
+</script>
+<!-- 解决刷新页面闪烁问题，可以在元素上添加display: none, 或者用vue.extend方法，详情：https://blog.csdn.net/qq_31393401/article/details/81017912 -->
+<!-- 下面是搜索基本写法 -->
+<!-- <script type="text/javascript" id="local.search.active">
+  var inputArea = document.querySelector("#local-search-input");
+  inputArea.onclick   = function(){ getSearchFile(); this.onclick = null }
+  inputArea.onkeydown = function(){ if(event.keyCode == 13) return false }
+</script> -->
+
+      
+
+    </nav>
+  </div>
+  
+    <a target="_blank" rel="noopener" href="https://github.com/yuang01/hexo-theme-bamboo" class="github-corner color-primary" aria-label="View source on GitHub"><svg width="60" height="60" viewBox="0 0 250 250" style="fill:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+  
+  
+</header>
+        <!-- 内容区域 -->
+        
+ <!-- prismjs 代码高亮 -->
+ 
+
+
+<div class="bg-dark-floor" style="position: fixed;left: 0;top: 0;width: 100%;height: 100%;z-index: -1;"></div>
+
+
+  <!-- 文章详情页顶部图片和标题 -->
+
+
+
+
+<div class="post-detail-header" id="thumbnail_canvas" style="background-repeat: no-repeat; background-size: cover; 
+  background-position: center center;position: relative;background-image:url('/medias/12.jpg')">
+  <div class="post-detail-header-mask"></div>
+  <canvas id="header_canvas"style="position:absolute;bottom:0;pointer-events:none;"></canvas>
+  
+  <div class="post-detail-header_info-box">
+    <div class="title-box">
+      <span class="title">
+        Linux 内存管理
+      </span>
+    </div>
+    
+    
+      
+        <span class="post-detail-header_date">
+          <i class="fas fa-calendar"></i> Published in：2022-05-03 |
+        </span>
+      
+
+      
+        <span class="post-detail-header_categories">
+          <i class="iconfont iconbookmark1"></i> category：
+          
+            <a href="/categories/Linux/" class="post-detail-header_category">
+              Linux
+            </a>
+          
+        </span>
+      
+
+      
+    
+  </div>
+  
+  
+    <script src="/js/bubble/bubble.js"></script>
+  
+</div>
+
+
+
+
+
+<div class="post-detail-content row justify-position" 
+  style="padding-top: 0px;">
+  <div class="main-content">
+    <article class="post post-detail">
+      <div class="post-content">
+        <h1 id="Linux-内存管理"><a href="#Linux-内存管理" class="headerlink" title="Linux 内存管理"></a>Linux 内存管理</h1><ul>
+<li><a href="#linux-%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86">Linux 内存管理</a><ul>
+<li><a href="#%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5">基本概念</a></li>
+<li><a href="#linux-%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8">Linux 内存管理系统调用</a></li>
+<li><a href="#linux-%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E5%AE%9E%E7%8E%B0">Linux 内存管理实现</a><ul>
+<li><a href="#%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98%E7%9A%84%E6%8A%BD%E8%B1%A1%E6%A8%A1%E5%9E%8B">虚拟内存的抽象模型</a><ul>
+<li><a href="#%E6%8C%89%E9%9C%80%E5%88%86%E9%A1%B5">按需分页</a></li>
+<li><a href="#%E4%BA%A4%E6%8D%A2">交换</a></li>
+<li><a href="#%E7%89%A9%E7%90%86%E5%92%8C%E8%99%9A%E6%8B%9F%E5%AF%BB%E5%9D%80%E6%A8%A1%E5%BC%8F">物理和虚拟寻址模式</a></li>
+<li><a href="#%E8%AE%BF%E9%97%AE%E6%8E%A7%E5%88%B6">访问控制</a></li>
+</ul>
+</li>
+<li><a href="#%E7%BC%93%E5%AD%98">缓存</a><ul>
+<li><a href="#%E7%BC%93%E5%86%B2%E5%8C%BA%E7%BC%93%E5%AD%98">缓冲区缓存</a></li>
+<li><a href="#%E9%A1%B5%E7%BC%93%E5%AD%98">页缓存</a></li>
+<li><a href="#%E4%BA%A4%E6%8D%A2%E5%8C%BA%E7%BC%93%E5%AD%98">交换区缓存</a></li>
+<li><a href="#%E7%A1%AC%E4%BB%B6%E7%BC%93%E5%AD%98">硬件缓存</a></li>
+</ul>
+</li>
+<li><a href="#linux-%E9%A1%B5%E8%A1%A8">Linux 页表</a></li>
+<li><a href="#%E9%A1%B5%E5%88%86%E9%85%8D%E5%92%8C%E5%8F%96%E6%B6%88%E5%88%86%E9%85%8D">页分配和取消分配</a><ul>
+<li><a href="#%E9%A1%B5%E9%9D%A2%E5%88%86%E9%85%8D">页面分配</a></li>
+<li><a href="#%E9%A1%B5%E9%9D%A2%E5%8F%96%E6%B6%88%E5%88%86%E9%85%8D">页面取消分配</a></li>
+</ul>
+</li>
+<li><a href="#%E5%86%85%E5%AD%98%E6%98%A0%E5%B0%84">内存映射</a></li>
+<li><a href="#%E6%8C%89%E9%9C%80%E5%88%86%E9%A1%B5-1">按需分页</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p>Linux 内存管理模型非常直接明了，因为 Linux 的这种机制使其具有可移植性并且能够在内存管理单元相差不大的机器下实现 Linux，下面我们就来认识一下 Linux 内存管理是如何实现的。</p>
+<h2 id="基本概念"><a href="#基本概念" class="headerlink" title="基本概念"></a>基本概念</h2><p>每个 Linux 进程都会有地址空间，这些地址空间由三个段区域组成：<strong>text 段、data 段、stack 段</strong>。下面是进程地址空间的示例。</p>
+<img src="https://s1.ax1x.com/2020/08/29/dTssSI.png" class="lazyload placeholder" data-srcset="https://s1.ax1x.com/2020/08/29/dTssSI.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="01" border="0">
+
+<p><code>数据段(data segment)</code> 包含了程序的变量、字符串、数组和其他数据的存储。数据段分为两部分，已经初始化的数据和尚未初始化的数据。其中<code>尚未初始化的数据</code>就是我们说的 BSS。数据段部分的初始化需要编译就期确定的常量以及程序启动就需要一个初始值的变量。所有 BSS 部分中的变量在加载后被初始化为 0 。</p>
+<p>和 <code>代码段(Text segment)</code> 不一样，data segment 数据段可以改变。程序总是修改它的变量。而且，许多程序需要在执行时动态分配空间。Linux 允许数据段随着内存的分配和回收从而增大或者减小。为了分配内存，程序可以增加数据段的大小。在 C 语言中有一套标准库 <code>malloc</code> 经常用于分配内存。进程地址空间描述符包含动态分配的内存区域称为 <code>堆(heap)</code>。</p>
+<p>第三部分段是 <code>栈段(stack segment)</code>。在大部分机器上，栈段会在虚拟内存地址顶部地址位置处，并向低位置处（向地址空间为 0 处）拓展。举个例子来说，在 32 位 x86 架构的机器上，栈开始于 <code>0xC0000000</code>，这是用户模式下进程允许可见的 3GB 虚拟地址限制。如果栈一直增大到超过栈段后，就会发生硬件故障并把页面下降一个页面。</p>
+<p>当程序启动时，栈区域并不是空的，相反，它会包含所有的 shell 环境变量以及为了调用它而向 shell 输入的命令行。举个例子，当你输入</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cp cxuan lx</span><br></pre></td></tr></table></figure>
+
+<p>时，cp 程序会运行并在栈中带着字符串 <code>cp cxuan lx</code> ，这样就能够找出源文件和目标文件的名称。</p>
+<p>当两个用户运行在相同程序中，例如<code>编辑器(editor)</code>，那么就会在内存中保持编辑器程序代码的两个副本，但是这种方式并不高效。Linux 系统支持<code>共享文本段作</code>为替代。下面图中我们会看到 A 和 B 两个进程，它们有着相同的文本区域。</p>
+<img src="https://s1.ax1x.com/2020/08/29/dTsDfA.png" class="lazyload placeholder" data-srcset="https://s1.ax1x.com/2020/08/29/dTsDfA.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="02" border="0">
+
+<p>数据段和栈段只有在 fork 之后才会共享，共享也是共享未修改过的页面。如果任何一个都需要变大但是没有相邻空间容纳的话，也不会有问题，因为相邻的虚拟页面不必映射到相邻的物理页面上。</p>
+<p>除了动态分配更多的内存，Linux 中的进程可以通过<code>内存映射文件</code>来访问文件数据。这个特性可以使我们把一个文件映射到进程空间的一部分而该文件就可以像位于内存中的字节数组一样被读写。把一个文件映射进来使得随机读写比使用 read 和 write 之类的 I&#x2F;O 系统调用要容易得多。共享库的访问就是使用了这种机制。如下所示</p>
+<img src="https://s1.ax1x.com/2020/08/29/dTsylt.png" class="lazyload placeholder" data-srcset="https://s1.ax1x.com/2020/08/29/dTsylt.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="03" border="0">
+
+<p>我们可以看到两个相同文件会被映射到相同的物理地址上，但是它们属于不同的地址空间。</p>
+<p>映射文件的优点是，两个或多个进程可以同时映射到同一文件中，任意一个进程对文件的写操作对其他文件可见。通过使用映射临时文件的方式，可以为多线程共享内存<code>提供高带宽</code>，临时文件在进程退出后消失。但是实际上，并没有两个相同的地址空间，因为每个进程维护的打开文件和信号不同。</p>
+<h2 id="Linux-内存管理系统调用"><a href="#Linux-内存管理系统调用" class="headerlink" title="Linux 内存管理系统调用"></a>Linux 内存管理系统调用</h2><p>下面我们探讨一下关于内存管理的系统调用方式。事实上，POSIX 并没有给内存管理指定任何的系统调用。然而，Linux 却有自己的内存系统调用，主要系统调用如下</p>
+<table>
+<thead>
+<tr>
+<th>系统调用</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>s &#x3D; brk(addr)</td>
+<td>改变数据段大小</td>
+</tr>
+<tr>
+<td>a &#x3D; mmap(addr,len,prot,flags,fd,offset)</td>
+<td>进行映射</td>
+</tr>
+<tr>
+<td>s &#x3D; unmap(addr,len)</td>
+<td>取消映射</td>
+</tr>
+</tbody></table>
+<p>如果遇到错误，那么 s 的返回值是 -1，a 和 addr 是内存地址，len 表示的是长度，prot 表示的是控制保护位，flags 是其他标志位，fd 是文件描述符，offset 是文件偏移量。</p>
+<p><code>brk</code> 通过给出超过数据段之外的第一个字节地址来指定数据段的大小。如果新的值要比原来的大，那么数据区会变得越来越大，反之会越来越小。</p>
+<p><code>mmap</code> 和 <code>unmap</code> 系统调用会控制映射文件。mmp 的第一个参数 addr 决定了文件映射的地址。它必须是页面大小的倍数。如果参数是 0，系统会分配地址并返回 a。第二个参数是长度，它告诉了需要映射多少字节。它也是页面大小的倍数。prot 决定了映射文件的保护位，保护位可以标记为 <strong>可读、可写、可执行或者这些的结合</strong>。第四个参数 flags 能够控制文件是私有的还是可读的以及 addr 是必须的还是只是进行提示。第五个参数 fd 是要映射的文件描述符。只有打开的文件是可以被映射的，因此如果想要进行文件映射，必须打开文件；最后一个参数 offset 会指示文件从什么时候开始，并不一定每次都要从零开始。</p>
+<h2 id="Linux-内存管理实现"><a href="#Linux-内存管理实现" class="headerlink" title="Linux 内存管理实现"></a>Linux 内存管理实现</h2><p>内存管理系统是操作系统最重要的部分之一。从计算机早期开始，我们实际使用的内存都要比系统中实际存在的内存多。<code>内存分配策略</code>克服了这一限制，并且其中最有名的就是 <code>虚拟内存(virtual memory)</code>。通过在多个竞争的进程之间共享虚拟内存，虚拟内存得以让系统有更多的内存。虚拟内存子系统主要包括下面这些概念。</p>
+<p><strong>大地址空间</strong></p>
+<p>操作系统使系统使用起来好像比实际的物理内存要大很多，那是因为虚拟内存要比物理内存大很多倍。</p>
+<p><strong>保护</strong></p>
+<p>系统中的每个进程都会有自己的虚拟地址空间。这些虚拟地址空间彼此完全分开，因此运行一个应用程序的进程不会影响另一个。并且，硬件虚拟内存机制允许内存保护关键内存区域。</p>
+<p><strong>内存映射</strong></p>
+<p>内存映射用来向进程地址空间映射图像和数据文件。在内存映射中，文件的内容直接映射到进程的虚拟空间中。</p>
+<p><strong>公平的物理内存分配</strong></p>
+<p>内存管理子系统允许系统中的每个正在运行的进程公平分配系统的物理内存。</p>
+<p><strong>共享虚拟内存</strong></p>
+<p>尽管虚拟内存让进程有自己的内存空间，但是有的时候你是需要共享内存的。例如几个进程同时在 shell 中运行，这会涉及到 IPC 的进程间通信问题，这个时候你需要的是共享内存来进行信息传递而不是通过拷贝每个进程的副本独立运行。</p>
+<p>下面我们就正式探讨一下什么是 <code>虚拟内存</code></p>
+<h3 id="虚拟内存的抽象模型"><a href="#虚拟内存的抽象模型" class="headerlink" title="虚拟内存的抽象模型"></a>虚拟内存的抽象模型</h3><p>在考虑 Linux 用于支持虚拟内存的方法之前，考虑一个不会被太多细节困扰的抽象模型是很有用的。</p>
+<p>处理器在执行指令时，会从内存中读取指令并将其<code>解码(decode)</code>，在指令解码时会获取某个位置的内容并将他存到内存中。然后处理器继续执行下一条指令。这样，处理器总是在访问存储器以获取指令和存储数据。</p>
+<p>在虚拟内存系统中，所有的地址空间都是虚拟的而不是物理的。但是实际存储和提取指令的是物理地址，所以需要让处理器根据操作系统维护的一张表将虚拟地址转换为物理地址。</p>
+<p>为了简单的完成转换，虚拟地址和物理地址会被分为固定大小的块，称为 <code>页(page)</code>。这些页有相同大小，如果页面大小不一样的话，那么操作系统将很难管理。Alpha AXP系统上的 Linux 使用 8 KB 页面，而 Intel x86 系统上的 Linux 使用 4 KB 页面。每个页面都有一个唯一的编号，即<code>页面框架号（PFN）</code>。</p>
+<img src="https://s1.ax1x.com/2020/08/29/dTsBYd.png" class="lazyload placeholder" data-srcset="https://s1.ax1x.com/2020/08/29/dTsBYd.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="04" border="0">
+
+<p>上面就是 Linux 内存映射模型了，在这个页模型中，虚拟地址由两部分组成：<strong>偏移量和虚拟页框号</strong>。每次处理器遇到虚拟地址时都会提取偏移量和虚拟页框号。处理器必须将虚拟页框号转换为物理页号，然后以正确的偏移量的位置访问物理页。</p>
+<p>上图中展示了两个进程 A 和 B 的虚拟地址空间，每个进程都有自己的页表。这些页表将进程中的虚拟页映射到内存中的物理页中。页表中每一项均包含</p>
+<ul>
+<li><code>有效标志(valid flag)</code>： 表明此页表条目是否有效</li>
+<li>该条目描述的物理页框号</li>
+<li>访问控制信息，页面使用方式，是否可写以及是否可以执行代码</li>
+</ul>
+<p>要将处理器的虚拟地址映射为内存的物理地址，首先需要计算虚拟地址的页框号和偏移量。页面大小为 2 的次幂，可以通过移位完成操作。</p>
+<p>如果当前进程尝试访问虚拟地址，但是访问不到的话，这种情况称为 <code>缺页异常</code>，此时虚拟操作系统的错误地址和页面错误的原因将通知操作系统。</p>
+<p>通过以这种方式将虚拟地址映射到物理地址，虚拟内存可以以任何顺序映射到系统的物理页面。</p>
+<h4 id="按需分页"><a href="#按需分页" class="headerlink" title="按需分页"></a>按需分页</h4><p>由于物理内存要比虚拟内存少很多，因此操作系统需要注意尽量避免直接使用<code>低效</code>的物理内存。节省物理内存的一种方式是仅加载执行程序当前使用的页面（这何尝不是一种懒加载的思想呢？）。例如，可以运行数据库来查询数据库，在这种情况下，不是所有的数据都装入内存，只装载需要检查的数据。这种仅仅在需要时才将虚拟页面加载进内中的技术称为按需分页。</p>
+<h4 id="交换"><a href="#交换" class="headerlink" title="交换"></a>交换</h4><p>如果某个进程需要将虚拟页面传入内存，但是此时没有可用的物理页面，那么操作系统必须丢弃物理内存中的另一个页面来为该页面腾出空间。</p>
+<p>如果页面已经修改过，那么操作系统必须保留该页面的内容，以便以后可以访问它。这种类型的页面被称为脏页，当将其从内存中移除时，它会保存在称为<code>交换文件</code>的特殊文件中。相对于处理器和物理内存的速度，对交换文件的访问非常慢，并且操作系统需要兼顾将页面写到磁盘的以及将它们保留在内存中以便再次使用。</p>
+<p>Linux 使用<code>最近最少使用(LRU)</code>页面老化技术来公平的选择可能会从系统中删除的页面，这个方案涉及系统中的每个页面，页面的年龄随着访问次数的变化而变化，如果某个页面访问次数多，那么该页就表示越 <code>年轻</code>，如果某个呃页面访问次数太少，那么该页越容易被<code>换出</code>。</p>
+<h4 id="物理和虚拟寻址模式"><a href="#物理和虚拟寻址模式" class="headerlink" title="物理和虚拟寻址模式"></a>物理和虚拟寻址模式</h4><p>大多数多功能处理器都支持 <code>物理地址</code>模式和<code>虚拟地址</code>模式的概念。物理寻址模式不需要页表，并且处理器不会在此模式下尝试执行任何地址转换。 Linux 内核被链接在物理地址空间中运行。</p>
+<p>Alpha AXP 处理器没有物理寻址模式。相反，它将内存空间划分为几个区域，并将其中两个指定为物理映射的地址。此内核地址空间称为 KSEG 地址空间，它包含从 0xfffffc0000000000 向上的所有地址。为了从 KSEG 中链接的代码（按照定义，内核代码）执行或访问其中的数据，该代码必须在内核模式下执行。链接到 Alpha 上的 Linux内核以从地址 0xfffffc0000310000 执行。</p>
+<h4 id="访问控制"><a href="#访问控制" class="headerlink" title="访问控制"></a>访问控制</h4><p>页面表的每一项还包含访问控制信息，访问控制信息主要检查进程是否应该访问内存。</p>
+<p>必要时需要对内存进行<code>访问限制</code>。 例如包含可执行代码的内存，自然是只读内存； 操作系统不应允许进程通过其可执行代码写入数据。 相比之下，包含数据的页面可以被写入，但是尝试执行该内存的指令将失败。 大多数处理器至少具有两种执行模式：内核态和用户态。 你不希望访问用户执行内核代码或内核数据结构，除非处理器以内核模式运行。</p>
+<img src="https://s1.ax1x.com/2020/08/29/dTsawD.png" class="lazyload placeholder" data-srcset="https://s1.ax1x.com/2020/08/29/dTsawD.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="05" border="0">
+
+<p>访问控制信息被保存在上面的 Page Table Entry ，页表项中，上面这幅图是 Alpha AXP的 PTE。位字段具有以下含义</p>
+<ul>
+<li>V</li>
+</ul>
+<p>表示 valid ，是否有效位</p>
+<ul>
+<li>FOR</li>
+</ul>
+<p>读取时故障，在尝试读取此页面时出现故障</p>
+<ul>
+<li>FOW</li>
+</ul>
+<p>写入时错误，在尝试写入时发生错误</p>
+<ul>
+<li>FOE</li>
+</ul>
+<p>执行时发生错误，在尝试执行此页面中的指令时，处理器都会报告页面错误并将控制权传递给操作系统，</p>
+<ul>
+<li>ASM</li>
+</ul>
+<p>地址空间匹配，当操作系统希望清除转换缓冲区中的某些条目时，将使用此选项。</p>
+<ul>
+<li>GH</li>
+</ul>
+<p>当在使用<code>单个转换缓冲区</code>条目而不是<code>多个转换缓冲区</code>条目映射整个块时使用的提示。</p>
+<ul>
+<li>KRE</li>
+</ul>
+<p>内核模式运行下的代码可以读取页面</p>
+<ul>
+<li>URE</li>
+</ul>
+<p>用户模式下的代码可以读取页面</p>
+<ul>
+<li>KWE</li>
+</ul>
+<p>以内核模式运行的代码可以写入页面</p>
+<ul>
+<li>UWE</li>
+</ul>
+<p>以用户模式运行的代码可以写入页面</p>
+<ul>
+<li>页框号</li>
+</ul>
+<p>对于设置了 V 位的 PTE，此字段包含此 PTE 的物理页面帧号（页面帧号）。对于无效的 PTE，如果此字段不为零，则包含有关页面在交换文件中的位置的信息。</p>
+<p>除此之外，Linux 还使用了两个位</p>
+<ul>
+<li>_PAGE_DIRTY</li>
+</ul>
+<p>如果已设置，则需要将页面写出到交换文件中</p>
+<ul>
+<li>_PAGE_ACCESSED</li>
+</ul>
+<p>Linux 用来将页面标记为已访问。</p>
+<h3 id="缓存"><a href="#缓存" class="headerlink" title="缓存"></a>缓存</h3><p>上面的虚拟内存抽象模型可以用来实施，但是效率不会太高。操作系统和处理器设计人员都尝试提高性能。 但是除了提高处理器，内存等的速度之外，最好的方法就是维护有用信息和数据的高速缓存，从而使某些操作更快。在 Linux 中，使用很多和内存管理有关的缓冲区，使用缓冲区来提高效率。</p>
+<h4 id="缓冲区缓存"><a href="#缓冲区缓存" class="headerlink" title="缓冲区缓存"></a>缓冲区缓存</h4><p>缓冲区高速缓存包含<code>块设备</code>驱动程序使用的数据缓冲区。</p>
+<p>还记得什么是块设备么？这里回顾下</p>
+<p>块设备是一个能存储<code>固定大小块</code>信息的设备，它支持<strong>以固定大小的块，扇区或群集读取和（可选）写入数据</strong>。每个块都有自己的<code>物理地址</code>。通常块的大小在 512 - 65536 之间。所有传输的信息都会以<code>连续</code>的块为单位。块设备的基本特征是每个块都较为对立，能够独立的进行读写。常见的块设备有 <strong>硬盘、蓝光光盘、USB 盘</strong></p>
+<p>与字符设备相比，块设备通常需要较少的引脚。</p>
+<img src="https://s1.ax1x.com/2020/08/29/dTs66P.png" class="lazyload placeholder" data-srcset="https://s1.ax1x.com/2020/08/29/dTs66P.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="06" border="0">
+
+<p>缓冲区高速缓存通过<code>设备标识符</code>和块编号用于快速查找数据块。 如果可以在缓冲区高速缓存中找到数据，则无需从物理块设备中读取数据，这种访问方式要快得多。</p>
+<h4 id="页缓存"><a href="#页缓存" class="headerlink" title="页缓存"></a>页缓存</h4><p>页缓存用于加快对磁盘上图像和数据的访问</p>
+<p>它用于一次一页地缓存文件中的内容，并且可以通过文件和文件中的偏移量进行访问。当页面从磁盘读入内存时，它们被缓存在页面缓存中。</p>
+<h4 id="交换区缓存"><a href="#交换区缓存" class="headerlink" title="交换区缓存"></a>交换区缓存</h4><p>仅仅已修改（脏页）被保存在交换文件中</p>
+<p>只要这些页面在写入交换文件后没有修改，则下次交换该页面时，无需将其写入交换文件，因为该页面已在交换文件中。 可以直接丢弃。 在大量交换的系统中，这节省了许多不必要的和昂贵的磁盘操作。</p>
+<h4 id="硬件缓存"><a href="#硬件缓存" class="headerlink" title="硬件缓存"></a>硬件缓存</h4><p>处理器中通常使用一种硬件缓存。页表条目的缓存。在这种情况下，处理器并不总是直接读取页表，而是根据需要缓存页的翻译。 这些是<code>转换后备缓冲区</code> 也被称为 <code>TLB</code>，包含来自系统中一个或多个进程的页表项的缓存副本。</p>
+<p>引用虚拟地址后，处理器将尝试查找匹配的 TLB 条目。 如果找到，则可以将虚拟地址直接转换为物理地址，并对数据执行正确的操作。 如果处理器找不到匹配的 TLB 条目， 它通过向操作系统发信号通知已发生 TLB 丢失获得操作系统的支持和帮助。系统特定的机制用于将该异常传递给可以修复问题的操作系统代码。 操作系统为地址映射生成一个新的 TLB 条目。 清除异常后，处理器将再次尝试转换虚拟地址。这次能够执行成功。</p>
+<p>使用缓存也存在缺点，为了节省精力，Linux 必须使用更多的时间和空间来维护这些缓存，并且如果缓存损坏，系统将会崩溃。</p>
+<h3 id="Linux-页表"><a href="#Linux-页表" class="headerlink" title="Linux 页表"></a>Linux 页表</h3><p>Linux 假定页表分为三个级别。访问的每个页表都包含下一级页表</p>
+<img src="https://s1.ax1x.com/2020/08/29/dTs0FH.png" class="lazyload placeholder" data-srcset="https://s1.ax1x.com/2020/08/29/dTs0FH.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="07" border="0">
+
+<p>图中的 PDG 表示全局页表，当创建一个新的进程时，都要为新进程创建一个新的页面目录，即 PGD。</p>
+<p>要将虚拟地址转换为物理地址，处理器必须获取每个级别字段的内容，将其转换为包含页表的物理页的偏移量，并读取下一级页表的页框号。这样重复三次，直到找到包含虚拟地址的物理页面的页框号为止。</p>
+<p>Linux 运行的每个平台都必须提供翻译宏，这些宏允许内核遍历特定进程的页表。这样，内核无需知道页表条目的格式或它们的排列方式。</p>
+<h3 id="页分配和取消分配"><a href="#页分配和取消分配" class="headerlink" title="页分配和取消分配"></a>页分配和取消分配</h3><p>对系统中物理页面有很多需求。例如，当图像加载到内存中时，操作系统需要分配页面。</p>
+<p>系统中所有物理页面均由 <code>mem_map</code> 数据结构描述，这个数据结构是 <code>mem_map_t</code> 的列表。它包括一些重要的属性</p>
+<ul>
+<li>count ：这是页面的用户数计数，当页面在多个进程之间共享时，计数大于 1 </li>
+<li>age：这是描述页面的年龄，用于确定页面是否适合丢弃或交换</li>
+<li>map_nr ：这是此mem_map_t描述的物理页框号。</li>
+</ul>
+<p>页面分配代码使用 <code>free_area</code>向量查找和释放页面，free_area 的每个元素都包含有关页面块的信息。</p>
+<h4 id="页面分配"><a href="#页面分配" class="headerlink" title="页面分配"></a>页面分配</h4><p>Linux 的页面分配使用一种著名的伙伴算法来进行页面的分配和取消分配。页面以 2 的幂为单位进行块分配。这就意味着它可以分配 1页、2 页、4页等等，只要系统中有足够可用的页面来满足需求就可以。判断的标准是<strong>nr_free_pages&gt; min_free_pages</strong>，如果满足，就会在 free_area 中搜索所需大小的页面块完成分配。free_area 的每个元素都有该大小的块的已分配页面和空闲页面块的映射。</p>
+<p>分配算法会搜索请求大小的页面块。如果没有任何请求大小的页面块可用的话，会搜寻一个是请求大小二倍的页面块，然后重复，直到一直搜寻完 free_area 找到一个页面块为止。如果找到的页面块要比请求的页面块大，就会对找到的页面块进行细分，直到找到合适的大小块为止。</p>
+<p>因为每个块都是 2 的次幂，所以拆分过程很容易，因为你只需将块分成两半即可。空闲块在适当的队列中排队，分配的页面块返回给调用者。</p>
+<img src="https://s1.ax1x.com/2020/08/29/dTsdTe.png" class="lazyload placeholder" data-srcset="https://s1.ax1x.com/2020/08/29/dTsdTe.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="08" border="0">
+
+<p>如果请求一个 2 个页的块，则 4 页的第一个块（从第 4 页的框架开始）将被分成两个 2 页的块。第一个页面（从第 4 页的帧开始）将作为分配的页面返回给调用方，第二个块（从第 6 页的页面开始）将作为 2 页的空闲块排队到 free_area 数组的元素 1 上。</p>
+<h4 id="页面取消分配"><a href="#页面取消分配" class="headerlink" title="页面取消分配"></a>页面取消分配</h4><p>上面的这种内存方式最造成一种后果，那就是内存的碎片化，会将较大的空闲页面分成较小的页面。页面解除分配代码会尽可能将页面重新组合成为更大的空闲块。每释放一个页面，都会检查相同大小的相邻的块，以查看是否空闲。如果是，则将其与新释放的页面块组合以形成下一个页面大小块的新的自由页面块。 每次将两个页面块重新组合为更大的空闲页面块时，页面释放代码就会尝试将该页面块重新组合为更大的空闲页面。 通过这种方式，可用页面的块将尽可能多地使用内存。</p>
+<p>例如上图，如果要释放第 1 页的页面，则将其与已经空闲的第 0 页页面框架组合在一起，并作为大小为 2页的空闲块排队到 free_area 的元素 1 中</p>
+<h3 id="内存映射"><a href="#内存映射" class="headerlink" title="内存映射"></a>内存映射</h3><p>内核有两种类型的内存映射：<code>共享型(shared)</code> 和<code>私有型(private)</code>。私有型是当进程为了只读文件，而不写文件时使用，这时，私有映射更加高效。 但是，任何对私有映射页的写操作都会导致内核停止映射该文件中的页。所以，写操作既不会改变磁盘上的文件，对访问该文件的其它进程也是不可见的。</p>
+<h3 id="按需分页-1"><a href="#按需分页-1" class="headerlink" title="按需分页"></a>按需分页</h3><p>一旦可执行映像被内存映射到虚拟内存后，它就可以被执行了。因为只将映像的开头部分物理的拉入到内存中，因此它将很快访问物理内存尚未存在的虚拟内存区域。当进程访问没有有效页表的虚拟地址时，操作系统会报告这项错误。</p>
+<p>页面错误描述页面出错的虚拟地址和引起的内存访问（RAM）类型。</p>
+<p>Linux 必须找到代表发生页面错误的内存区域的 vm_area_struct 结构。由于搜索 vm_area_struct 数据结构对于有效处理页面错误至关重要，因此它们以 <code>AVL（Adelson-Velskii和Landis）</code>树结构链接在一起。如果引起故障的虚拟地址没有 <code>vm_area_struct</code> 结构，则此进程已经访问了非法地址，Linux 会向进程发出 <code>SIGSEGV</code> 信号，如果进程没有用于该信号的处理程序，那么进程将会终止。</p>
+<p>然后，Linux 会针对此虚拟内存区域所允许的访问类型，检查发生的页面错误类型。 如果该进程以非法方式访问内存，例如写入仅允许读的区域，则还会发出内存访问错误信号。</p>
+<p>现在，Linux 已确定页面错误是合法的，因此必须对其进行处理。</p>
+
+      </div>
+      <div class="post-tags-categories">
+        
+        <div class="tags">
+          
+            <a href="/tags/Linux/" class="">
+              Linux
+            </a>
+          
+        </div>
+        
+      </div>
+      
+        <div class="copyright">
+  <ul class="post-copyright">
+    <li class="post-copyright-author">
+    <strong>author:  </strong>John Doe</a>
+    </li>
+    <li class="post-copyright-link">
+    <strong>link:  </strong>
+    <a href="/2022/05/03/Linux-内存管理/" target="_blank" title="Linux 内存管理">http://example.com/2022/05/03/Linux-内存管理/</a>
+    </li>
+    <li class="post-copyright-license">
+      <strong>Copyright notice:   </strong>
+      All articles on this website, unless otherwise stated, adopt <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">CC BY-NC-ND 4.0</a>
+      reprint policy. If reproduced, please indicate source!
+    </li>
+  </ul>
+<div>
+      
+    </article>
+    <!-- 上一篇文章和下一篇文章 -->
+    
+      <!-- 文章详情页的上一页和下一页 -->
+<div class="post-nav">
+
+
+
+  
+  <div class="post-nav-prev post-nav-item">
+    <div class="post-nav-img" style="background-size: cover; 
+      background-position: center center;">
+      <img class="lazyload lazyload placeholder" src="/medias/2.jpg" class="lazyload placeholder" data-srcset="/medias/2.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="">
+    </div>
+    <a href="/2022/05/03/Linux-%E8%BF%9B%E7%A8%8B%E5%92%8C%E7%BA%BF%E7%A8%8B/" class="post-nav-link">
+      <div class="title">
+        <i class="fas fa-angle-left"></i> Prev:
+        <div class="title-text">Linux 进程和线程</div>
+      </div>
+      
+      <!-- <div class="content">
+        Linux 进程和线程
+Linux 进程和线程
+基本概念
+Linux 进程间通信
+信号 signal
+管道 pipe
+共
+      </div> -->
+    </a>
+  </div>
+
+
+
+  
+  <div class="post-nav-next post-nav-item">
+    <div class="post-nav-img" style="background-size: cover; 
+      background-position: center center;">
+      <img class="lazyload lazyload placeholder" src="/medias/6.jpg" class="lazyload placeholder" data-srcset="/medias/6.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" src="" alt="">
+    </div>
+    <a href="/2022/05/03/Linux-IO%E7%AE%A1%E7%90%86/" class="post-nav-link">
+      <div class="title">
+        Next: <i class="fas fa-angle-right"></i>
+        <div class="title-text">Linux IO管理</div>
+      </div>
+      <!-- <div class="content">
+        Linux IO 管理
+Linux IO 管理
+Linux IO 基本概念
+网络
+Linux I&#x2F;O 系统调用
+      </div> -->
+    </a>
+  </div>
+
+</div>
+
+    
+    
+
+    <!-- 打赏 -->
+    
+      <div id="appDonate" class="post-donate">
+  <div id="donate_board" class="donate_bar center" ref="donate">
+    <a id="btn_donate" class="btn_donate" href="javascript:;" title="打赏" @click="showDialogDrawer()"></a>
+  </div>
+  <transition name="fade">
+    <div 
+      class="donate-box-mask"
+      v-cloak 
+      v-show="visible"
+      @click="cancelDialogDrawer()"
+    >
+    </div>
+  </transition>
+  <transition name="bounce">
+    <div class="donate-box" v-cloak v-show="visible">
+      <div class="donate-box_close">
+        <i class="fas fa-times" aria-hidden="true" @click="cancelDialogDrawer" pointer></i>
+      </div>
+      <div class="donate-box_title">
+        <h4>
+          你的赏识是我前进的动力
+        </h4>
+      </div>
+      <div class="donate-box_tab">
+        <div class="Alipay" pointer :class="{'active': tabActive === 'Alipay'}" @click="changeTabActive('Alipay')">
+          支付宝
+        </div>
+        <div class="WeChatpay" pointer :class="{'active': tabActive === 'WeChatpay'}" @click="changeTabActive('WeChatpay')">
+          微信
+        </div>
+      </div>
+      <div class="donate-box_img">
+        <div class="AlipayImg" v-show="tabActive === 'Alipay'">
+          <img src="/medias/1.jpg" class="lazyload placeholder" data-srcset="/medias/1.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="支付宝打赏" />
+        </div> 
+        <div class="WeChatpayImg" v-show="tabActive === 'WeChatpay'">
+          <img src="/medias/2.jpg" class="lazyload placeholder" data-srcset="/medias/2.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="微信打赏" />
+        </div>
+      </div>
+    </div>
+  </transition>
+</div>
+
+<script>
+  var body = document.body || document.documentElement || window;
+  var vm = new Vue({
+    el: '#appDonate',
+    data: {
+      visible: false,
+      tabActive: 'Alipay',
+      top: 0,
+    },
+    computed: {
+    },
+    mounted() {
+    },
+    methods: {
+      showDialogDrawer() {
+        this.visible = true;
+        // 防止页面滚动，只能让弹框滚动
+        // function getScroll() {
+        //   return {
+        //     left: window.pageXOffset || document.documentElement.scrollLeft || document.body.scrollLeft || 0,
+        //     top: window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0
+        //   };
+        // }
+        this.top = $(document).scrollTop() // or getScroll().top
+        // console.log('aa', $('.main-content'));
+        body.style.cssText = 'overflow: hidden;';
+      },
+      cancelDialogDrawer() {
+        this.visible = false;
+        body.removeAttribute('style');
+        $(document).scrollTop(this.top)
+      },
+      changeTabActive(name) {
+        this.tabActive = name;
+      }
+    },
+    created() {}
+  })
+</script>
+    
+
+    <!-- 分享 -->
+    
+      <!-- https://github.com/overtrue/share.js -->
+<!-- 文章详情页的分享 -->
+<div class="social-share" data-sites="twitter,facebook,google,qq,qzone,wechat,weibo,douban,linkedin" data-wechat-qrcode-helper="<p>微信扫一扫即可分享！</p>"></div>
+
+<script src="/js/shareJs/social-share.min.js"></script>
+</script>
+
+<style>
+  .social-share {
+    margin: 20px 0;
+  }
+</style>
+
+
+    
+    
+    <!-- 评论 -->
+    <!-- 评论 -->
+
+  <div id="myComment">
+    
+      <div id="gitment-container"></div>
+
+    
+  </div>
+
+<!-- comment script in themes\hexo-theme-bamboo\layout\_partial\scripts\index.ejs -->
+
+
+  </div>
+
+  <!-- 目录 -->
+  <!-- 文章详情页右侧目录 -->
+
+  <div class="toc-aside">
+    <div class="toc-main">
+      <div class="toc-aside-title">
+        <i class="fas fa-list-ul" aria-hidden="true"></i><span>catalog</span>
+        
+          <div class="toc-open-close">catalog</div>
+        
+      </div>
+      <div class="toc-content">
+        <div class="toc"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 手机端目录按钮 -->
+  <div id="toc-mobile-btn">
+    <i class="fas fa-list-ul" aria-hidden="true"></i>
+  </div>
+
+
+<script>
+  function closeToc(init) {
+    $(".toc-aside").css({'width': 0, 'padding': 0, 'transition': init ?  'noe' : 'width 0.3s' });
+    $(".toc-content").css({'width': 0});
+    $(".toc-aside-title span, .toc-aside-title i").css({'display': 'none'});
+    $(".main-content").css({'width': '75%', 'margin-left': 'auto', 'margin-right': 'auto',});
+  };
+  function openToc() {
+    $(".main-content").css({'width': '65%', 'margin-right': '10px', 'margin-left': 'calc(35% - 350px)'});
+    $(".toc-aside").css({'width': '300px', 'padding': '0 10px', 'transition': 'width 0.3s'});
+    $(".toc-content").css({'width': '300px'});
+    $(".toc-aside-title span, .toc-aside-title i").css({'display': 'inline-block'});
+  }
+  function openBtnClickFn () {
+    let openOrCloseBtn = $('.toc-aside .toc-aside-title .toc-open-close');
+    let open = eval('' || 'true');
+    openOrCloseBtn.click(function() {
+      if (open) {
+        closeToc();
+        open = false;
+      } else {
+        openToc();
+        open = true;
+      }
+    });
+  };
+  openBtnClickFn();
+  initCloseTocWidth(true);
+
+  function initCloseTocWidth(init) {
+    if (window.innerWidth >= 992) {
+      let isClose = false;
+      isClose && closeToc(init)
+    }
+  }
+
+  document.addEventListener('pjax:complete', function () {
+    $(".toc-aside").css({'transition': 'no'});
+  })
+  document.addEventListener('pjax:complete', function () {
+    openBtnClickFn();
+  })
+  
+</script>
+
+  <!-- 图片放大 Wrap images with fancybox support -->
+  <script src="/js/wrapImage.js"></script>
+</div>
+
+<!-- 文章详情页背景图 -->
+<div id="appBgSwiper" style="position: fixed;left: 0;top: 0;width: 100%;height: 100%;z-index: -2;"
+	:style="{'background-color': bgColor ? bgColor : 'transparent'}">
+	<transition-group tag="ul" :name="names">
+		<li v-for='(image,index) in img' :key='index' v-show="index === mark" class="bg-swiper-box">
+			<img :src="image" class="bg-swiper-img no-lazy">
+		</li>
+	</transition-group>
+</div>
+<script>
+	var vm = new Vue({
+		el: '#appBgSwiper',
+		data: {
+			names: '' || 'fade' || 'fade', // translate-fade fade
+			mark: 0,
+			img: [],
+			bgColor: '',
+			time: null
+		},
+		methods: {   //添加方法
+			change(i, m) {
+				if (i > m) {
+					// this.names = 'fade';
+				} else if (i < m) {
+					// this.names = 'fade';
+				} else {
+					return;
+				}
+				this.mark = i;
+			},
+			prev() {
+				// this.names = 'fade';
+				this.mark--;
+				if (this.mark === -1) {
+					this.mark = 3;
+					return
+				}
+			},
+			next() {
+				// this.names = 'fade';
+				this.mark++;
+				if (this.mark === this.img.length) {
+					this.mark = 0;
+					return
+				}
+			},
+			autoPlay() {
+				// this.names = 'fade';
+				this.mark++;
+				if (this.mark === this.img.length) {
+					this.mark = 0;
+					return
+				}
+			},
+			play() {
+				let bgImgDelay = '' || '180000'
+				let delay = parseInt(bgImgDelay) || 180000;
+				this.time = setInterval(this.autoPlay, delay);
+			},
+			enter() {
+				clearInterval(this.time);
+			},
+			leave() {
+				this.play();
+			}
+		},
+		created() {
+			this.play()
+		},
+		beforeDestroy() {
+			clearInterval(this.time);
+		},
+		mounted() {
+			let prop = '' || '';
+			let isImg = prop.includes('.bmp') || prop.includes('.jpg') || prop.includes('.png') || prop.includes('.tif') || prop.includes('.gif') || prop.includes('.pcx') || prop.includes('.tga') || prop.includes('.exif') || prop.includes('.fpx') || prop.includes('.psd') || prop.includes('.cdr') || prop.includes('.pcd') || prop.includes('.dxf') || prop.includes('.ufo') || prop.includes('.eps') || prop.includes('.ai') || prop.includes('.raw') || prop.includes('.WMF') || prop.includes('.webp') || prop.includes('.jpeg') || prop.includes('http://') || prop.includes('https://')
+			if (isImg) {
+				let img = prop.split(',');
+				let configRoot = '/'
+				let arrImg = [];
+				img.forEach(el => {
+					var Expression = /http(s)?:\/\/([\w-]+\.)+[\w-]+(\/[\w- .\/?%&=]*)?/;
+					var objExp = new RegExp(Expression);
+
+					if (objExp.test(el)) {
+						// http or https
+						arrImg.push(el);
+					} else {
+						// 非http or https开头
+						// 本地文件
+						let firstStr = el.charAt(0);
+						if (firstStr == '/') {
+							el = el.substr(1); // 删除第一个字符 '/',因为 configRoot最后一个字符为 /
+						}
+						el = configRoot + el;
+						arrImg.push(el);
+					}
+				})
+				this.img = arrImg;
+			} else {
+				this.bgColor = prop;
+			}
+		}
+	})
+</script>
+
+<style>
+	.bg-swiper-box {
+		position: absolute;
+		display: block;
+		width: 100%;
+		height: 100%;
+	}
+
+	.bg-swiper-img {
+		object-fit: cover;
+		width: 100%;
+		height: 100%;
+	}
+</style>
+
+
+
+
+  <script>
+  function loadMermaid() {
+    if (document.getElementsByClassName('mermaid').length) {
+      if (window.mermaidJsLoad) mermaid.init()
+      else {
+        loadScript('https://unpkg.com/mermaid/dist/mermaid.min.js').then(() => {
+          window.mermaidJsLoad = true
+          mermaid.initialize({
+            theme: 'default',
+          })
+          if ('true') {
+            mermaid.init();
+          }
+        })
+      }
+    }
+  };
+  document.addEventListener("DOMContentLoaded", function () {
+    loadMermaid();
+  })
+
+  document.addEventListener('pjax:complete', function () {
+    loadMermaid();
+  })
+  
+</script>
+
+
+      </main>
+    </div>
+
+    <!-- 页脚 -->
+    
+  
+  
+    <!-- 底部鱼儿跳动效果，依赖于jquery-->
+<div id="j-fish-skip" style=" position: relative;height: 153px;width: auto;"></div>
+<script>
+  var RENDERER = {
+    POINT_INTERVAL: 5,
+    FISH_COUNT: 3,
+    MAX_INTERVAL_COUNT: 50,
+    INIT_HEIGHT_RATE: .5,
+    THRESHOLD: 50,
+    FISH_COLOR: '',
+    init: function () {
+      this.setFishColor(); this.setParameters(), this.reconstructMethods(), this.setup(), this.bindEvent(), this.render()
+    },
+    setFishColor: function () {
+      let isDark = JSON.parse(localStorage.getItem('dark')) || JSON.parse('false');
+      if (isDark) {
+        this.FISH_COLOR = '#222'; // 暗黑色，有时间把这整成一个变量
+      } else {
+        this.FISH_COLOR = '' || '#42b983';
+      }
+    },
+    setParameters: function () {
+      this.$window = $(window), this.$container = $("#j-fish-skip"), this.$canvas = $("<canvas />"), this.context = this.$canvas.appendTo(this.$container).get(0).getContext("2d"), this.points = [], this.fishes = [], this.watchIds = []
+    },
+    createSurfacePoints: function () {
+      var t = Math.round(this.width / this.POINT_INTERVAL);
+      this.pointInterval = this.width / (t - 1), this.points.push(new SURFACE_POINT(this, 0));
+      for (var i = 1; i < t; i++) {
+        var e = new SURFACE_POINT(this, i * this.pointInterval),
+          h = this.points[i - 1];
+        e.setPreviousPoint(h), h.setNextPoint(e), this.points.push(e)
+      }
+    },
+    reconstructMethods: function () {
+      this.watchWindowSize = this.watchWindowSize.bind(this), this.jdugeToStopResize = this.jdugeToStopResize.bind(this), this.startEpicenter = this.startEpicenter.bind(this), this.moveEpicenter = this.moveEpicenter.bind(this), this.reverseVertical = this.reverseVertical.bind(this), this.render = this.render.bind(this)
+    },
+    setup: function () {
+      this.points.length = 0, this.fishes.length = 0, this.watchIds.length = 0, this.intervalCount = this.MAX_INTERVAL_COUNT, this.width = this.$container.width(), this.height = this.$container.height(), this.fishCount = this.FISH_COUNT * this.width / 500 * this.height / 500, this.$canvas.attr({
+        width: this.width,
+        height: this.height
+      }), this.reverse = !1, this.fishes.push(new FISH(this)), this.createSurfacePoints()
+    },
+    watchWindowSize: function () {
+      this.clearTimer(), this.tmpWidth = this.$window.width(), this.tmpHeight = this.$window.height(), this.watchIds.push(setTimeout(this.jdugeToStopResize, this.WATCH_INTERVAL))
+    },
+    clearTimer: function () {
+      for (; this.watchIds.length > 0;) clearTimeout(this.watchIds.pop())
+    },
+    jdugeToStopResize: function () {
+      var t = this.$window.width(),
+        i = this.$window.height(),
+        e = t == this.tmpWidth && i == this.tmpHeight;
+      this.tmpWidth = t, this.tmpHeight = i, e && this.setup()
+    },
+    bindEvent: function () {
+      this.$window.on("resize", this.watchWindowSize), this.$container.on("mouseenter", this.startEpicenter), this.$container.on("mousemove", this.moveEpicenter)
+    },
+    getAxis: function (t) {
+      var i = this.$container.offset();
+      return {
+        x: t.clientX - i.left + this.$window.scrollLeft(),
+        y: t.clientY - i.top + this.$window.scrollTop()
+      }
+    },
+    startEpicenter: function (t) {
+      this.axis = this.getAxis(t)
+    },
+    moveEpicenter: function (t) {
+      var i = this.getAxis(t);
+      this.axis || (this.axis = i), this.generateEpicenter(i.x, i.y, i.y - this.axis.y), this.axis = i
+    },
+    generateEpicenter: function (t, i, e) {
+      if (!(i < this.height / 2 - this.THRESHOLD || i > this.height / 2 + this.THRESHOLD)) {
+        var h = Math.round(t / this.pointInterval);
+        h < 0 || h >= this.points.length || this.points[h].interfere(i, e)
+      }
+    },
+    reverseVertical: function () {
+      this.reverse = !this.reverse;
+      for (var t = 0, i = this.fishes.length; t < i; t++) this.fishes[t].reverseVertical()
+    },
+    controlStatus: function () {
+      for (var t = 0, i = this.points.length; t < i; t++) this.points[t].updateSelf();
+      for (t = 0, i = this.points.length; t < i; t++) this.points[t].updateNeighbors();
+      this.fishes.length < this.fishCount && 0 == --this.intervalCount && (this.intervalCount = this.MAX_INTERVAL_COUNT, this.fishes.push(new FISH(this)))
+    },
+    render: function () {
+      requestAnimationFrame(this.render), this.controlStatus(), this.context.clearRect(0, 0, this.width, this.height), this.context.fillStyle = this.FISH_COLOR;
+      for (var t = 0, i = this.fishes.length; t < i; t++) this.fishes[t].render(this.context);
+      this.context.save(), this.context.globalCompositeOperation = "xor", this.context.beginPath(), this.context.moveTo(0, this.reverse ? 0 : this.height);
+      for (t = 0, i = this.points.length; t < i; t++) this.points[t].render(this.context);
+      this.context.lineTo(this.width, this.reverse ? 0 : this.height), this.context.closePath(), this.context.fill(), this.context.restore()
+    }
+  },
+  SURFACE_POINT = function (t, i) {
+    this.renderer = t, this.x = i, this.init()
+  };
+  SURFACE_POINT.prototype = {
+    SPRING_CONSTANT: .03,
+    SPRING_FRICTION: .9,
+    WAVE_SPREAD: .3,
+    ACCELARATION_RATE: .01,
+    init: function () {
+      this.initHeight = this.renderer.height * this.renderer.INIT_HEIGHT_RATE, this.height = this.initHeight, this.fy = 0, this.force = {
+        previous: 0,
+        next: 0
+      }
+    },
+    setPreviousPoint: function (t) {
+      this.previous = t
+    },
+    setNextPoint: function (t) {
+      this.next = t
+    },
+    interfere: function (t, i) {
+      this.fy = this.renderer.height * this.ACCELARATION_RATE * (this.renderer.height - this.height - t >= 0 ? -1 : 1) * Math.abs(i)
+    },
+    updateSelf: function () {
+      this.fy += this.SPRING_CONSTANT * (this.initHeight - this.height), this.fy *= this.SPRING_FRICTION, this.height += this.fy
+    },
+    updateNeighbors: function () {
+      this.previous && (this.force.previous = this.WAVE_SPREAD * (this.height - this.previous.height)), this.next && (this.force.next = this.WAVE_SPREAD * (this.height - this.next.height))
+    },
+    render: function (t) {
+      this.previous && (this.previous.height += this.force.previous, this.previous.fy += this.force.previous), this.next && (this.next.height += this.force.next, this.next.fy += this.force.next), t.lineTo(this.x, this.renderer.height - this.height)
+    }
+  };
+  var FISH = function (t) {
+    this.renderer = t, this.init()
+  };
+  FISH.prototype = {
+    GRAVITY: .4,
+    init: function () {
+      this.direction = Math.random() < .5, this.x = this.direction ? this.renderer.width + this.renderer.THRESHOLD : -this.renderer.THRESHOLD, this.previousY = this.y, this.vx = this.getRandomValue(4, 10) * (this.direction ? -1 : 1), this.renderer.reverse ? (this.y = this.getRandomValue(1 * this.renderer.height / 10, 4 * this.renderer.height / 10), this.vy = this.getRandomValue(2, 5), this.ay = this.getRandomValue(.05, .2)) : (this.y = this.getRandomValue(6 * this.renderer.height / 10, 9 * this.renderer.height / 10), this.vy = this.getRandomValue(-5, -2), this.ay = this.getRandomValue(-.2, -.05)), this.isOut = !1, this.theta = 0, this.phi = 0
+    },
+    getRandomValue: function (t, i) {
+      return t + (i - t) * Math.random()
+    },
+    reverseVertical: function () {
+      this.isOut = !this.isOut, this.ay *= -1
+    },
+    controlStatus: function (t) {
+      this.previousY = this.y, this.x += this.vx, this.y += this.vy, this.vy += this.ay, this.renderer.reverse ? this.y > this.renderer.height * this.renderer.INIT_HEIGHT_RATE ? (this.vy -= this.GRAVITY, this.isOut = !0) : (this.isOut && (this.ay = this.getRandomValue(.05, .2)), this.isOut = !1) : this.y < this.renderer.height * this.renderer.INIT_HEIGHT_RATE ? (this.vy += this.GRAVITY, this.isOut = !0) : (this.isOut && (this.ay = this.getRandomValue(-.2, -.05)), this.isOut = !1), this.isOut || (this.theta += Math.PI / 20, this.theta %= 2 * Math.PI, this.phi += Math.PI / 30, this.phi %= 2 * Math.PI), this.renderer.generateEpicenter(this.x + (this.direction ? -1 : 1) * this.renderer.THRESHOLD, this.y, this.y - this.previousY), (this.vx > 0 && this.x > this.renderer.width + this.renderer.THRESHOLD || this.vx < 0 && this.x < -this.renderer.THRESHOLD) && this.init()
+    },
+    render: function (t) {
+      t.save(), t.translate(this.x, this.y), t.rotate(Math.PI + Math.atan2(this.vy, this.vx)), t.scale(1, this.direction ? 1 : -1), t.beginPath(), t.moveTo(-30, 0), t.bezierCurveTo(-20, 15, 15, 10, 40, 0), t.bezierCurveTo(15, -10, -20, -15, -30, 0), t.fill(), t.save(), t.translate(40, 0), t.scale(.9 + .2 * Math.sin(this.theta), 1), t.beginPath(), t.moveTo(0, 0), t.quadraticCurveTo(5, 10, 20, 8), t.quadraticCurveTo(12, 5, 10, 0), t.quadraticCurveTo(12, -5, 20, -8), t.quadraticCurveTo(5, -10, 0, 0), t.fill(), t.restore(), t.save(), t.translate(-3, 0), t.rotate((Math.PI / 3 + Math.PI / 10 * Math.sin(this.phi)) * (this.renderer.reverse ? -1 : 1)), t.beginPath(), this.renderer.reverse ? (t.moveTo(5, 0), t.bezierCurveTo(10, 10, 10, 30, 0, 40), t.bezierCurveTo(-12, 25, -8, 10, 0, 0)) : (t.moveTo(-5, 0), t.bezierCurveTo(-10, -10, -10, -30, 0, -40), t.bezierCurveTo(12, -25, 8, -10, 0, 0)), t.closePath(), t.fill(), t.restore(), t.restore(), this.controlStatus(t)
+    }
+  }, $(function () {
+    RENDERER.init()
+    $('.dark').click(function () {
+      setTimeout(() => {
+        RENDERER.setFishColor();
+        RENDERER.context.fill();
+      });
+    })
+  });
+</script>
+  
+  <div class="footer bg-color">
+    <div class="footer-main">
+      
+        
+          <div class="link">
+            
+          </div>
+        
+      
+        
+          <div class="footer-copyright">
+            <p>Copyright © 2019 - 2020 <a target="_blank" rel="noopener" href="https://github.com/yuang01">yuang01</a> | Powered by <a target="_blank" rel="noopener" href="https://hexo.io/zh-cn/docs/">Hexo</a> | Theme <a target="_blank" rel="noopener" href="https://github.com/yuang01/theme">Bamboo</a> </p>
+
+          </div>
+        
+      
+        
+          
+            <!-- 不蒜子统计 -->
+            <!-- 不蒜子统计 -->
+<span id="busuanzi_container_site_pv">
+      <i class="fas fa-eye" aria-hidden="true"></i>Total visits：<span id="busuanzi_value_site_pv"></span> times
+</span>
+<span class="post-meta-divider">|</span>
+<span id="busuanzi_container_site_uv" style='display:none'>
+      <i class="fas fa-users" aria-hidden="true"></i>Number of visitors：<span id="busuanzi_value_site_uv"></span> people
+</span>
+
+          
+        
+      
+        
+          <div class="footer-custom">
+            
+          </div>
+        
+      
+    </div>
+  </div>
+
+
+
+    <!-- 渲染暗黑按钮 -->
+    
+      <div class="dark">
+  <div class="dark-content">
+    <i class="fas fa-moon" aria-hidden="true"></i>
+    <!-- <span>关灯</span> -->
+  </div>
+  
+</div>
+
+<script>
+  $(function() {
+    let isDark = JSON.parse(localStorage.getItem('dark'))  || JSON.parse('false');
+    if (isDark) {
+      $(".dark-content").replaceWith(
+          `
+          <div class='dark-content'>
+            <i class="fas fa-lightbulb" aria-hidden="true"></i>
+          </div>
+          `
+        );
+    }
+    $('.dark').click(function() {
+      if ($(document.body).is('.darkModel')) {
+        $(document.body).removeClass('darkModel');
+        localStorage.setItem('dark', false);
+        $(".dark-content").replaceWith(
+          `
+          <div class='dark-content'>
+            <i class="fas fa-moon" aria-hidden="true"></i>
+          </div>
+          `
+        );
+      } else {
+        $(document.body).addClass('darkModel');
+        localStorage.setItem('dark', true);
+        $(".dark-content").replaceWith(
+          `
+          <div class='dark-content'>
+            <i class="fas fa-lightbulb" aria-hidden="true"></i>
+          </div>
+          `
+        );
+      }
+    })
+  })
+</script>
+    
+    <!-- 渲染回到顶部按钮 -->
+    
+      <div class="goTop top-btn-color" pointer>
+  <i class="fas fa-arrow-up" aria-hidden="true"></i>
+</div>
+<script src="/js/goTop.js"></script>
+
+    
+    <!-- 渲染左下角音乐播放器 -->
+    
+      <link rel="stylesheet" href="/js/aplayer/APlayer@1.10.1.min.css">
+<style>
+.aplayer .aplayer-lrc p {
+  
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 16px !important;
+}
+
+.aplayer .aplayer-lrc p.aplayer-lrc-current {
+  
+  font-size: 15px;
+  color: #42b983;
+}
+
+
+.aplayer.aplayer-fixed.aplayer-narrow .aplayer-body {
+  left: -66px !important;
+}
+
+.aplayer.aplayer-fixed.aplayer-narrow .aplayer-body:hover {
+  left: 0px !important;
+}
+
+
+</style>
+<meting-js  
+  class=""
+  server="tencent"
+  type="playlist"
+  id="8062553743"
+  fixed='true'
+  autoplay='false'
+  theme='#42b983'
+  loop='all'
+  order='random'
+  preload='auto'
+  volume='0.7'
+  list-folded='true'
+>
+</meting-js>
+
+<!-- <style>
+  #aplayer {
+    position: fixed;
+    left: 0;
+    bottom: 300px;
+  }
+</style> -->
+<script src="https://unpkg.com/aplayer@1.10.1/dist/APlayer.min.js"></script>
+<script src="https://unpkg.com/meting@2/dist/Meting.min.js"></script>
+    
+
+    <!-- 图片放大 -->
+    
+      <script src="/js/fancybox/jquery.fancybox.min.js"></script>
+    
+
+    <!-- 百度解析 -->
+    <!-- Baidu Analytics -->
+
+    <!-- Baidu Push -->
+
+<script>
+    (function () {
+        var bp = document.createElement('script');
+        var curProtocol = window.location.protocol.split(':')[0];
+        if (curProtocol === 'https') {
+            bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+        } else {
+            bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+        }
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(bp, s);
+    })();
+</script>
+
+    
+    <!-- 背景彩带 -->
+    
+      <script type="text/javascript" size="100" alpha='0.4' zIndex="-1" src="/js/ribbon.min.js"></script>
+    
+
+    <script src="/js/utils/index.js"></script>
+    <script src="/js/app.js"></script>
+    
+    <!-- 文章目录所需js -->
+<link href="/js/tocbot/tocbot.css" rel="stylesheet">
+<script src="/js/tocbot/tocbot.min.js"></script>
+
+<script>
+  var headerEl = 'h2, h3, h4',  //headers 
+    content = '.post-detail',//文章容器
+    idArr = {};  //标题数组以确定是否增加索引id
+  //add #id
+  var option = {
+    // Where to render the table of contents.
+    tocSelector: '.toc',
+    // Where to grab the headings to build the table of contents.
+    contentSelector: content,
+    // Which headings to grab inside of the contentSelector element.
+    headingSelector: headerEl,
+    scrollSmooth: true,
+    scrollSmoothOffset: -80,
+    headingsOffset: -($(window).height() * 0.4 - 45),
+    positionFixedSelector: '.toc-main',
+    positionFixedClass: 'is-position-fixed',
+    fixedSidebarOffset: 'auto',
+    activeLinkClass: 'is-active-link',
+    // onClick: function (e) {},
+  }
+  if ($('.toc').length > 0) {
+
+    $(content).children(headerEl).each(function () {
+      //去除空格以及多余标点
+      var headerId = $(this).text().replace(/[\s|\~|`|\!|\@|\#|\$|\%|\^|\&|\*|\(|\)|\_|\+|\=|\||\|\[|\]|\{|\}|\;|\:|\"|\'|\,|\<|\.|\>|\/|\?|\：|\，|\。]/g, '');
+
+      headerId = headerId.toLowerCase();
+      if (idArr[headerId]) {
+        //id已经存在
+        $(this).attr('id', headerId + '-' + idArr[headerId]);
+        idArr[headerId]++;
+      }
+      else {
+        //id未存在
+        idArr[headerId] = 1;
+        $(this).attr('id', headerId);
+      }
+    });
+
+    document.addEventListener("DOMContentLoaded", function () {
+      tocbot.init(option);
+      mobileTocClick();
+    });
+
+  }
+
+  window.tocScrollFn = function () {
+    return bamboo.throttle(function () {
+      findHeadPosition();
+    }, 100)()
+  }
+  window.addEventListener('scroll', tocScrollFn);
+
+  const findHeadPosition = function (top) {
+    if ($('.toc-list').length <= 0) {
+      return false;
+    }
+    setTimeout(() => {  // or DOMContentLoaded 
+      autoScrollToc();
+    }, 0);
+  }
+
+  const autoScrollToc = function () {
+    const $activeItem = document.querySelector('.is-active-link');
+    const $cardToc = document.querySelector('.toc-content');
+    const activePosition = $activeItem.getBoundingClientRect().top
+    const sidebarScrollTop = $cardToc.scrollTop
+    if (activePosition > (document.documentElement.clientHeight - 100)) {
+      $cardToc.scrollTop = sidebarScrollTop + 150
+    }
+    if (activePosition < 100) {
+      $cardToc.scrollTop = sidebarScrollTop - 150
+    }
+  }
+
+  document.addEventListener('pjax:send', function () {
+    if ($('.toc').length) {
+      tocbot.destroy();
+    }
+  });
+
+  document.addEventListener('pjax:complete', function () {
+    if ($('.toc').length) {
+      tocbot.init(option);
+      mobileTocClick();
+    }
+  });
+  
+  // 手机端toc按钮点击出现目录
+  const mobileTocClick = function () {
+    const $cardTocLayout = document.getElementsByClassName('toc-aside')[0];
+    const $cardToc = $cardTocLayout.getElementsByClassName('toc-content')[0];
+    let right = '45px';
+    if (window.innerWidth >= 551 && window.innerWidth <= 992) {
+      right = '100px'
+    }
+    const mobileToc = {
+      open: () => {
+        $cardTocLayout.style.cssText = 'animation: toc-open .3s; opacity: 1; right: ' + right
+      },
+
+      close: () => {
+        $cardTocLayout.style.animation = 'toc-close .2s'
+        setTimeout(() => {
+          $cardTocLayout.style.cssText = "opacity:''; animation: ''; right: ''"
+        }, 100)
+      }
+    }
+    document.getElementById('toc-mobile-btn').addEventListener('click', () => {
+      if (window.getComputedStyle($cardTocLayout).getPropertyValue('opacity') === '0') mobileToc.open()
+      else mobileToc.close()
+    })
+
+    $cardToc.addEventListener('click', (e) => {
+      if (window.innerWidth < 992) { // 小于992px的时候
+        mobileToc.close()
+      }
+    })
+  }
+</script>
+
+<style>
+  .is-position-fixed {
+    position: sticky !important;
+    top: 74px;
+  }
+
+  .toc-main ul {
+    counter-reset: show-list;
+  }
+
+  .toc-main ul li::before {
+    content: counter(item)".";
+    display: block;
+    position: absolute;
+    left: 12px;
+    top: 0;
+  }
+</style> 
+
+<!-- 设置导航背景 -->
+<script>
+  let setHeaderClass = () => {
+    const headerMenuTransparent = true;
+    if (!headerMenuTransparent) { return; }
+    const nav = $('#navHeader');
+    const navTop = nav.outerHeight();
+    const winTop = $(window).scrollTop();
+    if(winTop > navTop) {
+      nav.addClass('header-bg-color');
+    }
+    else {
+      nav.removeClass('header-bg-color');
+    }
+  };
+
+  let scrollCollect = () => {
+    return bamboo.throttle(function (e) {
+      setHeaderClass();
+    }, 200)()
+  }
+
+  let initHeaderBg = () => {
+    setHeaderClass();
+  }
+
+  setHeaderClass();
+  window.addEventListener('scroll', scrollCollect);
+
+  document.addEventListener('pjax:send', function () {
+    window.removeEventListener('scroll', scrollCollect)
+  })
+  document.addEventListener('pjax:complete', function () {
+    window.addEventListener('scroll', scrollCollect);
+    setHeaderClass();
+  })
+</script> 
+
+<!-- 渲染issues标签里的内容 -->
+<script>
+  function loadIssuesJS() {
+    if ($(".post-detail").find(".issues-api").length == 0) {
+      return;
+    } 
+    loadScript('/js/issues/index.js');
+  };
+  $(function () {
+    loadIssuesJS();
+  });
+  document.addEventListener('pjax:complete', function () {
+    if (typeof IssuesAPI == "undefined") {
+      loadIssuesJS();
+    }
+  })
+</script>
+
+<!-- 输入框打字特效 -->
+<!-- 输入框打字特效 -->
+
+  <script src="/js/activate-power-mode.js"></script>
+  <script>
+    POWERMODE.colorful = true;  // 打开随机颜色特效
+    POWERMODE.shake = false;    // 关闭输入框抖动
+    document.body.addEventListener('input', POWERMODE);//监听打字事件
+  </script>
+
+
+<!-- markdown代码一键复制功能 -->
+
+  <link rel="stylesheet" href="https://unpkg.com/v-plugs-ayu/lib/ayu.css">
+  <script src="https://unpkg.com/v-plugs-ayu/lib/ayu.umd.min.js"></script>
+  <script src="/js/clipboard/clipboard.min.js"></script>
+  <div id="appCopy">
+  </div>
+  <script data-pjax>
+    var vm = new Vue({
+      el: '#appCopy',
+      data: {
+      },
+      computed: {
+      },
+      mounted() {
+        const that = this;
+        var copy = 'copy';
+        /* code */
+        var initCopyCode = function () {
+          var copyHtml = '';
+          copyHtml += '<button class="btn-copy" data-clipboard-snippet="" style="position:absolute;top:0;right:0;z-index:1;">';
+          copyHtml += '<i class="fas fa-copy"></i><span>' + copy + '</span>';
+          copyHtml += '</button>';
+          $(".post-detail pre").not('.gutter pre').wrap("<div class='codeBox' style='position:relative;width:100%;'></div>")
+          $(".post-detail pre").not('.gutter pre').before(copyHtml);
+          new ClipboardJS('.btn-copy', {
+            target: function (trigger) {
+              return trigger.nextElementSibling;
+            }
+          });
+        }
+        initCopyCode();
+        $('.btn-copy').unbind('click').bind('click', function () {
+          doSomething();
+        })
+        $(document).unbind('keypress').bind('keypress', function (e) {
+          if (e.ctrlKey && e.keyCode == 67) {
+            doSomething();
+          }
+        })
+
+        function doSomething() {
+          that.$notify({
+            title: "成功",
+            content: "代码已复制，请遵守相关授权协议。",
+            type: 'success'
+          })
+        }
+      },
+      methods: {
+      },
+      created() { }
+    })
+  </script>
+  
+
+<!-- 图片懒加载 -->
+<script defer src="https://unpkg.com/vanilla-lazyload@17.1.0/dist/lazyload.min.js"></script>
+<script>
+  // https://www.npmjs.com/package/vanilla-lazyload
+  // Set the options globally
+  // to make LazyLoad self-initialize
+  window.lazyLoadOptions = {
+    elements_selector: ".lazyload",
+    threshold: 0
+  };
+  // Listen to the initialization event
+  // and get the instance of LazyLoad
+  window.addEventListener(
+    "LazyLoad::Initialized",
+    function (event) {
+      window.lazyLoadInstance = event.detail.instance;
+    },
+    false
+  );
+  document.addEventListener('DOMContentLoaded', function () {
+    lazyLoadInstance.update();
+  });
+  document.addEventListener('pjax:complete', function () {
+    lazyLoadInstance.update();
+  });
+</script>
+
+
+<!-- 卡片滚动动画 -->
+   
+
+<!-- 评论所需js -->
+
+  
+    <script type="text/javascript">
+  var utteranceCommon = {};
+
+  function check_utterance() {
+    let isDark = JSON.parse(localStorage.getItem('dark')) || JSON.parse('false');
+    if (isDark) {
+      utteranceCommon.Theme = 'github-dark';
+    } else {
+      utteranceCommon.Theme = 'github-light';
+    }
+
+    return document.getElementById("gitment-container");
+  }
+  comment_el = '#gitment-container';
+  load_utterance = function () {
+    if ($(comment_el).length) {
+      // 匿名函数，防止污染全局变量
+      const HEAD = check_utterance();
+
+      var utterances = document.createElement('script');
+      utterances.type = 'text/javascript';
+      utterances.async = true;
+      utterances.setAttribute('issue-term', 'pathname')
+      utterances.setAttribute('theme', utteranceCommon.Theme)
+      utterances.setAttribute('repo', '')
+      utterances.crossorigin = 'anonymous';
+      utterances.src = 'https://utteranc.es/client.js';
+      // content 是要插入评论的地方
+      document.getElementById('gitment-container').appendChild(utterances);
+
+    }
+  }
+
+  function dark_utterance() {
+    const HEAD = check_utterance();
+    if (!HEAD) return;
+    const message = {
+      type: 'set-theme',
+      theme: utteranceCommon.Theme
+    };
+    const utteranceIframe = document.querySelector('iframe');
+    utteranceIframe.contentWindow.postMessage(message, 'https://utteranc.es');
+  }
+
+  $(document).ready(load_utterance);
+  document.addEventListener('pjax:complete', function () {
+    load_utterance();
+  });
+
+  $('.dark').click(function () {
+    setTimeout(() => {
+      dark_utterance();
+    });
+  })
+
+</script>
+
+<style>
+  .utterances {
+    max-width: inherit !important;
+  }
+</style>
+  
+
+
+<!-- 鼠标点击特效 -->
+<!-- 爱心点击 -->
+
+  
+    <canvas class="fireworks" style="position: fixed;left: 0;top: 0;z-index: 999; pointer-events: none;" ></canvas>
+    <script src="//cdn.bootcss.com/animejs/2.2.0/anime.min.js"></script>
+    <script src="/js/cursor/explosion.min.js"></script>
+  
+
+
+
+
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" data-pjax></script>
+
+
+    <!-- pjax -->
+    
+
+<!-- pjax -->
+
+
+  <script src="/js/pjax@0.2.8/index.js"></script>
+  
+    <!-- 样式位于：source/css/_third-party/pjaxanimate.styl -->
+
+<div class="pjax-animate">
+  
+    <div class="loading-circle"><div id="loader-circle"></div></div>
+    <script>
+      window.ShowLoading = function() {
+        $(".loading-circle").css("display", "block");
+      };
+      window.HideLoading = function() {
+        $(".loading-circle").css("display", "none");
+      }
+    </script>
+  
+	<script>
+    document.addEventListener('pjax:complete', function () {
+      window.HideLoading();
+    })
+    document.addEventListener('pjax:send', function () {
+      window.ShowLoading();
+    })
+    document.addEventListener('pjax:error', function () {
+      window.HideLoading();
+    })
+	</script>
+</div>
+
+  
+
+  <script>
+    var pjax = new Pjax({
+      elements: 'a[href]:not([href^="#"]):not([href="javascript:void(0)"]):not([no-pjax])',   // 拦截正常带链接的 a 标签
+      selectors: ["#pjax-container","title"],                                   // 根据实际需要确认重载区域
+      cacheBust: false,   // url 地址追加时间戳，用以避免浏览器缓存
+      timeout: 5000
+    });
+
+    document.addEventListener('pjax:send', function (e) {
+
+      try {
+        var currentUrl = window.location.pathname;
+        var targetUrl = e.triggerElement.href;
+        var banUrl = [""];
+        if (banUrl[0] != "") {
+          banUrl.forEach(item => {
+            if(currentUrl.indexOf(item) != -1 || targetUrl.indexOf(item) != -1) {
+              window.location.href = targetUrl;
+            }
+          });
+        }
+      } catch (error) {}
+
+      $(window).unbind('resize');
+      $(window).unbind('scroll');
+      $(document).unbind('scroll');
+      $(document).unbind('click');
+      $('body').unbind('click');
+
+    })
+    
+    document.addEventListener('pjax:complete', function () {
+      $('script[data-pjax], .pjax-reload script').each(function () {
+        $(this).parent().append($(this).remove());
+      });
+    });
+
+    document.addEventListener('pjax:error', function (e) {
+      window.location.href = e.triggerElement.href;
+    })
+    
+    // 刷新不从顶部开始
+    document.addEventListener("DOMContentLoaded", function () {
+      history.scrollRestoration = 'auto';
+    })
+  </script>
+
+
+
+  </body>
+</html>

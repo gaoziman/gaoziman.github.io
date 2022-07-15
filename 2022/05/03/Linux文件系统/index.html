@@ -1,0 +1,2145 @@
+<!DOCTYPE html>
+<html>
+  <!-- meta/link... -->
+  
+
+
+
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport">
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+
+
+  <title>Linux文件系统 | Hexo</title>
+
+  <link rel="icon" type="image/x-icon, image/vnd.microsoft.icon" href="/favicon.ico">
+  <link rel="stylesheet" href="https://at.alicdn.com/t/font_1911880_c1nvbyezg17.css">
+  <link href="https://unpkg.com/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet">
+  <link href="/js/swiper/swiper@5.4.1.min.css" rel="stylesheet">
+  
+  
+  
+  
+<link rel="stylesheet" href="/css/animate.min.css">
+
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+  
+    
+<link rel="stylesheet" href="/js/fancybox/jquery.fancybox.min.css">
+
+  
+  
+    
+<link rel="stylesheet" href="/js/shareJs/share.min.css">
+
+  
+  <style>
+        @media (max-width: 992px) {
+            #waifu {
+                display: none;
+            }
+        }
+    </style>
+    <script src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
+    <link href="//cdn.bootcss.com/pace/1.0.2/themes/pink/pace-theme-flash.css" rel="stylesheet">
+
+    
+
+    <!-- import link -->
+    
+        
+            
+        
+            
+        
+    
+    <!-- import script -->
+    
+        
+            
+        
+            
+        
+    
+
+<meta name="generator" content="Hexo 6.2.0"></head>
+
+  
+  <!-- 依赖于jquery和vue -->
+  
+    
+<script src="https://unpkg.com/jquery@3.5.1/dist/jquery.min.js"></script>
+
+  
+
+  
+    
+<script src="https://unpkg.com/vue@2.6.11/dist/vue.min.js"></script>
+
+  
+  
+  <body>
+    <!-- 预加载动画 -->
+    <!-- 页面预加载动画 -->
+
+<div id='loader'>
+  <link rel="stylesheet" href="/js/loaded/index.css" >
+  <div class="loading-left-bg"></div>
+  <div class="loading-right-bg"></div>
+  <div class="spinner-box">
+    <div class="configure-border-1">
+      <div class="configure-core"></div>
+    </div>
+    <div class="configure-border-2">
+      <div class="configure-core"></div>
+    </div>
+    <div class="loading-word">loading...</div>
+  </div>
+</div>
+
+<script>
+  var endLoading = function () {
+    document.body.style.overflow = 'auto';
+    document.getElementById('loader').classList.add("loading");
+  }
+  window.addEventListener('DOMContentLoaded',endLoading);
+  
+</script>
+
+    
+    <!-- 判断是否为暗黑风格 -->
+    <!-- 判断是否为黑夜模式 -->
+<script>
+  let isDark = JSON.parse(localStorage.getItem('dark')) || JSON.parse('false');
+
+  if (isDark) {
+    $(document.body).addClass('darkModel');
+  }
+</script>
+
+    <!-- 需要在上面加载的js -->
+    <script>
+  function loadScript(src, cb) {
+    return new Promise(resolve => {
+      setTimeout(function () {
+        var HEAD = document.getElementsByTagName("head")[0] || document.documentElement;
+        var script = document.createElement("script");
+        script.setAttribute("type", "text/javascript");
+        if (cb) {
+          if (JSON.stringify(cb)) {
+            for (let p in cb) {
+              if (p == "onload") {
+                script[p] = () => {
+                  cb[p]()
+                  resolve()
+                }
+              } else {
+                script[p] = cb[p]
+                script.onload = resolve
+              }
+            }
+          } else {
+            script.onload = () => {
+              cb()
+              resolve()
+            };
+          }
+        } else {
+          script.onload = resolve
+        }
+        script.setAttribute("src", src);
+        HEAD.appendChild(script);
+      });
+    });
+  }
+
+  //https://github.com/filamentgroup/loadCSS
+  var loadCSS = function (href, before, media, attributes) {
+    return new Promise(resolve => {
+      setTimeout(function () {
+        var link = document.createElement('link');
+        link.rel = "stylesheet";
+        link.href = src;
+        link.onload = resolve;
+        document.getElementsByTagName("head")[0].appendChild(link);
+      });
+    });
+  };
+
+</script> 
+
+<!-- 轮播图所需要的js -->
+<script src="/js/swiper/swiper.min.js"></script>
+<script src="/js/swiper/vue-awesome-swiper.js"></script>
+<script src="/js/swiper/swiper.animate1.0.3.min.js"></script>
+
+<script type="text/javascript">
+  Vue.use(window.VueAwesomeSwiper)
+</script>
+
+
+  <script src="/js/vue-typed-js/index.js"></script>
+
+
+<!-- 首页的公告滚动插件的js需要重新加载 -->
+<script src="/js/vue-seamless-scroll/index.js"></script>
+
+<!-- 打字机效果js -->
+<script src="https://unpkg.com/typed.js@2.0.11"></script>
+
+
+    <div id="safearea">
+      <main class="main" id="pjax-container">
+        <!-- 头部导航 -->
+        
+<header class="header   " 
+  id="navHeader"
+  style="position: fixed;
+  left: 0; top: 0; z-index: 10;width: 100%;"
+>
+  <div class="header-content">
+    <div class="bars">
+      <div id="appDrawer" class="sidebar-image">
+  <div class="drawer-box-icon">
+    <i class="fas fa-bars" aria-hidden="true" @click="showDialogDrawer"></i>
+  </div>
+  
+  <transition name="fade">
+    <div class="drawer-box_mask" v-cloak style="display: none;" v-show="visible" @click.self="cancelDialogDrawer">
+    </div>
+  </transition>
+  <div class="drawer-box" :class="{'active': visible}">
+    <div class="drawer-box-head bg-color">
+      <img class="drawer-box-head_logo lazyload placeholder" src="/medias/logo.png" class="lazyload placeholder" data-srcset="/medias/logo.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="logo">
+      <h3 class="drawer-box-head_title">Hexo</h3>
+      <h5 class="drawer-box-head_desc"></h5>
+    </div>
+    
+    <div class="drawer-box-content">
+      <ul class="drawer-box-content_menu">
+        
+        
+          <li class="drawer-box-content_item">
+            <a target="_blank" rel="noopener" href="https://github.com/yuang01/hexo-theme-bamboo">
+              <i class="fas fa-github" aria-hidden="true"></i>
+              <span>Github</span>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</div>
+
+<script>
+  var body = document.body || document.documentElement || window;
+  var vm = new Vue({
+    el: '#appDrawer',
+    data: {
+      visible: false,
+      top: 0,
+      openArr: [],
+    },
+    computed: {
+    },
+    mounted() {
+    },
+    methods: {
+      isOpen(index) {
+        if (this.openArr.includes(index)) {
+          return true;
+        } else {
+          return false;
+        }
+      },
+      openOrCloseMenu(curIndex) {
+        const index = this.openArr.indexOf(curIndex);
+        if (index !== -1) {
+          this.openArr.splice(index, 1);
+        } else {
+          this.openArr.push(curIndex);
+        }
+      },
+      showDialogDrawer() {
+        this.visible = true;
+        // 防止页面滚动，只能让弹框滚动
+        this.top = $(document).scrollTop()
+        body.style.cssText = 'width: 100%; height: 100%;overflow: hidden;';
+      },
+      cancelDialogDrawer() {
+        this.visible = false;
+        body.removeAttribute('style');
+        $(document).scrollTop(this.top)
+      }
+    },
+    created() {}
+  })
+</script>
+
+    </div>
+    <div class="blog-title" id="author-avatar">
+      
+        <div class="avatar">
+          <img src="/medias/logo.png" class="lazyload placeholder" data-srcset="/medias/logo.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="logo">
+        </div>
+      
+      <a href="/" class="logo">Hexo</a>
+    </div>
+    <nav class="navbar">
+      <ul class="menu">
+        
+      </ul>
+      
+      
+        <div id="appSearch">
+  <div class="search"  @click="showDialog()"><i class="fas fa-search" aria-hidden="true"></i></div>
+  <transition name="fade">
+    <div class="message-box_wrapper" style="display: none;" v-cloak v-show="dialogVisible" @click.self="cancelDialogVisible()">
+      <div class="message-box animated bounceInDown">
+        <h2>
+          <span>
+            <i class="fas fa-search" aria-hidden="true"></i>
+            <span class="title">Search</span>
+          </span>
+          <i class="fas fa-times close" pointer style="float:right;" aria-hidden="true" @click.self="cancelDialogVisible()"></i>
+        </h2>
+        <form class="site-search-form">
+          <input type="text"
+            placeholder="Please enter keywords"
+            id="local-search-input" 
+            @click="getSearchFile()"
+            class="st-search-input"
+            v-model="searchInput"
+          />
+        </form>
+        <div class="result-wrapper">
+          <div id="local-search-result" class="local-search-result-cls"></div>
+        </div>
+      </div>
+    </div>
+  </transition>
+</div>
+<script src="/js/local_search.js"></script>
+<script>
+  var body = document.body || document.documentElement || window;
+  var vm = new Vue({
+    el: '#appSearch',
+    data: {
+      dialogVisible: false,
+      searchInput: '',
+      top: 0,
+    },
+    computed: {
+    },
+    mounted() {
+      window.addEventListener('pjax:complete', () => {
+        this.cancelDialogVisible();
+      })
+    },
+    methods: {
+      showDialog() {
+        this.dialogVisible = true;
+        // 防止页面滚动，只能让弹框滚动
+        this.top = $(document).scrollTop()
+        body.style.cssText = 'overflow: hidden;';
+      },
+      getSearchFile() {
+        if (!this.searchInput) {
+          getSearchFile("/search.xml");
+        }
+      },
+      cancelDialogVisible() {
+        this.dialogVisible = false;
+        body.removeAttribute('style');
+        $(document).scrollTop(this.top)
+      },
+    },
+    created() {}
+  })
+</script>
+<!-- 解决刷新页面闪烁问题，可以在元素上添加display: none, 或者用vue.extend方法，详情：https://blog.csdn.net/qq_31393401/article/details/81017912 -->
+<!-- 下面是搜索基本写法 -->
+<!-- <script type="text/javascript" id="local.search.active">
+  var inputArea = document.querySelector("#local-search-input");
+  inputArea.onclick   = function(){ getSearchFile(); this.onclick = null }
+  inputArea.onkeydown = function(){ if(event.keyCode == 13) return false }
+</script> -->
+
+      
+
+    </nav>
+  </div>
+  
+    <a target="_blank" rel="noopener" href="https://github.com/yuang01/hexo-theme-bamboo" class="github-corner color-primary" aria-label="View source on GitHub"><svg width="60" height="60" viewBox="0 0 250 250" style="fill:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+  
+  
+</header>
+        <!-- 内容区域 -->
+        
+ <!-- prismjs 代码高亮 -->
+ 
+
+
+<div class="bg-dark-floor" style="position: fixed;left: 0;top: 0;width: 100%;height: 100%;z-index: -1;"></div>
+
+
+  <!-- 文章详情页顶部图片和标题 -->
+
+
+
+
+<div class="post-detail-header" id="thumbnail_canvas" style="background-repeat: no-repeat; background-size: cover; 
+  background-position: center center;position: relative;background-image:url('/medias/5.jpg')">
+  <div class="post-detail-header-mask"></div>
+  <canvas id="header_canvas"style="position:absolute;bottom:0;pointer-events:none;"></canvas>
+  
+  <div class="post-detail-header_info-box">
+    <div class="title-box">
+      <span class="title">
+        Linux文件系统
+      </span>
+    </div>
+    
+    
+      
+        <span class="post-detail-header_date">
+          <i class="fas fa-calendar"></i> Published in：2022-05-03 |
+        </span>
+      
+
+      
+        <span class="post-detail-header_categories">
+          <i class="iconfont iconbookmark1"></i> category：
+          
+            <a href="/categories/Linux/" class="post-detail-header_category">
+              Linux
+            </a>
+          
+        </span>
+      
+
+      
+    
+  </div>
+  
+  
+    <script src="/js/bubble/bubble.js"></script>
+  
+</div>
+
+
+
+
+
+<div class="post-detail-content row justify-position" 
+  style="padding-top: 0px;">
+  <div class="main-content">
+    <article class="post post-detail">
+      <div class="post-content">
+        <h1 id="Linux-文件系统"><a href="#Linux-文件系统" class="headerlink" title="Linux 文件系统"></a>Linux 文件系统</h1><ul>
+<li><a href="#linux-%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F">Linux 文件系统</a><ul>
+<li><a href="#linux-%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5">Linux 文件系统基本概念</a></li>
+<li><a href="#linux-%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8">Linux 文件系统调用</a></li>
+<li><a href="#linux-%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E7%9A%84%E5%AE%9E%E7%8E%B0">Linux 文件系统的实现</a><ul>
+<li><a href="#linux-%E8%99%9A%E6%8B%9F%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F">Linux 虚拟文件系统</a></li>
+<li><a href="#linux-ext2-%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F">Linux Ext2 文件系统</a></li>
+<li><a href="#linux-ext4-%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F">Linux Ext4 文件系统</a></li>
+<li><a href="#proc-%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F">&#x2F;proc 文件系统</a></li>
+<li><a href="#nfs-%E7%BD%91%E7%BB%9C%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F">NFS 网络文件系统</a><ul>
+<li><a href="#nfs-%E6%9E%B6%E6%9E%84">NFS 架构</a></li>
+<li><a href="#nfs-%E5%8D%8F%E8%AE%AE">NFS 协议</a></li>
+<li><a href="#nfs-%E5%AE%9E%E7%8E%B0">NFS 实现</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p>在 Linux 中，最直观、最可见的部分就是 <code>文件系统(file system)</code>。下面我们就来一起探讨一下关于 Linux 中国的文件系统，系统调用以及文件系统实现背后的原理和思想。这些思想中有一些来源于 MULTICS，现在已经被 Windows 等其他操作系统使用。Linux 的设计理念就是 <code>小的就是好的(Small is Beautiful)</code> 。虽然 Linux 只是使用了最简单的机制和少量的系统调用，但是 Linux 却提供了强大而优雅的文件系统。</p>
+<h2 id="Linux-文件系统基本概念"><a href="#Linux-文件系统基本概念" class="headerlink" title="Linux 文件系统基本概念"></a>Linux 文件系统基本概念</h2><p>Linux 在最初的设计是 MINIX1 文件系统，它只支持 14 字节的文件名，它的最大文件只支持到 64 MB。在 MINIX 1 之后的文件系统是 ext 文件系统。ext 系统相较于 MINIX 1 来说，在支持字节大小和文件大小上均有很大提升，但是 ext 的速度仍没有 MINIX 1 快，于是，ext 2 被开发出来，它能够支持长文件名和大文件，而且具有比 MINIX 1 更好的性能。这使他成为 Linux 的主要文件系统。只不过 Linux 会使用 <code>VFS</code> 曾支持多种文件系统。在 Linux 链接时，用户可以动态的将不同的文件系统挂载倒 VFS 上。</p>
+<p>Linux 中的文件是一个任意长度的字节序列，Linux 中的文件可以包含任意信息，比如 ASCII 码、二进制文件和其他类型的文件是不加区分的。</p>
+<p>为了方便起见，文件可以被组织在一个目录中，目录存储成文件的形式在很大程度上可以作为文件处理。目录可以有子目录，这样形成有层次的文件系统，Linux 系统下面的根目录是 <code>/</code> ，它通常包含了多个子目录。字符 <code>/</code> 还用于对目录名进行区分，例如 <strong>&#x2F;usr&#x2F;cxuan</strong> 表示的就是根目录下面的 usr 目录，其中有一个叫做 cxuan 的子目录。</p>
+<p>下面我们介绍一下 Linux 系统根目录下面的目录名</p>
+<ul>
+<li><code>/bin</code>，它是重要的二进制应用程序，包含二进制文件，系统的所有用户使用的命令都在这里</li>
+<li><code>/boot</code>，启动包含引导加载程序的相关文件</li>
+<li><code>/dev</code>，包含设备文件，终端文件，USB 或者连接到系统的任何设备</li>
+<li><code>/etc</code>，配置文件，启动脚本等，包含所有程序所需要的配置文件，也包含了启动&#x2F;停止单个应用程序的启动和关闭 shell 脚本</li>
+<li><code>/home</code>，本地主要路径，所有用户用 home 目录存储个人信息</li>
+<li><code>/lib</code>，系统库文件，包含支持位于 &#x2F;bin 和 &#x2F;sbin 下的二进制库文件</li>
+<li><code>/lost+found</code>，在根目录下提供一个遗失+查找系统，必须在 root 用户下才能查看当前目录下的内容</li>
+<li><code>/media</code>，挂载可移动介质</li>
+<li><code>/mnt</code>，挂载文件系统</li>
+<li><code>/opt</code>，提供一个可选的应用程序安装目录</li>
+<li><code>/proc</code>，特殊的动态目录，用于维护系统信息和状态，包括当前运行中进程信息</li>
+<li><code>/root</code>，root 用户的主要目录文件夹</li>
+<li><code>/sbin</code>，重要的二进制系统文件</li>
+<li><code>/tmp</code>， 系统和用户创建的临时文件，系统重启时，这个目录下的文件都会被删除</li>
+<li><code>/usr</code>，包含绝大多数用户都能访问的应用程序和文件</li>
+<li><code>/var</code>，经常变化的文件，诸如日志文件或数据库等</li>
+</ul>
+<p>在 Linux 中，有两种路径，一种是 <code>绝对路径(absolute path)</code> ，绝对路径告诉你从根目录下查找文件，绝对路径的缺点是太长而且不太方便。还有一种是 <code>相对路径(relative path)</code> ，相对路径所在的目录也叫做<code>工作目录(working directory)</code>。</p>
+<p>如果 <code>/usr/local/books</code> 是工作目录，那么 shell 命令</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cp books books-replica </span><br></pre></td></tr></table></figure>
+
+<p>就表示的是相对路径，而</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cp /usr/local/books/books /usr/local/books/books-replica</span><br></pre></td></tr></table></figure>
+
+<p>则表示的是绝对路径。</p>
+<p>在 Linux 中经常出现一个用户使用另一个用户的文件或者使用文件树结构中的文件。两个用户共享同一个文件，这个文件位于某个用户的目录结构中，另一个用户需要使用这个文件时，必须通过绝对路径才能引用到他。如果绝对路径很长，那么每次输入起来会变的非常麻烦，所以 Linux 提供了一种 <code>链接(link)</code> 机制。</p>
+<p>举个例子，下面是一个使用链接之前的图</p>
+<img src="https://s1.ax1x.com/2020/08/29/dTyinK.png" class="lazyload placeholder" data-srcset="https://s1.ax1x.com/2020/08/29/dTyinK.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="21" border="0" style="zoom:50%;" >
+
+<p>以上所示，比如有两个工作账户 jianshe 和 cxuan，jianshe 想要使用 cxuan 账户下的 A 目录，那么它可能会输入 <code>/usr/cxuan/A</code> ，这是一种未使用链接之后的图。</p>
+<p>使用链接后的示意如下</p>
+<img src="https://s1.ax1x.com/2020/08/29/dTy96x.png" class="lazyload placeholder" data-srcset="https://s1.ax1x.com/2020/08/29/dTy96x.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="22" border="0" style="zoom:50%;" >
+
+<p>现在，jianshe 可以创建一个链接来使用 cxuan 下面的目录了。‘</p>
+<p>当一个目录被创建出来后，有两个目录项也同时被创建出来，它们就是 <code>.</code> 和 <code>..</code> ，前者代表工作目录自身，后者代表该目录的父目录，也就是该目录所在的目录。这样一来，在 &#x2F;usr&#x2F;jianshe 中访问 cxuan 中的目录就是 <code>../cxuan/xxx</code></p>
+<p>Linux 文件系统不区分磁盘的，这是什么意思呢？一般来说，一个磁盘中的文件系统相互之间保持独立，如果一个文件系统目录想要访问另一个磁盘中的文件系统，在 Windows 中你可以像下面这样。</p>
+<img src="https://s1.ax1x.com/2020/08/29/dTyCX6.png" class="lazyload placeholder" data-srcset="https://s1.ax1x.com/2020/08/29/dTyCX6.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="23" border="0">
+
+<p>两个文件系统分别在不同的磁盘中，彼此保持独立。</p>
+<p>而在 Linux 中，是支持<code>挂载</code>的，它允许一个磁盘挂在到另外一个磁盘上，那么上面的关系会变成下面这样</p>
+<img src="https://s1.ax1x.com/2020/08/29/dTsvtJ.png" class="lazyload placeholder" data-srcset="https://s1.ax1x.com/2020/08/29/dTsvtJ.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="24" border="0">
+
+<p>挂在之后，两个文件系统就不再需要关心文件系统在哪个磁盘上了，两个文件系统彼此可见。</p>
+<p>Linux 文件系统的另外一个特性是支持 <code>加锁(locking)</code>。在一些应用中会出现两个或者更多的进程同时使用同一个文件的情况，这样很可能会导致<code>竞争条件(race condition)</code>。一种解决方法是对其进行加不同粒度的锁，就是为了防止某一个进程只修改某一行记录从而导致整个文件都不能使用的情况。</p>
+<p>POSIX 提供了一种灵活的、不同粒度级别的锁机制，允许一个进程使用一个不可分割的操作对一个字节或者整个文件进行加锁。加锁机制要求尝试加锁的进程指定其 <strong>要加锁的文件，开始位置以及要加锁的字节</strong></p>
+<p>Linux 系统提供了两种锁：<strong>共享锁和互斥锁</strong>。如果文件的一部分已经加上了共享锁，那么再加排他锁是不会成功的；如果文件系统的一部分已经被加了互斥锁，那么在互斥锁解除之前的任何加锁都不会成功。为了成功加锁、请求加锁的部分的所有字节都必须是可用的。</p>
+<p>在加锁阶段，进程需要设计好加锁失败后的情况，也就是判断加锁失败后是否选择阻塞，如果选择阻塞式，那么当已经加锁的进程中的锁被删除时，这个进程会解除阻塞并替换锁。如果进程选择非阻塞式的，那么就不会替换这个锁，会立刻从系统调用中返回，标记状态码表示是否加锁成功，然后进程会选择下一个时间再次尝试。</p>
+<p>加锁区域是可以重叠的。下面我们演示了三种不同条件的加锁区域。</p>
+<img src="https://s1.ax1x.com/2020/08/29/dTsjk4.png" class="lazyload placeholder" data-srcset="https://s1.ax1x.com/2020/08/29/dTsjk4.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="25" border="0">
+
+<p>如上图所示，A 的共享锁在第四字节到第八字节进行加锁</p>
+<img src="https://s1.ax1x.com/2020/08/29/dTsxh9.png" class="lazyload placeholder" data-srcset="https://s1.ax1x.com/2020/08/29/dTsxh9.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="26" border="0">
+
+<p>如上图所示，进程在 A 和 B 上同时加了共享锁，其中 6 - 8 字节是重叠锁</p>
+<img src="https://s1.ax1x.com/2020/08/29/dTySpR.png" class="lazyload placeholder" data-srcset="https://s1.ax1x.com/2020/08/29/dTySpR.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="27" border="0">
+
+<p>如上图所示，进程 A 和 B 和 C 同时加了共享锁，那么第六字节和第七字节是共享锁。</p>
+<p>如果此时一个进程尝试在第 6 个字节处加锁，此时会设置失败并阻塞，由于该区域被 A B C 同时加锁，那么只有等到 A B C 都释放锁后，进程才能加锁成功。</p>
+<h2 id="Linux-文件系统调用"><a href="#Linux-文件系统调用" class="headerlink" title="Linux 文件系统调用"></a>Linux 文件系统调用</h2><p>许多系统调用都会和文件与文件系统有关。我们首先先看一下对单个文件的系统调用，然后再来看一下对整个目录和文件的系统调用。</p>
+<p>为了创建一个新的文件，会使用到 <code>creat</code> 方法，注意没有 <code>e</code>。</p>
+<blockquote>
+<p>这里说一个小插曲，曾经有人问 UNIX 创始人 Ken Thompson，如果有机会重新写 UNIX ，你会怎么办，他回答自己要把 creat 改成 create ，哈哈哈哈。</p>
+</blockquote>
+<p>这个系统调用的两个参数是文件名和保护模式</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">fd = creat(&quot;aaa&quot;,mode);</span><br></pre></td></tr></table></figure>
+
+<p>这段命令会创建一个名为 aaa 的文件，并根据 mode 设置文件的保护位。这些位决定了哪个用户可能访问文件、如何访问。</p>
+<p>creat 系统调用不仅仅创建了一个名为 aaa 的文件，还会打开这个文件。为了允许后续的系统调用访问这个文件，这个 creat 系统调用会返回一个 <code>非负整数</code>， 这个就叫做 <code>文件描述符(file descriptor)</code>，也就是上面的 fd。</p>
+<p>如果在已经存在的文件上调用了 creat 系统调用，那么该文件中的内容会被清除，从 0 开始。通过设置合适的参数，<code>open</code> 系统调用也能够创建文件。</p>
+<p>下面让我们看一看主要的系统调用，如下表所示</p>
+<table>
+<thead>
+<tr>
+<th>系统调用</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>fd &#x3D; creat(name,mode)</td>
+<td>一种创建一个新文件的方式</td>
+</tr>
+<tr>
+<td>fd &#x3D; open(file, …)</td>
+<td>打开文件读、写或者读写</td>
+</tr>
+<tr>
+<td>s &#x3D; close(fd)</td>
+<td>关闭一个打开的文件</td>
+</tr>
+<tr>
+<td>n &#x3D; read(fd, buffer, nbytes)</td>
+<td>从文件中向缓存中读入数据</td>
+</tr>
+<tr>
+<td>n &#x3D; write(fd, buffer, nbytes)</td>
+<td>从缓存中向文件中写入数据</td>
+</tr>
+<tr>
+<td>position &#x3D; lseek(fd, offset, whence)</td>
+<td>移动文件指针</td>
+</tr>
+<tr>
+<td>s &#x3D; stat(name, &amp;buf)</td>
+<td>获取文件信息</td>
+</tr>
+<tr>
+<td>s &#x3D; fstat(fd, &amp;buf)</td>
+<td>获取文件信息</td>
+</tr>
+<tr>
+<td>s &#x3D; pipe(&amp;fd[0])</td>
+<td>创建一个管道</td>
+</tr>
+<tr>
+<td>s &#x3D; fcntl(fd,…)</td>
+<td>文件加锁等其他操作</td>
+</tr>
+</tbody></table>
+<p>为了对一个文件进行读写的前提是先需要打开文件，必须使用 creat 或者 open 打开，参数是打开文件的方式，是只读、可读写还是只写。open 系统调用也会返回文件描述符。打开文件后，需要使用 <code>close</code> 系统调用进行关闭。close 和 open 返回的 fd 总是未被使用的最小数量。</p>
+<blockquote>
+<p>什么是文件描述符？文件描述符就是一个数字，这个数字标示了计算机操作系统中打开的文件。它描述了数据资源，以及访问资源的方式。</p>
+</blockquote>
+<p>当程序要求打开一个文件时，内核会进行如下操作</p>
+<ul>
+<li>授予访问权限</li>
+<li>在<code>全局文件表(global file table)</code>中创建一个<code>条目(entry)</code></li>
+<li>向软件提供条目的位置</li>
+</ul>
+<p>文件描述符由唯一的非负整数组成，系统上每个打开的文件至少存在一个文件描述符。文件描述符最初在 Unix 中使用，并且被包括 Linux，macOS 和 BSD 在内的现代操作系统所使用。</p>
+<p>当一个进程成功访问一个打开的文件时，内核会返回一个文件描述符，这个文件描述符指向全局文件表的 entry 项。这个文件表项包含文件的 inode 信息，字节位移，访问限制等。例如下图所示</p>
+<img src="https://s1.ax1x.com/2020/08/29/dTyp11.png" class="lazyload placeholder" data-srcset="https://s1.ax1x.com/2020/08/29/dTyp11.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="28" border="0">
+
+<p>默认情况下，前三个文件描述符为 <code>STDIN(标准输入)</code>、<code>STDOUT(标准输出)</code>、<code>STDERR(标准错误)</code>。</p>
+<p>标准输入的文件描述符是 0 ，在终端中，默认为用户的键盘输入</p>
+<p>标准输出的文件描述符是 1 ，在终端中，默认为用户的屏幕</p>
+<p>与错误有关的默认数据流是 2，在终端中，默认为用户的屏幕。</p>
+<p>在简单聊了一下文件描述符后，我们继续回到文件系统调用的探讨。</p>
+<p>在文件系统调用中，开销最大的就是 read 和 write 了。read 和 write 都有三个参数</p>
+<ul>
+<li><code>文件描述符</code>：告诉需要对哪一个打开文件进行读取和写入</li>
+<li><code>缓冲区地址</code>：告诉数据需要从哪里读取和写入哪里</li>
+<li><code>统计</code>：告诉需要传输多少字节</li>
+</ul>
+<p>这就是所有的参数了，这个设计非常简单轻巧。</p>
+<p>虽然几乎所有程序都按顺序读取和写入文件，但是某些程序需要能够随机访问文件的任何部分。与每个文件相关联的是一个指针，该指针指示文件中的当前位置。顺序读取（或写入）时，它通常指向要读取（写入）的下一个字节。如果指针在读取 1024 个字节之前位于 4096 的位置，则它将在成功读取系统调用后自动移至 5120 的位置。</p>
+<p><code>Lseek</code> 系统调用会更改指针位置的值，以便后续对 read 或 write 的调用可以在文件中的任何位置开始，甚至可以超出文件末尾。</p>
+<blockquote>
+<p>lseek &#x3D; Lseek ，段首大写。</p>
+</blockquote>
+<p>lseek 避免叫做 seek 的原因就是 seek 已经在之前 16 位的计算机上用于搜素功能了。</p>
+<p><code>Lseek</code> 有三个参数：第一个是文件的文件描述符，第二个是文件的位置；第三个告诉文件位置是相对于文件的开头，当前位置还是文件的结尾</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">lseek(<span class="type">int</span> fildes, <span class="type">off_t</span> offset, <span class="type">int</span> whence);</span><br></pre></td></tr></table></figure>
+
+<p>lseek 的返回值是更改文件指针后文件中的绝对位置。lseek 是唯一从来不会造成真正磁盘查找的系统调用，它只是更新当前的文件位置，这个文件位置就是内存中的数字。</p>
+<p>对于每个文件，Linux 都会跟踪文件模式（常规，目录，特殊文件），大小，最后修改时间以及其他信息。程序能够通过 <code>stat</code> 系统调用看到这些信息。第一个参数就是文件名，第二个是指向要放置请求信息结构的指针。这些结构的属性如下图所示。</p>
+<table>
+<thead>
+<tr>
+<th>存储文件的设备</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>存储文件的设备</td>
+</tr>
+<tr>
+<td>i-node 编号</td>
+</tr>
+<tr>
+<td>文件模式(包括保护位信息)</td>
+</tr>
+<tr>
+<td>文件链接的数量</td>
+</tr>
+<tr>
+<td>文件所有者标识</td>
+</tr>
+<tr>
+<td>文件所属的组</td>
+</tr>
+<tr>
+<td>文件大小(字节)</td>
+</tr>
+<tr>
+<td>创建时间</td>
+</tr>
+<tr>
+<td>最后一个修改&#x2F;访问时间</td>
+</tr>
+</tbody></table>
+<p><code>fstat</code> 调用和 <code>stat</code> 相同，只有一点区别，fstat 可以对打开文件进行操作，而 stat 只能对路径进行操作。</p>
+<p><code>pipe</code> 文件系统调用被用来创建 shell 管道。它会创建一系列的<code>伪文件</code>，来缓冲和管道组件之间的数据，并且返回读取或者写入缓冲区的文件描述符。在管道中，像是如下操作</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sort &lt;in | head –40</span><br></pre></td></tr></table></figure>
+
+<p>sort 进程将会输出到文件描述符1，也就是标准输出，写入管道中，而 head 进程将从管道中读入。在这种方式中，sort 只是从文件描述符 0 中读取并写入到文件描述符 1 （管道）中，甚至不知道它们已经被重定向了。如果没有重定向的话，sort 会自动的从键盘读入并输出到屏幕中。</p>
+<p>最后一个系统调用是 <code>fcntl</code>，它用来锁定和解锁文件，应用共享锁和互斥锁，或者是执行一些文件相关的其他操作。</p>
+<p>现在我们来关心一下和整体目录和文件系统相关的系统调用，而不是把精力放在单个的文件上，下面列出了这些系统调用，我们一起来看一下。</p>
+<table>
+<thead>
+<tr>
+<th>系统调用</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>s &#x3D; mkdir(path,mode)</td>
+<td>创建一个新的目录</td>
+</tr>
+<tr>
+<td>s &#x3D; rmdir(path)</td>
+<td>移除一个目录</td>
+</tr>
+<tr>
+<td>s &#x3D; link(oldpath,newpath)</td>
+<td>创建指向已有文件的链接</td>
+</tr>
+<tr>
+<td>s &#x3D; unlink(path)</td>
+<td>取消文件的链接</td>
+</tr>
+<tr>
+<td>s &#x3D; chdir(path)</td>
+<td>改变工作目录</td>
+</tr>
+<tr>
+<td>dir &#x3D; opendir(path)</td>
+<td>打开一个目录读取</td>
+</tr>
+<tr>
+<td>s &#x3D; closedir(dir)</td>
+<td>关闭一个目录</td>
+</tr>
+<tr>
+<td>dirent &#x3D; readdir(dir)</td>
+<td>读取一个目录项</td>
+</tr>
+<tr>
+<td>rewinddir(dir)</td>
+<td>回转目录使其在此使用</td>
+</tr>
+</tbody></table>
+<p>可以使用 mkdir 和 rmdir 创建和删除目录。但是需要注意，只有目录为空时才可以删除。</p>
+<p>创建一个指向已有文件的链接时会创建一个<code>目录项(directory entry)</code>。系统调用 link 来创建链接，oldpath 代表已有的路径，newpath 代表需要链接的路径，使用 <code>unlink</code> 可以删除目录项。当文件的最后一个链接被删除时，这个文件会被自动删除。</p>
+<p>使用 <code>chdir</code> 系统调用可以改变工作目录。</p>
+<p>最后四个系统调用是用于读取目录的。和普通文件类似，他们可以被打开、关闭和读取。每次调用 <code>readdir</code> 都会以固定的格式返回一个目录项。用户不能对目录执行写操作，但是可以使用 creat 或者 link 在文件夹中创建一个目录，或使用 unlink 删除一个目录。用户不能在目录中查找某个特定文件，但是可以使用 <code>rewindir</code> 作用于一个打开的目录，使他能在此从头开始读取。</p>
+<h2 id="Linux-文件系统的实现"><a href="#Linux-文件系统的实现" class="headerlink" title="Linux 文件系统的实现"></a>Linux 文件系统的实现</h2><p>下面我们主要讨论一下 <code>虚拟文件系统(Virtual File System)</code>。 VFS 对高层进程和应用程序隐藏了 Linux 支持的所有文件系统的区别，以及文件系统是存储在本地设备，还是需要通过网络访问远程设备。设备和其他特殊文件和 VFS 层相关联。接下来，我们就会探讨一下第一个 Linux 广泛传播的文件系统： <code>ext2</code>。随后，我们就会探讨 <code>ext4</code> 文件系统所做的改进。各种各样的其他文件系统也正在使用中。 所有 Linux 系统都可以处理多个磁盘分区，每个磁盘分区上都有不同的文件系统。</p>
+<h3 id="Linux-虚拟文件系统"><a href="#Linux-虚拟文件系统" class="headerlink" title="Linux 虚拟文件系统"></a>Linux 虚拟文件系统</h3><p>为了能够使应用程序能够在不同类型的本地或者远程设备上的文件系统进行交互，因为在 Linux 当中文件系统千奇百种，比较常见的有 EXT3、EXT4，还有基于内存的 ramfs、tmpfs 和基于网络的 nfs，和基于用户态的 fuse，当然 fuse 应该不能完全的文件系统，只能算是一个能把文件系统实现放到用户态的模块，满足了内核文件系统的接口，他们都是文件系统的一种实现。对于这些文件系统，Linux 做了一层抽象就是 <code>VFS </code>虚拟文件系统，</p>
+<p>下表总结了 VFS 支持的四个主要的文件系统结构。</p>
+<table>
+<thead>
+<tr>
+<th>对象</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>超级块</td>
+<td>特定的文件系统</td>
+</tr>
+<tr>
+<td>Dentry</td>
+<td>目录项，路径的一个组成部分</td>
+</tr>
+<tr>
+<td>I-node</td>
+<td>特定的文件</td>
+</tr>
+<tr>
+<td>File</td>
+<td>跟一个进程相关联的打开文件</td>
+</tr>
+</tbody></table>
+<p><code>超级块(superblock)</code> 包含了有关文件系统布局的重要信息，超级块如果遭到破坏那么就会导致整个文件系统不可读。</p>
+<p><code>i-node</code> 索引节点，包含了每一个文件的描述符。</p>
+<blockquote>
+<p>在 Linux 中，目录和设备也表示为文件，因为它们具有对应的 i-node</p>
+</blockquote>
+<p>超级块和索引块所在的文件系统都在磁盘上有对应的结构。</p>
+<p>为了便于某些目录操作和路径遍历，比如 &#x2F;usr&#x2F;local&#x2F;cxuan，VFS 支持一个 <code>dentry</code> 数据结构，该数据结构代表着目录项。这个 dentry 数据结构有很多东西（<a target="_blank" rel="noopener" href="http://books.gigatux.nl/mirror/kerneldevelopment/0672327201/ch12lev1sec7.html%EF%BC%89%E8%BF%99%E4%B8%AA%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E7%94%B1%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E5%8A%A8%E6%80%81%E5%88%9B%E5%BB%BA%E3%80%82">http://books.gigatux.nl/mirror/kerneldevelopment/0672327201/ch12lev1sec7.html）这个数据结构由文件系统动态创建。</a></p>
+<p>目录项被缓存在 <code>dentry_cache</code> 缓存中。例如，缓存条目会缓存 &#x2F;usr 、 &#x2F;usr&#x2F;local 等条目。如果多个进程通过硬连接访问相同的文件，他们的文件对象将指向此缓存中的相同条目。</p>
+<p>最后，文件数据结构是代表着打开的文件，也代表着内存表示，它根据 open 系统调用创建。它支持 <strong>read、write、sendfile、lock</strong> 和其他在我们之前描述的系统调用中。</p>
+<p>在 VFS 下实现的实际文件系统不需要在内部使用完全相同的抽象和操作。 但是，它们必须在语义上实现与 VFS 对象指定的文件系统操作相同的文件系统操作。 四个 VFS 对象中每个对象的操作数据结构的元素都是指向基础文件系统中功能的指针。</p>
+<h3 id="Linux-Ext2-文件系统"><a href="#Linux-Ext2-文件系统" class="headerlink" title="Linux Ext2 文件系统"></a>Linux Ext2 文件系统</h3><p>现在我们一起看一下 Linux 中最流行的一个磁盘文件系统，那就是 <code>ext2</code> 。Linux 的第一个版本用于 <code>MINIX1</code> 文件系统，它的文件名大小被限制为最大 64 MB。MINIX 1 文件系统被永远的被它的扩展系统 ext 取代，因为 ext 允许更长的文件名和文件大小。由于 ext 的性能低下，ext 被其替代者 ext2 取代，ext2 目前仍在广泛使用。</p>
+<p>一个 ext2 Linux 磁盘分区包含了一个文件系统，这个文件系统的布局如下所示</p>
+<img src="https://s1.ax1x.com/2020/09/29/0Z3k40.png" class="lazyload placeholder" data-srcset="https://s1.ax1x.com/2020/09/29/0Z3k40.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="linuxfilesystem009" border="0">
+
+<p>Boot 块也就是第 0 块不是让 Linux 使用的，而是用来加载和引导计算机启动代码的。在块 0 之后，磁盘分区被分成多个组，这些组与磁盘柱面边界所处的位置无关。</p>
+<p>第一个块是 <code>超级块(superblock)</code>。它包含有关文件系统布局的信息，包括 i-node、磁盘块数量和以及空闲磁盘块列表的开始。下一个是 <code>组描述符(group descriptor)</code>，其中包含有关位图的位置，组中空闲块和 i-node 的数量以及组中的目录数量的信息。这些信息很重要，因为 ext2 会在磁盘上均匀分布目录。</p>
+<p>图中的两个位图用来记录空闲块和空闲 i-node，这是从 MINIX 1文件系统继承的选择，大多数 UNIX 文件系统使用位图而不是空闲列表。每个位图的大小是一个块。如果一个块的大小是 1 KB，那么就限制了块组的数量是 8192 个块和 8192 个 i-node。块的大小是一个严格的限制，块组的数量不固定，在 4KB 的块中，块组的数量增大四倍。</p>
+<p>在超级块之后分布的是 <code>i-node</code> 它们自己，i-node 取值范围是 1 - 某些最大值。每个 i-node 是 128 字节的 <code>long</code> ，这些字节恰好能够描述一个文件。i-node 包含了统计信息(包含了 <code>stat</code> 系统调用能获得的所有者信息，实际上 stat 就是从 i-node 中读取信息的)，以及足够的信息来查找保存文件数据的所有磁盘块。</p>
+<p>在 i-node 之后的是 <code>数据块(data blocks)</code>。所有的文件和目录都保存在这。如果一个文件或者目录包含多个块，那么这些块在磁盘中的分布不一定是连续的，也有可能不连续。事实上，大文件块可能会被拆分成很多小块散布在整个磁盘上。</p>
+<p>对应于目录的 i-node 分散在整个磁盘组上。如果有足够的空间，ext2 会把普通文件组织到与父目录相同的块组中，而把同一块上的数据文件组织成初始 <code>i-node</code> 节点。位图用来快速确定新文件系统数据的分配位置。在分配新的文件块时，ext2 也会给该文件预分配许多额外的数据块，这样可以减少将来向文件写入数据时产生的文件碎片。这种策略在整个磁盘上实现了文件系统的 <code>负载</code>，后续还有对文件碎片的排列和整理，而且性能也比较好。</p>
+<p>为了达到访问的目的，需要首先使用 Linux 系统调用，例如 <code>open</code>，这个系统调用会确定打开文件的路径。路径分为两种，<code>相对路径</code> 和 <code>绝对路径</code>。如果使用相对路径，那么就会从当前目录开始查找，否则就会从根目录进行查找。</p>
+<p>目录文件的文件名最高不能超过 255 个字符，它的分配如下图所示</p>
+<img src="https://s1.ax1x.com/2020/09/29/0Z3CHs.png" class="lazyload placeholder" data-srcset="https://s1.ax1x.com/2020/09/29/0Z3CHs.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="linuxfilesystem010" border="0">
+
+<p>每一个目录都由整数个磁盘块组成，这样目录就可以整体的写入磁盘。在一个目录中，文件和子目录的目录项都是未经排序的，并且一个挨着一个。目录项不能跨越磁盘块，所以通常在每个磁盘块的尾部会有部分未使用的字节。</p>
+<p>上图中每个目录项都由四个固定长度的属性和一个长度可变的属性组成。第一个属性是 <code>i-node</code> 节点数量，文件 first 的 i-node 编号是 19 ，文件 second 的编号是 42，目录 third 的 i-node 编号是 88。紧随其后的是 <code>rec_len</code> 域，表明目录项大小是多少字节，名称后面会有一些扩展，当名字以未知长度填充时，这个域被用来寻找下一个目录项，直至最后的未使用。这也是图中箭头的含义。紧随其后的是 <code>类型域</code>：F 表示的是文件，D 表示的是目录，最后是固定长度的文件名，上面的文件名的长度依次是 5、6、5，最后以文件名结束。</p>
+<p>rec_len 域是如何扩展的呢？如下图所示</p>
+<img src="https://s1.ax1x.com/2020/09/29/0Z3iEn.png" class="lazyload placeholder" data-srcset="https://s1.ax1x.com/2020/09/29/0Z3iEn.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="linuxfilesystem011" border="0">
+
+<p>我们可以看到，中间的 <code>second</code> 被移除了，所以将其所在的域变为第一个目录项的填充。当然，这个填充可以作为后续的目录项。</p>
+<p>由于目录是按照线性的顺序进行查找的，因此可能需要很长时间才能在大文件末尾找到目录项。因此，系统会为近期的访问目录维护一个缓存。这个缓存用文件名来查找，如果缓存命中，那么就会避免线程搜索这样昂贵的开销。组成路径的每个部分都在目录缓存中保存一个 <code>dentry</code> 对象，并且通过 i-node 找到后续的路径元素的目录项，直到找到真正的文件 i - node。</p>
+<p>比如说要使用绝对路径来寻找一个文件，我们暂定这个路径是 <code>/usr/local/file</code>，那么需要经过如下几个步骤：</p>
+<ul>
+<li>首先，系统会确定根目录，它通常使用 2 号 i -node ，也就是索引 2 节点，因为索引节点 1 是 ext2 &#x2F;3&#x2F;4 文件系统上的<code>坏块</code>索引节点。系统会将一项放在 dentry 缓存中，以应对将来对根目录的查找。</li>
+<li>然后，在根目录中查找字符串 <code>usr</code>，得到 &#x2F;usr 目录的 i - node 节点号。&#x2F;usr 的 i - node 同样也进入 dentry 缓存。然后节点被取出，并从中解析出磁盘块，这样就可以读取 &#x2F;usr 目录并查找字符串 <code>local</code> 了。一旦找到这个目录项，目录 <code>/usr/local</code> 的 i - node 节点就可以从中获得。有了 &#x2F;usr&#x2F;local 的 i - node 节点号，就可以读取 i - node 并确定目录所在的磁盘块。最后，从 &#x2F;usr&#x2F;local 目录查找 file 并确定其 i - node 节点呢号。</li>
+</ul>
+<p>如果文件存在，那么系统会提取 i - node 节点号并把它作为索引在 i - node 节点表中定位相应的 i - node 节点并装入内存。i - node 被存放在 i - node <code>节点表(i-node table)</code> 中，节点表是一个内核数据结构，它会持有当前打开文件和目录的 i - node 节点号。下面是一些 Linux 文件系统支持的 i - node 数据结构。</p>
+<table>
+<thead>
+<tr>
+<th>属性</th>
+<th>字节</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Mode</td>
+<td>2</td>
+<td>文件属性、保护位、setuid 和 setgid 位</td>
+</tr>
+<tr>
+<td>Nlinks</td>
+<td>2</td>
+<td>指向 i - node 节点目录项的数目</td>
+</tr>
+<tr>
+<td>Uid</td>
+<td>2</td>
+<td>文件所有者的 UID</td>
+</tr>
+<tr>
+<td>Gid</td>
+<td>2</td>
+<td>文件所有者的 GID</td>
+</tr>
+<tr>
+<td>Size</td>
+<td>4</td>
+<td>文件字节大小</td>
+</tr>
+<tr>
+<td>Addr</td>
+<td>60</td>
+<td>12 个磁盘块以及后面 3 个间接块的地址</td>
+</tr>
+<tr>
+<td>Gen</td>
+<td>1</td>
+<td>每次重复使用 i - node 时增加的代号</td>
+</tr>
+<tr>
+<td>Atime</td>
+<td>4</td>
+<td>最近访问文件的时间</td>
+</tr>
+<tr>
+<td>Mtime</td>
+<td>4</td>
+<td>最近修改文件的时间</td>
+</tr>
+<tr>
+<td>Ctime</td>
+<td>4</td>
+<td>最近更改 i - node 的时间</td>
+</tr>
+</tbody></table>
+<p>现在我们来一起探讨一下文件读取过程，还记得 <code>read</code> 函数是如何调用的吗？</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">n = read(fd,buffer,nbytes);</span><br></pre></td></tr></table></figure>
+
+<p>当内核接管后，它会从这三个参数以及内部表与用户有关的信息开始。内部表的其中一项是文件描述符数组。文件描述符数组用<code>文件描述符</code> 作为索引并为每一个打开文件保存一个表项。</p>
+<p>文件是和 i - node 节点号相关的。那么如何通过一个文件描述符找到文件对应的 i - node 节点呢？</p>
+<p>这里使用的一种设计思想是在文件描述符表和 i - node 节点表之间插入一个新的表，叫做 <code>打开文件描述符(open-file-description table)</code>。文件的读写位置会在打开文件描述符表中存在，如下图所示</p>
+<img src="https://s1.ax1x.com/2020/09/29/0Z3ZgU.png" class="lazyload placeholder" data-srcset="https://s1.ax1x.com/2020/09/29/0Z3ZgU.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="linuxfilesystem012" border="0">
+
+<p>我们使用 shell 、P1 和 P2 来描述一下父进程、子进程、子进程的关系。Shell 首先生成 P1，P1 的数据结构就是 Shell 的一个副本，因此两者都指向相同的打开文件描述符的表项。当 P1 运行完成后，Shell 的文件描述符仍会指向 P1 文件位置的打开文件描述。然后 Shell 生成了 P2，新的子进程自动继承文件的读写位置，甚至 P2 和 Shell 都不知道文件具体的读写位置。</p>
+<p>上面描述的是父进程和子进程这两个 <code>相关</code> 进程，如果是一个不相关进程打开文件时，它将得到自己的打开文件描述符表项，以及自己的文件读写位置，这是我们需要的。</p>
+<blockquote>
+<p>因此，打开文件描述符相当于是给相关进程提供同一个读写位置，而给不相关进程提供各自私有的位置。</p>
+</blockquote>
+<p>i - node 包含三个间接块的磁盘地址，它们每个指向磁盘块的地址所能够存储的大小不一样。</p>
+<h3 id="Linux-Ext4-文件系统"><a href="#Linux-Ext4-文件系统" class="headerlink" title="Linux Ext4 文件系统"></a>Linux Ext4 文件系统</h3><p>为了防止由于系统崩溃和电源故障造成的数据丢失，ext2 系统必须在每个数据块创建之后立即将其写入到磁盘上，磁盘磁头寻道操作导致的延迟是无法让人忍受的。为了增强文件系统的健壮性，Linux 依靠<code>日志文件系统</code>，ext3 是一个日志文件系统，它在 ext2 文件系统的基础之上做了改进，ext4 也是 ext3 的改进，ext4 也是一个日志文件系统。ext4 改变了 ext3 的块寻址方案，从而支持更大的文件和更大的文件系统大小。下面我们就来描述一下 ext4 文件系统的特性。</p>
+<p>具有记录的文件系统最基本的功能就是<code>记录日志</code>，这个日志记录了按照顺序描述所有文件系统的操作。通过顺序写出文件系统数据或元数据的更改，操作不受磁盘访问期间磁盘头移动的开销。最终，这个变更会写入并提交到合适的磁盘位置上。如果这个变更在提交到磁盘前文件系统宕机了，那么在重启期间，系统会检测到文件系统未正确卸载，那么就会遍历日志并应用日志的记录来对文件系统进行更改。</p>
+<p>Ext4 文件系统被设计用来高度匹配 ext2 和 ext3 文件系统的，尽管 ext4 文件系统在内核数据结构和磁盘布局上都做了变更。尽管如此，一个文件系统能够从 ext2 文件系统上卸载后成功的挂载到 ext4 文件系统上，并提供合适的日志记录。</p>
+<p>日志是作为循环缓冲区管理的文件。日志可以存储在与主文件系统相同或者不同的设备上。日志记录的读写操作会由单独的 <code>JBD(Journaling Block Device)</code> 来扮演。</p>
+<p>JBD 中有三个主要的数据结构，分别是 <strong>log record(日志记录)、原子操作和事务</strong>。一个日志记录描述了一个低级别的文件系统操作，这个操作通常导致块内的变化。因为像是 <code>write</code> 这种系统调用会包含多个地方的改动 — i - node 节点，现有的文件块，新的文件块和空闲列表等。相关的日志记录会以原子性的方式分组。ext4 会通知系统调用进程的开始和结束，以此使 JBD 能够确保原子操作的记录都能被应用，或者一个也不被应用。最后，主要从效率方面考虑，JBD 会视原子操作的集合为事务。一个事务中的日志记录是连续存储的。只有在所有的变更一起应用到磁盘后，日志记录才能够被丢弃。</p>
+<p>由于为每个磁盘写出日志的开销会很大，所以 ext4 可以配置为保留所有磁盘更改的日志，或者仅仅保留与文件系统元数据相关的日志更改。仅仅记录元数据可以减少系统开销，提升性能，但不能保证不会损坏文件数据。其他的几个日志系统维护着一系列元数据操作的日志，例如 SGI 的 XFS。</p>
+<h3 id="x2F-proc-文件系统"><a href="#x2F-proc-文件系统" class="headerlink" title="&#x2F;proc 文件系统"></a>&#x2F;proc 文件系统</h3><p>另外一个 Linux 文件系统是 <code>/proc</code> (process) 文件系统</p>
+<blockquote>
+<p>它的主要思想来源于贝尔实验室开发的第 8 版的 UNIX，后来被 BSD 和 System V 采用。</p>
+</blockquote>
+<p>然而，Linux 在一些方面上对这个想法进行了扩充。它的基本概念是为系统中的每个进程在 <code>/proc</code> 中创建一个目录。目录的名字就是进程 PID，以十进制数进行表示。例如，<code>/proc/1024</code> 就是一个进程号为 1024 的目录。在该目录下是进程信息相关的文件，比如进程的命令行、环境变量和信号掩码等。事实上，这些文件在磁盘上并不存在磁盘中。当需要这些信息的时候，系统会按需从进程中读取，并以标准格式返回给用户。</p>
+<p>许多 Linux 扩展与 <code>/proc</code> 中的其他文件和目录有关。它们包含各种各样的关于 CPU、磁盘分区、设备、中断向量、内核计数器、文件系统、已加载模块等信息。非特权用户可以读取很多这样的信息，于是就可以通过一种安全的方式了解系统情况。</p>
+<h3 id="NFS-网络文件系统"><a href="#NFS-网络文件系统" class="headerlink" title="NFS 网络文件系统"></a>NFS 网络文件系统</h3><p>从一开始，网络就在 Linux 中扮演了很重要的作用。下面我们会探讨一下 <code>NFS(Network File System)</code> 网络文件系统，它在现代 Linux 操作系统的作用是将不同计算机上的不同文件系统链接成一个逻辑整体。</p>
+<h4 id="NFS-架构"><a href="#NFS-架构" class="headerlink" title="NFS 架构"></a>NFS 架构</h4><p>NFS 最基本的思想是允许任意选定的一些<code>客户端</code>和<code>服务器</code>共享一个公共文件系统。在许多情况下，所有的客户端和服务器都会在同一个 <code>LAN(Local Area Network)</code>  局域网内共享，但是这并不是必须的。也可能是下面这样的情况：如果客户端和服务器距离较远，那么它们也可以在广域网上运行。客户端可以是服务器，服务器可以是客户端，但是为了简单起见，我们说的客户端就是消费服务，而服务器就是提供服务的角度来聊。</p>
+<p>每一个 NFS 服务都会导出一个或者多个目录供远程客户端访问。当一个目录可用时，它的所有子目录也可用。因此，通常整个目录树都会作为一个整体导出。服务器导出的目录列表会用一个文件来维护，这个文件是 <code>/etc/exports</code>，当服务器启动后，这些目录可以自动的被导出。客户端通过挂载这些导出的目录来访问它们。当一个客户端挂载了一个远程目录，这个目录就成为客户端目录层次的一部分，如下图所示。</p>
+<img src="https://s1.ax1x.com/2020/09/29/0Z3ECV.png" class="lazyload placeholder" data-srcset="https://s1.ax1x.com/2020/09/29/0Z3ECV.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="linuxfilesystem013" border="0">
+
+<p>在这个示例中，一号客户机挂载到服务器的 bin 目录下，因此它现在可以使用 shell 访问 &#x2F;bin&#x2F;cat 或者其他任何一个目录。同样，客户机 1 也可以挂载到 二号服务器上从而访问 &#x2F;usr&#x2F;local&#x2F;projects&#x2F;proj1 或者其他目录。二号客户机同样可以挂载到二号服务器上，访问路径是 &#x2F;mnt&#x2F;projects&#x2F;proj2。</p>
+<p>从上面可以看到，由于不同的客户端将文件挂载到各自目录树的不同位置，同一个文件在不同的客户端有不同的访问路径和不同的名字。挂载点一般通常在客户端本地，服务器不知道任何一个挂载点的存在。</p>
+<h4 id="NFS-协议"><a href="#NFS-协议" class="headerlink" title="NFS 协议"></a>NFS 协议</h4><p>由于 NFS 的协议之一是支持 <code>异构</code> 系统，客户端和服务器可能在不同的硬件上运行不同的操作系统，因此有必要在服务器和客户端之间进行接口定义。这样才能让任何写一个新客户端能够和现有的服务器一起正常工作，反之亦然。</p>
+<p>NFS 就通过定义两个客户端 - 服务器协议从而实现了这个目标。协议就是客户端发送给服务器的一连串的请求，以及服务器发送回客户端的相应答复。</p>
+<p>第一个 NFS 协议是处理挂载。客户端可以向服务器发送路径名并且请求服务器是否能够将服务器的目录挂载到自己目录层次上。因为服务器不关心挂载到哪里，因此请求不会包含挂载地址。如果路径名是合法的并且指定的目录已经被导出，那么服务器会将文件 <code>句柄</code> 返回给客户端。</p>
+<blockquote>
+<p>文件句柄包含唯一标识文件系统类型，磁盘，目录的i节点号和安全性信息的字段。</p>
+</blockquote>
+<p>随后调用读取和写入已安装目录或其任何子目录中的文件，都将使用文件句柄。</p>
+<p>当 Linux 启动时会在多用户之前运行 shell 脚本 &#x2F;etc&#x2F;rc 。可以将挂载远程文件系统的命令写入该脚本中，这样就可以在允许用户登陆之前自动挂载必要的远程文件系统。大部分 Linux 版本是支持<code>自动挂载</code>的。这个特性会支持将远程目录和本地目录进行关联。</p>
+<p>相对于手动挂载到 &#x2F;etc&#x2F;rc 目录下，自动挂载具有以下优势</p>
+<ul>
+<li>如果列出的 &#x2F;etc&#x2F;rc 目录下出现了某种故障，那么客户端将无法启动，或者启动会很困难、延迟或者伴随一些出错信息，如果客户根本不需要这个服务器，那么手动做了这些工作就白费了。</li>
+<li>允许客户端并行的尝试一组服务器，可以实现一定程度的容错率，并且性能也可以得到提高。</li>
+</ul>
+<p>另一方面，我们默认在自动挂载时所有可选的文件系统都是相同的。由于 NFS 不提供对文件或目录复制的支持，用户需要自己确保这些所有的文件系统都是相同的。因此，大部分的自动挂载都只应用于二进制文件和很少改动的只读的文件系统。</p>
+<p>第二个 NFS 协议是为文件和目录的访问而设计的。客户端能够通过向服务器发送消息来操作目录和读写文件。客户端也可以访问文件属性，比如文件模式、大小、上次修改时间。NFS 支持大多数的 Linux 系统调用，但是 open 和 close 系统调用却不支持。</p>
+<blockquote>
+<p>不支持 open 和 close 并不是一种疏忽，而是一种刻意的设计，完全没有必要在读一个文件之前对其进行打开，也没有必要在读完时对其进行关闭。</p>
+</blockquote>
+<p>NFS 使用了标准的 UNIX 保护机制，使用 <code>rwx</code> 位来标示<code>所有者(owner)</code>、<code>组(groups)</code>、<code>其他用户</code> 。最初，每个请求消息都会携带调用者的 groupId 和 userId，NFS 会对其进行验证。事实上，它会信任客户端不会发生欺骗行为。可以使用公钥密码来创建一个安全密钥，在每次请求和应答中使用它验证客户端和服务器。</p>
+<h4 id="NFS-实现"><a href="#NFS-实现" class="headerlink" title="NFS 实现"></a>NFS 实现</h4><p>即使客户端和服务器的代码实现是独立于 NFS 协议的，大部分的 Linux 系统会使用一个下图的三层实现，顶层是系统调用层，系统调用层能够处理 open 、 read 、 close 这类的系统调用。在解析和参数检查结束后调用第二层，<code>虚拟文件系统 (VFS)</code> 层。</p>
+<img src="https://s1.ax1x.com/2020/09/29/0Z3evF.png" class="lazyload placeholder" data-srcset="https://s1.ax1x.com/2020/09/29/0Z3evF.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="linuxfilesystem014" border="0">
+
+<p>VFS 层的任务是维护一个表，每个已经打开的文件都在表中有一个表项。VFS 层为每一个打开的文件维护着一个<code>虚拟i节点 </code>，简称为 v - node。v 节点用来说明文件是本地文件还是远程文件。如果是远程文件的话，那么 v - node 会提供足够的信息使客户端能够访问它们。对于本地文件，会记录其所在的文件系统和文件的 i-node ，因为现代操作系统能够支持多文件系统。虽然 VFS 是为了支持 NFS 而设计的，但是现代操作系统都会使用 VFS，而不管有没有 NFS。</p>
+
+      </div>
+      <div class="post-tags-categories">
+        
+        <div class="tags">
+          
+            <a href="/tags/Linux/" class="">
+              Linux
+            </a>
+          
+        </div>
+        
+      </div>
+      
+        <div class="copyright">
+  <ul class="post-copyright">
+    <li class="post-copyright-author">
+    <strong>author:  </strong>John Doe</a>
+    </li>
+    <li class="post-copyright-link">
+    <strong>link:  </strong>
+    <a href="/2022/05/03/Linux文件系统/" target="_blank" title="Linux文件系统">http://example.com/2022/05/03/Linux文件系统/</a>
+    </li>
+    <li class="post-copyright-license">
+      <strong>Copyright notice:   </strong>
+      All articles on this website, unless otherwise stated, adopt <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">CC BY-NC-ND 4.0</a>
+      reprint policy. If reproduced, please indicate source!
+    </li>
+  </ul>
+<div>
+      
+    </article>
+    <!-- 上一篇文章和下一篇文章 -->
+    
+      <!-- 文章详情页的上一页和下一页 -->
+<div class="post-nav">
+
+
+
+  
+  <div class="post-nav-prev post-nav-item">
+    <div class="post-nav-img" style="background-size: cover; 
+      background-position: center center;">
+      <img class="lazyload lazyload placeholder" src="/medias/7.jpg" class="lazyload placeholder" data-srcset="/medias/7.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="">
+    </div>
+    <a href="/2022/05/03/Linux%E5%BC%80%E7%AF%87hexo-n-Linux%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/" class="post-nav-link">
+      <div class="title">
+        <i class="fas fa-angle-left"></i> Prev:
+        <div class="title-text">Linux开篇!!!</div>
+      </div>
+      
+      <!-- <div class="content">
+        Linux 开篇！！！
+Linux 开篇！！！
+Linux 简介
+Linux 接口
+Linux 组成部分
+Shell
+L
+      </div> -->
+    </a>
+  </div>
+
+
+
+  
+  <div class="post-nav-next post-nav-item">
+    <div class="post-nav-img" style="background-size: cover; 
+      background-position: center center;">
+      <img class="lazyload lazyload placeholder" src="/medias/2.jpg" class="lazyload placeholder" data-srcset="/medias/2.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" src="" alt="">
+    </div>
+    <a href="/2022/05/03/MySQL%E4%BC%98%E5%8C%96/" class="post-nav-link">
+      <div class="title">
+        Next: <i class="fas fa-angle-right"></i>
+        <div class="title-text">MySQL优化</div>
+      </div>
+      <!-- <div class="content">
+        MySQL 优化
+MySQL 优化
+SQL 优化步骤
+通过 show status 命令了解 SQL 执行次数
+定位执行
+      </div> -->
+    </a>
+  </div>
+
+</div>
+
+    
+    
+
+    <!-- 打赏 -->
+    
+      <div id="appDonate" class="post-donate">
+  <div id="donate_board" class="donate_bar center" ref="donate">
+    <a id="btn_donate" class="btn_donate" href="javascript:;" title="打赏" @click="showDialogDrawer()"></a>
+  </div>
+  <transition name="fade">
+    <div 
+      class="donate-box-mask"
+      v-cloak 
+      v-show="visible"
+      @click="cancelDialogDrawer()"
+    >
+    </div>
+  </transition>
+  <transition name="bounce">
+    <div class="donate-box" v-cloak v-show="visible">
+      <div class="donate-box_close">
+        <i class="fas fa-times" aria-hidden="true" @click="cancelDialogDrawer" pointer></i>
+      </div>
+      <div class="donate-box_title">
+        <h4>
+          你的赏识是我前进的动力
+        </h4>
+      </div>
+      <div class="donate-box_tab">
+        <div class="Alipay" pointer :class="{'active': tabActive === 'Alipay'}" @click="changeTabActive('Alipay')">
+          支付宝
+        </div>
+        <div class="WeChatpay" pointer :class="{'active': tabActive === 'WeChatpay'}" @click="changeTabActive('WeChatpay')">
+          微信
+        </div>
+      </div>
+      <div class="donate-box_img">
+        <div class="AlipayImg" v-show="tabActive === 'Alipay'">
+          <img src="/medias/1.jpg" class="lazyload placeholder" data-srcset="/medias/1.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="支付宝打赏" />
+        </div> 
+        <div class="WeChatpayImg" v-show="tabActive === 'WeChatpay'">
+          <img src="/medias/2.jpg" class="lazyload placeholder" data-srcset="/medias/2.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="微信打赏" />
+        </div>
+      </div>
+    </div>
+  </transition>
+</div>
+
+<script>
+  var body = document.body || document.documentElement || window;
+  var vm = new Vue({
+    el: '#appDonate',
+    data: {
+      visible: false,
+      tabActive: 'Alipay',
+      top: 0,
+    },
+    computed: {
+    },
+    mounted() {
+    },
+    methods: {
+      showDialogDrawer() {
+        this.visible = true;
+        // 防止页面滚动，只能让弹框滚动
+        // function getScroll() {
+        //   return {
+        //     left: window.pageXOffset || document.documentElement.scrollLeft || document.body.scrollLeft || 0,
+        //     top: window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0
+        //   };
+        // }
+        this.top = $(document).scrollTop() // or getScroll().top
+        // console.log('aa', $('.main-content'));
+        body.style.cssText = 'overflow: hidden;';
+      },
+      cancelDialogDrawer() {
+        this.visible = false;
+        body.removeAttribute('style');
+        $(document).scrollTop(this.top)
+      },
+      changeTabActive(name) {
+        this.tabActive = name;
+      }
+    },
+    created() {}
+  })
+</script>
+    
+
+    <!-- 分享 -->
+    
+      <!-- https://github.com/overtrue/share.js -->
+<!-- 文章详情页的分享 -->
+<div class="social-share" data-sites="twitter,facebook,google,qq,qzone,wechat,weibo,douban,linkedin" data-wechat-qrcode-helper="<p>微信扫一扫即可分享！</p>"></div>
+
+<script src="/js/shareJs/social-share.min.js"></script>
+</script>
+
+<style>
+  .social-share {
+    margin: 20px 0;
+  }
+</style>
+
+
+    
+    
+    <!-- 评论 -->
+    <!-- 评论 -->
+
+  <div id="myComment">
+    
+      <div id="gitment-container"></div>
+
+    
+  </div>
+
+<!-- comment script in themes\hexo-theme-bamboo\layout\_partial\scripts\index.ejs -->
+
+
+  </div>
+
+  <!-- 目录 -->
+  <!-- 文章详情页右侧目录 -->
+
+  <div class="toc-aside">
+    <div class="toc-main">
+      <div class="toc-aside-title">
+        <i class="fas fa-list-ul" aria-hidden="true"></i><span>catalog</span>
+        
+          <div class="toc-open-close">catalog</div>
+        
+      </div>
+      <div class="toc-content">
+        <div class="toc"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 手机端目录按钮 -->
+  <div id="toc-mobile-btn">
+    <i class="fas fa-list-ul" aria-hidden="true"></i>
+  </div>
+
+
+<script>
+  function closeToc(init) {
+    $(".toc-aside").css({'width': 0, 'padding': 0, 'transition': init ?  'noe' : 'width 0.3s' });
+    $(".toc-content").css({'width': 0});
+    $(".toc-aside-title span, .toc-aside-title i").css({'display': 'none'});
+    $(".main-content").css({'width': '75%', 'margin-left': 'auto', 'margin-right': 'auto',});
+  };
+  function openToc() {
+    $(".main-content").css({'width': '65%', 'margin-right': '10px', 'margin-left': 'calc(35% - 350px)'});
+    $(".toc-aside").css({'width': '300px', 'padding': '0 10px', 'transition': 'width 0.3s'});
+    $(".toc-content").css({'width': '300px'});
+    $(".toc-aside-title span, .toc-aside-title i").css({'display': 'inline-block'});
+  }
+  function openBtnClickFn () {
+    let openOrCloseBtn = $('.toc-aside .toc-aside-title .toc-open-close');
+    let open = eval('' || 'true');
+    openOrCloseBtn.click(function() {
+      if (open) {
+        closeToc();
+        open = false;
+      } else {
+        openToc();
+        open = true;
+      }
+    });
+  };
+  openBtnClickFn();
+  initCloseTocWidth(true);
+
+  function initCloseTocWidth(init) {
+    if (window.innerWidth >= 992) {
+      let isClose = false;
+      isClose && closeToc(init)
+    }
+  }
+
+  document.addEventListener('pjax:complete', function () {
+    $(".toc-aside").css({'transition': 'no'});
+  })
+  document.addEventListener('pjax:complete', function () {
+    openBtnClickFn();
+  })
+  
+</script>
+
+  <!-- 图片放大 Wrap images with fancybox support -->
+  <script src="/js/wrapImage.js"></script>
+</div>
+
+<!-- 文章详情页背景图 -->
+<div id="appBgSwiper" style="position: fixed;left: 0;top: 0;width: 100%;height: 100%;z-index: -2;"
+	:style="{'background-color': bgColor ? bgColor : 'transparent'}">
+	<transition-group tag="ul" :name="names">
+		<li v-for='(image,index) in img' :key='index' v-show="index === mark" class="bg-swiper-box">
+			<img :src="image" class="bg-swiper-img no-lazy">
+		</li>
+	</transition-group>
+</div>
+<script>
+	var vm = new Vue({
+		el: '#appBgSwiper',
+		data: {
+			names: '' || 'fade' || 'fade', // translate-fade fade
+			mark: 0,
+			img: [],
+			bgColor: '',
+			time: null
+		},
+		methods: {   //添加方法
+			change(i, m) {
+				if (i > m) {
+					// this.names = 'fade';
+				} else if (i < m) {
+					// this.names = 'fade';
+				} else {
+					return;
+				}
+				this.mark = i;
+			},
+			prev() {
+				// this.names = 'fade';
+				this.mark--;
+				if (this.mark === -1) {
+					this.mark = 3;
+					return
+				}
+			},
+			next() {
+				// this.names = 'fade';
+				this.mark++;
+				if (this.mark === this.img.length) {
+					this.mark = 0;
+					return
+				}
+			},
+			autoPlay() {
+				// this.names = 'fade';
+				this.mark++;
+				if (this.mark === this.img.length) {
+					this.mark = 0;
+					return
+				}
+			},
+			play() {
+				let bgImgDelay = '' || '180000'
+				let delay = parseInt(bgImgDelay) || 180000;
+				this.time = setInterval(this.autoPlay, delay);
+			},
+			enter() {
+				clearInterval(this.time);
+			},
+			leave() {
+				this.play();
+			}
+		},
+		created() {
+			this.play()
+		},
+		beforeDestroy() {
+			clearInterval(this.time);
+		},
+		mounted() {
+			let prop = '' || '';
+			let isImg = prop.includes('.bmp') || prop.includes('.jpg') || prop.includes('.png') || prop.includes('.tif') || prop.includes('.gif') || prop.includes('.pcx') || prop.includes('.tga') || prop.includes('.exif') || prop.includes('.fpx') || prop.includes('.psd') || prop.includes('.cdr') || prop.includes('.pcd') || prop.includes('.dxf') || prop.includes('.ufo') || prop.includes('.eps') || prop.includes('.ai') || prop.includes('.raw') || prop.includes('.WMF') || prop.includes('.webp') || prop.includes('.jpeg') || prop.includes('http://') || prop.includes('https://')
+			if (isImg) {
+				let img = prop.split(',');
+				let configRoot = '/'
+				let arrImg = [];
+				img.forEach(el => {
+					var Expression = /http(s)?:\/\/([\w-]+\.)+[\w-]+(\/[\w- .\/?%&=]*)?/;
+					var objExp = new RegExp(Expression);
+
+					if (objExp.test(el)) {
+						// http or https
+						arrImg.push(el);
+					} else {
+						// 非http or https开头
+						// 本地文件
+						let firstStr = el.charAt(0);
+						if (firstStr == '/') {
+							el = el.substr(1); // 删除第一个字符 '/',因为 configRoot最后一个字符为 /
+						}
+						el = configRoot + el;
+						arrImg.push(el);
+					}
+				})
+				this.img = arrImg;
+			} else {
+				this.bgColor = prop;
+			}
+		}
+	})
+</script>
+
+<style>
+	.bg-swiper-box {
+		position: absolute;
+		display: block;
+		width: 100%;
+		height: 100%;
+	}
+
+	.bg-swiper-img {
+		object-fit: cover;
+		width: 100%;
+		height: 100%;
+	}
+</style>
+
+
+
+
+  <script>
+  function loadMermaid() {
+    if (document.getElementsByClassName('mermaid').length) {
+      if (window.mermaidJsLoad) mermaid.init()
+      else {
+        loadScript('https://unpkg.com/mermaid/dist/mermaid.min.js').then(() => {
+          window.mermaidJsLoad = true
+          mermaid.initialize({
+            theme: 'default',
+          })
+          if ('true') {
+            mermaid.init();
+          }
+        })
+      }
+    }
+  };
+  document.addEventListener("DOMContentLoaded", function () {
+    loadMermaid();
+  })
+
+  document.addEventListener('pjax:complete', function () {
+    loadMermaid();
+  })
+  
+</script>
+
+
+      </main>
+    </div>
+
+    <!-- 页脚 -->
+    
+  
+  
+    <!-- 底部鱼儿跳动效果，依赖于jquery-->
+<div id="j-fish-skip" style=" position: relative;height: 153px;width: auto;"></div>
+<script>
+  var RENDERER = {
+    POINT_INTERVAL: 5,
+    FISH_COUNT: 3,
+    MAX_INTERVAL_COUNT: 50,
+    INIT_HEIGHT_RATE: .5,
+    THRESHOLD: 50,
+    FISH_COLOR: '',
+    init: function () {
+      this.setFishColor(); this.setParameters(), this.reconstructMethods(), this.setup(), this.bindEvent(), this.render()
+    },
+    setFishColor: function () {
+      let isDark = JSON.parse(localStorage.getItem('dark')) || JSON.parse('false');
+      if (isDark) {
+        this.FISH_COLOR = '#222'; // 暗黑色，有时间把这整成一个变量
+      } else {
+        this.FISH_COLOR = '' || '#42b983';
+      }
+    },
+    setParameters: function () {
+      this.$window = $(window), this.$container = $("#j-fish-skip"), this.$canvas = $("<canvas />"), this.context = this.$canvas.appendTo(this.$container).get(0).getContext("2d"), this.points = [], this.fishes = [], this.watchIds = []
+    },
+    createSurfacePoints: function () {
+      var t = Math.round(this.width / this.POINT_INTERVAL);
+      this.pointInterval = this.width / (t - 1), this.points.push(new SURFACE_POINT(this, 0));
+      for (var i = 1; i < t; i++) {
+        var e = new SURFACE_POINT(this, i * this.pointInterval),
+          h = this.points[i - 1];
+        e.setPreviousPoint(h), h.setNextPoint(e), this.points.push(e)
+      }
+    },
+    reconstructMethods: function () {
+      this.watchWindowSize = this.watchWindowSize.bind(this), this.jdugeToStopResize = this.jdugeToStopResize.bind(this), this.startEpicenter = this.startEpicenter.bind(this), this.moveEpicenter = this.moveEpicenter.bind(this), this.reverseVertical = this.reverseVertical.bind(this), this.render = this.render.bind(this)
+    },
+    setup: function () {
+      this.points.length = 0, this.fishes.length = 0, this.watchIds.length = 0, this.intervalCount = this.MAX_INTERVAL_COUNT, this.width = this.$container.width(), this.height = this.$container.height(), this.fishCount = this.FISH_COUNT * this.width / 500 * this.height / 500, this.$canvas.attr({
+        width: this.width,
+        height: this.height
+      }), this.reverse = !1, this.fishes.push(new FISH(this)), this.createSurfacePoints()
+    },
+    watchWindowSize: function () {
+      this.clearTimer(), this.tmpWidth = this.$window.width(), this.tmpHeight = this.$window.height(), this.watchIds.push(setTimeout(this.jdugeToStopResize, this.WATCH_INTERVAL))
+    },
+    clearTimer: function () {
+      for (; this.watchIds.length > 0;) clearTimeout(this.watchIds.pop())
+    },
+    jdugeToStopResize: function () {
+      var t = this.$window.width(),
+        i = this.$window.height(),
+        e = t == this.tmpWidth && i == this.tmpHeight;
+      this.tmpWidth = t, this.tmpHeight = i, e && this.setup()
+    },
+    bindEvent: function () {
+      this.$window.on("resize", this.watchWindowSize), this.$container.on("mouseenter", this.startEpicenter), this.$container.on("mousemove", this.moveEpicenter)
+    },
+    getAxis: function (t) {
+      var i = this.$container.offset();
+      return {
+        x: t.clientX - i.left + this.$window.scrollLeft(),
+        y: t.clientY - i.top + this.$window.scrollTop()
+      }
+    },
+    startEpicenter: function (t) {
+      this.axis = this.getAxis(t)
+    },
+    moveEpicenter: function (t) {
+      var i = this.getAxis(t);
+      this.axis || (this.axis = i), this.generateEpicenter(i.x, i.y, i.y - this.axis.y), this.axis = i
+    },
+    generateEpicenter: function (t, i, e) {
+      if (!(i < this.height / 2 - this.THRESHOLD || i > this.height / 2 + this.THRESHOLD)) {
+        var h = Math.round(t / this.pointInterval);
+        h < 0 || h >= this.points.length || this.points[h].interfere(i, e)
+      }
+    },
+    reverseVertical: function () {
+      this.reverse = !this.reverse;
+      for (var t = 0, i = this.fishes.length; t < i; t++) this.fishes[t].reverseVertical()
+    },
+    controlStatus: function () {
+      for (var t = 0, i = this.points.length; t < i; t++) this.points[t].updateSelf();
+      for (t = 0, i = this.points.length; t < i; t++) this.points[t].updateNeighbors();
+      this.fishes.length < this.fishCount && 0 == --this.intervalCount && (this.intervalCount = this.MAX_INTERVAL_COUNT, this.fishes.push(new FISH(this)))
+    },
+    render: function () {
+      requestAnimationFrame(this.render), this.controlStatus(), this.context.clearRect(0, 0, this.width, this.height), this.context.fillStyle = this.FISH_COLOR;
+      for (var t = 0, i = this.fishes.length; t < i; t++) this.fishes[t].render(this.context);
+      this.context.save(), this.context.globalCompositeOperation = "xor", this.context.beginPath(), this.context.moveTo(0, this.reverse ? 0 : this.height);
+      for (t = 0, i = this.points.length; t < i; t++) this.points[t].render(this.context);
+      this.context.lineTo(this.width, this.reverse ? 0 : this.height), this.context.closePath(), this.context.fill(), this.context.restore()
+    }
+  },
+  SURFACE_POINT = function (t, i) {
+    this.renderer = t, this.x = i, this.init()
+  };
+  SURFACE_POINT.prototype = {
+    SPRING_CONSTANT: .03,
+    SPRING_FRICTION: .9,
+    WAVE_SPREAD: .3,
+    ACCELARATION_RATE: .01,
+    init: function () {
+      this.initHeight = this.renderer.height * this.renderer.INIT_HEIGHT_RATE, this.height = this.initHeight, this.fy = 0, this.force = {
+        previous: 0,
+        next: 0
+      }
+    },
+    setPreviousPoint: function (t) {
+      this.previous = t
+    },
+    setNextPoint: function (t) {
+      this.next = t
+    },
+    interfere: function (t, i) {
+      this.fy = this.renderer.height * this.ACCELARATION_RATE * (this.renderer.height - this.height - t >= 0 ? -1 : 1) * Math.abs(i)
+    },
+    updateSelf: function () {
+      this.fy += this.SPRING_CONSTANT * (this.initHeight - this.height), this.fy *= this.SPRING_FRICTION, this.height += this.fy
+    },
+    updateNeighbors: function () {
+      this.previous && (this.force.previous = this.WAVE_SPREAD * (this.height - this.previous.height)), this.next && (this.force.next = this.WAVE_SPREAD * (this.height - this.next.height))
+    },
+    render: function (t) {
+      this.previous && (this.previous.height += this.force.previous, this.previous.fy += this.force.previous), this.next && (this.next.height += this.force.next, this.next.fy += this.force.next), t.lineTo(this.x, this.renderer.height - this.height)
+    }
+  };
+  var FISH = function (t) {
+    this.renderer = t, this.init()
+  };
+  FISH.prototype = {
+    GRAVITY: .4,
+    init: function () {
+      this.direction = Math.random() < .5, this.x = this.direction ? this.renderer.width + this.renderer.THRESHOLD : -this.renderer.THRESHOLD, this.previousY = this.y, this.vx = this.getRandomValue(4, 10) * (this.direction ? -1 : 1), this.renderer.reverse ? (this.y = this.getRandomValue(1 * this.renderer.height / 10, 4 * this.renderer.height / 10), this.vy = this.getRandomValue(2, 5), this.ay = this.getRandomValue(.05, .2)) : (this.y = this.getRandomValue(6 * this.renderer.height / 10, 9 * this.renderer.height / 10), this.vy = this.getRandomValue(-5, -2), this.ay = this.getRandomValue(-.2, -.05)), this.isOut = !1, this.theta = 0, this.phi = 0
+    },
+    getRandomValue: function (t, i) {
+      return t + (i - t) * Math.random()
+    },
+    reverseVertical: function () {
+      this.isOut = !this.isOut, this.ay *= -1
+    },
+    controlStatus: function (t) {
+      this.previousY = this.y, this.x += this.vx, this.y += this.vy, this.vy += this.ay, this.renderer.reverse ? this.y > this.renderer.height * this.renderer.INIT_HEIGHT_RATE ? (this.vy -= this.GRAVITY, this.isOut = !0) : (this.isOut && (this.ay = this.getRandomValue(.05, .2)), this.isOut = !1) : this.y < this.renderer.height * this.renderer.INIT_HEIGHT_RATE ? (this.vy += this.GRAVITY, this.isOut = !0) : (this.isOut && (this.ay = this.getRandomValue(-.2, -.05)), this.isOut = !1), this.isOut || (this.theta += Math.PI / 20, this.theta %= 2 * Math.PI, this.phi += Math.PI / 30, this.phi %= 2 * Math.PI), this.renderer.generateEpicenter(this.x + (this.direction ? -1 : 1) * this.renderer.THRESHOLD, this.y, this.y - this.previousY), (this.vx > 0 && this.x > this.renderer.width + this.renderer.THRESHOLD || this.vx < 0 && this.x < -this.renderer.THRESHOLD) && this.init()
+    },
+    render: function (t) {
+      t.save(), t.translate(this.x, this.y), t.rotate(Math.PI + Math.atan2(this.vy, this.vx)), t.scale(1, this.direction ? 1 : -1), t.beginPath(), t.moveTo(-30, 0), t.bezierCurveTo(-20, 15, 15, 10, 40, 0), t.bezierCurveTo(15, -10, -20, -15, -30, 0), t.fill(), t.save(), t.translate(40, 0), t.scale(.9 + .2 * Math.sin(this.theta), 1), t.beginPath(), t.moveTo(0, 0), t.quadraticCurveTo(5, 10, 20, 8), t.quadraticCurveTo(12, 5, 10, 0), t.quadraticCurveTo(12, -5, 20, -8), t.quadraticCurveTo(5, -10, 0, 0), t.fill(), t.restore(), t.save(), t.translate(-3, 0), t.rotate((Math.PI / 3 + Math.PI / 10 * Math.sin(this.phi)) * (this.renderer.reverse ? -1 : 1)), t.beginPath(), this.renderer.reverse ? (t.moveTo(5, 0), t.bezierCurveTo(10, 10, 10, 30, 0, 40), t.bezierCurveTo(-12, 25, -8, 10, 0, 0)) : (t.moveTo(-5, 0), t.bezierCurveTo(-10, -10, -10, -30, 0, -40), t.bezierCurveTo(12, -25, 8, -10, 0, 0)), t.closePath(), t.fill(), t.restore(), t.restore(), this.controlStatus(t)
+    }
+  }, $(function () {
+    RENDERER.init()
+    $('.dark').click(function () {
+      setTimeout(() => {
+        RENDERER.setFishColor();
+        RENDERER.context.fill();
+      });
+    })
+  });
+</script>
+  
+  <div class="footer bg-color">
+    <div class="footer-main">
+      
+        
+          <div class="link">
+            
+          </div>
+        
+      
+        
+          <div class="footer-copyright">
+            <p>Copyright © 2019 - 2020 <a target="_blank" rel="noopener" href="https://github.com/yuang01">yuang01</a> | Powered by <a target="_blank" rel="noopener" href="https://hexo.io/zh-cn/docs/">Hexo</a> | Theme <a target="_blank" rel="noopener" href="https://github.com/yuang01/theme">Bamboo</a> </p>
+
+          </div>
+        
+      
+        
+          
+            <!-- 不蒜子统计 -->
+            <!-- 不蒜子统计 -->
+<span id="busuanzi_container_site_pv">
+      <i class="fas fa-eye" aria-hidden="true"></i>Total visits：<span id="busuanzi_value_site_pv"></span> times
+</span>
+<span class="post-meta-divider">|</span>
+<span id="busuanzi_container_site_uv" style='display:none'>
+      <i class="fas fa-users" aria-hidden="true"></i>Number of visitors：<span id="busuanzi_value_site_uv"></span> people
+</span>
+
+          
+        
+      
+        
+          <div class="footer-custom">
+            
+          </div>
+        
+      
+    </div>
+  </div>
+
+
+
+    <!-- 渲染暗黑按钮 -->
+    
+      <div class="dark">
+  <div class="dark-content">
+    <i class="fas fa-moon" aria-hidden="true"></i>
+    <!-- <span>关灯</span> -->
+  </div>
+  
+</div>
+
+<script>
+  $(function() {
+    let isDark = JSON.parse(localStorage.getItem('dark'))  || JSON.parse('false');
+    if (isDark) {
+      $(".dark-content").replaceWith(
+          `
+          <div class='dark-content'>
+            <i class="fas fa-lightbulb" aria-hidden="true"></i>
+          </div>
+          `
+        );
+    }
+    $('.dark').click(function() {
+      if ($(document.body).is('.darkModel')) {
+        $(document.body).removeClass('darkModel');
+        localStorage.setItem('dark', false);
+        $(".dark-content").replaceWith(
+          `
+          <div class='dark-content'>
+            <i class="fas fa-moon" aria-hidden="true"></i>
+          </div>
+          `
+        );
+      } else {
+        $(document.body).addClass('darkModel');
+        localStorage.setItem('dark', true);
+        $(".dark-content").replaceWith(
+          `
+          <div class='dark-content'>
+            <i class="fas fa-lightbulb" aria-hidden="true"></i>
+          </div>
+          `
+        );
+      }
+    })
+  })
+</script>
+    
+    <!-- 渲染回到顶部按钮 -->
+    
+      <div class="goTop top-btn-color" pointer>
+  <i class="fas fa-arrow-up" aria-hidden="true"></i>
+</div>
+<script src="/js/goTop.js"></script>
+
+    
+    <!-- 渲染左下角音乐播放器 -->
+    
+      <link rel="stylesheet" href="/js/aplayer/APlayer@1.10.1.min.css">
+<style>
+.aplayer .aplayer-lrc p {
+  
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 16px !important;
+}
+
+.aplayer .aplayer-lrc p.aplayer-lrc-current {
+  
+  font-size: 15px;
+  color: #42b983;
+}
+
+
+.aplayer.aplayer-fixed.aplayer-narrow .aplayer-body {
+  left: -66px !important;
+}
+
+.aplayer.aplayer-fixed.aplayer-narrow .aplayer-body:hover {
+  left: 0px !important;
+}
+
+
+</style>
+<meting-js  
+  class=""
+  server="tencent"
+  type="playlist"
+  id="8062553743"
+  fixed='true'
+  autoplay='false'
+  theme='#42b983'
+  loop='all'
+  order='random'
+  preload='auto'
+  volume='0.7'
+  list-folded='true'
+>
+</meting-js>
+
+<!-- <style>
+  #aplayer {
+    position: fixed;
+    left: 0;
+    bottom: 300px;
+  }
+</style> -->
+<script src="https://unpkg.com/aplayer@1.10.1/dist/APlayer.min.js"></script>
+<script src="https://unpkg.com/meting@2/dist/Meting.min.js"></script>
+    
+
+    <!-- 图片放大 -->
+    
+      <script src="/js/fancybox/jquery.fancybox.min.js"></script>
+    
+
+    <!-- 百度解析 -->
+    <!-- Baidu Analytics -->
+
+    <!-- Baidu Push -->
+
+<script>
+    (function () {
+        var bp = document.createElement('script');
+        var curProtocol = window.location.protocol.split(':')[0];
+        if (curProtocol === 'https') {
+            bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+        } else {
+            bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+        }
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(bp, s);
+    })();
+</script>
+
+    
+    <!-- 背景彩带 -->
+    
+      <script type="text/javascript" size="100" alpha='0.4' zIndex="-1" src="/js/ribbon.min.js"></script>
+    
+
+    <script src="/js/utils/index.js"></script>
+    <script src="/js/app.js"></script>
+    
+    <!-- 文章目录所需js -->
+<link href="/js/tocbot/tocbot.css" rel="stylesheet">
+<script src="/js/tocbot/tocbot.min.js"></script>
+
+<script>
+  var headerEl = 'h2, h3, h4',  //headers 
+    content = '.post-detail',//文章容器
+    idArr = {};  //标题数组以确定是否增加索引id
+  //add #id
+  var option = {
+    // Where to render the table of contents.
+    tocSelector: '.toc',
+    // Where to grab the headings to build the table of contents.
+    contentSelector: content,
+    // Which headings to grab inside of the contentSelector element.
+    headingSelector: headerEl,
+    scrollSmooth: true,
+    scrollSmoothOffset: -80,
+    headingsOffset: -($(window).height() * 0.4 - 45),
+    positionFixedSelector: '.toc-main',
+    positionFixedClass: 'is-position-fixed',
+    fixedSidebarOffset: 'auto',
+    activeLinkClass: 'is-active-link',
+    // onClick: function (e) {},
+  }
+  if ($('.toc').length > 0) {
+
+    $(content).children(headerEl).each(function () {
+      //去除空格以及多余标点
+      var headerId = $(this).text().replace(/[\s|\~|`|\!|\@|\#|\$|\%|\^|\&|\*|\(|\)|\_|\+|\=|\||\|\[|\]|\{|\}|\;|\:|\"|\'|\,|\<|\.|\>|\/|\?|\：|\，|\。]/g, '');
+
+      headerId = headerId.toLowerCase();
+      if (idArr[headerId]) {
+        //id已经存在
+        $(this).attr('id', headerId + '-' + idArr[headerId]);
+        idArr[headerId]++;
+      }
+      else {
+        //id未存在
+        idArr[headerId] = 1;
+        $(this).attr('id', headerId);
+      }
+    });
+
+    document.addEventListener("DOMContentLoaded", function () {
+      tocbot.init(option);
+      mobileTocClick();
+    });
+
+  }
+
+  window.tocScrollFn = function () {
+    return bamboo.throttle(function () {
+      findHeadPosition();
+    }, 100)()
+  }
+  window.addEventListener('scroll', tocScrollFn);
+
+  const findHeadPosition = function (top) {
+    if ($('.toc-list').length <= 0) {
+      return false;
+    }
+    setTimeout(() => {  // or DOMContentLoaded 
+      autoScrollToc();
+    }, 0);
+  }
+
+  const autoScrollToc = function () {
+    const $activeItem = document.querySelector('.is-active-link');
+    const $cardToc = document.querySelector('.toc-content');
+    const activePosition = $activeItem.getBoundingClientRect().top
+    const sidebarScrollTop = $cardToc.scrollTop
+    if (activePosition > (document.documentElement.clientHeight - 100)) {
+      $cardToc.scrollTop = sidebarScrollTop + 150
+    }
+    if (activePosition < 100) {
+      $cardToc.scrollTop = sidebarScrollTop - 150
+    }
+  }
+
+  document.addEventListener('pjax:send', function () {
+    if ($('.toc').length) {
+      tocbot.destroy();
+    }
+  });
+
+  document.addEventListener('pjax:complete', function () {
+    if ($('.toc').length) {
+      tocbot.init(option);
+      mobileTocClick();
+    }
+  });
+  
+  // 手机端toc按钮点击出现目录
+  const mobileTocClick = function () {
+    const $cardTocLayout = document.getElementsByClassName('toc-aside')[0];
+    const $cardToc = $cardTocLayout.getElementsByClassName('toc-content')[0];
+    let right = '45px';
+    if (window.innerWidth >= 551 && window.innerWidth <= 992) {
+      right = '100px'
+    }
+    const mobileToc = {
+      open: () => {
+        $cardTocLayout.style.cssText = 'animation: toc-open .3s; opacity: 1; right: ' + right
+      },
+
+      close: () => {
+        $cardTocLayout.style.animation = 'toc-close .2s'
+        setTimeout(() => {
+          $cardTocLayout.style.cssText = "opacity:''; animation: ''; right: ''"
+        }, 100)
+      }
+    }
+    document.getElementById('toc-mobile-btn').addEventListener('click', () => {
+      if (window.getComputedStyle($cardTocLayout).getPropertyValue('opacity') === '0') mobileToc.open()
+      else mobileToc.close()
+    })
+
+    $cardToc.addEventListener('click', (e) => {
+      if (window.innerWidth < 992) { // 小于992px的时候
+        mobileToc.close()
+      }
+    })
+  }
+</script>
+
+<style>
+  .is-position-fixed {
+    position: sticky !important;
+    top: 74px;
+  }
+
+  .toc-main ul {
+    counter-reset: show-list;
+  }
+
+  .toc-main ul li::before {
+    content: counter(item)".";
+    display: block;
+    position: absolute;
+    left: 12px;
+    top: 0;
+  }
+</style> 
+
+<!-- 设置导航背景 -->
+<script>
+  let setHeaderClass = () => {
+    const headerMenuTransparent = true;
+    if (!headerMenuTransparent) { return; }
+    const nav = $('#navHeader');
+    const navTop = nav.outerHeight();
+    const winTop = $(window).scrollTop();
+    if(winTop > navTop) {
+      nav.addClass('header-bg-color');
+    }
+    else {
+      nav.removeClass('header-bg-color');
+    }
+  };
+
+  let scrollCollect = () => {
+    return bamboo.throttle(function (e) {
+      setHeaderClass();
+    }, 200)()
+  }
+
+  let initHeaderBg = () => {
+    setHeaderClass();
+  }
+
+  setHeaderClass();
+  window.addEventListener('scroll', scrollCollect);
+
+  document.addEventListener('pjax:send', function () {
+    window.removeEventListener('scroll', scrollCollect)
+  })
+  document.addEventListener('pjax:complete', function () {
+    window.addEventListener('scroll', scrollCollect);
+    setHeaderClass();
+  })
+</script> 
+
+<!-- 渲染issues标签里的内容 -->
+<script>
+  function loadIssuesJS() {
+    if ($(".post-detail").find(".issues-api").length == 0) {
+      return;
+    } 
+    loadScript('/js/issues/index.js');
+  };
+  $(function () {
+    loadIssuesJS();
+  });
+  document.addEventListener('pjax:complete', function () {
+    if (typeof IssuesAPI == "undefined") {
+      loadIssuesJS();
+    }
+  })
+</script>
+
+<!-- 输入框打字特效 -->
+<!-- 输入框打字特效 -->
+
+  <script src="/js/activate-power-mode.js"></script>
+  <script>
+    POWERMODE.colorful = true;  // 打开随机颜色特效
+    POWERMODE.shake = false;    // 关闭输入框抖动
+    document.body.addEventListener('input', POWERMODE);//监听打字事件
+  </script>
+
+
+<!-- markdown代码一键复制功能 -->
+
+  <link rel="stylesheet" href="https://unpkg.com/v-plugs-ayu/lib/ayu.css">
+  <script src="https://unpkg.com/v-plugs-ayu/lib/ayu.umd.min.js"></script>
+  <script src="/js/clipboard/clipboard.min.js"></script>
+  <div id="appCopy">
+  </div>
+  <script data-pjax>
+    var vm = new Vue({
+      el: '#appCopy',
+      data: {
+      },
+      computed: {
+      },
+      mounted() {
+        const that = this;
+        var copy = 'copy';
+        /* code */
+        var initCopyCode = function () {
+          var copyHtml = '';
+          copyHtml += '<button class="btn-copy" data-clipboard-snippet="" style="position:absolute;top:0;right:0;z-index:1;">';
+          copyHtml += '<i class="fas fa-copy"></i><span>' + copy + '</span>';
+          copyHtml += '</button>';
+          $(".post-detail pre").not('.gutter pre').wrap("<div class='codeBox' style='position:relative;width:100%;'></div>")
+          $(".post-detail pre").not('.gutter pre').before(copyHtml);
+          new ClipboardJS('.btn-copy', {
+            target: function (trigger) {
+              return trigger.nextElementSibling;
+            }
+          });
+        }
+        initCopyCode();
+        $('.btn-copy').unbind('click').bind('click', function () {
+          doSomething();
+        })
+        $(document).unbind('keypress').bind('keypress', function (e) {
+          if (e.ctrlKey && e.keyCode == 67) {
+            doSomething();
+          }
+        })
+
+        function doSomething() {
+          that.$notify({
+            title: "成功",
+            content: "代码已复制，请遵守相关授权协议。",
+            type: 'success'
+          })
+        }
+      },
+      methods: {
+      },
+      created() { }
+    })
+  </script>
+  
+
+<!-- 图片懒加载 -->
+<script defer src="https://unpkg.com/vanilla-lazyload@17.1.0/dist/lazyload.min.js"></script>
+<script>
+  // https://www.npmjs.com/package/vanilla-lazyload
+  // Set the options globally
+  // to make LazyLoad self-initialize
+  window.lazyLoadOptions = {
+    elements_selector: ".lazyload",
+    threshold: 0
+  };
+  // Listen to the initialization event
+  // and get the instance of LazyLoad
+  window.addEventListener(
+    "LazyLoad::Initialized",
+    function (event) {
+      window.lazyLoadInstance = event.detail.instance;
+    },
+    false
+  );
+  document.addEventListener('DOMContentLoaded', function () {
+    lazyLoadInstance.update();
+  });
+  document.addEventListener('pjax:complete', function () {
+    lazyLoadInstance.update();
+  });
+</script>
+
+
+<!-- 卡片滚动动画 -->
+   
+
+<!-- 评论所需js -->
+
+  
+    <script type="text/javascript">
+  var utteranceCommon = {};
+
+  function check_utterance() {
+    let isDark = JSON.parse(localStorage.getItem('dark')) || JSON.parse('false');
+    if (isDark) {
+      utteranceCommon.Theme = 'github-dark';
+    } else {
+      utteranceCommon.Theme = 'github-light';
+    }
+
+    return document.getElementById("gitment-container");
+  }
+  comment_el = '#gitment-container';
+  load_utterance = function () {
+    if ($(comment_el).length) {
+      // 匿名函数，防止污染全局变量
+      const HEAD = check_utterance();
+
+      var utterances = document.createElement('script');
+      utterances.type = 'text/javascript';
+      utterances.async = true;
+      utterances.setAttribute('issue-term', 'pathname')
+      utterances.setAttribute('theme', utteranceCommon.Theme)
+      utterances.setAttribute('repo', '')
+      utterances.crossorigin = 'anonymous';
+      utterances.src = 'https://utteranc.es/client.js';
+      // content 是要插入评论的地方
+      document.getElementById('gitment-container').appendChild(utterances);
+
+    }
+  }
+
+  function dark_utterance() {
+    const HEAD = check_utterance();
+    if (!HEAD) return;
+    const message = {
+      type: 'set-theme',
+      theme: utteranceCommon.Theme
+    };
+    const utteranceIframe = document.querySelector('iframe');
+    utteranceIframe.contentWindow.postMessage(message, 'https://utteranc.es');
+  }
+
+  $(document).ready(load_utterance);
+  document.addEventListener('pjax:complete', function () {
+    load_utterance();
+  });
+
+  $('.dark').click(function () {
+    setTimeout(() => {
+      dark_utterance();
+    });
+  })
+
+</script>
+
+<style>
+  .utterances {
+    max-width: inherit !important;
+  }
+</style>
+  
+
+
+<!-- 鼠标点击特效 -->
+<!-- 爱心点击 -->
+
+  
+    <canvas class="fireworks" style="position: fixed;left: 0;top: 0;z-index: 999; pointer-events: none;" ></canvas>
+    <script src="//cdn.bootcss.com/animejs/2.2.0/anime.min.js"></script>
+    <script src="/js/cursor/explosion.min.js"></script>
+  
+
+
+
+
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" data-pjax></script>
+
+
+    <!-- pjax -->
+    
+
+<!-- pjax -->
+
+
+  <script src="/js/pjax@0.2.8/index.js"></script>
+  
+    <!-- 样式位于：source/css/_third-party/pjaxanimate.styl -->
+
+<div class="pjax-animate">
+  
+    <div class="loading-circle"><div id="loader-circle"></div></div>
+    <script>
+      window.ShowLoading = function() {
+        $(".loading-circle").css("display", "block");
+      };
+      window.HideLoading = function() {
+        $(".loading-circle").css("display", "none");
+      }
+    </script>
+  
+	<script>
+    document.addEventListener('pjax:complete', function () {
+      window.HideLoading();
+    })
+    document.addEventListener('pjax:send', function () {
+      window.ShowLoading();
+    })
+    document.addEventListener('pjax:error', function () {
+      window.HideLoading();
+    })
+	</script>
+</div>
+
+  
+
+  <script>
+    var pjax = new Pjax({
+      elements: 'a[href]:not([href^="#"]):not([href="javascript:void(0)"]):not([no-pjax])',   // 拦截正常带链接的 a 标签
+      selectors: ["#pjax-container","title"],                                   // 根据实际需要确认重载区域
+      cacheBust: false,   // url 地址追加时间戳，用以避免浏览器缓存
+      timeout: 5000
+    });
+
+    document.addEventListener('pjax:send', function (e) {
+
+      try {
+        var currentUrl = window.location.pathname;
+        var targetUrl = e.triggerElement.href;
+        var banUrl = [""];
+        if (banUrl[0] != "") {
+          banUrl.forEach(item => {
+            if(currentUrl.indexOf(item) != -1 || targetUrl.indexOf(item) != -1) {
+              window.location.href = targetUrl;
+            }
+          });
+        }
+      } catch (error) {}
+
+      $(window).unbind('resize');
+      $(window).unbind('scroll');
+      $(document).unbind('scroll');
+      $(document).unbind('click');
+      $('body').unbind('click');
+
+    })
+    
+    document.addEventListener('pjax:complete', function () {
+      $('script[data-pjax], .pjax-reload script').each(function () {
+        $(this).parent().append($(this).remove());
+      });
+    });
+
+    document.addEventListener('pjax:error', function (e) {
+      window.location.href = e.triggerElement.href;
+    })
+    
+    // 刷新不从顶部开始
+    document.addEventListener("DOMContentLoaded", function () {
+      history.scrollRestoration = 'auto';
+    })
+  </script>
+
+
+
+  </body>
+</html>

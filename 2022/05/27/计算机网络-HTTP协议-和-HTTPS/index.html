@@ -1,0 +1,1891 @@
+<!DOCTYPE html>
+<html>
+  <!-- meta/link... -->
+  
+
+
+
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport">
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+
+
+  <title>计算机网络 --- HTTP协议 和 HTTPS | Hexo</title>
+
+  <link rel="icon" type="image/x-icon, image/vnd.microsoft.icon" href="/favicon.ico">
+  <link rel="stylesheet" href="https://at.alicdn.com/t/font_1911880_c1nvbyezg17.css">
+  <link href="https://unpkg.com/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet">
+  <link href="/js/swiper/swiper@5.4.1.min.css" rel="stylesheet">
+  
+  
+  
+  
+<link rel="stylesheet" href="/css/animate.min.css">
+
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+  
+    
+<link rel="stylesheet" href="/js/fancybox/jquery.fancybox.min.css">
+
+  
+  
+    
+<link rel="stylesheet" href="/js/shareJs/share.min.css">
+
+  
+  <style>
+        @media (max-width: 992px) {
+            #waifu {
+                display: none;
+            }
+        }
+    </style>
+    <script src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
+    <link href="//cdn.bootcss.com/pace/1.0.2/themes/pink/pace-theme-flash.css" rel="stylesheet">
+
+    
+
+    <!-- import link -->
+    
+        
+            
+        
+            
+        
+    
+    <!-- import script -->
+    
+        
+            
+        
+            
+        
+    
+
+<meta name="generator" content="Hexo 6.2.0"></head>
+
+  
+  <!-- 依赖于jquery和vue -->
+  
+    
+<script src="https://unpkg.com/jquery@3.5.1/dist/jquery.min.js"></script>
+
+  
+
+  
+    
+<script src="https://unpkg.com/vue@2.6.11/dist/vue.min.js"></script>
+
+  
+  
+  <body>
+    <!-- 预加载动画 -->
+    <!-- 页面预加载动画 -->
+
+<div id='loader'>
+  <link rel="stylesheet" href="/js/loaded/index.css" >
+  <div class="loading-left-bg"></div>
+  <div class="loading-right-bg"></div>
+  <div class="spinner-box">
+    <div class="configure-border-1">
+      <div class="configure-core"></div>
+    </div>
+    <div class="configure-border-2">
+      <div class="configure-core"></div>
+    </div>
+    <div class="loading-word">loading...</div>
+  </div>
+</div>
+
+<script>
+  var endLoading = function () {
+    document.body.style.overflow = 'auto';
+    document.getElementById('loader').classList.add("loading");
+  }
+  window.addEventListener('DOMContentLoaded',endLoading);
+  
+</script>
+
+    
+    <!-- 判断是否为暗黑风格 -->
+    <!-- 判断是否为黑夜模式 -->
+<script>
+  let isDark = JSON.parse(localStorage.getItem('dark')) || JSON.parse('false');
+
+  if (isDark) {
+    $(document.body).addClass('darkModel');
+  }
+</script>
+
+    <!-- 需要在上面加载的js -->
+    <script>
+  function loadScript(src, cb) {
+    return new Promise(resolve => {
+      setTimeout(function () {
+        var HEAD = document.getElementsByTagName("head")[0] || document.documentElement;
+        var script = document.createElement("script");
+        script.setAttribute("type", "text/javascript");
+        if (cb) {
+          if (JSON.stringify(cb)) {
+            for (let p in cb) {
+              if (p == "onload") {
+                script[p] = () => {
+                  cb[p]()
+                  resolve()
+                }
+              } else {
+                script[p] = cb[p]
+                script.onload = resolve
+              }
+            }
+          } else {
+            script.onload = () => {
+              cb()
+              resolve()
+            };
+          }
+        } else {
+          script.onload = resolve
+        }
+        script.setAttribute("src", src);
+        HEAD.appendChild(script);
+      });
+    });
+  }
+
+  //https://github.com/filamentgroup/loadCSS
+  var loadCSS = function (href, before, media, attributes) {
+    return new Promise(resolve => {
+      setTimeout(function () {
+        var link = document.createElement('link');
+        link.rel = "stylesheet";
+        link.href = src;
+        link.onload = resolve;
+        document.getElementsByTagName("head")[0].appendChild(link);
+      });
+    });
+  };
+
+</script> 
+
+<!-- 轮播图所需要的js -->
+<script src="/js/swiper/swiper.min.js"></script>
+<script src="/js/swiper/vue-awesome-swiper.js"></script>
+<script src="/js/swiper/swiper.animate1.0.3.min.js"></script>
+
+<script type="text/javascript">
+  Vue.use(window.VueAwesomeSwiper)
+</script>
+
+
+  <script src="/js/vue-typed-js/index.js"></script>
+
+
+<!-- 首页的公告滚动插件的js需要重新加载 -->
+<script src="/js/vue-seamless-scroll/index.js"></script>
+
+<!-- 打字机效果js -->
+<script src="https://unpkg.com/typed.js@2.0.11"></script>
+
+
+    <div id="safearea">
+      <main class="main" id="pjax-container">
+        <!-- 头部导航 -->
+        
+<header class="header   " 
+  id="navHeader"
+  style="position: fixed;
+  left: 0; top: 0; z-index: 10;width: 100%;"
+>
+  <div class="header-content">
+    <div class="bars">
+      <div id="appDrawer" class="sidebar-image">
+  <div class="drawer-box-icon">
+    <i class="fas fa-bars" aria-hidden="true" @click="showDialogDrawer"></i>
+  </div>
+  
+  <transition name="fade">
+    <div class="drawer-box_mask" v-cloak style="display: none;" v-show="visible" @click.self="cancelDialogDrawer">
+    </div>
+  </transition>
+  <div class="drawer-box" :class="{'active': visible}">
+    <div class="drawer-box-head bg-color">
+      <img class="drawer-box-head_logo lazyload placeholder" src="/medias/logo.png" class="lazyload placeholder" data-srcset="/medias/logo.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="logo">
+      <h3 class="drawer-box-head_title">Hexo</h3>
+      <h5 class="drawer-box-head_desc"></h5>
+    </div>
+    
+    <div class="drawer-box-content">
+      <ul class="drawer-box-content_menu">
+        
+        
+          <li class="drawer-box-content_item">
+            <a target="_blank" rel="noopener" href="https://github.com/yuang01/hexo-theme-bamboo">
+              <i class="fas fa-github" aria-hidden="true"></i>
+              <span>Github</span>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</div>
+
+<script>
+  var body = document.body || document.documentElement || window;
+  var vm = new Vue({
+    el: '#appDrawer',
+    data: {
+      visible: false,
+      top: 0,
+      openArr: [],
+    },
+    computed: {
+    },
+    mounted() {
+    },
+    methods: {
+      isOpen(index) {
+        if (this.openArr.includes(index)) {
+          return true;
+        } else {
+          return false;
+        }
+      },
+      openOrCloseMenu(curIndex) {
+        const index = this.openArr.indexOf(curIndex);
+        if (index !== -1) {
+          this.openArr.splice(index, 1);
+        } else {
+          this.openArr.push(curIndex);
+        }
+      },
+      showDialogDrawer() {
+        this.visible = true;
+        // 防止页面滚动，只能让弹框滚动
+        this.top = $(document).scrollTop()
+        body.style.cssText = 'width: 100%; height: 100%;overflow: hidden;';
+      },
+      cancelDialogDrawer() {
+        this.visible = false;
+        body.removeAttribute('style');
+        $(document).scrollTop(this.top)
+      }
+    },
+    created() {}
+  })
+</script>
+
+    </div>
+    <div class="blog-title" id="author-avatar">
+      
+        <div class="avatar">
+          <img src="/medias/logo.png" class="lazyload placeholder" data-srcset="/medias/logo.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="logo">
+        </div>
+      
+      <a href="/" class="logo">Hexo</a>
+    </div>
+    <nav class="navbar">
+      <ul class="menu">
+        
+      </ul>
+      
+      
+        <div id="appSearch">
+  <div class="search"  @click="showDialog()"><i class="fas fa-search" aria-hidden="true"></i></div>
+  <transition name="fade">
+    <div class="message-box_wrapper" style="display: none;" v-cloak v-show="dialogVisible" @click.self="cancelDialogVisible()">
+      <div class="message-box animated bounceInDown">
+        <h2>
+          <span>
+            <i class="fas fa-search" aria-hidden="true"></i>
+            <span class="title">Search</span>
+          </span>
+          <i class="fas fa-times close" pointer style="float:right;" aria-hidden="true" @click.self="cancelDialogVisible()"></i>
+        </h2>
+        <form class="site-search-form">
+          <input type="text"
+            placeholder="Please enter keywords"
+            id="local-search-input" 
+            @click="getSearchFile()"
+            class="st-search-input"
+            v-model="searchInput"
+          />
+        </form>
+        <div class="result-wrapper">
+          <div id="local-search-result" class="local-search-result-cls"></div>
+        </div>
+      </div>
+    </div>
+  </transition>
+</div>
+<script src="/js/local_search.js"></script>
+<script>
+  var body = document.body || document.documentElement || window;
+  var vm = new Vue({
+    el: '#appSearch',
+    data: {
+      dialogVisible: false,
+      searchInput: '',
+      top: 0,
+    },
+    computed: {
+    },
+    mounted() {
+      window.addEventListener('pjax:complete', () => {
+        this.cancelDialogVisible();
+      })
+    },
+    methods: {
+      showDialog() {
+        this.dialogVisible = true;
+        // 防止页面滚动，只能让弹框滚动
+        this.top = $(document).scrollTop()
+        body.style.cssText = 'overflow: hidden;';
+      },
+      getSearchFile() {
+        if (!this.searchInput) {
+          getSearchFile("/search.xml");
+        }
+      },
+      cancelDialogVisible() {
+        this.dialogVisible = false;
+        body.removeAttribute('style');
+        $(document).scrollTop(this.top)
+      },
+    },
+    created() {}
+  })
+</script>
+<!-- 解决刷新页面闪烁问题，可以在元素上添加display: none, 或者用vue.extend方法，详情：https://blog.csdn.net/qq_31393401/article/details/81017912 -->
+<!-- 下面是搜索基本写法 -->
+<!-- <script type="text/javascript" id="local.search.active">
+  var inputArea = document.querySelector("#local-search-input");
+  inputArea.onclick   = function(){ getSearchFile(); this.onclick = null }
+  inputArea.onkeydown = function(){ if(event.keyCode == 13) return false }
+</script> -->
+
+      
+
+    </nav>
+  </div>
+  
+    <a target="_blank" rel="noopener" href="https://github.com/yuang01/hexo-theme-bamboo" class="github-corner color-primary" aria-label="View source on GitHub"><svg width="60" height="60" viewBox="0 0 250 250" style="fill:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+  
+  
+</header>
+        <!-- 内容区域 -->
+        
+ <!-- prismjs 代码高亮 -->
+ 
+
+
+<div class="bg-dark-floor" style="position: fixed;left: 0;top: 0;width: 100%;height: 100%;z-index: -1;"></div>
+
+
+  <!-- 文章详情页顶部图片和标题 -->
+
+
+
+
+<div class="post-detail-header" id="thumbnail_canvas" style="background-repeat: no-repeat; background-size: cover; 
+  background-position: center center;position: relative;background-image:url('/medias/3.jpg')">
+  <div class="post-detail-header-mask"></div>
+  <canvas id="header_canvas"style="position:absolute;bottom:0;pointer-events:none;"></canvas>
+  
+  <div class="post-detail-header_info-box">
+    <div class="title-box">
+      <span class="title">
+        计算机网络 --- HTTP协议 和 HTTPS
+      </span>
+    </div>
+    
+    
+      
+        <span class="post-detail-header_date">
+          <i class="fas fa-calendar"></i> Published in：2022-05-27 |
+        </span>
+      
+
+      
+        <span class="post-detail-header_categories">
+          <i class="iconfont iconbookmark1"></i> category：
+          
+            <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" class="post-detail-header_category">
+              计算机网络
+            </a>
+          
+        </span>
+      
+
+      
+    
+  </div>
+  
+  
+    <script src="/js/bubble/bubble.js"></script>
+  
+</div>
+
+
+
+
+
+<div class="post-detail-content row justify-position" 
+  style="padding-top: 0px;">
+  <div class="main-content">
+    <article class="post post-detail">
+      <div class="post-content">
+        <h1 id="计算机网络-—-HTTP协议-和-HTTPS"><a href="#计算机网络-—-HTTP协议-和-HTTPS" class="headerlink" title="计算机网络 — HTTP协议 和 HTTPS"></a>计算机网络 — HTTP协议 和 HTTPS</h1><h1 id="1-了解-HTTP-协议"><a href="#1-了解-HTTP-协议" class="headerlink" title="1. 了解 HTTP 协议"></a>1. 了解 HTTP 协议</h1><h2 id="1-1-HTTP-是什么"><a href="#1-1-HTTP-是什么" class="headerlink" title="1.1 HTTP 是什么"></a>1.1 HTTP 是什么</h2><p>HTTP (HyperText Transfer Protocol, 超文本传输协议) 是一种应用非常广泛的 <a target="_blank" rel="noopener" href="https://so.csdn.net/so/search?q=%E5%BA%94%E7%94%A8%E5%B1%82&spm=1001.2101.3001.7020">应用层</a>协议.</p>
+<blockquote>
+<p>所谓 “超文本” 的含义, 就是传输的内容不仅仅是文本(比如 html, css 这个就是文本), 还可以是一些<br>其他的资源, 比如图片, 视频, <a target="_blank" rel="noopener" href="https://so.csdn.net/so/search?q=%E9%9F%B3%E9%A2%91&spm=1001.2101.3001.7020">音频</a>等二进制的数据</p>
+</blockquote>
+<h2 id="1-2-抓包工具的使用"><a href="#1-2-抓包工具的使用" class="headerlink" title="1.2 抓包工具的使用"></a>1.2 <a target="_blank" rel="noopener" href="https://so.csdn.net/so/search?q=%E6%8A%93%E5%8C%85%E5%B7%A5%E5%85%B7&spm=1001.2101.3001.7020">抓包工具</a>的使用</h2><h3 id="1-Fiddler-的下载"><a href="#1-Fiddler-的下载" class="headerlink" title="1. Fiddler 的下载"></a>1. <a target="_blank" rel="noopener" href="https://so.csdn.net/so/search?q=Fiddler&spm=1001.2101.3001.7020">Fiddler</a> 的下载</h3><p>① 可以直接在官网下载 <a target="_blank" rel="noopener" href="https://www.telerik.com/download/fiddler">Fiddler官网地址</a><br>② 也可以直接进入 <a target="_blank" rel="noopener" href="https://www.sogou.com/web?query=fiddler&_asf=www.sogou.com&_ast=&w=01019900&p=40040100&ie=utf8&from=index-nologin&s_from=index&sut=2602&sst0=1650441810212&lkt=0,0,0&sugsuv=1650186416440610&sugtime=1650441810212">fiddler搜索页</a><br><img src="https://img-blog.csdnimg.cn/9576b656efbf4e068c26e15351a37842.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAd3d6enp6enp6eno=,size_20,color_FFFFFF,t_70,g_se,x_16" class="lazyload placeholder" data-srcset="https://img-blog.csdnimg.cn/9576b656efbf4e068c26e15351a37842.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAd3d6enp6enp6eno=,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="在这里插入图片描述"></p>
+<h3 id="2-Fiddler-基本的设置"><a href="#2-Fiddler-基本的设置" class="headerlink" title="2. Fiddler 基本的设置"></a>2. Fiddler 基本的设置</h3><p>① 首先设置 点击 <code>Tools</code> -&gt; <code>Options</code><br><img src="https://img-blog.csdnimg.cn/e00bf8ee61064e64b8335d1dabe19ba9.png" class="lazyload placeholder" data-srcset="https://img-blog.csdnimg.cn/e00bf8ee61064e64b8335d1dabe19ba9.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/2b176d5915184651b05880a77d02c4d8.png" class="lazyload placeholder" data-srcset="https://img-blog.csdnimg.cn/2b176d5915184651b05880a77d02c4d8.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="在这里插入图片描述"><br>② 点击 <code>HTTPS</code> 将下面能勾选的勾上<br><img src="https://img-blog.csdnimg.cn/1576a7e3874849d9ac627d8a449ec47d.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAd3d6enp6enp6eno=,size_19,color_FFFFFF,t_70,g_se,x_16" class="lazyload placeholder" data-srcset="https://img-blog.csdnimg.cn/1576a7e3874849d9ac627d8a449ec47d.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAd3d6enp6enp6eno=,size_19,color_FFFFFF,t_70,g_se,x_16" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="在这里插入图片描述"></p>
+<h3 id="3-Fillder-的使用"><a href="#3-Fillder-的使用" class="headerlink" title="3. Fillder 的使用"></a>3. Fillder 的使用</h3><p>将左边的内容清空,然后再进入一个网站,找到对应的那个</p>
+<p><img src="https://img-blog.csdnimg.cn/5d606955fffd4b2e8095cf213f6a0b0d.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAd3d6enp6enp6eno=,size_19,color_FFFFFF,t_70,g_se,x_16" class="lazyload placeholder" data-srcset="https://img-blog.csdnimg.cn/5d606955fffd4b2e8095cf213f6a0b0d.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAd3d6enp6enp6eno=,size_19,color_FFFFFF,t_70,g_se,x_16" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="进入"><br>按照图片的顺序进行点击,右上就是请求,右下就是响应<br><img src="https://img-blog.csdnimg.cn/54ff673317bc4069ac14ce22bc3c456f.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAd3d6enp6enp6eno=,size_20,color_FFFFFF,t_70,g_se,x_16" class="lazyload placeholder" data-srcset="https://img-blog.csdnimg.cn/54ff673317bc4069ac14ce22bc3c456f.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAd3d6enp6enp6eno=,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="在这里插入图片描述"></p>
+<h2 id="1-3-观察一个抓包结果"><a href="#1-3-观察一个抓包结果" class="headerlink" title="1.3 观察一个抓包结果"></a>1.3 观察一个抓包结果</h2><p>HTTP 请求<br><img src="https://img-blog.csdnimg.cn/c3747fed9ca144b29902161beea9802b.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAd3d6enp6enp6eno=,size_20,color_FFFFFF,t_70,g_se,x_16" class="lazyload placeholder" data-srcset="https://img-blog.csdnimg.cn/c3747fed9ca144b29902161beea9802b.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAd3d6enp6enp6eno=,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="在这里插入图片描述"><br>HTTP响应<br><img src="https://img-blog.csdnimg.cn/d2bb38ccaece4eb49754736498a14270.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAd3d6enp6enp6eno=,size_20,color_FFFFFF,t_70,g_se,x_16" class="lazyload placeholder" data-srcset="https://img-blog.csdnimg.cn/d2bb38ccaece4eb49754736498a14270.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAd3d6enp6enp6eno=,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="在这里插入图片描述"></p>
+<h1 id="2-HTTP-协议的报文格式"><a href="#2-HTTP-协议的报文格式" class="headerlink" title="2. HTTP 协议的报文格式"></a>2. HTTP 协议的报文格式</h1><h2 id="2-1-请求报文格式"><a href="#2-1-请求报文格式" class="headerlink" title="2.1 请求报文格式"></a>2.1 请求报文格式</h2><p><strong>首行:</strong> <code>[方法]</code> <code>[URL]</code> <code>[版本]</code><br><strong>Header:</strong> 请求的属性.<br><strong>空行</strong><br><strong>Body:</strong> 空行后面的内容为 Body.</p>
+<h2 id="2-2-响应报文格式"><a href="#2-2-响应报文格式" class="headerlink" title="2.2 响应报文格式"></a>2.2 响应报文格式</h2><p><strong>首行:</strong> <code>[版本号]</code> <code>[状态码]</code> <code>[状态码的解释]</code><br><strong>Header</strong>: 请求的属性.<br><strong>空行</strong><br><strong>Body:</strong> 空行后面的内容为 Body.</p>
+<h2 id="2-3-报文格式的注意事项"><a href="#2-3-报文格式的注意事项" class="headerlink" title="2.3 报文格式的注意事项"></a>2.3 报文格式的注意事项</h2><ol>
+<li>首行的内容之间有一个空格.<br><img src="https://img-blog.csdnimg.cn/0691822f11b74eb1bf76f2341b77b023.png" class="lazyload placeholder" data-srcset="https://img-blog.csdnimg.cn/0691822f11b74eb1bf76f2341b77b023.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/a6566a19a64e489fa3063ec97e23a41e.png" class="lazyload placeholder" data-srcset="https://img-blog.csdnimg.cn/a6566a19a64e489fa3063ec97e23a41e.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="在这里插入图片描述"></li>
+<li>请求的属性是使用冒号分割的键值对.<br>每组属性之间使用\n分割<br>遇到空行表示Header部分结束</li>
+<li>Body 允许为空.<br>如果Body存在,Header中会有一个Content-Length属性来标识Body的长度</li>
+<li>协议格式总结<br><img src="https://img-blog.csdnimg.cn/aa799cf9ef794b739ee8fc593d81845b.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAd3d6enp6enp6eno=,size_20,color_FFFFFF,t_70,g_se,x_16" class="lazyload placeholder" data-srcset="https://img-blog.csdnimg.cn/aa799cf9ef794b739ee8fc593d81845b.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAd3d6enp6enp6eno=,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="在这里插入图片描述"></li>
+</ol>
+<h1 id="3-认识-URL"><a href="#3-认识-URL" class="headerlink" title="3. 认识 URL"></a>3. 认识 URL</h1><h2 id="3-1-URL-基本格式"><a href="#3-1-URL-基本格式" class="headerlink" title="3.1 URL 基本格式"></a>3.1 URL 基本格式</h2><p><img src="https://img-blog.csdnimg.cn/c5816c09189d4c06b75bbdd80a689493.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAd3d6enp6enp6eno=,size_20,color_FFFFFF,t_70,g_se,x_16" class="lazyload placeholder" data-srcset="https://img-blog.csdnimg.cn/c5816c09189d4c06b75bbdd80a689493.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAd3d6enp6enp6eno=,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="在这里插入图片描述"></p>
+<h2 id="3-2-分析一个具体的-URL"><a href="#3-2-分析一个具体的-URL" class="headerlink" title="3.2 分析一个具体的 URL:"></a>3.2 分析一个具体的 URL:</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">https://dict.youdao.com/result?word=1&amp;lang=en</span><br><span class="line">1</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<ul>
+<li><code>https</code>: 协议方案名.</li>
+<li><code>user:pass</code>: 登录信息. 目前一般会省略</li>
+<li><code>dict.youdao.com</code>: 服务器地址. 此处是一个 “域名”, 域名会通过 DNS 系统解析成一个具体的 IP 地址</li>
+<li><code>端口号</code>: 目前一般会省略. http协议默认使用 80 端口. https协议默认使用 443 端口</li>
+<li><code>/result</code> 带层次的文件路径</li>
+<li><code>word=1&amp;lang=en</code>: 查询字符串(query string). 本质是一个键值对结构,键值对之间使用<code>&amp;</code>分割,键和值之间使用<code>=</code>分割</li>
+<li><code>片段标识</code>: 此 URL 中省略了片段标识. 片段标识主要用于页面内跳转.</li>
+</ul>
+</blockquote>
+<h2 id="3-3-URL-中的可省略部分"><a href="#3-3-URL-中的可省略部分" class="headerlink" title="3.3 URL 中的可省略部分"></a>3.3 URL 中的可省略部分</h2><blockquote>
+<ul>
+<li><code>协议名</code>: 可以省略, 省略后 <strong>默认为 http:&#x2F;&#x2F;</strong></li>
+<li><code>ip 地址 / 域名</code>: 在 HTML 中可以省略(比如 img, link, script, a 标签的 src 或者 href 属性). 省略后表示服务器的 ip &#x2F; 域名与当前 HTML 所属的 ip &#x2F; 域名一致.</li>
+<li><code>端口号</code>: 可以省略. 省略后如果<strong>是 http 协议, 端口号自动设为 80; 如果是 https 协议, 端口号自动设为 443.</strong></li>
+<li><code>带层次的文件路径</code>: 可以省略. 省略后相当于 &#x2F; . 有些服务器会在发现 &#x2F; 路径的时候自动问&#x2F;index.html</li>
+<li><code>查询字符串</code>: 可以省略</li>
+<li><code>片段标识</code>: 可以省略</li>
+</ul>
+</blockquote>
+<h2 id="3-4-关于-URL-encode-和-URL-decode"><a href="#3-4-关于-URL-encode-和-URL-decode" class="headerlink" title="3.4 关于 URL encode 和 URL decode"></a>3.4 关于 URL encode 和 URL decode</h2><p>像<code> / ? : = &amp;</code> 等这样的字符, 已经被url当做特殊意义理解了. 因此这些字符不能随意出现</p>
+<p>把特殊字符,转换成转义字符 &#x3D;&gt; <code>URL encode</code><br>把转义字符,还原成原来的字符 &#x3D;&gt; <code>URL decode</code><br><img src="https://img-blog.csdnimg.cn/547ac305785d414c946b5deeda7f7fd2.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAd3d6enp6enp6eno=,size_20,color_FFFFFF,t_70,g_se,x_16" class="lazyload placeholder" data-srcset="https://img-blog.csdnimg.cn/547ac305785d414c946b5deeda7f7fd2.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAd3d6enp6enp6eno=,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="在这里插入图片描述"></p>
+<p><img src="https://img-blog.csdnimg.cn/1c89539889a145cf970e38dff7e4016f.png" class="lazyload placeholder" data-srcset="https://img-blog.csdnimg.cn/1c89539889a145cf970e38dff7e4016f.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="在这里插入图片描述"></p>
+<h1 id="4-HTTP-请求-Request"><a href="#4-HTTP-请求-Request" class="headerlink" title="4. HTTP 请求(Request)"></a>4. HTTP 请求(Request)</h1><h2 id="4-1-HTTP-方法"><a href="#4-1-HTTP-方法" class="headerlink" title="4.1 HTTP 方法"></a>4.1 HTTP 方法</h2><p><img src="https://img-blog.csdnimg.cn/2a24e9f7f5f34c45ae904ff9d3ba31dd.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAd3d6enp6enp6eno=,size_20,color_FFFFFF,t_70,g_se,x_16" class="lazyload placeholder" data-srcset="https://img-blog.csdnimg.cn/2a24e9f7f5f34c45ae904ff9d3ba31dd.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAd3d6enp6enp6eno=,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="在这里插入图片描述"></p>
+<h3 id="4-1-GET-方法"><a href="#4-1-GET-方法" class="headerlink" title="4.1 GET 方法"></a>4.1 GET 方法</h3><h4 id="①-构造-HTTP-GET-请求的情况"><a href="#①-构造-HTTP-GET-请求的情况" class="headerlink" title="① 构造 HTTP GET 请求的情况"></a>① 构造 HTTP GET 请求的情况</h4><ol>
+<li>直接在浏览器中输入 URL</li>
+<li>HTML 中的 link,img,a,script 标签等</li>
+<li>form 表单</li>
+<li>ajax</li>
+<li>使用 java代码&#x2F;其他的库</li>
+<li>通过 linux 下的 wget &#x2F; curl</li>
+<li>通过第三方工具,postman 这类工具</li>
+</ol>
+<h4 id="②-使用-Fiddler-观察-GET请求"><a href="#②-使用-Fiddler-观察-GET请求" class="headerlink" title="② 使用 Fiddler 观察 GET请求"></a>② 使用 Fiddler 观察 GET请求</h4><p>在浏览器中输入<code>sogou.com</code><br><img src="https://img-blog.csdnimg.cn/80236f43be7a47cabea9898badedbf13.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAd3d6enp6enp6eno=,size_20,color_FFFFFF,t_70,g_se,x_16" class="lazyload placeholder" data-srcset="https://img-blog.csdnimg.cn/80236f43be7a47cabea9898badedbf13.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAd3d6enp6enp6eno=,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="在这里插入图片描述"><br><strong>GET 请求的特点</strong></p>
+<ul>
+<li>首行的第一部分为 GET</li>
+<li>URL 的 query string 可以为空, 也可以不为空.</li>
+<li>header 部分有若干个键值对结构.</li>
+<li>body 部分为空.(可以不为空)</li>
+</ul>
+<blockquote>
+<p>关于 GET 请求的 URL 长度问题<br>HTTP 协议由 RFC 2616 标准定义.没有对 URL 的长度有任何的限制</p>
+</blockquote>
+<h3 id="4-2-POST-方法"><a href="#4-2-POST-方法" class="headerlink" title="4.2 POST 方法"></a>4.2 POST 方法</h3><h4 id="①-构造-HTTP-POST-请求的情况"><a href="#①-构造-HTTP-POST-请求的情况" class="headerlink" title="① 构造 HTTP POST 请求的情况"></a>① 构造 HTTP POST 请求的情况</h4><ol>
+<li>form表单</li>
+<li>ajax</li>
+<li>第三方工具</li>
+</ol>
+<h4 id="②-使用-Fiddler-观察-POST-请求"><a href="#②-使用-Fiddler-观察-POST-请求" class="headerlink" title="② 使用 Fiddler 观察 POST 请求"></a>② 使用 Fiddler 观察 POST 请求</h4><p><img src="https://img-blog.csdnimg.cn/00603c5daffa4a72bcdf5705ec8c9678.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAd3d6enp6enp6eno=,size_20,color_FFFFFF,t_70,g_se,x_16" class="lazyload placeholder" data-srcset="https://img-blog.csdnimg.cn/00603c5daffa4a72bcdf5705ec8c9678.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAd3d6enp6enp6eno=,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="在这里插入图片描述"><br><strong>POST 请求的特点</strong></p>
+<ul>
+<li>首行的第一部分为 POST</li>
+<li>URL 的 query string 一般为空 (也可以不为空)</li>
+<li>header 部分有若干个键值对结构.</li>
+<li>body 部分一般不为空. body 内的数据格式通过 header 中的 Content-Type 指定. body 的长度由header 中的 Content-Length 指定.</li>
+</ul>
+<h3 id="4-3-面试题-谈谈-GET-和-POST-的区别"><a href="#4-3-面试题-谈谈-GET-和-POST-的区别" class="headerlink" title="4.3 面试题: 谈谈 GET 和 POST 的区别"></a>4.3 面试题: 谈谈 GET 和 POST 的区别</h3><p>GET 和 POST 之间没有本质的区别</p>
+<ol>
+<li>数据位置: GET 把自定义数据放到 query string, POST 把自定义数据放到 body</li>
+<li>语义区别: GET 一般用于”获取数据”,POST 一般用于提交数据</li>
+<li>幂等性: GET 请求一般会设计成”幂等”. POST 请求一般不要求设计成”幂等”(如果多次请求得到的结果一样, 就视为请求是幂等的)</li>
+<li>可缓存: GET 请求一般会被缓存 POST 请求一般不能被缓存</li>
+</ol>
+<h3 id="4-4-其他相关方法"><a href="#4-4-其他相关方法" class="headerlink" title="4.4 其他相关方法"></a>4.4 其他相关方法</h3><ul>
+<li>PUT 与 POST 相似，只是具有幂等特性，一般用于更新</li>
+<li>DELETE 删除服务器指定资源</li>
+<li>OPTIONS 返回服务器所支持的请求方法</li>
+<li>HEAD 类似于GET，只不过响应体不返回，只返回响应头</li>
+<li>TRACE 回显服务器端收到的请求，测试的时候会用到这个</li>
+<li>CONNECT 预留，暂无使用</li>
+</ul>
+<p>这些方法都可以使用ajax来构造.(也可以通过第三方工具).</p>
+<h2 id="4-2-认识请求报头-header"><a href="#4-2-认识请求报头-header" class="headerlink" title="4.2 认识请求报头 (header)"></a>4.2 认识请求报头 (header)</h2><p>header 的整体的格式也是 “键值对” 结构<br>每个键值对占一行. 键和值之间使用分号分割</p>
+<h3 id="①-Host"><a href="#①-Host" class="headerlink" title="① Host"></a>① Host</h3><blockquote>
+<p>表示服务器主机的地址和端口</p>
+</blockquote>
+<h3 id="②-Content-Length"><a href="#②-Content-Length" class="headerlink" title="② Content-Length"></a>② Content-Length</h3><blockquote>
+<p>表示 body 中的数据长度</p>
+</blockquote>
+<h3 id="③-Content-Type"><a href="#③-Content-Type" class="headerlink" title="③ Content-Type"></a>③ Content-Type</h3><blockquote>
+<p>表示 body 中的数据格式的类型</p>
+</blockquote>
+<h4 id="1-application-x2F-x-www-form-urlencoded"><a href="#1-application-x2F-x-www-form-urlencoded" class="headerlink" title="1) application&#x2F;x-www-form-urlencoded"></a>1) application&#x2F;x-www-form-urlencoded</h4><p>在 form 表单提交的时候会出现的数据格式类型.<br><img src="https://img-blog.csdnimg.cn/72854c0c07884fe4871b17eaa020be30.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAd3d6enp6enp6eno=,size_20,color_FFFFFF,t_70,g_se,x_16" class="lazyload placeholder" data-srcset="https://img-blog.csdnimg.cn/72854c0c07884fe4871b17eaa020be30.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAd3d6enp6enp6eno=,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="在这里插入图片描述"><br>此时的body的格式<br><img src="https://img-blog.csdnimg.cn/d5d2337733d944d69319cd06ef321333.png" class="lazyload placeholder" data-srcset="https://img-blog.csdnimg.cn/d5d2337733d944d69319cd06ef321333.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="在这里插入图片描述"></p>
+<h4 id="2-multipart-x2F-form-data"><a href="#2-multipart-x2F-form-data" class="headerlink" title="2) multipart&#x2F;form-data:"></a>2) multipart&#x2F;form-data:</h4><p>通常用于提交图片&#x2F;文件<br><img src="https://img-blog.csdnimg.cn/1d5fb80d62a74d7fb90910ae133666c2.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAd3d6enp6enp6eno=,size_20,color_FFFFFF,t_70,g_se,x_16" class="lazyload placeholder" data-srcset="https://img-blog.csdnimg.cn/1d5fb80d62a74d7fb90910ae133666c2.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAd3d6enp6enp6eno=,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="在这里插入图片描述"><br>body的格式<br><img src="https://img-blog.csdnimg.cn/96d92544efdb4bfe92132f4ca9847137.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAd3d6enp6enp6eno=,size_20,color_FFFFFF,t_70,g_se,x_16" class="lazyload placeholder" data-srcset="https://img-blog.csdnimg.cn/96d92544efdb4bfe92132f4ca9847137.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAd3d6enp6enp6eno=,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="在这里插入图片描述"></p>
+<h4 id="3-application-x2F-json"><a href="#3-application-x2F-json" class="headerlink" title="3) application&#x2F;json"></a>3) application&#x2F;json</h4><p><img src="https://img-blog.csdnimg.cn/34f17fe38b984329a2b04424aec3a459.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAd3d6enp6enp6eno=,size_20,color_FFFFFF,t_70,g_se,x_16" class="lazyload placeholder" data-srcset="https://img-blog.csdnimg.cn/34f17fe38b984329a2b04424aec3a459.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAd3d6enp6enp6eno=,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="在这里插入图片描述"><br>body格式<br><img src="https://img-blog.csdnimg.cn/0caf7c4617b54f938e0dcd6411bcaf66.png" class="lazyload placeholder" data-srcset="https://img-blog.csdnimg.cn/0caf7c4617b54f938e0dcd6411bcaf66.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="在这里插入图片描述"></p>
+<h3 id="④-User-Agent"><a href="#④-User-Agent" class="headerlink" title="④ User-Agent"></a>④ User-Agent</h3><p>字段User-Agent会将创建请求的浏览器和用户代理名称等信息传达给服务器<br><img src="https://img-blog.csdnimg.cn/54f6eebd0a5142a6bffae14dc51912ea.png" class="lazyload placeholder" data-srcset="https://img-blog.csdnimg.cn/54f6eebd0a5142a6bffae14dc51912ea.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="在这里插入图片描述"><br>这里的 <code>Windows NT 10.0;WOW64</code> 表示操作系统的信息<br><code>AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.198 Safari/537.36</code> 表示浏览器信息</p>
+<h3 id="⑤-Referer"><a href="#⑤-Referer" class="headerlink" title="⑤ Referer"></a>⑤ Referer</h3><p>表示这个页面是从哪个页面跳转过来的.<br><img src="https://img-blog.csdnimg.cn/416102db439d4749a960f03a262edcde.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAd3d6enp6enp6eno=,size_20,color_FFFFFF,t_70,g_se,x_16" class="lazyload placeholder" data-srcset="https://img-blog.csdnimg.cn/416102db439d4749a960f03a262edcde.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAd3d6enp6enp6eno=,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="在这里插入图片描述"><br>如果直接在浏览器中输入URL, 或者直接通过收藏夹访问页面时是没有 Referer 的</p>
+<h3 id="⑥-Cookie"><a href="#⑥-Cookie" class="headerlink" title="⑥ Cookie"></a>⑥ Cookie</h3><p>因为HTTP是无状态的协议,无法根据之前的状态进行本次的请求处理<br>为了保留无状态协议这个特征,于是引入了 Cookie 信息来控制客户端的状态.<br>Cookie会根据从服务器端发送的响应报文内的一个叫做 Set-Cookie 的首部字段信息,通知客户端保存 Cookie.当下次再给该服务器发送请求的时候,客户端会自动在请求报文中加入Cookie值后发送出去.<br>服务器端发现客户端发送来的 Cookie 后,会去检查是哪一个客户端发来的连接请求,对比服务器上的记录,最后得到之前的状态信息.</p>
+<p><img src="https://img-blog.csdnimg.cn/4ef87f7727bc4cd9857f0ef34b692e67.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAd3d6enp6enp6eno=,size_16,color_FFFFFF,t_70,g_se,x_16" class="lazyload placeholder" data-srcset="https://img-blog.csdnimg.cn/4ef87f7727bc4cd9857f0ef34b692e67.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAd3d6enp6enp6eno=,size_16,color_FFFFFF,t_70,g_se,x_16" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="在这里插入图片描述"></p>
+<h2 id="4-3-认识请求正文-body"><a href="#4-3-认识请求正文-body" class="headerlink" title="4.3 认识请求正文 (body)"></a>4.3 认识请求正文 (body)</h2><h3 id="①-application-x2F-x-www-form-urlencoded"><a href="#①-application-x2F-x-www-form-urlencoded" class="headerlink" title="① application&#x2F;x-www-form-urlencoded"></a>① application&#x2F;x-www-form-urlencoded</h3><p><img src="https://img-blog.csdnimg.cn/07574c5ed0194fa19561369c79a3df41.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAd3d6enp6enp6eno=,size_20,color_FFFFFF,t_70,g_se,x_16" class="lazyload placeholder" data-srcset="https://img-blog.csdnimg.cn/07574c5ed0194fa19561369c79a3df41.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAd3d6enp6enp6eno=,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="在这里插入图片描述"></p>
+<h3 id="②-multipart-x2F-form-data"><a href="#②-multipart-x2F-form-data" class="headerlink" title="② multipart&#x2F;form-data"></a>② multipart&#x2F;form-data</h3><p><img src="https://img-blog.csdnimg.cn/a7adadd8991e47029ef0652dbb1efabd.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAd3d6enp6enp6eno=,size_20,color_FFFFFF,t_70,g_se,x_16" class="lazyload placeholder" data-srcset="https://img-blog.csdnimg.cn/a7adadd8991e47029ef0652dbb1efabd.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAd3d6enp6enp6eno=,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="在这里插入图片描述"></p>
+<h3 id="③-application-x2F-json"><a href="#③-application-x2F-json" class="headerlink" title="③ application&#x2F;json"></a>③ application&#x2F;json</h3><p><img src="https://img-blog.csdnimg.cn/6e8267a7e01a4cebb77c8d62731384ee.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAd3d6enp6enp6eno=,size_20,color_FFFFFF,t_70,g_se,x_16" class="lazyload placeholder" data-srcset="https://img-blog.csdnimg.cn/6e8267a7e01a4cebb77c8d62731384ee.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAd3d6enp6enp6eno=,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="在这里插入图片描述"></p>
+<h1 id="5-HTTP-响应-Response"><a href="#5-HTTP-响应-Response" class="headerlink" title="5. HTTP 响应(Response)"></a>5. HTTP 响应(Response)</h1><h2 id="5-1-认识状态码-status-code"><a href="#5-1-认识状态码-status-code" class="headerlink" title="5.1 认识状态码 (status code)"></a>5.1 认识状态码 (status code)</h2><p><img src="https://img-blog.csdnimg.cn/833fc106ce104d718173cf684fb050e1.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAd3d6enp6enp6eno=,size_20,color_FFFFFF,t_70,g_se,x_16" class="lazyload placeholder" data-srcset="https://img-blog.csdnimg.cn/833fc106ce104d718173cf684fb050e1.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAd3d6enp6enp6eno=,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="在这里插入图片描述"></p>
+<h3 id="①-200-OK"><a href="#①-200-OK" class="headerlink" title="① 200 OK"></a>① 200 OK</h3><blockquote>
+<p>这是一个最常见的状态码, 表示访问成功.</p>
+</blockquote>
+<p><img src="https://img-blog.csdnimg.cn/58b232f0b2984a45b38452b61fa51329.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAd3d6enp6enp6eno=,size_18,color_FFFFFF,t_70,g_se,x_16" class="lazyload placeholder" data-srcset="https://img-blog.csdnimg.cn/58b232f0b2984a45b38452b61fa51329.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAd3d6enp6enp6eno=,size_18,color_FFFFFF,t_70,g_se,x_16" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="在这里插入图片描述"></p>
+<h3 id="②-404-Not-Found"><a href="#②-404-Not-Found" class="headerlink" title="② 404 Not Found"></a>② 404 Not Found</h3><blockquote>
+<p>没有找到资源.</p>
+</blockquote>
+<p><img src="https://img-blog.csdnimg.cn/ce8acc6fcd514d5ba058e790949252c5.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAd3d6enp6enp6eno=,size_20,color_FFFFFF,t_70,g_se,x_16" class="lazyload placeholder" data-srcset="https://img-blog.csdnimg.cn/ce8acc6fcd514d5ba058e790949252c5.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAd3d6enp6enp6eno=,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="在这里插入图片描述"></p>
+<h3 id="③-403-Forbidden"><a href="#③-403-Forbidden" class="headerlink" title="③ 403 Forbidden"></a>③ 403 Forbidden</h3><blockquote>
+<p>表示访问被拒绝. 有的页面通常需要用户具有一定的权限才能访问(登陆后才能访问). 如果用户没有登陆直接访问, 就容易见到 403.</p>
+</blockquote>
+<p><img src="https://img-blog.csdnimg.cn/224e512534184e7ab13c772ee0d5a166.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAd3d6enp6enp6eno=,size_20,color_FFFFFF,t_70,g_se,x_16" class="lazyload placeholder" data-srcset="https://img-blog.csdnimg.cn/224e512534184e7ab13c772ee0d5a166.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAd3d6enp6enp6eno=,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="在这里插入图片描述"></p>
+<p><img src="https://img-blog.csdnimg.cn/870a41eb934c45eb87410c5f5707eab6.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAd3d6enp6enp6eno=,size_12,color_FFFFFF,t_70,g_se,x_16" class="lazyload placeholder" data-srcset="https://img-blog.csdnimg.cn/870a41eb934c45eb87410c5f5707eab6.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAd3d6enp6enp6eno=,size_12,color_FFFFFF,t_70,g_se,x_16" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="在这里插入图片描述"></p>
+<h3 id="④-500-Internal-Server-Error"><a href="#④-500-Internal-Server-Error" class="headerlink" title="④ 500 Internal Server Error"></a>④ 500 Internal Server Error</h3><p>服务器出现内部错误. 一般是服务器的代码执行过程中遇到了一些特殊情况(服务器异常崩溃)会产生这个<br>状态码</p>
+<h3 id="⑤-302-Move-temporarily"><a href="#⑤-302-Move-temporarily" class="headerlink" title="⑤ 302 Move temporarily"></a>⑤ 302 Move temporarily</h3><blockquote>
+<p><strong>临时重定向.</strong><br>重定向就和呼叫转移一样,<br>就是换了个手机号,别人呼叫你旧手机号,会自动转到新手机号上</p>
+</blockquote>
+<p><img src="https://img-blog.csdnimg.cn/0827b0da304b447a9c51daab2a529063.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAd3d6enp6enp6eno=,size_20,color_FFFFFF,t_70,g_se,x_16" class="lazyload placeholder" data-srcset="https://img-blog.csdnimg.cn/0827b0da304b447a9c51daab2a529063.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAd3d6enp6enp6eno=,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="在这里插入图片描述"></p>
+<h2 id="5-2-认识响应正文-body"><a href="#5-2-认识响应正文-body" class="headerlink" title="5.2 认识响应正文 (body)"></a>5.2 认识响应正文 (body)</h2><p>正文的具体格式取决于 Content-Type.</p>
+<h3 id="①-text-x2F-html"><a href="#①-text-x2F-html" class="headerlink" title="① text&#x2F;html"></a>① text&#x2F;html</h3><blockquote>
+<p>body中的数据格式是 HTML</p>
+</blockquote>
+<p><img src="https://img-blog.csdnimg.cn/ccca214a772e43d4883e4eb473331e29.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAd3d6enp6enp6eno=,size_20,color_FFFFFF,t_70,g_se,x_16" class="lazyload placeholder" data-srcset="https://img-blog.csdnimg.cn/ccca214a772e43d4883e4eb473331e29.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAd3d6enp6enp6eno=,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="在这里插入图片描述"></p>
+<h3 id="②-text-x2F-css"><a href="#②-text-x2F-css" class="headerlink" title="② text&#x2F;css"></a>② text&#x2F;css</h3><blockquote>
+<p>body中的数据格式是css</p>
+</blockquote>
+<h3 id="③-application-x2F-javascript"><a href="#③-application-x2F-javascript" class="headerlink" title="③ application&#x2F;javascript"></a>③ application&#x2F;javascript</h3><blockquote>
+<p>body中的数据格式是javascript</p>
+</blockquote>
+<h3 id="④-application-x2F-json"><a href="#④-application-x2F-json" class="headerlink" title="④ application&#x2F;json"></a>④ application&#x2F;json</h3><blockquote>
+<p>body中的数据格式是json</p>
+</blockquote>
+<h1 id="6-构造-HTTP-请求"><a href="#6-构造-HTTP-请求" class="headerlink" title="6. 构造 HTTP 请求"></a>6. 构造 HTTP 请求</h1><h2 id="6-1-通过-form-表单构造-HTTP-请求"><a href="#6-1-通过-form-表单构造-HTTP-请求" class="headerlink" title="6.1 通过 form 表单构造 HTTP 请求"></a>6.1 通过 form 表单构造 HTTP 请求</h2><h3 id="①-构造-GET-请求"><a href="#①-构造-GET-请求" class="headerlink" title="① 构造 GET 请求"></a>① 构造 GET 请求</h3><p>代码:</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">    <span class="tag">&lt;<span class="name">form</span> <span class="attr">action</span>=<span class="string">&quot;http://www.baidu.com&quot;</span> <span class="attr">method</span>=<span class="string">&quot;GET&quot;</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">&quot;text&quot;</span> <span class="attr">name</span>=<span class="string">&quot;user&quot;</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">&quot;password&quot;</span> <span class="attr">name</span>=<span class="string">&quot;password&quot;</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">&quot;submit&quot;</span> <span class="attr">value</span>=<span class="string">&quot;提交&quot;</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">form</span>&gt;</span></span><br><span class="line">12345</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://img-blog.csdnimg.cn/002ed74025654cf0abe7ff2e3e279ccf.png" class="lazyload placeholder" data-srcset="https://img-blog.csdnimg.cn/002ed74025654cf0abe7ff2e3e279ccf.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="在这里插入图片描述"><br>当输入 wwww zzzz 提交之后进行抓包<br><img src="https://img-blog.csdnimg.cn/50273f6089884bce9a1ba68905672f26.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAd3d6enp6enp6eno=,size_20,color_FFFFFF,t_70,g_se,x_16" class="lazyload placeholder" data-srcset="https://img-blog.csdnimg.cn/50273f6089884bce9a1ba68905672f26.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAd3d6enp6enp6eno=,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="在这里插入图片描述"></p>
+<h3 id="②-构造-POST-请求"><a href="#②-构造-POST-请求" class="headerlink" title="② 构造 POST 请求"></a>② 构造 POST 请求</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">    <span class="tag">&lt;<span class="name">form</span> <span class="attr">action</span>=<span class="string">&quot;http://www.baidu.com&quot;</span> <span class="attr">method</span>=<span class="string">&quot;POST&quot;</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">&quot;text&quot;</span> <span class="attr">name</span>=<span class="string">&quot;user&quot;</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">&quot;password&quot;</span> <span class="attr">name</span>=<span class="string">&quot;password&quot;</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">&quot;submit&quot;</span> <span class="attr">value</span>=<span class="string">&quot;提交&quot;</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">form</span>&gt;</span></span><br><span class="line">12345</span><br></pre></td></tr></table></figure>
+
+<p>同样的输入 wwww zzzzz 进行抓包<br><img src="https://img-blog.csdnimg.cn/e55b6b8b7bf24f6381cfe640cc2b0253.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAd3d6enp6enp6eno=,size_20,color_FFFFFF,t_70,g_se,x_16" class="lazyload placeholder" data-srcset="https://img-blog.csdnimg.cn/e55b6b8b7bf24f6381cfe640cc2b0253.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAd3d6enp6enp6eno=,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="在这里插入图片描述"></p>
+<h2 id="6-2-通过-ajax-构造-HTTP-请求"><a href="#6-2-通过-ajax-构造-HTTP-请求" class="headerlink" title="6.2 通过 ajax 构造 HTTP 请求"></a>6.2 通过 ajax 构造 HTTP 请求</h2><h3 id="①-发送-GET-请求"><a href="#①-发送-GET-请求" class="headerlink" title="① 发送 GET 请求"></a>① 发送 GET 请求</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">    &lt;script&gt;</span><br><span class="line">        <span class="comment">// 1. 创建 XMLHttpRequest 对象</span></span><br><span class="line">        <span class="keyword">let</span> httpRequest = <span class="keyword">new</span> <span class="title class_">XMLHttpRequest</span>();</span><br><span class="line">        <span class="comment">// 2. 默认异步处理响应. 需要挂在处理响应的回调函数.</span></span><br><span class="line">        httpRequest.<span class="property">onreadystatechange</span> = <span class="keyword">function</span> (<span class="params"></span>) &#123;</span><br><span class="line">            <span class="comment">// readState 表示当前的状态.</span></span><br><span class="line">            <span class="comment">// 0: 请求未初始化</span></span><br><span class="line">            <span class="comment">// 1: 服务器连接已建立</span></span><br><span class="line">            <span class="comment">// 2: 请求已接收</span></span><br><span class="line">            <span class="comment">// 3: 请求处理中</span></span><br><span class="line">            <span class="comment">// 4: 请求已完成，且响应已就绪</span></span><br><span class="line">            <span class="keyword">if</span> (httpRequest.<span class="property">readyState</span> == <span class="number">4</span>) &#123;</span><br><span class="line">                <span class="comment">// status 属性获取 HTTP 响应状态码</span></span><br><span class="line">                <span class="variable language_">console</span>.<span class="title function_">log</span>(httpRequest.<span class="property">status</span>);</span><br><span class="line">                <span class="comment">// responseText 属性获取 HTTP 响应 body</span></span><br><span class="line">                <span class="variable language_">console</span>.<span class="title function_">log</span>(httpRequest.<span class="property">responseText</span>);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 3. 调用 open 方法设置要访问的 url</span></span><br><span class="line">        httpRequest.<span class="title function_">open</span>(<span class="string">&#x27;GET&#x27;</span>, <span class="string">&#x27;http://42.192.83.143:8080/AjaxMockServer/info&#x27;</span>);</span><br><span class="line">        <span class="comment">// 4. 调用 send 方法发送 http 请求</span></span><br><span class="line">        httpRequest.<span class="title function_">send</span>();</span><br><span class="line">    &lt;/script&gt;</span><br><span class="line"><span class="number">1234567891011121314151617181920212223</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="②-发送-POST-请求"><a href="#②-发送-POST-请求" class="headerlink" title="② 发送 POST 请求"></a>② 发送 POST 请求</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">    &lt;script&gt;</span><br><span class="line">        <span class="comment">// 1. 创建 XMLHttpRequest 对象</span></span><br><span class="line">        <span class="keyword">let</span> httpRequest = <span class="keyword">new</span> <span class="title class_">XMLHttpRequest</span>();</span><br><span class="line">        <span class="comment">// 2. 默认异步处理响应. 需要挂在处理响应的回调函数.</span></span><br><span class="line">        httpRequest.<span class="property">onreadystatechange</span> = <span class="keyword">function</span> (<span class="params"></span>) &#123;</span><br><span class="line">            <span class="comment">// readState 表示当前的状态.</span></span><br><span class="line">            <span class="comment">// 0: 请求未初始化</span></span><br><span class="line">            <span class="comment">// 1: 服务器连接已建立</span></span><br><span class="line">            <span class="comment">// 2: 请求已接收</span></span><br><span class="line">            <span class="comment">// 3: 请求处理中</span></span><br><span class="line">            <span class="comment">// 4: 请求已完成，且响应已就绪</span></span><br><span class="line">            <span class="keyword">if</span> (httpRequest.<span class="property">readyState</span> == <span class="number">4</span>) &#123;</span><br><span class="line">                <span class="comment">// status 属性获取 HTTP 响应状态码</span></span><br><span class="line">                <span class="variable language_">console</span>.<span class="title function_">log</span>(httpRequest.<span class="property">status</span>);</span><br><span class="line">                <span class="comment">// responseText 属性获取 HTTP 响应 body</span></span><br><span class="line">                <span class="variable language_">console</span>.<span class="title function_">log</span>(httpRequest.<span class="property">responseText</span>);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 3. 调用 open 方法设置要访问的 url</span></span><br><span class="line">        httpRequest.<span class="title function_">open</span>(<span class="string">&#x27;POST&#x27;</span>, <span class="string">&#x27;http://42.192.83.143:8080/AjaxMockServer/info&#x27;</span>);</span><br><span class="line">        <span class="comment">// 4. 调用 setRequestHeader 设置请求头</span></span><br><span class="line">        httpRequest.<span class="title function_">setRequestHeader</span>(<span class="string">&#x27;Content-Type&#x27;</span>, <span class="string">&#x27;application/x-www-formurlencoded&#x27;</span>);</span><br><span class="line">        <span class="comment">// 5. 调用 send 方法发送 http 请求</span></span><br><span class="line">        httpRequest.<span class="title function_">send</span>(<span class="string">&#x27;name=zhangsan&amp;age=18&#x27;</span>);</span><br><span class="line">    &lt;/script&gt;</span><br><span class="line"><span class="number">12345678910111213141516171819202122232425</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="③-通过第三方库来封装-ajax"><a href="#③-通过第三方库来封装-ajax" class="headerlink" title="③ 通过第三方库来封装 ajax"></a>③ 通过第三方库来封装 ajax</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">    &lt;script src=<span class="string">&quot;https://releases.jquery.com/git/jquery-git.min.js&quot;</span>&gt;&lt;/script&gt;</span><br><span class="line">    <span class="language-xml"><span class="tag">&lt;<span class="name">script</span>&gt;</span><span class="language-javascript"></span></span></span><br><span class="line"><span class="language-javascript"><span class="language-xml">        $.<span class="title function_">ajax</span>(&#123;</span></span></span><br><span class="line"><span class="language-javascript"><span class="language-xml">            <span class="attr">type</span>: <span class="string">&#x27;GET&#x27;</span>,</span></span></span><br><span class="line"><span class="language-javascript"><span class="language-xml">            <span class="attr">url</span>:<span class="string">&#x27;http://www.baidu.com/index.html&#x27;</span>,</span></span></span><br><span class="line"><span class="language-javascript"><span class="language-xml">            <span class="attr">success</span>: <span class="keyword">function</span>(<span class="params">data, status</span>)&#123;</span></span></span><br><span class="line"><span class="language-javascript"><span class="language-xml">                <span class="comment">// data 是响应body status 是状态码描述</span></span></span></span><br><span class="line"><span class="language-javascript"><span class="language-xml">                <span class="variable language_">console</span>.<span class="title function_">log</span>(status);</span></span></span><br><span class="line"><span class="language-javascript"><span class="language-xml">                <span class="variable language_">console</span>.<span class="title function_">log</span>(data);</span></span></span><br><span class="line"><span class="language-javascript"><span class="language-xml">            &#125;</span></span></span><br><span class="line"><span class="language-javascript"><span class="language-xml">        &#125;)</span></span></span><br><span class="line"><span class="language-javascript"><span class="language-xml">    </span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span></span><br><span class="line"><span class="number">123456789101112</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="6-3-通过-Java-socket-构造-HTTP-请求"><a href="#6-3-通过-Java-socket-构造-HTTP-请求" class="headerlink" title="6.3 通过 Java socket 构造 HTTP 请求"></a>6.3 通过 Java socket 构造 HTTP 请求</h2><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.<span class="property">io</span>.<span class="property">FileInputStream</span>;</span><br><span class="line"><span class="keyword">import</span> java.<span class="property">io</span>.<span class="property">IOException</span>;</span><br><span class="line"><span class="keyword">import</span> java.<span class="property">io</span>.<span class="property">InputStream</span>;</span><br><span class="line"><span class="keyword">import</span> java.<span class="property">io</span>.<span class="property">OutputStream</span>;</span><br><span class="line"><span class="keyword">import</span> java.<span class="property">net</span>.<span class="property">Socket</span>;</span><br><span class="line"><span class="keyword">import</span> java.<span class="property">nio</span>.<span class="property">charset</span>.<span class="property">StandardCharsets</span>;</span><br><span class="line"></span><br><span class="line">public <span class="keyword">class</span> <span class="title class_">HttpClient</span> &#123;</span><br><span class="line">    private <span class="title class_">Socket</span> socket;</span><br><span class="line">    private <span class="title class_">String</span> ip;</span><br><span class="line">    private int port;</span><br><span class="line"></span><br><span class="line">    public <span class="title class_">HttpClient</span>(<span class="title class_">String</span> ip,int port) throws <span class="title class_">IOException</span> &#123;</span><br><span class="line">        socket = <span class="keyword">new</span> <span class="title class_">Socket</span>(ip,port);</span><br><span class="line">        <span class="variable language_">this</span>.<span class="property">port</span> = port;</span><br><span class="line">        <span class="variable language_">this</span>.<span class="property">ip</span> = ip;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public <span class="title class_">String</span> <span class="title function_">get</span>(<span class="title class_">String</span> url) throws <span class="title class_">IOException</span> &#123;</span><br><span class="line">        <span class="title class_">StringBuilder</span> request = <span class="keyword">new</span> <span class="title class_">StringBuilder</span>();</span><br><span class="line">        <span class="comment">// 构造首行</span></span><br><span class="line">        request.<span class="title function_">append</span>(<span class="string">&quot;Get &quot;</span> + url + <span class="string">&quot; HTTP/1.1\n&quot;</span>);</span><br><span class="line">        <span class="comment">// 构造 header</span></span><br><span class="line">        request.<span class="title function_">append</span>(<span class="string">&quot;Host: &quot;</span> + ip + <span class="string">&quot;:&quot;</span> + port + <span class="string">&quot;\n&quot;</span>);</span><br><span class="line">        <span class="comment">// 构造空行</span></span><br><span class="line">        request.<span class="title function_">append</span>(<span class="string">&quot;\n&quot;</span>);</span><br><span class="line">        <span class="comment">// GET 不需要 body, 构造完毕</span></span><br><span class="line">        <span class="title class_">OutputStream</span> outputStream = socket.<span class="title function_">getOutputStream</span>();</span><br><span class="line">        <span class="comment">// outputStream 是一个字节流,以字节为单位进行写入,因此需要把 StringBuilfer 转换乘byte[]</span></span><br><span class="line">        outputStream.<span class="title function_">write</span>(request.<span class="title function_">toString</span>().<span class="title function_">getBytes</span>());</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 读取响应</span></span><br><span class="line">        <span class="title class_">InputStream</span> inputStream = socket.<span class="title function_">getInputStream</span>();</span><br><span class="line">        <span class="comment">// 1M 大小的缓冲区,用来存放响应数据</span></span><br><span class="line">        byte[] buffer = <span class="keyword">new</span> byte[<span class="number">1024</span> * <span class="number">1024</span>];</span><br><span class="line">        <span class="comment">// n 表示实际上读到的字节数</span></span><br><span class="line">        int n = inputStream.<span class="title function_">read</span>(buffer);</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">String</span>(buffer,<span class="number">0</span>,n,<span class="string">&quot;utf-8&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public <span class="title class_">String</span> <span class="title function_">post</span>(<span class="title class_">String</span> url,<span class="title class_">String</span> body) throws <span class="title class_">IOException</span> &#123;</span><br><span class="line">        <span class="title class_">StringBuilder</span> request = <span class="keyword">new</span> <span class="title class_">StringBuilder</span>();</span><br><span class="line">        <span class="comment">// 构造首行</span></span><br><span class="line">        request.<span class="title function_">append</span>(<span class="string">&quot;POST&quot;</span> + url + <span class="string">&quot;HTTP/1.1\n&quot;</span>);</span><br><span class="line">        <span class="comment">// 构造header</span></span><br><span class="line">        request.<span class="title function_">append</span>(<span class="string">&quot;Host: &quot;</span> + ip + <span class="string">&quot;:&quot;</span> + port + <span class="string">&quot;\n&quot;</span>);</span><br><span class="line">        request.<span class="title function_">append</span>(<span class="string">&quot;Content-Type: text/plain\n&quot;</span>);</span><br><span class="line">        request.<span class="title function_">append</span>(<span class="string">&quot;Content-Length: &quot;</span> + body.<span class="title function_">getBytes</span>().<span class="property">length</span> + <span class="string">&quot;\n&quot;</span>);</span><br><span class="line">        <span class="comment">// 构造空行</span></span><br><span class="line">        request.<span class="title function_">append</span>(<span class="string">&quot;\n&quot;</span>);</span><br><span class="line">        <span class="comment">// 构造 body</span></span><br><span class="line">        request.<span class="title function_">append</span>(body);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 发送请求</span></span><br><span class="line">        <span class="title class_">OutputStream</span> outputStream = socket.<span class="title function_">getOutputStream</span>();</span><br><span class="line">        outputStream.<span class="title function_">write</span>(request.<span class="title function_">toString</span>().<span class="title function_">getBytes</span>());</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 读取响应</span></span><br><span class="line">        <span class="title class_">InputStream</span> inputStream = socket.<span class="title function_">getInputStream</span>();</span><br><span class="line">        byte[] buffer = <span class="keyword">new</span> byte[<span class="number">1024</span> * <span class="number">1024</span>];</span><br><span class="line">        int n = inputStream.<span class="title function_">read</span>(buffer);</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">String</span>(buffer, <span class="number">0</span>, n, <span class="string">&quot;utf-8&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span>(<span class="title class_">String</span>[] args) throws <span class="title class_">IOException</span> &#123;</span><br><span class="line">        <span class="title class_">HttpClient</span> httpClient = <span class="keyword">new</span> <span class="title class_">HttpClient</span>(<span class="string">&quot;42.192.83.143&quot;</span>,<span class="number">9090</span>);</span><br><span class="line">        <span class="title class_">String</span> resp = httpClient.<span class="title function_">get</span>(<span class="string">&quot;/AjaxMockServer/info&quot;</span>);</span><br><span class="line">        <span class="title class_">System</span>.<span class="property">out</span>.<span class="title function_">println</span>(resp);</span><br><span class="line"><span class="comment">//        String resp = httpClient.post(&quot;/AjaxMockServer/info&quot;,&quot;这是正文&quot;);</span></span><br><span class="line"><span class="comment">//        System.out.println(resp);</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="number">12345678910111213141516171819202122232425262728293031323334353637383940414243444546474849505152535455565758596061626364656667686970717273</span></span><br></pre></td></tr></table></figure>
+
+<h1 id="7-HTTPS"><a href="#7-HTTPS" class="headerlink" title="7. HTTPS"></a>7. HTTPS</h1><h2 id="7-1-什么是-HTTPS"><a href="#7-1-什么是-HTTPS" class="headerlink" title="7.1 什么是 HTTPS"></a>7.1 什么是 HTTPS</h2><p>HTTPS 也是一个应用层协议. 是在 HTTP 协议的基础上引入了一个加密层(SSL&#x2F;TLS).</p>
+<h2 id="7-2-为什么引入-HTTPS"><a href="#7-2-为什么引入-HTTPS" class="headerlink" title="7.2 为什么引入 HTTPS"></a>7.2 为什么引入 HTTPS</h2><p>因为HTTP是明文传输, 本来要传什么,实际上就传了什么,但是一旦这样传输,在传输的过程中, 被第三方截获到了,就可能造成信息泄露.</p>
+<p>于是引入了 HTTPS在HTTP基础上进行了加密,进一步的保护了用户的信息安全.</p>
+<blockquote>
+<p><strong>明文</strong>: 真正要传输的信息<br><strong>密文</strong>: 加密之后的消息</p>
+<p><strong>加密</strong>: 就是把 <strong>明文</strong> (要传输的信息)进行一系列变换, 生成 <strong>密文</strong> .<br><strong>解密</strong>: 就是把 <strong>密文</strong> 再进行一系列变换, 还原成 <strong>明文</strong> .</p>
+<p>在这个加密和解密的过程中, 往往需要一个或者多个中间的数据, 辅助进行这个过程, 这样的数据称为 <strong>密钥</strong></p>
+</blockquote>
+<h2 id="7-3-HTTP-的工作流程"><a href="#7-3-HTTP-的工作流程" class="headerlink" title="7.3 HTTP 的工作流程"></a>7.3 HTTP 的工作流程</h2><h3 id="①-引入对称加密"><a href="#①-引入对称加密" class="headerlink" title="① 引入对称加密"></a>① 引入对称加密</h3><p>对称加密其实就是通过<strong>同一个 “密钥”</strong> , 把明文加密成密文, 并且也能把密文解密成明文.</p>
+<blockquote>
+<p>例子: 现有 明文: 1111 密钥: 6666 加密解密过程通过: 按位异或<br>A 将<strong>明文: 1111</strong> 通过 <strong>密钥: 6666</strong> 加密成 <strong>密文:2</strong> 发送给B<br>B 通过<strong>密钥: 6666</strong> 对<strong>密文: 7773</strong> 进行解密 得到 <strong>明文: 1111</strong></p>
+</blockquote>
+<p>此时同时也引入了一个问题,当客户端把密钥进行明文传输的时候,也可能被别人截获,再次发送密文,别人就可以通过密钥获取到明文,那此时的加密就没什么作用了<br><img src="https://img-blog.csdnimg.cn/be4bb37135bd482cafbfdb05d883a4a8.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAd3d6enp6enp6eno=,size_20,color_FFFFFF,t_70,g_se,x_16" class="lazyload placeholder" data-srcset="https://img-blog.csdnimg.cn/be4bb37135bd482cafbfdb05d883a4a8.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAd3d6enp6enp6eno=,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="在这里插入图片描述"></p>
+<p>解决办法: 对密钥进行加密传输.</p>
+<h3 id="②-引入非对称加密"><a href="#②-引入非对称加密" class="headerlink" title="② 引入非对称加密"></a>② 引入非对称加密</h3><p>非对称加密要<strong>用到两个密钥</strong>, 一个叫做 “公钥”, 一个叫做 “私钥”<br>公钥和私钥是配对的. 最大的缺点就是运算速度非常慢，比对称加密要慢很多</p>
+<p>此时也有一个问题,可能在获取的公钥就是假的.<br><img src="https://img-blog.csdnimg.cn/a576f99d7a654401ac2758669f6bb9b5.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAd3d6enp6enp6eno=,size_20,color_FFFFFF,t_70,g_se,x_16" class="lazyload placeholder" data-srcset="https://img-blog.csdnimg.cn/a576f99d7a654401ac2758669f6bb9b5.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAd3d6enp6enp6eno=,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="在这里插入图片描述"><br>解决办法: 引入证书.</p>
+<h3 id="③-引入证书"><a href="#③-引入证书" class="headerlink" title="③ 引入证书"></a>③ 引入证书</h3><p>在客户端和服务器刚一建立连接的时候, 服务器给客户端返回一个 证书.<br>这个证书包含了刚才的公钥, 也包含了网站的身份信息<br><img src="https://img-blog.csdnimg.cn/ba756d93e0174926a924aaa4482e2a0b.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAd3d6enp6enp6eno=,size_20,color_FFFFFF,t_70,g_se,x_16" class="lazyload placeholder" data-srcset="https://img-blog.csdnimg.cn/ba756d93e0174926a924aaa4482e2a0b.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAd3d6enp6enp6eno=,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="在这里插入图片描述"></p>
+<blockquote>
+<p>当客户端获取到这个证书之后, 会对证书进行校验(防止证书是伪造的).</p>
+<ul>
+<li>判定证书的有效期是否过期</li>
+<li>判定证书的发布机构是否受信任(操作系统中已内置的受信任的证书发布机构).</li>
+<li>验证证书是否被篡改: 从系统中拿到该证书发布机构的公钥, 对签名解密, 得到一个 hash 值(称为数据摘要), 设为 hash1. 然后计算整个证书的 hash 值, 设为 hash2. 对比 hash1 和 hash2 是否相等.如果相等, 则说明证书是没有被篡改过的.</li>
+</ul>
+</blockquote>
+<h2 id="7-4-HTTPS-传输过程"><a href="#7-4-HTTPS-传输过程" class="headerlink" title="7.4 HTTPS 传输过程"></a>7.4 HTTPS 传输过程</h2><ol>
+<li>客户端先从服务器那边获取到证书.证书里包含了公钥.</li>
+<li>客户端对整数进行校检.</li>
+<li>客户端生成一个对称密钥,使用公钥对对称密钥进行加密,发送给服务器</li>
+<li>服务器得到这个请求后,使用私钥解密,得到对称密钥.</li>
+<li>客户端发出后续的请求,后续的请求都是使用这个对称密钥加密的.收到的数据也都是使用这个对称密钥解密的.</li>
+</ol>
+
+      </div>
+      <div class="post-tags-categories">
+        
+        <div class="tags">
+          
+            <a href="/tags/HTTP/" class="">
+              HTTP
+            </a>
+          
+            <a href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" class="">
+              计算机网络
+            </a>
+          
+            <a href="/tags/HTTPS/" class="">
+              HTTPS
+            </a>
+          
+        </div>
+        
+      </div>
+      
+        <div class="copyright">
+  <ul class="post-copyright">
+    <li class="post-copyright-author">
+    <strong>author:  </strong>John Doe</a>
+    </li>
+    <li class="post-copyright-link">
+    <strong>link:  </strong>
+    <a href="/2022/05/27/计算机网络-HTTP协议-和-HTTPS/" target="_blank" title="计算机网络 --- HTTP协议 和 HTTPS">http://example.com/2022/05/27/计算机网络-HTTP协议-和-HTTPS/</a>
+    </li>
+    <li class="post-copyright-license">
+      <strong>Copyright notice:   </strong>
+      All articles on this website, unless otherwise stated, adopt <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">CC BY-NC-ND 4.0</a>
+      reprint policy. If reproduced, please indicate source!
+    </li>
+  </ul>
+<div>
+      
+    </article>
+    <!-- 上一篇文章和下一篇文章 -->
+    
+      <!-- 文章详情页的上一页和下一页 -->
+<div class="post-nav">
+
+
+
+  
+  <div class="post-nav-prev post-nav-item">
+    <div class="post-nav-img" style="background-size: cover; 
+      background-position: center center;">
+      <img class="lazyload lazyload placeholder" src="/medias/5.jpg" class="lazyload placeholder" data-srcset="/medias/5.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="">
+    </div>
+    <a href="/2022/05/27/MyBatis%E7%AC%94%E8%AE%B0-2022/" class="post-nav-link">
+      <div class="title">
+        <i class="fas fa-angle-left"></i> Prev:
+        <div class="title-text">MyBatis-2022</div>
+      </div>
+      
+      <!-- <div class="content">
+        一、MyBatis笔记-20221、MyBatis历史MyBatis最初是Apache的一个开源项目iBatis, 20
+      </div> -->
+    </a>
+  </div>
+
+
+
+  
+  <div class="post-nav-next post-nav-item">
+    <div class="post-nav-img" style="background-size: cover; 
+      background-position: center center;">
+      <img class="lazyload lazyload placeholder" src="/medias/2.jpg" class="lazyload placeholder" data-srcset="/medias/2.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" src="" alt="">
+    </div>
+    <a href="/2022/05/27/hm-JSP/" class="post-nav-link">
+      <div class="title">
+        Next: <i class="fas fa-angle-right"></i>
+        <div class="title-text">hm-JSP</div>
+      </div>
+      <!-- <div class="content">
+        JSP今日目标：
+
+
+理解 JSP 及 JSP 原理
+能在 JSP中使用 EL表达式 和 JSTL标签
+理解 MVC模式
+      </div> -->
+    </a>
+  </div>
+
+</div>
+
+    
+    
+
+    <!-- 打赏 -->
+    
+      <div id="appDonate" class="post-donate">
+  <div id="donate_board" class="donate_bar center" ref="donate">
+    <a id="btn_donate" class="btn_donate" href="javascript:;" title="打赏" @click="showDialogDrawer()"></a>
+  </div>
+  <transition name="fade">
+    <div 
+      class="donate-box-mask"
+      v-cloak 
+      v-show="visible"
+      @click="cancelDialogDrawer()"
+    >
+    </div>
+  </transition>
+  <transition name="bounce">
+    <div class="donate-box" v-cloak v-show="visible">
+      <div class="donate-box_close">
+        <i class="fas fa-times" aria-hidden="true" @click="cancelDialogDrawer" pointer></i>
+      </div>
+      <div class="donate-box_title">
+        <h4>
+          你的赏识是我前进的动力
+        </h4>
+      </div>
+      <div class="donate-box_tab">
+        <div class="Alipay" pointer :class="{'active': tabActive === 'Alipay'}" @click="changeTabActive('Alipay')">
+          支付宝
+        </div>
+        <div class="WeChatpay" pointer :class="{'active': tabActive === 'WeChatpay'}" @click="changeTabActive('WeChatpay')">
+          微信
+        </div>
+      </div>
+      <div class="donate-box_img">
+        <div class="AlipayImg" v-show="tabActive === 'Alipay'">
+          <img src="/medias/1.jpg" class="lazyload placeholder" data-srcset="/medias/1.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="支付宝打赏" />
+        </div> 
+        <div class="WeChatpayImg" v-show="tabActive === 'WeChatpay'">
+          <img src="/medias/2.jpg" class="lazyload placeholder" data-srcset="/medias/2.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="微信打赏" />
+        </div>
+      </div>
+    </div>
+  </transition>
+</div>
+
+<script>
+  var body = document.body || document.documentElement || window;
+  var vm = new Vue({
+    el: '#appDonate',
+    data: {
+      visible: false,
+      tabActive: 'Alipay',
+      top: 0,
+    },
+    computed: {
+    },
+    mounted() {
+    },
+    methods: {
+      showDialogDrawer() {
+        this.visible = true;
+        // 防止页面滚动，只能让弹框滚动
+        // function getScroll() {
+        //   return {
+        //     left: window.pageXOffset || document.documentElement.scrollLeft || document.body.scrollLeft || 0,
+        //     top: window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0
+        //   };
+        // }
+        this.top = $(document).scrollTop() // or getScroll().top
+        // console.log('aa', $('.main-content'));
+        body.style.cssText = 'overflow: hidden;';
+      },
+      cancelDialogDrawer() {
+        this.visible = false;
+        body.removeAttribute('style');
+        $(document).scrollTop(this.top)
+      },
+      changeTabActive(name) {
+        this.tabActive = name;
+      }
+    },
+    created() {}
+  })
+</script>
+    
+
+    <!-- 分享 -->
+    
+      <!-- https://github.com/overtrue/share.js -->
+<!-- 文章详情页的分享 -->
+<div class="social-share" data-sites="twitter,facebook,google,qq,qzone,wechat,weibo,douban,linkedin" data-wechat-qrcode-helper="<p>微信扫一扫即可分享！</p>"></div>
+
+<script src="/js/shareJs/social-share.min.js"></script>
+</script>
+
+<style>
+  .social-share {
+    margin: 20px 0;
+  }
+</style>
+
+
+    
+    
+    <!-- 评论 -->
+    <!-- 评论 -->
+
+  <div id="myComment">
+    
+      <div id="gitment-container"></div>
+
+    
+  </div>
+
+<!-- comment script in themes\hexo-theme-bamboo\layout\_partial\scripts\index.ejs -->
+
+
+  </div>
+
+  <!-- 目录 -->
+  <!-- 文章详情页右侧目录 -->
+
+  <div class="toc-aside">
+    <div class="toc-main">
+      <div class="toc-aside-title">
+        <i class="fas fa-list-ul" aria-hidden="true"></i><span>catalog</span>
+        
+          <div class="toc-open-close">catalog</div>
+        
+      </div>
+      <div class="toc-content">
+        <div class="toc"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 手机端目录按钮 -->
+  <div id="toc-mobile-btn">
+    <i class="fas fa-list-ul" aria-hidden="true"></i>
+  </div>
+
+
+<script>
+  function closeToc(init) {
+    $(".toc-aside").css({'width': 0, 'padding': 0, 'transition': init ?  'noe' : 'width 0.3s' });
+    $(".toc-content").css({'width': 0});
+    $(".toc-aside-title span, .toc-aside-title i").css({'display': 'none'});
+    $(".main-content").css({'width': '75%', 'margin-left': 'auto', 'margin-right': 'auto',});
+  };
+  function openToc() {
+    $(".main-content").css({'width': '65%', 'margin-right': '10px', 'margin-left': 'calc(35% - 350px)'});
+    $(".toc-aside").css({'width': '300px', 'padding': '0 10px', 'transition': 'width 0.3s'});
+    $(".toc-content").css({'width': '300px'});
+    $(".toc-aside-title span, .toc-aside-title i").css({'display': 'inline-block'});
+  }
+  function openBtnClickFn () {
+    let openOrCloseBtn = $('.toc-aside .toc-aside-title .toc-open-close');
+    let open = eval('' || 'true');
+    openOrCloseBtn.click(function() {
+      if (open) {
+        closeToc();
+        open = false;
+      } else {
+        openToc();
+        open = true;
+      }
+    });
+  };
+  openBtnClickFn();
+  initCloseTocWidth(true);
+
+  function initCloseTocWidth(init) {
+    if (window.innerWidth >= 992) {
+      let isClose = false;
+      isClose && closeToc(init)
+    }
+  }
+
+  document.addEventListener('pjax:complete', function () {
+    $(".toc-aside").css({'transition': 'no'});
+  })
+  document.addEventListener('pjax:complete', function () {
+    openBtnClickFn();
+  })
+  
+</script>
+
+  <!-- 图片放大 Wrap images with fancybox support -->
+  <script src="/js/wrapImage.js"></script>
+</div>
+
+<!-- 文章详情页背景图 -->
+<div id="appBgSwiper" style="position: fixed;left: 0;top: 0;width: 100%;height: 100%;z-index: -2;"
+	:style="{'background-color': bgColor ? bgColor : 'transparent'}">
+	<transition-group tag="ul" :name="names">
+		<li v-for='(image,index) in img' :key='index' v-show="index === mark" class="bg-swiper-box">
+			<img :src="image" class="bg-swiper-img no-lazy">
+		</li>
+	</transition-group>
+</div>
+<script>
+	var vm = new Vue({
+		el: '#appBgSwiper',
+		data: {
+			names: '' || 'fade' || 'fade', // translate-fade fade
+			mark: 0,
+			img: [],
+			bgColor: '',
+			time: null
+		},
+		methods: {   //添加方法
+			change(i, m) {
+				if (i > m) {
+					// this.names = 'fade';
+				} else if (i < m) {
+					// this.names = 'fade';
+				} else {
+					return;
+				}
+				this.mark = i;
+			},
+			prev() {
+				// this.names = 'fade';
+				this.mark--;
+				if (this.mark === -1) {
+					this.mark = 3;
+					return
+				}
+			},
+			next() {
+				// this.names = 'fade';
+				this.mark++;
+				if (this.mark === this.img.length) {
+					this.mark = 0;
+					return
+				}
+			},
+			autoPlay() {
+				// this.names = 'fade';
+				this.mark++;
+				if (this.mark === this.img.length) {
+					this.mark = 0;
+					return
+				}
+			},
+			play() {
+				let bgImgDelay = '' || '180000'
+				let delay = parseInt(bgImgDelay) || 180000;
+				this.time = setInterval(this.autoPlay, delay);
+			},
+			enter() {
+				clearInterval(this.time);
+			},
+			leave() {
+				this.play();
+			}
+		},
+		created() {
+			this.play()
+		},
+		beforeDestroy() {
+			clearInterval(this.time);
+		},
+		mounted() {
+			let prop = '' || '';
+			let isImg = prop.includes('.bmp') || prop.includes('.jpg') || prop.includes('.png') || prop.includes('.tif') || prop.includes('.gif') || prop.includes('.pcx') || prop.includes('.tga') || prop.includes('.exif') || prop.includes('.fpx') || prop.includes('.psd') || prop.includes('.cdr') || prop.includes('.pcd') || prop.includes('.dxf') || prop.includes('.ufo') || prop.includes('.eps') || prop.includes('.ai') || prop.includes('.raw') || prop.includes('.WMF') || prop.includes('.webp') || prop.includes('.jpeg') || prop.includes('http://') || prop.includes('https://')
+			if (isImg) {
+				let img = prop.split(',');
+				let configRoot = '/'
+				let arrImg = [];
+				img.forEach(el => {
+					var Expression = /http(s)?:\/\/([\w-]+\.)+[\w-]+(\/[\w- .\/?%&=]*)?/;
+					var objExp = new RegExp(Expression);
+
+					if (objExp.test(el)) {
+						// http or https
+						arrImg.push(el);
+					} else {
+						// 非http or https开头
+						// 本地文件
+						let firstStr = el.charAt(0);
+						if (firstStr == '/') {
+							el = el.substr(1); // 删除第一个字符 '/',因为 configRoot最后一个字符为 /
+						}
+						el = configRoot + el;
+						arrImg.push(el);
+					}
+				})
+				this.img = arrImg;
+			} else {
+				this.bgColor = prop;
+			}
+		}
+	})
+</script>
+
+<style>
+	.bg-swiper-box {
+		position: absolute;
+		display: block;
+		width: 100%;
+		height: 100%;
+	}
+
+	.bg-swiper-img {
+		object-fit: cover;
+		width: 100%;
+		height: 100%;
+	}
+</style>
+
+
+
+
+  <script>
+  function loadMermaid() {
+    if (document.getElementsByClassName('mermaid').length) {
+      if (window.mermaidJsLoad) mermaid.init()
+      else {
+        loadScript('https://unpkg.com/mermaid/dist/mermaid.min.js').then(() => {
+          window.mermaidJsLoad = true
+          mermaid.initialize({
+            theme: 'default',
+          })
+          if ('true') {
+            mermaid.init();
+          }
+        })
+      }
+    }
+  };
+  document.addEventListener("DOMContentLoaded", function () {
+    loadMermaid();
+  })
+
+  document.addEventListener('pjax:complete', function () {
+    loadMermaid();
+  })
+  
+</script>
+
+
+      </main>
+    </div>
+
+    <!-- 页脚 -->
+    
+  
+  
+    <!-- 底部鱼儿跳动效果，依赖于jquery-->
+<div id="j-fish-skip" style=" position: relative;height: 153px;width: auto;"></div>
+<script>
+  var RENDERER = {
+    POINT_INTERVAL: 5,
+    FISH_COUNT: 3,
+    MAX_INTERVAL_COUNT: 50,
+    INIT_HEIGHT_RATE: .5,
+    THRESHOLD: 50,
+    FISH_COLOR: '',
+    init: function () {
+      this.setFishColor(); this.setParameters(), this.reconstructMethods(), this.setup(), this.bindEvent(), this.render()
+    },
+    setFishColor: function () {
+      let isDark = JSON.parse(localStorage.getItem('dark')) || JSON.parse('false');
+      if (isDark) {
+        this.FISH_COLOR = '#222'; // 暗黑色，有时间把这整成一个变量
+      } else {
+        this.FISH_COLOR = '' || '#42b983';
+      }
+    },
+    setParameters: function () {
+      this.$window = $(window), this.$container = $("#j-fish-skip"), this.$canvas = $("<canvas />"), this.context = this.$canvas.appendTo(this.$container).get(0).getContext("2d"), this.points = [], this.fishes = [], this.watchIds = []
+    },
+    createSurfacePoints: function () {
+      var t = Math.round(this.width / this.POINT_INTERVAL);
+      this.pointInterval = this.width / (t - 1), this.points.push(new SURFACE_POINT(this, 0));
+      for (var i = 1; i < t; i++) {
+        var e = new SURFACE_POINT(this, i * this.pointInterval),
+          h = this.points[i - 1];
+        e.setPreviousPoint(h), h.setNextPoint(e), this.points.push(e)
+      }
+    },
+    reconstructMethods: function () {
+      this.watchWindowSize = this.watchWindowSize.bind(this), this.jdugeToStopResize = this.jdugeToStopResize.bind(this), this.startEpicenter = this.startEpicenter.bind(this), this.moveEpicenter = this.moveEpicenter.bind(this), this.reverseVertical = this.reverseVertical.bind(this), this.render = this.render.bind(this)
+    },
+    setup: function () {
+      this.points.length = 0, this.fishes.length = 0, this.watchIds.length = 0, this.intervalCount = this.MAX_INTERVAL_COUNT, this.width = this.$container.width(), this.height = this.$container.height(), this.fishCount = this.FISH_COUNT * this.width / 500 * this.height / 500, this.$canvas.attr({
+        width: this.width,
+        height: this.height
+      }), this.reverse = !1, this.fishes.push(new FISH(this)), this.createSurfacePoints()
+    },
+    watchWindowSize: function () {
+      this.clearTimer(), this.tmpWidth = this.$window.width(), this.tmpHeight = this.$window.height(), this.watchIds.push(setTimeout(this.jdugeToStopResize, this.WATCH_INTERVAL))
+    },
+    clearTimer: function () {
+      for (; this.watchIds.length > 0;) clearTimeout(this.watchIds.pop())
+    },
+    jdugeToStopResize: function () {
+      var t = this.$window.width(),
+        i = this.$window.height(),
+        e = t == this.tmpWidth && i == this.tmpHeight;
+      this.tmpWidth = t, this.tmpHeight = i, e && this.setup()
+    },
+    bindEvent: function () {
+      this.$window.on("resize", this.watchWindowSize), this.$container.on("mouseenter", this.startEpicenter), this.$container.on("mousemove", this.moveEpicenter)
+    },
+    getAxis: function (t) {
+      var i = this.$container.offset();
+      return {
+        x: t.clientX - i.left + this.$window.scrollLeft(),
+        y: t.clientY - i.top + this.$window.scrollTop()
+      }
+    },
+    startEpicenter: function (t) {
+      this.axis = this.getAxis(t)
+    },
+    moveEpicenter: function (t) {
+      var i = this.getAxis(t);
+      this.axis || (this.axis = i), this.generateEpicenter(i.x, i.y, i.y - this.axis.y), this.axis = i
+    },
+    generateEpicenter: function (t, i, e) {
+      if (!(i < this.height / 2 - this.THRESHOLD || i > this.height / 2 + this.THRESHOLD)) {
+        var h = Math.round(t / this.pointInterval);
+        h < 0 || h >= this.points.length || this.points[h].interfere(i, e)
+      }
+    },
+    reverseVertical: function () {
+      this.reverse = !this.reverse;
+      for (var t = 0, i = this.fishes.length; t < i; t++) this.fishes[t].reverseVertical()
+    },
+    controlStatus: function () {
+      for (var t = 0, i = this.points.length; t < i; t++) this.points[t].updateSelf();
+      for (t = 0, i = this.points.length; t < i; t++) this.points[t].updateNeighbors();
+      this.fishes.length < this.fishCount && 0 == --this.intervalCount && (this.intervalCount = this.MAX_INTERVAL_COUNT, this.fishes.push(new FISH(this)))
+    },
+    render: function () {
+      requestAnimationFrame(this.render), this.controlStatus(), this.context.clearRect(0, 0, this.width, this.height), this.context.fillStyle = this.FISH_COLOR;
+      for (var t = 0, i = this.fishes.length; t < i; t++) this.fishes[t].render(this.context);
+      this.context.save(), this.context.globalCompositeOperation = "xor", this.context.beginPath(), this.context.moveTo(0, this.reverse ? 0 : this.height);
+      for (t = 0, i = this.points.length; t < i; t++) this.points[t].render(this.context);
+      this.context.lineTo(this.width, this.reverse ? 0 : this.height), this.context.closePath(), this.context.fill(), this.context.restore()
+    }
+  },
+  SURFACE_POINT = function (t, i) {
+    this.renderer = t, this.x = i, this.init()
+  };
+  SURFACE_POINT.prototype = {
+    SPRING_CONSTANT: .03,
+    SPRING_FRICTION: .9,
+    WAVE_SPREAD: .3,
+    ACCELARATION_RATE: .01,
+    init: function () {
+      this.initHeight = this.renderer.height * this.renderer.INIT_HEIGHT_RATE, this.height = this.initHeight, this.fy = 0, this.force = {
+        previous: 0,
+        next: 0
+      }
+    },
+    setPreviousPoint: function (t) {
+      this.previous = t
+    },
+    setNextPoint: function (t) {
+      this.next = t
+    },
+    interfere: function (t, i) {
+      this.fy = this.renderer.height * this.ACCELARATION_RATE * (this.renderer.height - this.height - t >= 0 ? -1 : 1) * Math.abs(i)
+    },
+    updateSelf: function () {
+      this.fy += this.SPRING_CONSTANT * (this.initHeight - this.height), this.fy *= this.SPRING_FRICTION, this.height += this.fy
+    },
+    updateNeighbors: function () {
+      this.previous && (this.force.previous = this.WAVE_SPREAD * (this.height - this.previous.height)), this.next && (this.force.next = this.WAVE_SPREAD * (this.height - this.next.height))
+    },
+    render: function (t) {
+      this.previous && (this.previous.height += this.force.previous, this.previous.fy += this.force.previous), this.next && (this.next.height += this.force.next, this.next.fy += this.force.next), t.lineTo(this.x, this.renderer.height - this.height)
+    }
+  };
+  var FISH = function (t) {
+    this.renderer = t, this.init()
+  };
+  FISH.prototype = {
+    GRAVITY: .4,
+    init: function () {
+      this.direction = Math.random() < .5, this.x = this.direction ? this.renderer.width + this.renderer.THRESHOLD : -this.renderer.THRESHOLD, this.previousY = this.y, this.vx = this.getRandomValue(4, 10) * (this.direction ? -1 : 1), this.renderer.reverse ? (this.y = this.getRandomValue(1 * this.renderer.height / 10, 4 * this.renderer.height / 10), this.vy = this.getRandomValue(2, 5), this.ay = this.getRandomValue(.05, .2)) : (this.y = this.getRandomValue(6 * this.renderer.height / 10, 9 * this.renderer.height / 10), this.vy = this.getRandomValue(-5, -2), this.ay = this.getRandomValue(-.2, -.05)), this.isOut = !1, this.theta = 0, this.phi = 0
+    },
+    getRandomValue: function (t, i) {
+      return t + (i - t) * Math.random()
+    },
+    reverseVertical: function () {
+      this.isOut = !this.isOut, this.ay *= -1
+    },
+    controlStatus: function (t) {
+      this.previousY = this.y, this.x += this.vx, this.y += this.vy, this.vy += this.ay, this.renderer.reverse ? this.y > this.renderer.height * this.renderer.INIT_HEIGHT_RATE ? (this.vy -= this.GRAVITY, this.isOut = !0) : (this.isOut && (this.ay = this.getRandomValue(.05, .2)), this.isOut = !1) : this.y < this.renderer.height * this.renderer.INIT_HEIGHT_RATE ? (this.vy += this.GRAVITY, this.isOut = !0) : (this.isOut && (this.ay = this.getRandomValue(-.2, -.05)), this.isOut = !1), this.isOut || (this.theta += Math.PI / 20, this.theta %= 2 * Math.PI, this.phi += Math.PI / 30, this.phi %= 2 * Math.PI), this.renderer.generateEpicenter(this.x + (this.direction ? -1 : 1) * this.renderer.THRESHOLD, this.y, this.y - this.previousY), (this.vx > 0 && this.x > this.renderer.width + this.renderer.THRESHOLD || this.vx < 0 && this.x < -this.renderer.THRESHOLD) && this.init()
+    },
+    render: function (t) {
+      t.save(), t.translate(this.x, this.y), t.rotate(Math.PI + Math.atan2(this.vy, this.vx)), t.scale(1, this.direction ? 1 : -1), t.beginPath(), t.moveTo(-30, 0), t.bezierCurveTo(-20, 15, 15, 10, 40, 0), t.bezierCurveTo(15, -10, -20, -15, -30, 0), t.fill(), t.save(), t.translate(40, 0), t.scale(.9 + .2 * Math.sin(this.theta), 1), t.beginPath(), t.moveTo(0, 0), t.quadraticCurveTo(5, 10, 20, 8), t.quadraticCurveTo(12, 5, 10, 0), t.quadraticCurveTo(12, -5, 20, -8), t.quadraticCurveTo(5, -10, 0, 0), t.fill(), t.restore(), t.save(), t.translate(-3, 0), t.rotate((Math.PI / 3 + Math.PI / 10 * Math.sin(this.phi)) * (this.renderer.reverse ? -1 : 1)), t.beginPath(), this.renderer.reverse ? (t.moveTo(5, 0), t.bezierCurveTo(10, 10, 10, 30, 0, 40), t.bezierCurveTo(-12, 25, -8, 10, 0, 0)) : (t.moveTo(-5, 0), t.bezierCurveTo(-10, -10, -10, -30, 0, -40), t.bezierCurveTo(12, -25, 8, -10, 0, 0)), t.closePath(), t.fill(), t.restore(), t.restore(), this.controlStatus(t)
+    }
+  }, $(function () {
+    RENDERER.init()
+    $('.dark').click(function () {
+      setTimeout(() => {
+        RENDERER.setFishColor();
+        RENDERER.context.fill();
+      });
+    })
+  });
+</script>
+  
+  <div class="footer bg-color">
+    <div class="footer-main">
+      
+        
+          <div class="link">
+            
+          </div>
+        
+      
+        
+          <div class="footer-copyright">
+            <p>Copyright © 2019 - 2020 <a target="_blank" rel="noopener" href="https://github.com/yuang01">yuang01</a> | Powered by <a target="_blank" rel="noopener" href="https://hexo.io/zh-cn/docs/">Hexo</a> | Theme <a target="_blank" rel="noopener" href="https://github.com/yuang01/theme">Bamboo</a> </p>
+
+          </div>
+        
+      
+        
+          
+            <!-- 不蒜子统计 -->
+            <!-- 不蒜子统计 -->
+<span id="busuanzi_container_site_pv">
+      <i class="fas fa-eye" aria-hidden="true"></i>Total visits：<span id="busuanzi_value_site_pv"></span> times
+</span>
+<span class="post-meta-divider">|</span>
+<span id="busuanzi_container_site_uv" style='display:none'>
+      <i class="fas fa-users" aria-hidden="true"></i>Number of visitors：<span id="busuanzi_value_site_uv"></span> people
+</span>
+
+          
+        
+      
+        
+          <div class="footer-custom">
+            
+          </div>
+        
+      
+    </div>
+  </div>
+
+
+
+    <!-- 渲染暗黑按钮 -->
+    
+      <div class="dark">
+  <div class="dark-content">
+    <i class="fas fa-moon" aria-hidden="true"></i>
+    <!-- <span>关灯</span> -->
+  </div>
+  
+</div>
+
+<script>
+  $(function() {
+    let isDark = JSON.parse(localStorage.getItem('dark'))  || JSON.parse('false');
+    if (isDark) {
+      $(".dark-content").replaceWith(
+          `
+          <div class='dark-content'>
+            <i class="fas fa-lightbulb" aria-hidden="true"></i>
+          </div>
+          `
+        );
+    }
+    $('.dark').click(function() {
+      if ($(document.body).is('.darkModel')) {
+        $(document.body).removeClass('darkModel');
+        localStorage.setItem('dark', false);
+        $(".dark-content").replaceWith(
+          `
+          <div class='dark-content'>
+            <i class="fas fa-moon" aria-hidden="true"></i>
+          </div>
+          `
+        );
+      } else {
+        $(document.body).addClass('darkModel');
+        localStorage.setItem('dark', true);
+        $(".dark-content").replaceWith(
+          `
+          <div class='dark-content'>
+            <i class="fas fa-lightbulb" aria-hidden="true"></i>
+          </div>
+          `
+        );
+      }
+    })
+  })
+</script>
+    
+    <!-- 渲染回到顶部按钮 -->
+    
+      <div class="goTop top-btn-color" pointer>
+  <i class="fas fa-arrow-up" aria-hidden="true"></i>
+</div>
+<script src="/js/goTop.js"></script>
+
+    
+    <!-- 渲染左下角音乐播放器 -->
+    
+      <link rel="stylesheet" href="/js/aplayer/APlayer@1.10.1.min.css">
+<style>
+.aplayer .aplayer-lrc p {
+  
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 16px !important;
+}
+
+.aplayer .aplayer-lrc p.aplayer-lrc-current {
+  
+  font-size: 15px;
+  color: #42b983;
+}
+
+
+.aplayer.aplayer-fixed.aplayer-narrow .aplayer-body {
+  left: -66px !important;
+}
+
+.aplayer.aplayer-fixed.aplayer-narrow .aplayer-body:hover {
+  left: 0px !important;
+}
+
+
+</style>
+<meting-js  
+  class=""
+  server="tencent"
+  type="playlist"
+  id="8062553743"
+  fixed='true'
+  autoplay='false'
+  theme='#42b983'
+  loop='all'
+  order='random'
+  preload='auto'
+  volume='0.7'
+  list-folded='true'
+>
+</meting-js>
+
+<!-- <style>
+  #aplayer {
+    position: fixed;
+    left: 0;
+    bottom: 300px;
+  }
+</style> -->
+<script src="https://unpkg.com/aplayer@1.10.1/dist/APlayer.min.js"></script>
+<script src="https://unpkg.com/meting@2/dist/Meting.min.js"></script>
+    
+
+    <!-- 图片放大 -->
+    
+      <script src="/js/fancybox/jquery.fancybox.min.js"></script>
+    
+
+    <!-- 百度解析 -->
+    <!-- Baidu Analytics -->
+
+    <!-- Baidu Push -->
+
+<script>
+    (function () {
+        var bp = document.createElement('script');
+        var curProtocol = window.location.protocol.split(':')[0];
+        if (curProtocol === 'https') {
+            bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+        } else {
+            bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+        }
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(bp, s);
+    })();
+</script>
+
+    
+    <!-- 背景彩带 -->
+    
+      <script type="text/javascript" size="100" alpha='0.4' zIndex="-1" src="/js/ribbon.min.js"></script>
+    
+
+    <script src="/js/utils/index.js"></script>
+    <script src="/js/app.js"></script>
+    
+    <!-- 文章目录所需js -->
+<link href="/js/tocbot/tocbot.css" rel="stylesheet">
+<script src="/js/tocbot/tocbot.min.js"></script>
+
+<script>
+  var headerEl = 'h2, h3, h4',  //headers 
+    content = '.post-detail',//文章容器
+    idArr = {};  //标题数组以确定是否增加索引id
+  //add #id
+  var option = {
+    // Where to render the table of contents.
+    tocSelector: '.toc',
+    // Where to grab the headings to build the table of contents.
+    contentSelector: content,
+    // Which headings to grab inside of the contentSelector element.
+    headingSelector: headerEl,
+    scrollSmooth: true,
+    scrollSmoothOffset: -80,
+    headingsOffset: -($(window).height() * 0.4 - 45),
+    positionFixedSelector: '.toc-main',
+    positionFixedClass: 'is-position-fixed',
+    fixedSidebarOffset: 'auto',
+    activeLinkClass: 'is-active-link',
+    // onClick: function (e) {},
+  }
+  if ($('.toc').length > 0) {
+
+    $(content).children(headerEl).each(function () {
+      //去除空格以及多余标点
+      var headerId = $(this).text().replace(/[\s|\~|`|\!|\@|\#|\$|\%|\^|\&|\*|\(|\)|\_|\+|\=|\||\|\[|\]|\{|\}|\;|\:|\"|\'|\,|\<|\.|\>|\/|\?|\：|\，|\。]/g, '');
+
+      headerId = headerId.toLowerCase();
+      if (idArr[headerId]) {
+        //id已经存在
+        $(this).attr('id', headerId + '-' + idArr[headerId]);
+        idArr[headerId]++;
+      }
+      else {
+        //id未存在
+        idArr[headerId] = 1;
+        $(this).attr('id', headerId);
+      }
+    });
+
+    document.addEventListener("DOMContentLoaded", function () {
+      tocbot.init(option);
+      mobileTocClick();
+    });
+
+  }
+
+  window.tocScrollFn = function () {
+    return bamboo.throttle(function () {
+      findHeadPosition();
+    }, 100)()
+  }
+  window.addEventListener('scroll', tocScrollFn);
+
+  const findHeadPosition = function (top) {
+    if ($('.toc-list').length <= 0) {
+      return false;
+    }
+    setTimeout(() => {  // or DOMContentLoaded 
+      autoScrollToc();
+    }, 0);
+  }
+
+  const autoScrollToc = function () {
+    const $activeItem = document.querySelector('.is-active-link');
+    const $cardToc = document.querySelector('.toc-content');
+    const activePosition = $activeItem.getBoundingClientRect().top
+    const sidebarScrollTop = $cardToc.scrollTop
+    if (activePosition > (document.documentElement.clientHeight - 100)) {
+      $cardToc.scrollTop = sidebarScrollTop + 150
+    }
+    if (activePosition < 100) {
+      $cardToc.scrollTop = sidebarScrollTop - 150
+    }
+  }
+
+  document.addEventListener('pjax:send', function () {
+    if ($('.toc').length) {
+      tocbot.destroy();
+    }
+  });
+
+  document.addEventListener('pjax:complete', function () {
+    if ($('.toc').length) {
+      tocbot.init(option);
+      mobileTocClick();
+    }
+  });
+  
+  // 手机端toc按钮点击出现目录
+  const mobileTocClick = function () {
+    const $cardTocLayout = document.getElementsByClassName('toc-aside')[0];
+    const $cardToc = $cardTocLayout.getElementsByClassName('toc-content')[0];
+    let right = '45px';
+    if (window.innerWidth >= 551 && window.innerWidth <= 992) {
+      right = '100px'
+    }
+    const mobileToc = {
+      open: () => {
+        $cardTocLayout.style.cssText = 'animation: toc-open .3s; opacity: 1; right: ' + right
+      },
+
+      close: () => {
+        $cardTocLayout.style.animation = 'toc-close .2s'
+        setTimeout(() => {
+          $cardTocLayout.style.cssText = "opacity:''; animation: ''; right: ''"
+        }, 100)
+      }
+    }
+    document.getElementById('toc-mobile-btn').addEventListener('click', () => {
+      if (window.getComputedStyle($cardTocLayout).getPropertyValue('opacity') === '0') mobileToc.open()
+      else mobileToc.close()
+    })
+
+    $cardToc.addEventListener('click', (e) => {
+      if (window.innerWidth < 992) { // 小于992px的时候
+        mobileToc.close()
+      }
+    })
+  }
+</script>
+
+<style>
+  .is-position-fixed {
+    position: sticky !important;
+    top: 74px;
+  }
+
+  .toc-main ul {
+    counter-reset: show-list;
+  }
+
+  .toc-main ul li::before {
+    content: counter(item)".";
+    display: block;
+    position: absolute;
+    left: 12px;
+    top: 0;
+  }
+</style> 
+
+<!-- 设置导航背景 -->
+<script>
+  let setHeaderClass = () => {
+    const headerMenuTransparent = true;
+    if (!headerMenuTransparent) { return; }
+    const nav = $('#navHeader');
+    const navTop = nav.outerHeight();
+    const winTop = $(window).scrollTop();
+    if(winTop > navTop) {
+      nav.addClass('header-bg-color');
+    }
+    else {
+      nav.removeClass('header-bg-color');
+    }
+  };
+
+  let scrollCollect = () => {
+    return bamboo.throttle(function (e) {
+      setHeaderClass();
+    }, 200)()
+  }
+
+  let initHeaderBg = () => {
+    setHeaderClass();
+  }
+
+  setHeaderClass();
+  window.addEventListener('scroll', scrollCollect);
+
+  document.addEventListener('pjax:send', function () {
+    window.removeEventListener('scroll', scrollCollect)
+  })
+  document.addEventListener('pjax:complete', function () {
+    window.addEventListener('scroll', scrollCollect);
+    setHeaderClass();
+  })
+</script> 
+
+<!-- 渲染issues标签里的内容 -->
+<script>
+  function loadIssuesJS() {
+    if ($(".post-detail").find(".issues-api").length == 0) {
+      return;
+    } 
+    loadScript('/js/issues/index.js');
+  };
+  $(function () {
+    loadIssuesJS();
+  });
+  document.addEventListener('pjax:complete', function () {
+    if (typeof IssuesAPI == "undefined") {
+      loadIssuesJS();
+    }
+  })
+</script>
+
+<!-- 输入框打字特效 -->
+<!-- 输入框打字特效 -->
+
+  <script src="/js/activate-power-mode.js"></script>
+  <script>
+    POWERMODE.colorful = true;  // 打开随机颜色特效
+    POWERMODE.shake = false;    // 关闭输入框抖动
+    document.body.addEventListener('input', POWERMODE);//监听打字事件
+  </script>
+
+
+<!-- markdown代码一键复制功能 -->
+
+  <link rel="stylesheet" href="https://unpkg.com/v-plugs-ayu/lib/ayu.css">
+  <script src="https://unpkg.com/v-plugs-ayu/lib/ayu.umd.min.js"></script>
+  <script src="/js/clipboard/clipboard.min.js"></script>
+  <div id="appCopy">
+  </div>
+  <script data-pjax>
+    var vm = new Vue({
+      el: '#appCopy',
+      data: {
+      },
+      computed: {
+      },
+      mounted() {
+        const that = this;
+        var copy = 'copy';
+        /* code */
+        var initCopyCode = function () {
+          var copyHtml = '';
+          copyHtml += '<button class="btn-copy" data-clipboard-snippet="" style="position:absolute;top:0;right:0;z-index:1;">';
+          copyHtml += '<i class="fas fa-copy"></i><span>' + copy + '</span>';
+          copyHtml += '</button>';
+          $(".post-detail pre").not('.gutter pre').wrap("<div class='codeBox' style='position:relative;width:100%;'></div>")
+          $(".post-detail pre").not('.gutter pre').before(copyHtml);
+          new ClipboardJS('.btn-copy', {
+            target: function (trigger) {
+              return trigger.nextElementSibling;
+            }
+          });
+        }
+        initCopyCode();
+        $('.btn-copy').unbind('click').bind('click', function () {
+          doSomething();
+        })
+        $(document).unbind('keypress').bind('keypress', function (e) {
+          if (e.ctrlKey && e.keyCode == 67) {
+            doSomething();
+          }
+        })
+
+        function doSomething() {
+          that.$notify({
+            title: "成功",
+            content: "代码已复制，请遵守相关授权协议。",
+            type: 'success'
+          })
+        }
+      },
+      methods: {
+      },
+      created() { }
+    })
+  </script>
+  
+
+<!-- 图片懒加载 -->
+<script defer src="https://unpkg.com/vanilla-lazyload@17.1.0/dist/lazyload.min.js"></script>
+<script>
+  // https://www.npmjs.com/package/vanilla-lazyload
+  // Set the options globally
+  // to make LazyLoad self-initialize
+  window.lazyLoadOptions = {
+    elements_selector: ".lazyload",
+    threshold: 0
+  };
+  // Listen to the initialization event
+  // and get the instance of LazyLoad
+  window.addEventListener(
+    "LazyLoad::Initialized",
+    function (event) {
+      window.lazyLoadInstance = event.detail.instance;
+    },
+    false
+  );
+  document.addEventListener('DOMContentLoaded', function () {
+    lazyLoadInstance.update();
+  });
+  document.addEventListener('pjax:complete', function () {
+    lazyLoadInstance.update();
+  });
+</script>
+
+
+<!-- 卡片滚动动画 -->
+   
+
+<!-- 评论所需js -->
+
+  
+    <script type="text/javascript">
+  var utteranceCommon = {};
+
+  function check_utterance() {
+    let isDark = JSON.parse(localStorage.getItem('dark')) || JSON.parse('false');
+    if (isDark) {
+      utteranceCommon.Theme = 'github-dark';
+    } else {
+      utteranceCommon.Theme = 'github-light';
+    }
+
+    return document.getElementById("gitment-container");
+  }
+  comment_el = '#gitment-container';
+  load_utterance = function () {
+    if ($(comment_el).length) {
+      // 匿名函数，防止污染全局变量
+      const HEAD = check_utterance();
+
+      var utterances = document.createElement('script');
+      utterances.type = 'text/javascript';
+      utterances.async = true;
+      utterances.setAttribute('issue-term', 'pathname')
+      utterances.setAttribute('theme', utteranceCommon.Theme)
+      utterances.setAttribute('repo', '')
+      utterances.crossorigin = 'anonymous';
+      utterances.src = 'https://utteranc.es/client.js';
+      // content 是要插入评论的地方
+      document.getElementById('gitment-container').appendChild(utterances);
+
+    }
+  }
+
+  function dark_utterance() {
+    const HEAD = check_utterance();
+    if (!HEAD) return;
+    const message = {
+      type: 'set-theme',
+      theme: utteranceCommon.Theme
+    };
+    const utteranceIframe = document.querySelector('iframe');
+    utteranceIframe.contentWindow.postMessage(message, 'https://utteranc.es');
+  }
+
+  $(document).ready(load_utterance);
+  document.addEventListener('pjax:complete', function () {
+    load_utterance();
+  });
+
+  $('.dark').click(function () {
+    setTimeout(() => {
+      dark_utterance();
+    });
+  })
+
+</script>
+
+<style>
+  .utterances {
+    max-width: inherit !important;
+  }
+</style>
+  
+
+
+<!-- 鼠标点击特效 -->
+<!-- 爱心点击 -->
+
+  
+    <canvas class="fireworks" style="position: fixed;left: 0;top: 0;z-index: 999; pointer-events: none;" ></canvas>
+    <script src="//cdn.bootcss.com/animejs/2.2.0/anime.min.js"></script>
+    <script src="/js/cursor/explosion.min.js"></script>
+  
+
+
+
+
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" data-pjax></script>
+
+
+    <!-- pjax -->
+    
+
+<!-- pjax -->
+
+
+  <script src="/js/pjax@0.2.8/index.js"></script>
+  
+    <!-- 样式位于：source/css/_third-party/pjaxanimate.styl -->
+
+<div class="pjax-animate">
+  
+    <div class="loading-circle"><div id="loader-circle"></div></div>
+    <script>
+      window.ShowLoading = function() {
+        $(".loading-circle").css("display", "block");
+      };
+      window.HideLoading = function() {
+        $(".loading-circle").css("display", "none");
+      }
+    </script>
+  
+	<script>
+    document.addEventListener('pjax:complete', function () {
+      window.HideLoading();
+    })
+    document.addEventListener('pjax:send', function () {
+      window.ShowLoading();
+    })
+    document.addEventListener('pjax:error', function () {
+      window.HideLoading();
+    })
+	</script>
+</div>
+
+  
+
+  <script>
+    var pjax = new Pjax({
+      elements: 'a[href]:not([href^="#"]):not([href="javascript:void(0)"]):not([no-pjax])',   // 拦截正常带链接的 a 标签
+      selectors: ["#pjax-container","title"],                                   // 根据实际需要确认重载区域
+      cacheBust: false,   // url 地址追加时间戳，用以避免浏览器缓存
+      timeout: 5000
+    });
+
+    document.addEventListener('pjax:send', function (e) {
+
+      try {
+        var currentUrl = window.location.pathname;
+        var targetUrl = e.triggerElement.href;
+        var banUrl = [""];
+        if (banUrl[0] != "") {
+          banUrl.forEach(item => {
+            if(currentUrl.indexOf(item) != -1 || targetUrl.indexOf(item) != -1) {
+              window.location.href = targetUrl;
+            }
+          });
+        }
+      } catch (error) {}
+
+      $(window).unbind('resize');
+      $(window).unbind('scroll');
+      $(document).unbind('scroll');
+      $(document).unbind('click');
+      $('body').unbind('click');
+
+    })
+    
+    document.addEventListener('pjax:complete', function () {
+      $('script[data-pjax], .pjax-reload script').each(function () {
+        $(this).parent().append($(this).remove());
+      });
+    });
+
+    document.addEventListener('pjax:error', function (e) {
+      window.location.href = e.triggerElement.href;
+    })
+    
+    // 刷新不从顶部开始
+    document.addEventListener("DOMContentLoaded", function () {
+      history.scrollRestoration = 'auto';
+    })
+  </script>
+
+
+
+  </body>
+</html>

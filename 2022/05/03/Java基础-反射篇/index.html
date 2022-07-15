@@ -1,0 +1,1952 @@
+<!DOCTYPE html>
+<html>
+  <!-- meta/link... -->
+  
+
+
+
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport">
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+
+
+  <title>Java基础 反射篇 | Hexo</title>
+
+  <link rel="icon" type="image/x-icon, image/vnd.microsoft.icon" href="/favicon.ico">
+  <link rel="stylesheet" href="https://at.alicdn.com/t/font_1911880_c1nvbyezg17.css">
+  <link href="https://unpkg.com/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet">
+  <link href="/js/swiper/swiper@5.4.1.min.css" rel="stylesheet">
+  
+  
+  
+  
+<link rel="stylesheet" href="/css/animate.min.css">
+
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+  
+    
+<link rel="stylesheet" href="/js/fancybox/jquery.fancybox.min.css">
+
+  
+  
+    
+<link rel="stylesheet" href="/js/shareJs/share.min.css">
+
+  
+  <style>
+        @media (max-width: 992px) {
+            #waifu {
+                display: none;
+            }
+        }
+    </style>
+    <script src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
+    <link href="//cdn.bootcss.com/pace/1.0.2/themes/pink/pace-theme-flash.css" rel="stylesheet">
+
+    
+
+    <!-- import link -->
+    
+        
+            
+        
+            
+        
+    
+    <!-- import script -->
+    
+        
+            
+        
+            
+        
+    
+
+<meta name="generator" content="Hexo 6.2.0"></head>
+
+  
+  <!-- 依赖于jquery和vue -->
+  
+    
+<script src="https://unpkg.com/jquery@3.5.1/dist/jquery.min.js"></script>
+
+  
+
+  
+    
+<script src="https://unpkg.com/vue@2.6.11/dist/vue.min.js"></script>
+
+  
+  
+  <body>
+    <!-- 预加载动画 -->
+    <!-- 页面预加载动画 -->
+
+<div id='loader'>
+  <link rel="stylesheet" href="/js/loaded/index.css" >
+  <div class="loading-left-bg"></div>
+  <div class="loading-right-bg"></div>
+  <div class="spinner-box">
+    <div class="configure-border-1">
+      <div class="configure-core"></div>
+    </div>
+    <div class="configure-border-2">
+      <div class="configure-core"></div>
+    </div>
+    <div class="loading-word">loading...</div>
+  </div>
+</div>
+
+<script>
+  var endLoading = function () {
+    document.body.style.overflow = 'auto';
+    document.getElementById('loader').classList.add("loading");
+  }
+  window.addEventListener('DOMContentLoaded',endLoading);
+  
+</script>
+
+    
+    <!-- 判断是否为暗黑风格 -->
+    <!-- 判断是否为黑夜模式 -->
+<script>
+  let isDark = JSON.parse(localStorage.getItem('dark')) || JSON.parse('false');
+
+  if (isDark) {
+    $(document.body).addClass('darkModel');
+  }
+</script>
+
+    <!-- 需要在上面加载的js -->
+    <script>
+  function loadScript(src, cb) {
+    return new Promise(resolve => {
+      setTimeout(function () {
+        var HEAD = document.getElementsByTagName("head")[0] || document.documentElement;
+        var script = document.createElement("script");
+        script.setAttribute("type", "text/javascript");
+        if (cb) {
+          if (JSON.stringify(cb)) {
+            for (let p in cb) {
+              if (p == "onload") {
+                script[p] = () => {
+                  cb[p]()
+                  resolve()
+                }
+              } else {
+                script[p] = cb[p]
+                script.onload = resolve
+              }
+            }
+          } else {
+            script.onload = () => {
+              cb()
+              resolve()
+            };
+          }
+        } else {
+          script.onload = resolve
+        }
+        script.setAttribute("src", src);
+        HEAD.appendChild(script);
+      });
+    });
+  }
+
+  //https://github.com/filamentgroup/loadCSS
+  var loadCSS = function (href, before, media, attributes) {
+    return new Promise(resolve => {
+      setTimeout(function () {
+        var link = document.createElement('link');
+        link.rel = "stylesheet";
+        link.href = src;
+        link.onload = resolve;
+        document.getElementsByTagName("head")[0].appendChild(link);
+      });
+    });
+  };
+
+</script> 
+
+<!-- 轮播图所需要的js -->
+<script src="/js/swiper/swiper.min.js"></script>
+<script src="/js/swiper/vue-awesome-swiper.js"></script>
+<script src="/js/swiper/swiper.animate1.0.3.min.js"></script>
+
+<script type="text/javascript">
+  Vue.use(window.VueAwesomeSwiper)
+</script>
+
+
+  <script src="/js/vue-typed-js/index.js"></script>
+
+
+<!-- 首页的公告滚动插件的js需要重新加载 -->
+<script src="/js/vue-seamless-scroll/index.js"></script>
+
+<!-- 打字机效果js -->
+<script src="https://unpkg.com/typed.js@2.0.11"></script>
+
+
+    <div id="safearea">
+      <main class="main" id="pjax-container">
+        <!-- 头部导航 -->
+        
+<header class="header   " 
+  id="navHeader"
+  style="position: fixed;
+  left: 0; top: 0; z-index: 10;width: 100%;"
+>
+  <div class="header-content">
+    <div class="bars">
+      <div id="appDrawer" class="sidebar-image">
+  <div class="drawer-box-icon">
+    <i class="fas fa-bars" aria-hidden="true" @click="showDialogDrawer"></i>
+  </div>
+  
+  <transition name="fade">
+    <div class="drawer-box_mask" v-cloak style="display: none;" v-show="visible" @click.self="cancelDialogDrawer">
+    </div>
+  </transition>
+  <div class="drawer-box" :class="{'active': visible}">
+    <div class="drawer-box-head bg-color">
+      <img class="drawer-box-head_logo lazyload placeholder" src="/medias/logo.png" class="lazyload placeholder" data-srcset="/medias/logo.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="logo">
+      <h3 class="drawer-box-head_title">Hexo</h3>
+      <h5 class="drawer-box-head_desc"></h5>
+    </div>
+    
+    <div class="drawer-box-content">
+      <ul class="drawer-box-content_menu">
+        
+        
+          <li class="drawer-box-content_item">
+            <a target="_blank" rel="noopener" href="https://github.com/yuang01/hexo-theme-bamboo">
+              <i class="fas fa-github" aria-hidden="true"></i>
+              <span>Github</span>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</div>
+
+<script>
+  var body = document.body || document.documentElement || window;
+  var vm = new Vue({
+    el: '#appDrawer',
+    data: {
+      visible: false,
+      top: 0,
+      openArr: [],
+    },
+    computed: {
+    },
+    mounted() {
+    },
+    methods: {
+      isOpen(index) {
+        if (this.openArr.includes(index)) {
+          return true;
+        } else {
+          return false;
+        }
+      },
+      openOrCloseMenu(curIndex) {
+        const index = this.openArr.indexOf(curIndex);
+        if (index !== -1) {
+          this.openArr.splice(index, 1);
+        } else {
+          this.openArr.push(curIndex);
+        }
+      },
+      showDialogDrawer() {
+        this.visible = true;
+        // 防止页面滚动，只能让弹框滚动
+        this.top = $(document).scrollTop()
+        body.style.cssText = 'width: 100%; height: 100%;overflow: hidden;';
+      },
+      cancelDialogDrawer() {
+        this.visible = false;
+        body.removeAttribute('style');
+        $(document).scrollTop(this.top)
+      }
+    },
+    created() {}
+  })
+</script>
+
+    </div>
+    <div class="blog-title" id="author-avatar">
+      
+        <div class="avatar">
+          <img src="/medias/logo.png" class="lazyload placeholder" data-srcset="/medias/logo.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="logo">
+        </div>
+      
+      <a href="/" class="logo">Hexo</a>
+    </div>
+    <nav class="navbar">
+      <ul class="menu">
+        
+      </ul>
+      
+      
+        <div id="appSearch">
+  <div class="search"  @click="showDialog()"><i class="fas fa-search" aria-hidden="true"></i></div>
+  <transition name="fade">
+    <div class="message-box_wrapper" style="display: none;" v-cloak v-show="dialogVisible" @click.self="cancelDialogVisible()">
+      <div class="message-box animated bounceInDown">
+        <h2>
+          <span>
+            <i class="fas fa-search" aria-hidden="true"></i>
+            <span class="title">Search</span>
+          </span>
+          <i class="fas fa-times close" pointer style="float:right;" aria-hidden="true" @click.self="cancelDialogVisible()"></i>
+        </h2>
+        <form class="site-search-form">
+          <input type="text"
+            placeholder="Please enter keywords"
+            id="local-search-input" 
+            @click="getSearchFile()"
+            class="st-search-input"
+            v-model="searchInput"
+          />
+        </form>
+        <div class="result-wrapper">
+          <div id="local-search-result" class="local-search-result-cls"></div>
+        </div>
+      </div>
+    </div>
+  </transition>
+</div>
+<script src="/js/local_search.js"></script>
+<script>
+  var body = document.body || document.documentElement || window;
+  var vm = new Vue({
+    el: '#appSearch',
+    data: {
+      dialogVisible: false,
+      searchInput: '',
+      top: 0,
+    },
+    computed: {
+    },
+    mounted() {
+      window.addEventListener('pjax:complete', () => {
+        this.cancelDialogVisible();
+      })
+    },
+    methods: {
+      showDialog() {
+        this.dialogVisible = true;
+        // 防止页面滚动，只能让弹框滚动
+        this.top = $(document).scrollTop()
+        body.style.cssText = 'overflow: hidden;';
+      },
+      getSearchFile() {
+        if (!this.searchInput) {
+          getSearchFile("/search.xml");
+        }
+      },
+      cancelDialogVisible() {
+        this.dialogVisible = false;
+        body.removeAttribute('style');
+        $(document).scrollTop(this.top)
+      },
+    },
+    created() {}
+  })
+</script>
+<!-- 解决刷新页面闪烁问题，可以在元素上添加display: none, 或者用vue.extend方法，详情：https://blog.csdn.net/qq_31393401/article/details/81017912 -->
+<!-- 下面是搜索基本写法 -->
+<!-- <script type="text/javascript" id="local.search.active">
+  var inputArea = document.querySelector("#local-search-input");
+  inputArea.onclick   = function(){ getSearchFile(); this.onclick = null }
+  inputArea.onkeydown = function(){ if(event.keyCode == 13) return false }
+</script> -->
+
+      
+
+    </nav>
+  </div>
+  
+    <a target="_blank" rel="noopener" href="https://github.com/yuang01/hexo-theme-bamboo" class="github-corner color-primary" aria-label="View source on GitHub"><svg width="60" height="60" viewBox="0 0 250 250" style="fill:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+  
+  
+</header>
+        <!-- 内容区域 -->
+        
+ <!-- prismjs 代码高亮 -->
+ 
+
+
+<div class="bg-dark-floor" style="position: fixed;left: 0;top: 0;width: 100%;height: 100%;z-index: -1;"></div>
+
+
+  <!-- 文章详情页顶部图片和标题 -->
+
+
+
+
+<div class="post-detail-header" id="thumbnail_canvas" style="background-repeat: no-repeat; background-size: cover; 
+  background-position: center center;position: relative;background-image:url('/medias/1.jpg')">
+  <div class="post-detail-header-mask"></div>
+  <canvas id="header_canvas"style="position:absolute;bottom:0;pointer-events:none;"></canvas>
+  
+  <div class="post-detail-header_info-box">
+    <div class="title-box">
+      <span class="title">
+        Java基础 反射篇
+      </span>
+    </div>
+    
+    
+      
+        <span class="post-detail-header_date">
+          <i class="fas fa-calendar"></i> Published in：2022-05-03 |
+        </span>
+      
+
+      
+        <span class="post-detail-header_categories">
+          <i class="iconfont iconbookmark1"></i> category：
+          
+            <a href="/categories/Java-Basic/" class="post-detail-header_category">
+              Java-Basic
+            </a>
+          
+        </span>
+      
+
+      
+    
+  </div>
+  
+  
+    <script src="/js/bubble/bubble.js"></script>
+  
+</div>
+
+
+
+
+
+<div class="post-detail-content row justify-position" 
+  style="padding-top: 0px;">
+  <div class="main-content">
+    <article class="post post-detail">
+      <div class="post-content">
+        <h1 id="Java基础-反射篇"><a href="#Java基础-反射篇" class="headerlink" title="Java基础 反射篇"></a>Java基础 反射篇</h1><p>反射是一个非常重要的知识点，在学习<code>Spring 框架</code>时，Bean的初始化用到了反射，在<code>破坏单例模式</code>时也用到了反射，在<code>获取标注的注解</code>时也会用到反射······</p>
+<p>当然了，反射在日常开发中，我们没碰到过多少，至少我没怎么用过。但面试是<strong>造火箭</strong>现场，可爱的面试官们又怎会轻易地放过我们呢？反射是开源框架中的一个重要设计理念，在源码分析中少不了它的身影，所以，今天我会尽量用浅显易懂的语言，让你去理解下面这几点：</p>
+<p>（1）反射的思想以及它的作用​ :point_right: <strong>概念篇</strong></p>
+<p>（2）反射的基本使用及应用场景 :point_right: <strong>应用篇</strong></p>
+<p>（3）使用反射能给我们编码时带来的优势以及存在的缺陷 :point_right: <strong>分析篇</strong></p>
+<h2 id="反射的思想及作用"><a href="#反射的思想及作用" class="headerlink" title="反射的思想及作用"></a>反射的思想及作用</h2><p>有反必有正，就像世间的阴和阳，计算机的0和1一样。天道有轮回，苍天…<del>（净会在这瞎bibi）</del></p>
+<p>在学习反射之前，先来了解<strong>正射</strong>是什么。我们平常用的最多的 <code>new</code> 方式实例化对象的方式就是一种正射的体现。假如我需要实例化一个<code>HashMap</code>，代码就会是这样子。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Map&lt;Integer, Integer&gt; map = <span class="keyword">new</span> <span class="title class_">HashMap</span>&lt;&gt;();</span><br><span class="line">map.put(<span class="number">1</span>, <span class="number">1</span>);</span><br></pre></td></tr></table></figure>
+
+<p>某一天发现，该段程序不适合用 HashMap 存储键值对，更倾向于用<code>LinkedHashMap</code>存储。重新编写代码后变成下面这个样子。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Map&lt;Integer, Integer&gt; map = <span class="keyword">new</span> <span class="title class_">LinkedHashMap</span>&lt;&gt;();</span><br><span class="line">map.put(<span class="number">1</span>, <span class="number">1</span>);</span><br></pre></td></tr></table></figure>
+
+<p>假如又有一天，发现数据还是适合用 HashMap来存储，难道又要重新修改源码吗？</p>
+<blockquote>
+<p>发现问题了吗？我们每次改变一种需求，都要去重新<strong>修改源码</strong>，然后对代码进行编译，打包，再到 JVM 上重启项目。这么些步骤下来，效率非常低。</p>
+</blockquote>
+<p><img src="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/1596529718718-903156ef-2e22-428e-9449-ab26ced3b5f8.png" class="lazyload placeholder" data-srcset="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/1596529718718-903156ef-2e22-428e-9449-ab26ced3b5f8.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image.png"></p>
+<p>对于这种<strong>需求频繁变更但变更不大</strong>的场景，频繁地更改源码肯定是一种不允许的操作，我们可以使用一个<code>开关</code>，判断什么时候使用哪一种数据结构。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> Map&lt;Integer, Integer&gt; <span class="title function_">getMap</span><span class="params">(String param)</span> &#123;</span><br><span class="line">    Map&lt;Integer, Integer&gt; map = <span class="literal">null</span>;</span><br><span class="line">    <span class="keyword">if</span> (param.equals(<span class="string">&quot;HashMap&quot;</span>)) &#123;</span><br><span class="line">        map = <span class="keyword">new</span> <span class="title class_">HashMap</span>&lt;&gt;();</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (param.equals(<span class="string">&quot;LinkedHashMap&quot;</span>)) &#123;</span><br><span class="line">        map = <span class="keyword">new</span> <span class="title class_">LinkedHashMap</span>&lt;&gt;();</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (param.equals(<span class="string">&quot;WeakHashMap&quot;</span>)) &#123;</span><br><span class="line">        map = <span class="keyword">new</span> <span class="title class_">WeakHashMap</span>&lt;&gt;();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> map;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>通过传入参数<code>param</code>决定使用哪一种数据结构，可以在项目运行时，通过<strong>动态传入参数</strong>决定使用哪一个数据结构。</p>
+<p>如果某一天还想用<code>TreeMap</code>，还是避免不了修改源码，重新编译执行的弊端。这个时候，<strong>反射</strong>就派上用场了。</p>
+<p>在代码运行之前，我们<strong>不确定</strong>将来会使用哪一种数据结构，只有在程序<strong>运行时才决定</strong>使用哪一个数据类，而<code>反射</code>可以在<strong>程序运行过程</strong>中动态<strong>获取类信息</strong>和<strong>调用类方法</strong>。通过反射构造类实例，代码会演变成下面这样。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> Map&lt;Integer, Integer&gt; <span class="title function_">getMap</span><span class="params">(String className)</span> &#123;</span><br><span class="line">    <span class="type">Class</span> <span class="variable">clazz</span> <span class="operator">=</span> Class.forName(className);</span><br><span class="line">    <span class="type">Consructor</span> <span class="variable">con</span> <span class="operator">=</span> clazz.getConstructor();</span><br><span class="line">    <span class="keyword">return</span> (Map&lt;Integer, Integer&gt;) con.newInstance();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>无论使用什么 Map，只要实现了<code>Map接口</code>，就可以使用<code>全类名路径</code>传入到方法中，获得对应的 Map 实例。例如java.util.HashMap &#x2F; java.util.LinkedHashMap····如果要创建其它类例如<code>WeakHashMap</code>，我也<strong>不需要修改上面这段源码</strong>。</p>
+<p>我们来回顾一下如何从 <code>new</code> 一个对象引出使用<code>反射</code>的。</p>
+<ul>
+<li>在不使用反射时，构造对象使用 new 方式实现，这种方式在<strong>编译期</strong>就可以把对象的类型确定下来。</li>
+<li>如果需求发生变更，需要构造另一个对象，则需要修改源码，非常不优雅，所以我们通过使用<code>开关</code>，在程序运行时判断需要构造哪一个对象，在运行时可以<strong>变更开关</strong>来实例化不同的数据结构。</li>
+<li>如果还有其它扩展的类有可能被使用，就会创建出<strong>非常多的分支</strong>，且在编码时不知道有什么其他的类被使用到，假如日后<code>Map</code>接口下多了一个集合类是<code>xxxHashMap</code>，还得创建分支，此时引出了反射：可以在<code>运行时</code>才确定使用哪一个数据类，在切换类时，无需重新修改源码、编译程序。</li>
+</ul>
+<p>第一章总结：</p>
+<ul>
+<li>反射的<strong>思想</strong>：<strong>在程序运行过程中确定和解析数据类的类型。</strong></li>
+<li>反射的<strong>作用</strong>：对于在<code>编译期</code>无法确定使用哪个数据类的场景，通过<code>反射</code>可以在程序运行时<strong>构造出不同的数据类实例</strong>。</li>
+</ul>
+<h2 id="反射的基本使用"><a href="#反射的基本使用" class="headerlink" title="反射的基本使用"></a>反射的基本使用</h2><p>Java 反射的主要组成部分有4个：</p>
+<ul>
+<li><code>Class</code>：任何运行在内存中的所有类都是该 Class 类的实例对象，每个 Class 类对象内部都包含了本来的<strong>所有信息</strong>。记着一句话，通过反射干任何事，先找 Class 准没错！</li>
+<li><code>Field</code>：描述一个类的<strong>属性</strong>，内部包含了该属性的所有信息，例如<strong>数据类型，属性名，访问修饰符</strong>······</li>
+<li><code>Constructor</code>：描述一个类的<strong>构造方法</strong>，内部包含了构造方法的所有信息，例如<strong>参数类型，参数名字，访问修饰符</strong>······</li>
+<li><code>Method</code>：描述一个类的<strong>所有方法</strong>（包括抽象方法），内部包含了该方法的所有信息，与<code>Constructor</code>类似，不同之处是 Method 拥有<strong>返回值类型</strong>信息，因为构造方法是没有返回值的。</li>
+</ul>
+<p>我总结了一张脑图，放在了下面，如果用到了反射，离不开这核心的<code>4</code>个类，只有去了解它们内部提供了哪些信息，有什么作用，运用它们的时候才能<strong>易如反掌</strong>。</p>
+<img src="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/1596555823611-0f82d57a-d2b1-4457-a10f-b36e101c0b8e.png" class="lazyload placeholder" data-srcset="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/1596555823611-0f82d57a-d2b1-4457-a10f-b36e101c0b8e.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="img" style="zoom:67%;" />
+
+<p>我们在学习反射的基本使用时，我会用一个<code>SmallPineapple</code>类作为模板进行说明，首先我们先来熟悉这个类的基本组成：<strong>属性，构造函数和方法</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">SmallPineapple</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> String name;</span><br><span class="line">    <span class="keyword">public</span> <span class="type">int</span> age;</span><br><span class="line">    <span class="keyword">private</span> <span class="type">double</span> weight; <span class="comment">// 体重只有自己知道</span></span><br><span class="line">   	</span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">SmallPineapple</span><span class="params">()</span> &#123;&#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">SmallPineapple</span><span class="params">(String name, <span class="type">int</span> age)</span> &#123;</span><br><span class="line">        <span class="built_in">this</span>.name = name;</span><br><span class="line">        <span class="built_in">this</span>.age = age;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">getInfo</span><span class="params">()</span> &#123;</span><br><span class="line">        System.out.print(<span class="string">&quot;[&quot;</span>+ name + <span class="string">&quot; 的年龄是：&quot;</span> + age + <span class="string">&quot;]&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>反射中的用法有非常非常多，常见的功能有以下这几个：</p>
+<ul>
+<li>在运行时获取一个类的 <strong>Class 对象</strong></li>
+<li>在运行时构造一个类的<strong>实例化对象</strong></li>
+<li>在运行时获取一个类的所有信息：<strong>变量、方法、构造器、注解</strong></li>
+</ul>
+<h3 id="获取类的-Class-对象"><a href="#获取类的-Class-对象" class="headerlink" title="获取类的 Class 对象"></a>获取类的 Class 对象</h3><p>在 Java 中，每一个类都会有专属于自己的 Class 对象，当我们编写完<code>.java</code>文件后，使用<code>javac</code>编译后，就会产生一个字节码文件<code>.class</code>，在字节码文件中包含类的所有信息，如<code>属性</code>，<code>构造方法</code>，<code>方法</code>······当字节码文件被装载进虚拟机执行时，会在内存中生成 Class 对象，它包含了该类内部的所有信息，在程序运行时可以获取这些信息。</p>
+<p>获取 Class 对象的方法有<code>3</code>种：</p>
+<ul>
+<li><code>类名.class</code>：这种获取方式只有在<code>编译</code>前已经声明了该类的类型才能获取到 Class 对象</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">Class</span> <span class="variable">clazz</span> <span class="operator">=</span> SmallPineapple.class;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><code>实例.getClass()</code>：通过实例化对象获取该实例的 Class 对象</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">SmallPineapple</span> <span class="variable">sp</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">SmallPineapple</span>();</span><br><span class="line"><span class="type">Class</span> <span class="variable">clazz</span> <span class="operator">=</span> sp.getClass();</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><code>Class.forName(className)</code>：通过类的<strong>全限定名</strong>获取该类的 Class 对象</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">Class</span> <span class="variable">clazz</span> <span class="operator">=</span> Class.forName(<span class="string">&quot;com.bean.smallpineapple&quot;</span>);</span><br></pre></td></tr></table></figure>
+
+<p>拿到 <code>Class</code>对象就可以对它为所欲为了：剥开它的皮（获取<strong>类信息</strong>）、指挥它做事（调用它的<strong>方法</strong>），看透它的一切（获取<strong>属性</strong>），总之它就没有隐私了。</p>
+<p>不过在程序中，每个类的 Class 对象只有一个，也就是说你只有这一个<code>奴隶</code>。我们用上面三种方式测试，通过三种方式打印各个 <code>Class</code> 对象都是相同的。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">Class</span> <span class="variable">clazz1</span> <span class="operator">=</span> Class.forName(<span class="string">&quot;com.bean.SmallPineapple&quot;</span>);</span><br><span class="line"><span class="type">Class</span> <span class="variable">clazz2</span> <span class="operator">=</span> SmallPineapple.class;</span><br><span class="line"><span class="type">SmallPineapple</span> <span class="variable">instance</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">SmallPineapple</span>();</span><br><span class="line"><span class="type">Class</span> <span class="variable">clazz3</span> <span class="operator">=</span> instance.getClass();</span><br><span class="line">System.out.println(<span class="string">&quot;Class.forName() == SmallPineapple.class:&quot;</span> + (clazz1 == clazz2));</span><br><span class="line">System.out.println(<span class="string">&quot;Class.forName() == instance.getClass():&quot;</span> + (clazz1 == clazz3));</span><br><span class="line">System.out.println(<span class="string">&quot;instance.getClass() == SmallPineapple.class:&quot;</span> + (clazz2 == clazz3));</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/1596534789018-870958ba-911f-45a3-b4b7-f73ff93251fd.png" class="lazyload placeholder" data-srcset="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/1596534789018-870958ba-911f-45a3-b4b7-f73ff93251fd.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image.png"></p>
+<blockquote>
+<p>内存中只有一个 Class 对象的原因要牵扯到 <code>JVM 类加载机制</code>的<code>双亲委派模型</code>，它保证了程序运行时，<code>加载类</code>时每个类在内存中仅会产生一个<code>Class对象</code>。在这里我不打算详细展开说明，可以简单地理解为 JVM 帮我们保证了<strong>一个类在内存中至多存在一个 Class 对象</strong>。</p>
+</blockquote>
+<h3 id="构造类的实例化对象"><a href="#构造类的实例化对象" class="headerlink" title="构造类的实例化对象"></a>构造类的实例化对象</h3><p>通过反射构造一个类的实例方式有<code>2</code>种：</p>
+<ul>
+<li>Class 对象调用<code>newInstance()</code>方法</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">Class</span> <span class="variable">clazz</span> <span class="operator">=</span> Class.forName(<span class="string">&quot;com.bean.SmallPineapple&quot;</span>);</span><br><span class="line"><span class="type">SmallPineapple</span> <span class="variable">smallPineapple</span> <span class="operator">=</span> (SmallPineapple) clazz.newInstance();</span><br><span class="line">smallPineapple.getInfo();</span><br><span class="line"><span class="comment">// [null 的年龄是：0]</span></span><br></pre></td></tr></table></figure>
+
+<p>即使 SmallPineapple 已经显式定义了构造方法，通过 newInstance()  创建的实例中，所有属性值都是对应类型的<code>初始值</code>，因为 newInstance() 构造实例会<strong>调用默认无参构造器</strong>。</p>
+<ul>
+<li>Constructor 构造器调用<code>newInstance()</code>方法</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">Class</span> <span class="variable">clazz</span> <span class="operator">=</span> Class.forName(<span class="string">&quot;com.bean.SmallPineapple&quot;</span>);</span><br><span class="line"><span class="type">Constructor</span> <span class="variable">constructor</span> <span class="operator">=</span> clazz.getConstructor(String.class, <span class="type">int</span>.class);</span><br><span class="line">constructor.setAccessible(<span class="literal">true</span>);</span><br><span class="line"><span class="type">SmallPineapple</span> <span class="variable">smallPineapple2</span> <span class="operator">=</span> (SmallPineapple) constructor.newInstance(<span class="string">&quot;小菠萝&quot;</span>, <span class="number">21</span>);</span><br><span class="line">smallPineapple2.getInfo();</span><br><span class="line"><span class="comment">// [小菠萝 的年龄是：21]</span></span><br></pre></td></tr></table></figure>
+
+<p>通过 getConstructor(Object… paramTypes) 方法指定获取<strong>指定参数类型</strong>的 Constructor， Constructor 调用 newInstance(Object… paramValues) 时传入构造方法参数的值，同样可以构造一个实例，且内部属性已经被赋值。</p>
+<p>通过<code>Class</code>对象调用 newInstance() 会走<strong>默认无参构造方法</strong>，如果想通过<strong>显式构造方法</strong>构造实例，需要提前从Class中调用<code>getConstructor()</code>方法获取对应的构造器，通过构造器去实例化对象。</p>
+<blockquote>
+<p>这些 API 是在开发当中最常遇到的，当然还有非常多重载的方法，本文由于篇幅原因，且如果每个方法都一一讲解，我们也记不住，所以用到的时候去类里面查找就已经足够了。</p>
+</blockquote>
+<h3 id="获取一个类的所有信息"><a href="#获取一个类的所有信息" class="headerlink" title="获取一个类的所有信息"></a>获取一个类的所有信息</h3><p><strong>Class 对象中包含了该类的所有信息，在编译期我们能看到的信息就是该类的变量、方法、构造器，在运行时最常被获取的也是这些信息。</strong></p>
+<p><img src="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/1597313607659-2df4f865-3bc8-4dbd-8dfc-f6eafe34519d.png" class="lazyload placeholder" data-srcset="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/1597313607659-2df4f865-3bc8-4dbd-8dfc-f6eafe34519d.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="img"></p>
+<h3 id="获取类中的变量（Field）"><a href="#获取类中的变量（Field）" class="headerlink" title="获取类中的变量（Field）"></a>获取类中的变量（Field）</h3><ul>
+<li>Field[] getFields()：获取类中所有被<code>public</code>修饰的所有变量</li>
+<li>Field getField(String name)：根据<strong>变量名</strong>获取类中的一个变量，该<strong>变量必须被public修饰</strong></li>
+<li>Field[] getDeclaredFields()：获取类中所有的变量，但<strong>无法获取继承下来的变量</strong></li>
+<li>Field getDeclaredField(String name)：根据姓名获取类中的某个变量，<strong>无法获取继承下来的变量</strong></li>
+</ul>
+<h3 id="获取类中的方法（Method）"><a href="#获取类中的方法（Method）" class="headerlink" title="获取类中的方法（Method）"></a>获取类中的方法（Method）</h3><ul>
+<li><p>Method[] getMethods()：获取类中被<code>public</code>修饰的所有方法</p>
+</li>
+<li><p>Method getMethod(String name, Class…&lt;?&gt; paramTypes)：根据<strong>名字和参数类型</strong>获取对应方法，该方法必须被<code>public</code>修饰</p>
+</li>
+<li><p>Method[] getDeclaredMethods()：获取<code>所有</code>方法，但<strong>无法获取继承下来的方法</strong></p>
+</li>
+<li><p>Method getDeclaredMethod(String name, Class…&lt;?&gt; paramTypes)：根据<strong>名字和参数类型</strong>获取对应方法，<strong>无法获取继承下来的方法</strong></p>
+</li>
+</ul>
+<h3 id="获取类的构造器（Constructor）"><a href="#获取类的构造器（Constructor）" class="headerlink" title="获取类的构造器（Constructor）"></a>获取类的构造器（Constructor）</h3><ul>
+<li>Constuctor[] getConstructors()：获取类中所有被<code>public</code>修饰的构造器</li>
+<li>Constructor getConstructor(Class…&lt;?&gt; paramTypes)：根据<code>参数类型</code>获取类中某个构造器，该构造器必须被<code>public</code>修饰</li>
+<li>Constructor[] getDeclaredConstructors()：获取类中所有构造器</li>
+<li>Constructor getDeclaredConstructor(class…&lt;?&gt; paramTypes)：根据<code>参数类型</code>获取对应的构造器</li>
+</ul>
+<p>每种功能内部以 Declared 细分为<code>2</code>类：</p>
+<blockquote>
+<p>有<code>Declared</code>修饰的方法：可以获取该类内部包含的<strong>所有</strong>变量、方法和构造器，但是<strong>无法获取继承下来的信息</strong></p>
+<p>无<code>Declared</code>修饰的方法：可以获取该类中<code>public</code>修饰的变量、方法和构造器，可<strong>获取继承下来的信息</strong></p>
+</blockquote>
+<p>如果想获取类中<strong>所有的（包括继承）</strong>变量、方法和构造器，则需要同时调用<code>getXXXs()</code>和<code>getDeclaredXXXs()</code>两个方法，用<code>Set</code>集合存储它们获得的变量、构造器和方法，以防两个方法获取到相同的东西。</p>
+<p>例如：要获取SmallPineapple获取类中<strong>所有的变量</strong>，代码应该是下面这样写。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">Class</span> <span class="variable">clazz</span> <span class="operator">=</span> Class.forName(<span class="string">&quot;com.bean.SmallPineapple&quot;</span>);</span><br><span class="line"><span class="comment">// 获取 public 属性，包括继承</span></span><br><span class="line">Field[] fields1 = clazz.getFields();</span><br><span class="line"><span class="comment">// 获取所有属性，不包括继承</span></span><br><span class="line">Field[] fields2 = clazz.getDeclaredFields();</span><br><span class="line"><span class="comment">// 将所有属性汇总到 set</span></span><br><span class="line">Set&lt;Field&gt; allFields = <span class="keyword">new</span> <span class="title class_">HashSet</span>&lt;&gt;();</span><br><span class="line">allFields.addAll(Arrays.asList(fields1));</span><br><span class="line">allFields.addAll(Arrays.asList(fields2));</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>不知道你有没有发现一件<strong>有趣的事情</strong>，如果父类的属性用<code>protected</code>修饰，利用反射是<strong>无法获取到</strong>的。</p>
+<p>protected 修饰符的作用范围：只允许<code>同一个包下</code>或者<code>子类</code>访问，可以继承到子类。</p>
+<p>getFields() 只能获取到本类的<code>public</code>属性的变量值；</p>
+<p>getDeclaredFields() 只能获取到<strong>本类的所有属性，不包括继承</strong>的；无论如何都获取不到父类的 protected 属性修饰的变量，但是它的的确确存在于子类中。</p>
+</blockquote>
+<h3 id="获取注解"><a href="#获取注解" class="headerlink" title="获取注解"></a>获取注解</h3><p><strong>获取注解单独拧了出来，因为它并不是专属于 Class 对象的一种信息，每个变量，方法和构造器都可以被注解修饰，所以在反射中，Field，Constructor 和 Method 类对象都可以调用下面这些方法获取标注在它们之上的注解。</strong></p>
+<ul>
+<li>Annotation[] getAnnotations()：获取该对象上的<strong>所有注解</strong></li>
+<li>Annotation getAnnotation(Class annotaionClass)：传入<code>注解类型</code>，获取该对象上的特定一个注解</li>
+<li>Annotation[] getDeclaredAnnotations()：获取该对象上的显式标注的所有注解，无法获取<code>继承</code>下来的注解</li>
+<li>Annotation getDeclaredAnnotation(Class annotationClass)：根据<code>注解类型</code>，获取该对象上的特定一个注解，无法获取<code>继承</code>下来的注解</li>
+</ul>
+<p>只有注解的<code>@Retension</code>标注为<code>RUNTIME</code>时，才能够通过反射获取到该注解，@Retension 有<code>3</code>种保存策略：</p>
+<ul>
+<li><code>SOURCE</code>：只在<strong>源文件(.java)<strong>中保存，即该注解只会保留在源文件中，</strong>编译时编译器会忽略该注解</strong>，例如 @Override 注解</li>
+<li><code>CLASS</code>：保存在<strong>字节码文件(.class)<strong>中，注解会随着编译跟随字节码文件中，但是</strong>运行时</strong>不会对该注解进行解析</li>
+<li><code>RUNTIME</code>：一直保存到<strong>运行时</strong>，<strong>用得最多的一种保存策略</strong>，在运行时可以获取到该注解的所有信息</li>
+</ul>
+<p>像下面这个例子，SmallPineapple 类继承了抽象类<code>Pineapple</code>，<code>getInfo()</code>方法上标识有 @Override 注解，且在子类中标注了<code>@Transient</code>注解，在运行时获取子类重写方法上的所有注解，只能获取到<code>@Transient</code>的信息。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">class</span> <span class="title class_">Pineapple</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">void</span> <span class="title function_">getInfo</span><span class="params">()</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">SmallPineapple</span> <span class="keyword">extends</span> <span class="title class_">Pineapple</span> &#123;</span><br><span class="line">    <span class="meta">@Transient</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">getInfo</span><span class="params">()</span> &#123;</span><br><span class="line">        System.out.print(<span class="string">&quot;小菠萝的身高和年龄是:&quot;</span> + height + <span class="string">&quot;cm ; &quot;</span> + age + <span class="string">&quot;岁&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>启动类<code>Bootstrap</code>获取 SmallPineapple 类中的 getInfo() 方法上的注解信息：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Bootstrap</span> &#123;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 根据运行时传入的全类名路径判断具体的类对象</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> path 类的全类名路径</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">execute</span><span class="params">(String path)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        <span class="type">Class</span> <span class="variable">obj</span> <span class="operator">=</span> Class.forName(path);</span><br><span class="line">        <span class="type">Method</span> <span class="variable">method</span> <span class="operator">=</span> obj.getMethod(<span class="string">&quot;getInfo&quot;</span>);</span><br><span class="line">        Annotation[] annotations = method.getAnnotations();</span><br><span class="line">        <span class="keyword">for</span> (Annotation annotation : annotations) &#123;</span><br><span class="line">            System.out.println(annotation.toString());</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        execute(<span class="string">&quot;com.pineapple.SmallPineapple&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// @java.beans.Transient(value=true)</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="通过反射调用方法"><a href="#通过反射调用方法" class="headerlink" title="通过反射调用方法"></a>通过反射调用方法</h3><p>通过反射获取到某个 Method 类对象后，可以通过调用<code>invoke</code>方法执行。</p>
+<ul>
+<li><code>invoke(Oject obj, Object... args)</code>：参数&#96;&#96;1<code>指定调用该方法的**对象**，参数</code>2&#96;是方法的参数列表值。</li>
+</ul>
+<p>如果调用的方法是<strong>静态方法</strong>，参数1只需要传入<code>null</code>，因为静态方法不与某个对象有关，只与某个类有关。</p>
+<p>可以像下面这种做法，通过反射实例化一个对象，然后获取<code>Method</code>方法对象，调用<code>invoke()</code>指定<code>SmallPineapple</code>的<code>getInfo()</code>方法。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">Class</span> <span class="variable">clazz</span> <span class="operator">=</span> Class.forName(<span class="string">&quot;com.bean.SmallPineapple&quot;</span>);</span><br><span class="line"><span class="type">Constructor</span> <span class="variable">constructor</span> <span class="operator">=</span> clazz.getConstructor(String.class, <span class="type">int</span>.class);</span><br><span class="line">constructor.setAccessible(<span class="literal">true</span>);</span><br><span class="line"><span class="type">SmallPineapple</span> <span class="variable">sp</span> <span class="operator">=</span> (SmallPineapple) constructor.newInstance(<span class="string">&quot;小菠萝&quot;</span>, <span class="number">21</span>);</span><br><span class="line"><span class="type">Method</span> <span class="variable">method</span> <span class="operator">=</span> clazz.getMethod(<span class="string">&quot;getInfo&quot;</span>);</span><br><span class="line"><span class="keyword">if</span> (method != <span class="literal">null</span>) &#123;</span><br><span class="line">    method.invoke(sp, <span class="literal">null</span>);</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// [小菠萝的年龄是：21]</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="反射的应用场景"><a href="#反射的应用场景" class="headerlink" title="反射的应用场景"></a>反射的应用场景</h2><p>反射常见的应用场景这里介绍<code>3</code>个：</p>
+<ul>
+<li>Spring 实例化对象：当程序启动时，Spring 会读取配置文件<code>applicationContext.xml</code>并解析出里面所有的 <bean> 标签实例化到<code>IOC</code>容器中。</li>
+<li>反射 + 工厂模式：通过<code>反射</code>消除工厂中的多个分支，如果需要生产新的类，无需关注工厂类，工厂类可以应对各种新增的类，<code>反射</code>可以使得程序更加健壮。</li>
+<li>JDBC连接数据库：使用JDBC连接数据库时，指定连接数据库的<code>驱动类</code>时用到反射加载驱动类</li>
+</ul>
+<h3 id="Spring-的-IOC-容器"><a href="#Spring-的-IOC-容器" class="headerlink" title="Spring 的 IOC 容器"></a>Spring 的 IOC 容器</h3><p>在 Spring 中，经常会编写一个上下文配置文件<code>applicationContext.xml</code>，里面就是关于<code>bean</code>的配置，程序启动时会读取该 xml 文件，解析出所有的 <code>&lt;bean&gt;</code>标签，并实例化对象放入<code>IOC</code>容器中。</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version=<span class="string">&quot;1.0&quot;</span> encoding=<span class="string">&quot;UTF-8&quot;</span>?&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">beans</span> <span class="attr">xmlns</span>=<span class="string">&quot;http://www.springframework.org/schema/beans&quot;</span></span></span><br><span class="line"><span class="tag">       <span class="attr">xmlns:xsi</span>=<span class="string">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span></span></span><br><span class="line"><span class="tag">       <span class="attr">xsi:schemaLocation</span>=<span class="string">&quot;http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd&quot;</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">&quot;smallpineapple&quot;</span> <span class="attr">class</span>=<span class="string">&quot;com.bean.SmallPineapple&quot;</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">constructor-arg</span> <span class="attr">type</span>=<span class="string">&quot;java.lang.String&quot;</span> <span class="attr">value</span>=<span class="string">&quot;小菠萝&quot;</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">constructor-arg</span> <span class="attr">type</span>=<span class="string">&quot;int&quot;</span> <span class="attr">value</span>=<span class="string">&quot;21&quot;</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">bean</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">beans</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>在定义好上面的文件后，通过<code>ClassPathXmlApplicationContext</code>加载该配置文件，程序启动时，Spring 会将该配置文件中的所有<code>bean</code>都实例化，放入 IOC 容器中，IOC 容器本质上就是一个工厂，通过该工厂传入 &lt;bean&gt; 标签的<code>id</code>属性获取到对应的实例。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Main</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="type">ApplicationContext</span> <span class="variable">ac</span> <span class="operator">=</span></span><br><span class="line">                <span class="keyword">new</span> <span class="title class_">ClassPathXmlApplicationContext</span>(<span class="string">&quot;applicationContext.xml&quot;</span>);</span><br><span class="line">        <span class="type">SmallPineapple</span> <span class="variable">smallPineapple</span> <span class="operator">=</span> (SmallPineapple) ac.getBean(<span class="string">&quot;smallpineapple&quot;</span>);</span><br><span class="line">        smallPineapple.getInfo(); <span class="comment">// [小菠萝的年龄是：21]</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>Spring 在实例化对象的过程经过简化之后，可以理解为反射实例化对象的步骤：</p>
+<ul>
+<li><strong>获取Class对象的构造器</strong></li>
+<li>通过构造器<strong>调用 newInstance()</strong> 实例化对象</li>
+</ul>
+<p>当然 Spring 在实例化对象时，做了非常多额外的操作，才能够让现在的开发足够的<strong>便捷且稳定</strong>。</p>
+<blockquote>
+<p>在之后的文章中会专门写一篇文章讲解如何利用反射实现一个<code>简易版</code>的<code>IOC</code>容器，IOC容器原理很简单，只要掌握了反射的思想，了解反射的常用 API 就可以实现，我可以提供一个简单的思路：利用 HashMap 存储所有实例，key 代表 &lt;bean&gt; 标签的 <code>id</code>，value 存储对应的实例，这对应了 Spring IOC容器管理的对象默认是<strong>单例</strong>的。</p>
+</blockquote>
+<h3 id="反射-抽象工厂模式"><a href="#反射-抽象工厂模式" class="headerlink" title="反射 + 抽象工厂模式"></a>反射 + 抽象工厂模式</h3><p>传统的工厂模式，如果需要生产新的子类，<strong>需要修改工厂类，在工厂类中增加新的分支</strong>；</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">MapFactory</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> Map&lt;Object, object&gt; <span class="title function_">produceMap</span><span class="params">(String name)</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (<span class="string">&quot;HashMap&quot;</span>.equals(name)) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">HashMap</span>&lt;&gt;();</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (<span class="string">&quot;TreeMap&quot;</span>.equals(name)) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">TreeMap</span>&lt;&gt;();</span><br><span class="line">        &#125; <span class="comment">// ···</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>利用反射和工厂模式相结合，在产生新的子类时，<strong>工厂类不用修改任何东西</strong>，可以专注于子类的实现，<strong>当子类确定下来时，工厂也就可以生产该子类了。</strong></p>
+<p>反射 + 抽象工厂的<strong>核心思想</strong>是：</p>
+<ul>
+<li><strong>在运行时通过参数传入不同子类的全限定名获取到不同的 Class 对象，调用 newInstance() 方法返回不同的子类。</strong>细心的读者会发现提到了<strong>子类</strong>这个概念，所以反射 + 抽象工厂模式，一般会用于有<strong>继承</strong>或者<strong>接口实现</strong>关系。</li>
+</ul>
+<p>例如，在运行时才确定使用哪一种 <code>Map</code> 结构，我们可以利用反射传入某个具体 Map 的全限定名，实例化一个特定的子类。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">MapFactory</span> &#123;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> className 类的全限定名</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span> Map&lt;Object, Object&gt; <span class="title function_">produceMap</span><span class="params">(String className)</span> &#123;</span><br><span class="line">        <span class="type">Class</span> <span class="variable">clazz</span> <span class="operator">=</span> Class.forName(className);</span><br><span class="line">        Map&lt;Object, Object&gt; map = clazz.newInstance();</span><br><span class="line">        <span class="keyword">return</span> map;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>className</code> 可以指定为 java.util.HashMap，或者 java.util.TreeMap 等等，根据业务场景来定。</p>
+<h3 id="JDBC-加载数据库驱动类"><a href="#JDBC-加载数据库驱动类" class="headerlink" title="JDBC 加载数据库驱动类"></a>JDBC 加载数据库驱动类</h3><p>在导入第三方库时，JVM不会主动去加载外部导入的类，而是<strong>等到真正使用时，才去加载需要的类</strong>，正是如此，我们可以在获取数据库连接时传入驱动类的全限定名，交给 JVM 加载该类。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">DBConnectionUtil</span> &#123;</span><br><span class="line">    <span class="comment">/** 指定数据库的驱动类 */</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">String</span> <span class="variable">DRIVER_CLASS_NAME</span> <span class="operator">=</span> <span class="string">&quot;com.mysql.jdbc.Driver&quot;</span>;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> Connection <span class="title function_">getConnection</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="type">Connection</span> <span class="variable">conn</span> <span class="operator">=</span> <span class="literal">null</span>;</span><br><span class="line">        <span class="comment">// 加载驱动类</span></span><br><span class="line">        Class.forName(DRIVER_CLASS_NAME);</span><br><span class="line">        <span class="comment">// 获取数据库连接对象</span></span><br><span class="line">        conn = DriverManager.getConnection(<span class="string">&quot;jdbc:mysql://···&quot;</span>, <span class="string">&quot;root&quot;</span>, <span class="string">&quot;root&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> conn;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在我们开发 SpringBoot 项目时，会经常遇到这个类，但是可能习惯成自然了，就没多大在乎，我在这里给你们看看常见的<code>application.yml</code>中的数据库配置，我想你应该会恍然大悟吧。</p>
+<p><img src="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/1597332406168-5103f33d-79f5-456b-9962-0f779bab5174.png" class="lazyload placeholder" data-srcset="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/1597332406168-5103f33d-79f5-456b-9962-0f779bab5174.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="img"></p>
+<p>这里的 <strong>driver-class-name</strong>，和我们一开始加载的类是不是觉得很相似，这是因为<strong>MySQL</strong>版本不同引起的<strong>驱动类不同</strong>，这体现使用反射的好处：不需要修改源码，<strong>仅加载配置文件就可以完成驱动类的替换</strong>。</p>
+<blockquote>
+<p>在之后的文章中会专门写一篇文章详细地介绍反射的应用场景，实现简单的<code>IOC</code>容器以及通过反射实现工厂模式的好处。</p>
+<p>在这里，你只需要掌握反射的基本用法和它的思想，了解它的主要使用场景。</p>
+</blockquote>
+<h2 id="反射的优势及缺陷"><a href="#反射的优势及缺陷" class="headerlink" title="反射的优势及缺陷"></a>反射的优势及缺陷</h2><p>反射的<strong>优点</strong>：</p>
+<ul>
+<li><strong>增加程序的灵活性</strong>：面对需求变更时，可以灵活地实例化不同对象</li>
+</ul>
+<p>但是，有得必有失，一项技术不可能只有优点没有缺点，反射也有<strong>两个比较隐晦的缺点</strong>：</p>
+<ul>
+<li><strong>破坏类的封装性</strong>：可以强制访问 private 修饰的信息</li>
+<li><strong>性能损耗</strong>：反射相比直接实例化对象、调用方法、访问变量，中间需要非常多的<strong>检查步骤和解析步骤</strong>，JVM无法对它们优化。</li>
+</ul>
+<h3 id="增加程序的灵活性"><a href="#增加程序的灵活性" class="headerlink" title="增加程序的灵活性"></a>增加程序的灵活性</h3><p>这里不再用 SmallPineapple 举例了，我们来看一个更加<code>贴近开发</code>的例子：</p>
+<ul>
+<li>利用反射连接数据库，<strong>涉及到数据库的数据源</strong>。在 SpringBoot 中一切约定大于配置，想要<strong>定制配置</strong>时，使用<code>application.properties</code>配置文件指定数据源</li>
+</ul>
+<p><strong>角色1 - Java的设计者</strong>：我们设计好<code>DataSource</code>接口，你们其它数据库厂商想要开发者用<code>你们的数据源</code>监控数据库，就得实现<code>我的这个接口</code>！</p>
+<p><strong>角色2 - 数据库厂商</strong>：</p>
+<ul>
+<li>MySQL 数据库厂商：我们提供了 <strong>com.mysql.cj.jdbc.MysqlDataSource</strong> 数据源，开发者可以使用它连接 MySQL。</li>
+<li>阿里巴巴厂商：我们提供了 <strong>com.alibaba.druid.pool.DruidDataSource</strong> 数据源，我这个数据源更牛逼，具有<strong>页面监控</strong>，<strong>慢SQL日志记录</strong>等功能，开发者快来用它监控 MySQL吧！</li>
+<li>SQLServer 厂商：我们提供了 <strong>com.microsoft.sqlserver.jdbc.SQLServerDataSource</strong> 数据源，如果你想实用SQL Server 作为数据库，那就使用我们的这个数据源连接吧</li>
+</ul>
+<p><strong>角色3 - 开发者</strong>：我们可以用<code>配置文件</code>指定使用<code>DruidDataSource</code>数据源</p>
+<figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">spring.datasource.type</span>=<span class="string">com.alibaba.druid.pool.DruidDataSource</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>需求变更</strong>：某一天，老板来跟我们说，Druid 数据源不太符合我们现在的项目了，我们使用 <strong>MysqlDataSource</strong> 吧，然后程序猿就会修改配置文件，重新加载配置文件，并重启项目，完成数据源的切换。</p>
+<figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">spring.datasource.type</span>=<span class="string">com.mysql.cj.jdbc.MysqlDataSource</span></span><br></pre></td></tr></table></figure>
+
+<p>在改变连接数据库的数据源时，只需要改变配置文件即可，<strong>无需改变任何代码</strong>，原因是：</p>
+<ul>
+<li><strong>Spring Boot 底层封装好了连接数据库的数据源配置，利用反射，适配各个数据源。</strong></li>
+</ul>
+<p>下面来简略的进行源码分析。我们用<code>ctrl+左键</code>点击<code>spring.datasource.type</code>进入 DataSourceProperties 类中，发现使用setType() 将<strong>全类名转化为 Class 对象</strong>注入到<code>type</code>成员变量当中。在连接并监控数据库时，就会使用指定的数据源操作。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> Class&lt;? <span class="keyword">extends</span> <span class="title class_">DataSource</span>&gt; type;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">setType</span><span class="params">(Class&lt;? extends DataSource&gt; type)</span> &#123;</span><br><span class="line">    <span class="built_in">this</span>.type = type;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>Class</code>对象指定了泛型上界<code>DataSource</code>，我们去看一下各大数据源的<code>类图结构</code>。</p>
+<p><img src="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/1596689119592-98ae06fd-c59e-4794-8130-ff0bdfe0f550.png" class="lazyload placeholder" data-srcset="https://gaoziman.oss-cn-hangzhou.aliyuncs.com/img/1596689119592-98ae06fd-c59e-4794-8130-ff0bdfe0f550.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image.png"></p>
+<p><strong>上图展示了一部分数据源，当然不止这些，但是我们可以看到，无论指定使用哪一种数据源，我们都只需要与配置文件打交道，而无需更改源码，这就是反射的灵活性！</strong></p>
+<h3 id="破坏类的封装性"><a href="#破坏类的封装性" class="headerlink" title="破坏类的封装性"></a>破坏类的封装性</h3><p>很明显的一个特点，反射可以获取类中被<code>private</code>修饰的变量、方法和构造器，这<strong>违反了面向对象的封装特性</strong>，因为被 private 修饰意味着不想对外暴露，只允许本类访问，而<code>setAccessable(true)</code>可以无视访问修饰符的限制，外界可以强制访问。</p>
+<p>还记得<code>单例模式</code>一文吗？里面讲到反射破坏饿汉式和懒汉式单例模式，所以之后用了<code>枚举</code>避免被反射KO。</p>
+<p>回到最初的起点，SmallPineapple 里有一个 weight 属性被 private 修饰符修饰，目的在于自己的体重并不想给外界知道。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">SmallPineapple</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> String name;</span><br><span class="line">    <span class="keyword">public</span> <span class="type">int</span> age;</span><br><span class="line">    <span class="keyword">private</span> <span class="type">double</span> weight; <span class="comment">// 体重只有自己知道</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">SmallPineapple</span><span class="params">(String name, <span class="type">int</span> age, <span class="type">double</span> weight)</span> &#123;</span><br><span class="line">        <span class="built_in">this</span>.name = name;</span><br><span class="line">        <span class="built_in">this</span>.age = age;</span><br><span class="line">        <span class="built_in">this</span>.weight = weight;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>虽然 weight 属性理论上只有自己知道，但是如果经过反射，这个类就像在<strong>裸奔</strong>一样，在反射面前变得<code>一览无遗</code>。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">SmallPineapple</span> <span class="variable">sp</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">SmallPineapple</span>(<span class="string">&quot;小菠萝&quot;</span>, <span class="number">21</span>, <span class="string">&quot;54.5&quot;</span>);</span><br><span class="line"><span class="type">Clazz</span> <span class="variable">clazz</span> <span class="operator">=</span> Class.forName(sp.getClass());</span><br><span class="line"><span class="type">Field</span> <span class="variable">weight</span> <span class="operator">=</span> clazz.getDeclaredField(<span class="string">&quot;weight&quot;</span>);</span><br><span class="line">weight.setAccessable(<span class="literal">true</span>);</span><br><span class="line">System.out.println(<span class="string">&quot;窥觑到小菠萝的体重是：&quot;</span> + weight.get(sp));</span><br><span class="line"><span class="comment">// 窥觑到小菠萝的体重是：54.5 kg</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="性能损耗"><a href="#性能损耗" class="headerlink" title="性能损耗"></a>性能损耗</h3><p><strong>在直接 new 对象并调用对象方法和访问属性时，编译器会在编译期提前检查可访问性，如果尝试进行不正确的访问，IDE会提前提示错误，例如参数传递类型不匹配，非法访问 private 属性和方法。</strong></p>
+<blockquote>
+<p>而在利用反射操作对象时，编译器无法提前得知对象的类型，访问是否合法，参数传递类型是否匹配。只有在程序运行时调用反射的代码时才会从头开始检查、调用、返回结果，JVM也无法对反射的代码进行优化。</p>
+</blockquote>
+<p>虽然反射具有性能损耗的特点，但是我们不能一概而论，产生了使用反射就会性能下降的思想，反射的慢，需要同时调用上<code>100W</code>次才可能体现出来，在几次、几十次的调用，并不能体现反射的性能低下。所以不要一味地戴有色眼镜看反射，<strong>在单次调用反射的过程中，性能损耗可以忽略不计。如果程序的性能要求很高，那么尽量不要使用反射。</strong></p>
+<h2 id="反射基础篇文末总结"><a href="#反射基础篇文末总结" class="headerlink" title="反射基础篇文末总结"></a>反射基础篇文末总结</h2><ul>
+<li>反射的思想：反射就像是<strong>一面镜子</strong>一样，在<strong>运行时</strong>才看到自己是谁，可获取到自己的信息，甚至实例化对象。</li>
+<li>反射的作用：<strong>在运行时才确定实例化对象，使程序更加健壮</strong>，面对需求变更时，可以最大程度地做到不修改程序源码应对不同的场景，实例化不同类型的对象。</li>
+<li>反射的应用场景常见的有<code>3</code>个：Spring的 IOC 容器，反射+工厂模式 使工厂类更稳定，JDBC连接数据库时加载驱动类</li>
+<li>反射的<code>3</code>个特点：增加程序的灵活性、破坏类的封装性以及性能损耗</li>
+</ul>
+
+      </div>
+      <div class="post-tags-categories">
+        
+        <div class="tags">
+          
+            <a href="/tags/Java/" class="">
+              Java
+            </a>
+          
+            <a href="/tags/Java%E5%9F%BA%E7%A1%80/" class="">
+              Java基础
+            </a>
+          
+        </div>
+        
+      </div>
+      
+        <div class="copyright">
+  <ul class="post-copyright">
+    <li class="post-copyright-author">
+    <strong>author:  </strong>John Doe</a>
+    </li>
+    <li class="post-copyright-link">
+    <strong>link:  </strong>
+    <a href="/2022/05/03/Java基础-反射篇/" target="_blank" title="Java基础 反射篇">http://example.com/2022/05/03/Java基础-反射篇/</a>
+    </li>
+    <li class="post-copyright-license">
+      <strong>Copyright notice:   </strong>
+      All articles on this website, unless otherwise stated, adopt <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">CC BY-NC-ND 4.0</a>
+      reprint policy. If reproduced, please indicate source!
+    </li>
+  </ul>
+<div>
+      
+    </article>
+    <!-- 上一篇文章和下一篇文章 -->
+    
+      <!-- 文章详情页的上一页和下一页 -->
+<div class="post-nav">
+
+
+
+  
+  <div class="post-nav-prev post-nav-item">
+    <div class="post-nav-img" style="background-size: cover; 
+      background-position: center center;">
+      <img class="lazyload lazyload placeholder" src="/medias/14.jpg" class="lazyload placeholder" data-srcset="/medias/14.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="">
+    </div>
+    <a href="/2022/05/03/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3-static-%E5%85%B3%E9%94%AE%E5%AD%97/" class="post-nav-link">
+      <div class="title">
+        <i class="fas fa-angle-left"></i> Prev:
+        <div class="title-text">深入理解 static 关键字</div>
+      </div>
+      
+      <!-- <div class="content">
+        深入理解 static 关键字static 是我们日常生活中经常用到的关键字，也是 Java 中非常重要的一个关键字，s
+      </div> -->
+    </a>
+  </div>
+
+
+
+  
+  <div class="post-nav-next post-nav-item">
+    <div class="post-nav-img" style="background-size: cover; 
+      background-position: center center;">
+      <img class="lazyload lazyload placeholder" src="/medias/11.jpg" class="lazyload placeholder" data-srcset="/medias/11.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" src="" alt="">
+    </div>
+    <a href="/2022/05/03/%E8%B0%88%E8%B0%88%E5%BC%BA%E5%BC%95%E7%94%A8%E3%80%81%E8%BD%AF%E5%BC%95%E7%94%A8%E3%80%81%E5%BC%B1%E5%BC%95%E7%94%A8%E3%80%81%E5%B9%BB%E8%B1%A1%E5%BC%95%E7%94%A8/" class="post-nav-link">
+      <div class="title">
+        Next: <i class="fas fa-angle-right"></i>
+        <div class="title-text">谈谈强引用、软引用、弱引用、幻象引用</div>
+      </div>
+      <!-- <div class="content">
+        谈谈强引用、软引用、弱引用、幻象引用我们说的不同的引用类型其实都是逻辑上的，而对于虚拟机来说，主要体现的是对象的不同的可
+      </div> -->
+    </a>
+  </div>
+
+</div>
+
+    
+    
+
+    <!-- 打赏 -->
+    
+      <div id="appDonate" class="post-donate">
+  <div id="donate_board" class="donate_bar center" ref="donate">
+    <a id="btn_donate" class="btn_donate" href="javascript:;" title="打赏" @click="showDialogDrawer()"></a>
+  </div>
+  <transition name="fade">
+    <div 
+      class="donate-box-mask"
+      v-cloak 
+      v-show="visible"
+      @click="cancelDialogDrawer()"
+    >
+    </div>
+  </transition>
+  <transition name="bounce">
+    <div class="donate-box" v-cloak v-show="visible">
+      <div class="donate-box_close">
+        <i class="fas fa-times" aria-hidden="true" @click="cancelDialogDrawer" pointer></i>
+      </div>
+      <div class="donate-box_title">
+        <h4>
+          你的赏识是我前进的动力
+        </h4>
+      </div>
+      <div class="donate-box_tab">
+        <div class="Alipay" pointer :class="{'active': tabActive === 'Alipay'}" @click="changeTabActive('Alipay')">
+          支付宝
+        </div>
+        <div class="WeChatpay" pointer :class="{'active': tabActive === 'WeChatpay'}" @click="changeTabActive('WeChatpay')">
+          微信
+        </div>
+      </div>
+      <div class="donate-box_img">
+        <div class="AlipayImg" v-show="tabActive === 'Alipay'">
+          <img src="/medias/1.jpg" class="lazyload placeholder" data-srcset="/medias/1.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="支付宝打赏" />
+        </div> 
+        <div class="WeChatpayImg" v-show="tabActive === 'WeChatpay'">
+          <img src="/medias/2.jpg" class="lazyload placeholder" data-srcset="/medias/2.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="微信打赏" />
+        </div>
+      </div>
+    </div>
+  </transition>
+</div>
+
+<script>
+  var body = document.body || document.documentElement || window;
+  var vm = new Vue({
+    el: '#appDonate',
+    data: {
+      visible: false,
+      tabActive: 'Alipay',
+      top: 0,
+    },
+    computed: {
+    },
+    mounted() {
+    },
+    methods: {
+      showDialogDrawer() {
+        this.visible = true;
+        // 防止页面滚动，只能让弹框滚动
+        // function getScroll() {
+        //   return {
+        //     left: window.pageXOffset || document.documentElement.scrollLeft || document.body.scrollLeft || 0,
+        //     top: window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0
+        //   };
+        // }
+        this.top = $(document).scrollTop() // or getScroll().top
+        // console.log('aa', $('.main-content'));
+        body.style.cssText = 'overflow: hidden;';
+      },
+      cancelDialogDrawer() {
+        this.visible = false;
+        body.removeAttribute('style');
+        $(document).scrollTop(this.top)
+      },
+      changeTabActive(name) {
+        this.tabActive = name;
+      }
+    },
+    created() {}
+  })
+</script>
+    
+
+    <!-- 分享 -->
+    
+      <!-- https://github.com/overtrue/share.js -->
+<!-- 文章详情页的分享 -->
+<div class="social-share" data-sites="twitter,facebook,google,qq,qzone,wechat,weibo,douban,linkedin" data-wechat-qrcode-helper="<p>微信扫一扫即可分享！</p>"></div>
+
+<script src="/js/shareJs/social-share.min.js"></script>
+</script>
+
+<style>
+  .social-share {
+    margin: 20px 0;
+  }
+</style>
+
+
+    
+    
+    <!-- 评论 -->
+    <!-- 评论 -->
+
+  <div id="myComment">
+    
+      <div id="gitment-container"></div>
+
+    
+  </div>
+
+<!-- comment script in themes\hexo-theme-bamboo\layout\_partial\scripts\index.ejs -->
+
+
+  </div>
+
+  <!-- 目录 -->
+  <!-- 文章详情页右侧目录 -->
+
+  <div class="toc-aside">
+    <div class="toc-main">
+      <div class="toc-aside-title">
+        <i class="fas fa-list-ul" aria-hidden="true"></i><span>catalog</span>
+        
+          <div class="toc-open-close">catalog</div>
+        
+      </div>
+      <div class="toc-content">
+        <div class="toc"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 手机端目录按钮 -->
+  <div id="toc-mobile-btn">
+    <i class="fas fa-list-ul" aria-hidden="true"></i>
+  </div>
+
+
+<script>
+  function closeToc(init) {
+    $(".toc-aside").css({'width': 0, 'padding': 0, 'transition': init ?  'noe' : 'width 0.3s' });
+    $(".toc-content").css({'width': 0});
+    $(".toc-aside-title span, .toc-aside-title i").css({'display': 'none'});
+    $(".main-content").css({'width': '75%', 'margin-left': 'auto', 'margin-right': 'auto',});
+  };
+  function openToc() {
+    $(".main-content").css({'width': '65%', 'margin-right': '10px', 'margin-left': 'calc(35% - 350px)'});
+    $(".toc-aside").css({'width': '300px', 'padding': '0 10px', 'transition': 'width 0.3s'});
+    $(".toc-content").css({'width': '300px'});
+    $(".toc-aside-title span, .toc-aside-title i").css({'display': 'inline-block'});
+  }
+  function openBtnClickFn () {
+    let openOrCloseBtn = $('.toc-aside .toc-aside-title .toc-open-close');
+    let open = eval('' || 'true');
+    openOrCloseBtn.click(function() {
+      if (open) {
+        closeToc();
+        open = false;
+      } else {
+        openToc();
+        open = true;
+      }
+    });
+  };
+  openBtnClickFn();
+  initCloseTocWidth(true);
+
+  function initCloseTocWidth(init) {
+    if (window.innerWidth >= 992) {
+      let isClose = false;
+      isClose && closeToc(init)
+    }
+  }
+
+  document.addEventListener('pjax:complete', function () {
+    $(".toc-aside").css({'transition': 'no'});
+  })
+  document.addEventListener('pjax:complete', function () {
+    openBtnClickFn();
+  })
+  
+</script>
+
+  <!-- 图片放大 Wrap images with fancybox support -->
+  <script src="/js/wrapImage.js"></script>
+</div>
+
+<!-- 文章详情页背景图 -->
+<div id="appBgSwiper" style="position: fixed;left: 0;top: 0;width: 100%;height: 100%;z-index: -2;"
+	:style="{'background-color': bgColor ? bgColor : 'transparent'}">
+	<transition-group tag="ul" :name="names">
+		<li v-for='(image,index) in img' :key='index' v-show="index === mark" class="bg-swiper-box">
+			<img :src="image" class="bg-swiper-img no-lazy">
+		</li>
+	</transition-group>
+</div>
+<script>
+	var vm = new Vue({
+		el: '#appBgSwiper',
+		data: {
+			names: '' || 'fade' || 'fade', // translate-fade fade
+			mark: 0,
+			img: [],
+			bgColor: '',
+			time: null
+		},
+		methods: {   //添加方法
+			change(i, m) {
+				if (i > m) {
+					// this.names = 'fade';
+				} else if (i < m) {
+					// this.names = 'fade';
+				} else {
+					return;
+				}
+				this.mark = i;
+			},
+			prev() {
+				// this.names = 'fade';
+				this.mark--;
+				if (this.mark === -1) {
+					this.mark = 3;
+					return
+				}
+			},
+			next() {
+				// this.names = 'fade';
+				this.mark++;
+				if (this.mark === this.img.length) {
+					this.mark = 0;
+					return
+				}
+			},
+			autoPlay() {
+				// this.names = 'fade';
+				this.mark++;
+				if (this.mark === this.img.length) {
+					this.mark = 0;
+					return
+				}
+			},
+			play() {
+				let bgImgDelay = '' || '180000'
+				let delay = parseInt(bgImgDelay) || 180000;
+				this.time = setInterval(this.autoPlay, delay);
+			},
+			enter() {
+				clearInterval(this.time);
+			},
+			leave() {
+				this.play();
+			}
+		},
+		created() {
+			this.play()
+		},
+		beforeDestroy() {
+			clearInterval(this.time);
+		},
+		mounted() {
+			let prop = '' || '';
+			let isImg = prop.includes('.bmp') || prop.includes('.jpg') || prop.includes('.png') || prop.includes('.tif') || prop.includes('.gif') || prop.includes('.pcx') || prop.includes('.tga') || prop.includes('.exif') || prop.includes('.fpx') || prop.includes('.psd') || prop.includes('.cdr') || prop.includes('.pcd') || prop.includes('.dxf') || prop.includes('.ufo') || prop.includes('.eps') || prop.includes('.ai') || prop.includes('.raw') || prop.includes('.WMF') || prop.includes('.webp') || prop.includes('.jpeg') || prop.includes('http://') || prop.includes('https://')
+			if (isImg) {
+				let img = prop.split(',');
+				let configRoot = '/'
+				let arrImg = [];
+				img.forEach(el => {
+					var Expression = /http(s)?:\/\/([\w-]+\.)+[\w-]+(\/[\w- .\/?%&=]*)?/;
+					var objExp = new RegExp(Expression);
+
+					if (objExp.test(el)) {
+						// http or https
+						arrImg.push(el);
+					} else {
+						// 非http or https开头
+						// 本地文件
+						let firstStr = el.charAt(0);
+						if (firstStr == '/') {
+							el = el.substr(1); // 删除第一个字符 '/',因为 configRoot最后一个字符为 /
+						}
+						el = configRoot + el;
+						arrImg.push(el);
+					}
+				})
+				this.img = arrImg;
+			} else {
+				this.bgColor = prop;
+			}
+		}
+	})
+</script>
+
+<style>
+	.bg-swiper-box {
+		position: absolute;
+		display: block;
+		width: 100%;
+		height: 100%;
+	}
+
+	.bg-swiper-img {
+		object-fit: cover;
+		width: 100%;
+		height: 100%;
+	}
+</style>
+
+
+
+
+  <script>
+  function loadMermaid() {
+    if (document.getElementsByClassName('mermaid').length) {
+      if (window.mermaidJsLoad) mermaid.init()
+      else {
+        loadScript('https://unpkg.com/mermaid/dist/mermaid.min.js').then(() => {
+          window.mermaidJsLoad = true
+          mermaid.initialize({
+            theme: 'default',
+          })
+          if ('true') {
+            mermaid.init();
+          }
+        })
+      }
+    }
+  };
+  document.addEventListener("DOMContentLoaded", function () {
+    loadMermaid();
+  })
+
+  document.addEventListener('pjax:complete', function () {
+    loadMermaid();
+  })
+  
+</script>
+
+
+      </main>
+    </div>
+
+    <!-- 页脚 -->
+    
+  
+  
+    <!-- 底部鱼儿跳动效果，依赖于jquery-->
+<div id="j-fish-skip" style=" position: relative;height: 153px;width: auto;"></div>
+<script>
+  var RENDERER = {
+    POINT_INTERVAL: 5,
+    FISH_COUNT: 3,
+    MAX_INTERVAL_COUNT: 50,
+    INIT_HEIGHT_RATE: .5,
+    THRESHOLD: 50,
+    FISH_COLOR: '',
+    init: function () {
+      this.setFishColor(); this.setParameters(), this.reconstructMethods(), this.setup(), this.bindEvent(), this.render()
+    },
+    setFishColor: function () {
+      let isDark = JSON.parse(localStorage.getItem('dark')) || JSON.parse('false');
+      if (isDark) {
+        this.FISH_COLOR = '#222'; // 暗黑色，有时间把这整成一个变量
+      } else {
+        this.FISH_COLOR = '' || '#42b983';
+      }
+    },
+    setParameters: function () {
+      this.$window = $(window), this.$container = $("#j-fish-skip"), this.$canvas = $("<canvas />"), this.context = this.$canvas.appendTo(this.$container).get(0).getContext("2d"), this.points = [], this.fishes = [], this.watchIds = []
+    },
+    createSurfacePoints: function () {
+      var t = Math.round(this.width / this.POINT_INTERVAL);
+      this.pointInterval = this.width / (t - 1), this.points.push(new SURFACE_POINT(this, 0));
+      for (var i = 1; i < t; i++) {
+        var e = new SURFACE_POINT(this, i * this.pointInterval),
+          h = this.points[i - 1];
+        e.setPreviousPoint(h), h.setNextPoint(e), this.points.push(e)
+      }
+    },
+    reconstructMethods: function () {
+      this.watchWindowSize = this.watchWindowSize.bind(this), this.jdugeToStopResize = this.jdugeToStopResize.bind(this), this.startEpicenter = this.startEpicenter.bind(this), this.moveEpicenter = this.moveEpicenter.bind(this), this.reverseVertical = this.reverseVertical.bind(this), this.render = this.render.bind(this)
+    },
+    setup: function () {
+      this.points.length = 0, this.fishes.length = 0, this.watchIds.length = 0, this.intervalCount = this.MAX_INTERVAL_COUNT, this.width = this.$container.width(), this.height = this.$container.height(), this.fishCount = this.FISH_COUNT * this.width / 500 * this.height / 500, this.$canvas.attr({
+        width: this.width,
+        height: this.height
+      }), this.reverse = !1, this.fishes.push(new FISH(this)), this.createSurfacePoints()
+    },
+    watchWindowSize: function () {
+      this.clearTimer(), this.tmpWidth = this.$window.width(), this.tmpHeight = this.$window.height(), this.watchIds.push(setTimeout(this.jdugeToStopResize, this.WATCH_INTERVAL))
+    },
+    clearTimer: function () {
+      for (; this.watchIds.length > 0;) clearTimeout(this.watchIds.pop())
+    },
+    jdugeToStopResize: function () {
+      var t = this.$window.width(),
+        i = this.$window.height(),
+        e = t == this.tmpWidth && i == this.tmpHeight;
+      this.tmpWidth = t, this.tmpHeight = i, e && this.setup()
+    },
+    bindEvent: function () {
+      this.$window.on("resize", this.watchWindowSize), this.$container.on("mouseenter", this.startEpicenter), this.$container.on("mousemove", this.moveEpicenter)
+    },
+    getAxis: function (t) {
+      var i = this.$container.offset();
+      return {
+        x: t.clientX - i.left + this.$window.scrollLeft(),
+        y: t.clientY - i.top + this.$window.scrollTop()
+      }
+    },
+    startEpicenter: function (t) {
+      this.axis = this.getAxis(t)
+    },
+    moveEpicenter: function (t) {
+      var i = this.getAxis(t);
+      this.axis || (this.axis = i), this.generateEpicenter(i.x, i.y, i.y - this.axis.y), this.axis = i
+    },
+    generateEpicenter: function (t, i, e) {
+      if (!(i < this.height / 2 - this.THRESHOLD || i > this.height / 2 + this.THRESHOLD)) {
+        var h = Math.round(t / this.pointInterval);
+        h < 0 || h >= this.points.length || this.points[h].interfere(i, e)
+      }
+    },
+    reverseVertical: function () {
+      this.reverse = !this.reverse;
+      for (var t = 0, i = this.fishes.length; t < i; t++) this.fishes[t].reverseVertical()
+    },
+    controlStatus: function () {
+      for (var t = 0, i = this.points.length; t < i; t++) this.points[t].updateSelf();
+      for (t = 0, i = this.points.length; t < i; t++) this.points[t].updateNeighbors();
+      this.fishes.length < this.fishCount && 0 == --this.intervalCount && (this.intervalCount = this.MAX_INTERVAL_COUNT, this.fishes.push(new FISH(this)))
+    },
+    render: function () {
+      requestAnimationFrame(this.render), this.controlStatus(), this.context.clearRect(0, 0, this.width, this.height), this.context.fillStyle = this.FISH_COLOR;
+      for (var t = 0, i = this.fishes.length; t < i; t++) this.fishes[t].render(this.context);
+      this.context.save(), this.context.globalCompositeOperation = "xor", this.context.beginPath(), this.context.moveTo(0, this.reverse ? 0 : this.height);
+      for (t = 0, i = this.points.length; t < i; t++) this.points[t].render(this.context);
+      this.context.lineTo(this.width, this.reverse ? 0 : this.height), this.context.closePath(), this.context.fill(), this.context.restore()
+    }
+  },
+  SURFACE_POINT = function (t, i) {
+    this.renderer = t, this.x = i, this.init()
+  };
+  SURFACE_POINT.prototype = {
+    SPRING_CONSTANT: .03,
+    SPRING_FRICTION: .9,
+    WAVE_SPREAD: .3,
+    ACCELARATION_RATE: .01,
+    init: function () {
+      this.initHeight = this.renderer.height * this.renderer.INIT_HEIGHT_RATE, this.height = this.initHeight, this.fy = 0, this.force = {
+        previous: 0,
+        next: 0
+      }
+    },
+    setPreviousPoint: function (t) {
+      this.previous = t
+    },
+    setNextPoint: function (t) {
+      this.next = t
+    },
+    interfere: function (t, i) {
+      this.fy = this.renderer.height * this.ACCELARATION_RATE * (this.renderer.height - this.height - t >= 0 ? -1 : 1) * Math.abs(i)
+    },
+    updateSelf: function () {
+      this.fy += this.SPRING_CONSTANT * (this.initHeight - this.height), this.fy *= this.SPRING_FRICTION, this.height += this.fy
+    },
+    updateNeighbors: function () {
+      this.previous && (this.force.previous = this.WAVE_SPREAD * (this.height - this.previous.height)), this.next && (this.force.next = this.WAVE_SPREAD * (this.height - this.next.height))
+    },
+    render: function (t) {
+      this.previous && (this.previous.height += this.force.previous, this.previous.fy += this.force.previous), this.next && (this.next.height += this.force.next, this.next.fy += this.force.next), t.lineTo(this.x, this.renderer.height - this.height)
+    }
+  };
+  var FISH = function (t) {
+    this.renderer = t, this.init()
+  };
+  FISH.prototype = {
+    GRAVITY: .4,
+    init: function () {
+      this.direction = Math.random() < .5, this.x = this.direction ? this.renderer.width + this.renderer.THRESHOLD : -this.renderer.THRESHOLD, this.previousY = this.y, this.vx = this.getRandomValue(4, 10) * (this.direction ? -1 : 1), this.renderer.reverse ? (this.y = this.getRandomValue(1 * this.renderer.height / 10, 4 * this.renderer.height / 10), this.vy = this.getRandomValue(2, 5), this.ay = this.getRandomValue(.05, .2)) : (this.y = this.getRandomValue(6 * this.renderer.height / 10, 9 * this.renderer.height / 10), this.vy = this.getRandomValue(-5, -2), this.ay = this.getRandomValue(-.2, -.05)), this.isOut = !1, this.theta = 0, this.phi = 0
+    },
+    getRandomValue: function (t, i) {
+      return t + (i - t) * Math.random()
+    },
+    reverseVertical: function () {
+      this.isOut = !this.isOut, this.ay *= -1
+    },
+    controlStatus: function (t) {
+      this.previousY = this.y, this.x += this.vx, this.y += this.vy, this.vy += this.ay, this.renderer.reverse ? this.y > this.renderer.height * this.renderer.INIT_HEIGHT_RATE ? (this.vy -= this.GRAVITY, this.isOut = !0) : (this.isOut && (this.ay = this.getRandomValue(.05, .2)), this.isOut = !1) : this.y < this.renderer.height * this.renderer.INIT_HEIGHT_RATE ? (this.vy += this.GRAVITY, this.isOut = !0) : (this.isOut && (this.ay = this.getRandomValue(-.2, -.05)), this.isOut = !1), this.isOut || (this.theta += Math.PI / 20, this.theta %= 2 * Math.PI, this.phi += Math.PI / 30, this.phi %= 2 * Math.PI), this.renderer.generateEpicenter(this.x + (this.direction ? -1 : 1) * this.renderer.THRESHOLD, this.y, this.y - this.previousY), (this.vx > 0 && this.x > this.renderer.width + this.renderer.THRESHOLD || this.vx < 0 && this.x < -this.renderer.THRESHOLD) && this.init()
+    },
+    render: function (t) {
+      t.save(), t.translate(this.x, this.y), t.rotate(Math.PI + Math.atan2(this.vy, this.vx)), t.scale(1, this.direction ? 1 : -1), t.beginPath(), t.moveTo(-30, 0), t.bezierCurveTo(-20, 15, 15, 10, 40, 0), t.bezierCurveTo(15, -10, -20, -15, -30, 0), t.fill(), t.save(), t.translate(40, 0), t.scale(.9 + .2 * Math.sin(this.theta), 1), t.beginPath(), t.moveTo(0, 0), t.quadraticCurveTo(5, 10, 20, 8), t.quadraticCurveTo(12, 5, 10, 0), t.quadraticCurveTo(12, -5, 20, -8), t.quadraticCurveTo(5, -10, 0, 0), t.fill(), t.restore(), t.save(), t.translate(-3, 0), t.rotate((Math.PI / 3 + Math.PI / 10 * Math.sin(this.phi)) * (this.renderer.reverse ? -1 : 1)), t.beginPath(), this.renderer.reverse ? (t.moveTo(5, 0), t.bezierCurveTo(10, 10, 10, 30, 0, 40), t.bezierCurveTo(-12, 25, -8, 10, 0, 0)) : (t.moveTo(-5, 0), t.bezierCurveTo(-10, -10, -10, -30, 0, -40), t.bezierCurveTo(12, -25, 8, -10, 0, 0)), t.closePath(), t.fill(), t.restore(), t.restore(), this.controlStatus(t)
+    }
+  }, $(function () {
+    RENDERER.init()
+    $('.dark').click(function () {
+      setTimeout(() => {
+        RENDERER.setFishColor();
+        RENDERER.context.fill();
+      });
+    })
+  });
+</script>
+  
+  <div class="footer bg-color">
+    <div class="footer-main">
+      
+        
+          <div class="link">
+            
+          </div>
+        
+      
+        
+          <div class="footer-copyright">
+            <p>Copyright © 2019 - 2020 <a target="_blank" rel="noopener" href="https://github.com/yuang01">yuang01</a> | Powered by <a target="_blank" rel="noopener" href="https://hexo.io/zh-cn/docs/">Hexo</a> | Theme <a target="_blank" rel="noopener" href="https://github.com/yuang01/theme">Bamboo</a> </p>
+
+          </div>
+        
+      
+        
+          
+            <!-- 不蒜子统计 -->
+            <!-- 不蒜子统计 -->
+<span id="busuanzi_container_site_pv">
+      <i class="fas fa-eye" aria-hidden="true"></i>Total visits：<span id="busuanzi_value_site_pv"></span> times
+</span>
+<span class="post-meta-divider">|</span>
+<span id="busuanzi_container_site_uv" style='display:none'>
+      <i class="fas fa-users" aria-hidden="true"></i>Number of visitors：<span id="busuanzi_value_site_uv"></span> people
+</span>
+
+          
+        
+      
+        
+          <div class="footer-custom">
+            
+          </div>
+        
+      
+    </div>
+  </div>
+
+
+
+    <!-- 渲染暗黑按钮 -->
+    
+      <div class="dark">
+  <div class="dark-content">
+    <i class="fas fa-moon" aria-hidden="true"></i>
+    <!-- <span>关灯</span> -->
+  </div>
+  
+</div>
+
+<script>
+  $(function() {
+    let isDark = JSON.parse(localStorage.getItem('dark'))  || JSON.parse('false');
+    if (isDark) {
+      $(".dark-content").replaceWith(
+          `
+          <div class='dark-content'>
+            <i class="fas fa-lightbulb" aria-hidden="true"></i>
+          </div>
+          `
+        );
+    }
+    $('.dark').click(function() {
+      if ($(document.body).is('.darkModel')) {
+        $(document.body).removeClass('darkModel');
+        localStorage.setItem('dark', false);
+        $(".dark-content").replaceWith(
+          `
+          <div class='dark-content'>
+            <i class="fas fa-moon" aria-hidden="true"></i>
+          </div>
+          `
+        );
+      } else {
+        $(document.body).addClass('darkModel');
+        localStorage.setItem('dark', true);
+        $(".dark-content").replaceWith(
+          `
+          <div class='dark-content'>
+            <i class="fas fa-lightbulb" aria-hidden="true"></i>
+          </div>
+          `
+        );
+      }
+    })
+  })
+</script>
+    
+    <!-- 渲染回到顶部按钮 -->
+    
+      <div class="goTop top-btn-color" pointer>
+  <i class="fas fa-arrow-up" aria-hidden="true"></i>
+</div>
+<script src="/js/goTop.js"></script>
+
+    
+    <!-- 渲染左下角音乐播放器 -->
+    
+      <link rel="stylesheet" href="/js/aplayer/APlayer@1.10.1.min.css">
+<style>
+.aplayer .aplayer-lrc p {
+  
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 16px !important;
+}
+
+.aplayer .aplayer-lrc p.aplayer-lrc-current {
+  
+  font-size: 15px;
+  color: #42b983;
+}
+
+
+.aplayer.aplayer-fixed.aplayer-narrow .aplayer-body {
+  left: -66px !important;
+}
+
+.aplayer.aplayer-fixed.aplayer-narrow .aplayer-body:hover {
+  left: 0px !important;
+}
+
+
+</style>
+<meting-js  
+  class=""
+  server="tencent"
+  type="playlist"
+  id="8062553743"
+  fixed='true'
+  autoplay='false'
+  theme='#42b983'
+  loop='all'
+  order='random'
+  preload='auto'
+  volume='0.7'
+  list-folded='true'
+>
+</meting-js>
+
+<!-- <style>
+  #aplayer {
+    position: fixed;
+    left: 0;
+    bottom: 300px;
+  }
+</style> -->
+<script src="https://unpkg.com/aplayer@1.10.1/dist/APlayer.min.js"></script>
+<script src="https://unpkg.com/meting@2/dist/Meting.min.js"></script>
+    
+
+    <!-- 图片放大 -->
+    
+      <script src="/js/fancybox/jquery.fancybox.min.js"></script>
+    
+
+    <!-- 百度解析 -->
+    <!-- Baidu Analytics -->
+
+    <!-- Baidu Push -->
+
+<script>
+    (function () {
+        var bp = document.createElement('script');
+        var curProtocol = window.location.protocol.split(':')[0];
+        if (curProtocol === 'https') {
+            bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+        } else {
+            bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+        }
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(bp, s);
+    })();
+</script>
+
+    
+    <!-- 背景彩带 -->
+    
+      <script type="text/javascript" size="100" alpha='0.4' zIndex="-1" src="/js/ribbon.min.js"></script>
+    
+
+    <script src="/js/utils/index.js"></script>
+    <script src="/js/app.js"></script>
+    
+    <!-- 文章目录所需js -->
+<link href="/js/tocbot/tocbot.css" rel="stylesheet">
+<script src="/js/tocbot/tocbot.min.js"></script>
+
+<script>
+  var headerEl = 'h2, h3, h4',  //headers 
+    content = '.post-detail',//文章容器
+    idArr = {};  //标题数组以确定是否增加索引id
+  //add #id
+  var option = {
+    // Where to render the table of contents.
+    tocSelector: '.toc',
+    // Where to grab the headings to build the table of contents.
+    contentSelector: content,
+    // Which headings to grab inside of the contentSelector element.
+    headingSelector: headerEl,
+    scrollSmooth: true,
+    scrollSmoothOffset: -80,
+    headingsOffset: -($(window).height() * 0.4 - 45),
+    positionFixedSelector: '.toc-main',
+    positionFixedClass: 'is-position-fixed',
+    fixedSidebarOffset: 'auto',
+    activeLinkClass: 'is-active-link',
+    // onClick: function (e) {},
+  }
+  if ($('.toc').length > 0) {
+
+    $(content).children(headerEl).each(function () {
+      //去除空格以及多余标点
+      var headerId = $(this).text().replace(/[\s|\~|`|\!|\@|\#|\$|\%|\^|\&|\*|\(|\)|\_|\+|\=|\||\|\[|\]|\{|\}|\;|\:|\"|\'|\,|\<|\.|\>|\/|\?|\：|\，|\。]/g, '');
+
+      headerId = headerId.toLowerCase();
+      if (idArr[headerId]) {
+        //id已经存在
+        $(this).attr('id', headerId + '-' + idArr[headerId]);
+        idArr[headerId]++;
+      }
+      else {
+        //id未存在
+        idArr[headerId] = 1;
+        $(this).attr('id', headerId);
+      }
+    });
+
+    document.addEventListener("DOMContentLoaded", function () {
+      tocbot.init(option);
+      mobileTocClick();
+    });
+
+  }
+
+  window.tocScrollFn = function () {
+    return bamboo.throttle(function () {
+      findHeadPosition();
+    }, 100)()
+  }
+  window.addEventListener('scroll', tocScrollFn);
+
+  const findHeadPosition = function (top) {
+    if ($('.toc-list').length <= 0) {
+      return false;
+    }
+    setTimeout(() => {  // or DOMContentLoaded 
+      autoScrollToc();
+    }, 0);
+  }
+
+  const autoScrollToc = function () {
+    const $activeItem = document.querySelector('.is-active-link');
+    const $cardToc = document.querySelector('.toc-content');
+    const activePosition = $activeItem.getBoundingClientRect().top
+    const sidebarScrollTop = $cardToc.scrollTop
+    if (activePosition > (document.documentElement.clientHeight - 100)) {
+      $cardToc.scrollTop = sidebarScrollTop + 150
+    }
+    if (activePosition < 100) {
+      $cardToc.scrollTop = sidebarScrollTop - 150
+    }
+  }
+
+  document.addEventListener('pjax:send', function () {
+    if ($('.toc').length) {
+      tocbot.destroy();
+    }
+  });
+
+  document.addEventListener('pjax:complete', function () {
+    if ($('.toc').length) {
+      tocbot.init(option);
+      mobileTocClick();
+    }
+  });
+  
+  // 手机端toc按钮点击出现目录
+  const mobileTocClick = function () {
+    const $cardTocLayout = document.getElementsByClassName('toc-aside')[0];
+    const $cardToc = $cardTocLayout.getElementsByClassName('toc-content')[0];
+    let right = '45px';
+    if (window.innerWidth >= 551 && window.innerWidth <= 992) {
+      right = '100px'
+    }
+    const mobileToc = {
+      open: () => {
+        $cardTocLayout.style.cssText = 'animation: toc-open .3s; opacity: 1; right: ' + right
+      },
+
+      close: () => {
+        $cardTocLayout.style.animation = 'toc-close .2s'
+        setTimeout(() => {
+          $cardTocLayout.style.cssText = "opacity:''; animation: ''; right: ''"
+        }, 100)
+      }
+    }
+    document.getElementById('toc-mobile-btn').addEventListener('click', () => {
+      if (window.getComputedStyle($cardTocLayout).getPropertyValue('opacity') === '0') mobileToc.open()
+      else mobileToc.close()
+    })
+
+    $cardToc.addEventListener('click', (e) => {
+      if (window.innerWidth < 992) { // 小于992px的时候
+        mobileToc.close()
+      }
+    })
+  }
+</script>
+
+<style>
+  .is-position-fixed {
+    position: sticky !important;
+    top: 74px;
+  }
+
+  .toc-main ul {
+    counter-reset: show-list;
+  }
+
+  .toc-main ul li::before {
+    content: counter(item)".";
+    display: block;
+    position: absolute;
+    left: 12px;
+    top: 0;
+  }
+</style> 
+
+<!-- 设置导航背景 -->
+<script>
+  let setHeaderClass = () => {
+    const headerMenuTransparent = true;
+    if (!headerMenuTransparent) { return; }
+    const nav = $('#navHeader');
+    const navTop = nav.outerHeight();
+    const winTop = $(window).scrollTop();
+    if(winTop > navTop) {
+      nav.addClass('header-bg-color');
+    }
+    else {
+      nav.removeClass('header-bg-color');
+    }
+  };
+
+  let scrollCollect = () => {
+    return bamboo.throttle(function (e) {
+      setHeaderClass();
+    }, 200)()
+  }
+
+  let initHeaderBg = () => {
+    setHeaderClass();
+  }
+
+  setHeaderClass();
+  window.addEventListener('scroll', scrollCollect);
+
+  document.addEventListener('pjax:send', function () {
+    window.removeEventListener('scroll', scrollCollect)
+  })
+  document.addEventListener('pjax:complete', function () {
+    window.addEventListener('scroll', scrollCollect);
+    setHeaderClass();
+  })
+</script> 
+
+<!-- 渲染issues标签里的内容 -->
+<script>
+  function loadIssuesJS() {
+    if ($(".post-detail").find(".issues-api").length == 0) {
+      return;
+    } 
+    loadScript('/js/issues/index.js');
+  };
+  $(function () {
+    loadIssuesJS();
+  });
+  document.addEventListener('pjax:complete', function () {
+    if (typeof IssuesAPI == "undefined") {
+      loadIssuesJS();
+    }
+  })
+</script>
+
+<!-- 输入框打字特效 -->
+<!-- 输入框打字特效 -->
+
+  <script src="/js/activate-power-mode.js"></script>
+  <script>
+    POWERMODE.colorful = true;  // 打开随机颜色特效
+    POWERMODE.shake = false;    // 关闭输入框抖动
+    document.body.addEventListener('input', POWERMODE);//监听打字事件
+  </script>
+
+
+<!-- markdown代码一键复制功能 -->
+
+  <link rel="stylesheet" href="https://unpkg.com/v-plugs-ayu/lib/ayu.css">
+  <script src="https://unpkg.com/v-plugs-ayu/lib/ayu.umd.min.js"></script>
+  <script src="/js/clipboard/clipboard.min.js"></script>
+  <div id="appCopy">
+  </div>
+  <script data-pjax>
+    var vm = new Vue({
+      el: '#appCopy',
+      data: {
+      },
+      computed: {
+      },
+      mounted() {
+        const that = this;
+        var copy = 'copy';
+        /* code */
+        var initCopyCode = function () {
+          var copyHtml = '';
+          copyHtml += '<button class="btn-copy" data-clipboard-snippet="" style="position:absolute;top:0;right:0;z-index:1;">';
+          copyHtml += '<i class="fas fa-copy"></i><span>' + copy + '</span>';
+          copyHtml += '</button>';
+          $(".post-detail pre").not('.gutter pre').wrap("<div class='codeBox' style='position:relative;width:100%;'></div>")
+          $(".post-detail pre").not('.gutter pre').before(copyHtml);
+          new ClipboardJS('.btn-copy', {
+            target: function (trigger) {
+              return trigger.nextElementSibling;
+            }
+          });
+        }
+        initCopyCode();
+        $('.btn-copy').unbind('click').bind('click', function () {
+          doSomething();
+        })
+        $(document).unbind('keypress').bind('keypress', function (e) {
+          if (e.ctrlKey && e.keyCode == 67) {
+            doSomething();
+          }
+        })
+
+        function doSomething() {
+          that.$notify({
+            title: "成功",
+            content: "代码已复制，请遵守相关授权协议。",
+            type: 'success'
+          })
+        }
+      },
+      methods: {
+      },
+      created() { }
+    })
+  </script>
+  
+
+<!-- 图片懒加载 -->
+<script defer src="https://unpkg.com/vanilla-lazyload@17.1.0/dist/lazyload.min.js"></script>
+<script>
+  // https://www.npmjs.com/package/vanilla-lazyload
+  // Set the options globally
+  // to make LazyLoad self-initialize
+  window.lazyLoadOptions = {
+    elements_selector: ".lazyload",
+    threshold: 0
+  };
+  // Listen to the initialization event
+  // and get the instance of LazyLoad
+  window.addEventListener(
+    "LazyLoad::Initialized",
+    function (event) {
+      window.lazyLoadInstance = event.detail.instance;
+    },
+    false
+  );
+  document.addEventListener('DOMContentLoaded', function () {
+    lazyLoadInstance.update();
+  });
+  document.addEventListener('pjax:complete', function () {
+    lazyLoadInstance.update();
+  });
+</script>
+
+
+<!-- 卡片滚动动画 -->
+   
+
+<!-- 评论所需js -->
+
+  
+    <script type="text/javascript">
+  var utteranceCommon = {};
+
+  function check_utterance() {
+    let isDark = JSON.parse(localStorage.getItem('dark')) || JSON.parse('false');
+    if (isDark) {
+      utteranceCommon.Theme = 'github-dark';
+    } else {
+      utteranceCommon.Theme = 'github-light';
+    }
+
+    return document.getElementById("gitment-container");
+  }
+  comment_el = '#gitment-container';
+  load_utterance = function () {
+    if ($(comment_el).length) {
+      // 匿名函数，防止污染全局变量
+      const HEAD = check_utterance();
+
+      var utterances = document.createElement('script');
+      utterances.type = 'text/javascript';
+      utterances.async = true;
+      utterances.setAttribute('issue-term', 'pathname')
+      utterances.setAttribute('theme', utteranceCommon.Theme)
+      utterances.setAttribute('repo', '')
+      utterances.crossorigin = 'anonymous';
+      utterances.src = 'https://utteranc.es/client.js';
+      // content 是要插入评论的地方
+      document.getElementById('gitment-container').appendChild(utterances);
+
+    }
+  }
+
+  function dark_utterance() {
+    const HEAD = check_utterance();
+    if (!HEAD) return;
+    const message = {
+      type: 'set-theme',
+      theme: utteranceCommon.Theme
+    };
+    const utteranceIframe = document.querySelector('iframe');
+    utteranceIframe.contentWindow.postMessage(message, 'https://utteranc.es');
+  }
+
+  $(document).ready(load_utterance);
+  document.addEventListener('pjax:complete', function () {
+    load_utterance();
+  });
+
+  $('.dark').click(function () {
+    setTimeout(() => {
+      dark_utterance();
+    });
+  })
+
+</script>
+
+<style>
+  .utterances {
+    max-width: inherit !important;
+  }
+</style>
+  
+
+
+<!-- 鼠标点击特效 -->
+<!-- 爱心点击 -->
+
+  
+    <canvas class="fireworks" style="position: fixed;left: 0;top: 0;z-index: 999; pointer-events: none;" ></canvas>
+    <script src="//cdn.bootcss.com/animejs/2.2.0/anime.min.js"></script>
+    <script src="/js/cursor/explosion.min.js"></script>
+  
+
+
+
+
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" data-pjax></script>
+
+
+    <!-- pjax -->
+    
+
+<!-- pjax -->
+
+
+  <script src="/js/pjax@0.2.8/index.js"></script>
+  
+    <!-- 样式位于：source/css/_third-party/pjaxanimate.styl -->
+
+<div class="pjax-animate">
+  
+    <div class="loading-circle"><div id="loader-circle"></div></div>
+    <script>
+      window.ShowLoading = function() {
+        $(".loading-circle").css("display", "block");
+      };
+      window.HideLoading = function() {
+        $(".loading-circle").css("display", "none");
+      }
+    </script>
+  
+	<script>
+    document.addEventListener('pjax:complete', function () {
+      window.HideLoading();
+    })
+    document.addEventListener('pjax:send', function () {
+      window.ShowLoading();
+    })
+    document.addEventListener('pjax:error', function () {
+      window.HideLoading();
+    })
+	</script>
+</div>
+
+  
+
+  <script>
+    var pjax = new Pjax({
+      elements: 'a[href]:not([href^="#"]):not([href="javascript:void(0)"]):not([no-pjax])',   // 拦截正常带链接的 a 标签
+      selectors: ["#pjax-container","title"],                                   // 根据实际需要确认重载区域
+      cacheBust: false,   // url 地址追加时间戳，用以避免浏览器缓存
+      timeout: 5000
+    });
+
+    document.addEventListener('pjax:send', function (e) {
+
+      try {
+        var currentUrl = window.location.pathname;
+        var targetUrl = e.triggerElement.href;
+        var banUrl = [""];
+        if (banUrl[0] != "") {
+          banUrl.forEach(item => {
+            if(currentUrl.indexOf(item) != -1 || targetUrl.indexOf(item) != -1) {
+              window.location.href = targetUrl;
+            }
+          });
+        }
+      } catch (error) {}
+
+      $(window).unbind('resize');
+      $(window).unbind('scroll');
+      $(document).unbind('scroll');
+      $(document).unbind('click');
+      $('body').unbind('click');
+
+    })
+    
+    document.addEventListener('pjax:complete', function () {
+      $('script[data-pjax], .pjax-reload script').each(function () {
+        $(this).parent().append($(this).remove());
+      });
+    });
+
+    document.addEventListener('pjax:error', function (e) {
+      window.location.href = e.triggerElement.href;
+    })
+    
+    // 刷新不从顶部开始
+    document.addEventListener("DOMContentLoaded", function () {
+      history.scrollRestoration = 'auto';
+    })
+  </script>
+
+
+
+  </body>
+</html>

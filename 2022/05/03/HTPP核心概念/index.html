@@ -1,0 +1,2243 @@
+<!DOCTYPE html>
+<html>
+  <!-- meta/link... -->
+  
+
+
+
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport">
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+
+
+  <title>HTPP核心概念 | Hexo</title>
+
+  <link rel="icon" type="image/x-icon, image/vnd.microsoft.icon" href="/favicon.ico">
+  <link rel="stylesheet" href="https://at.alicdn.com/t/font_1911880_c1nvbyezg17.css">
+  <link href="https://unpkg.com/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet">
+  <link href="/js/swiper/swiper@5.4.1.min.css" rel="stylesheet">
+  
+  
+  
+  
+<link rel="stylesheet" href="/css/animate.min.css">
+
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+  
+    
+<link rel="stylesheet" href="/js/fancybox/jquery.fancybox.min.css">
+
+  
+  
+    
+<link rel="stylesheet" href="/js/shareJs/share.min.css">
+
+  
+  <style>
+        @media (max-width: 992px) {
+            #waifu {
+                display: none;
+            }
+        }
+    </style>
+    <script src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
+    <link href="//cdn.bootcss.com/pace/1.0.2/themes/pink/pace-theme-flash.css" rel="stylesheet">
+
+    
+
+    <!-- import link -->
+    
+        
+            
+        
+            
+        
+    
+    <!-- import script -->
+    
+        
+            
+        
+            
+        
+    
+
+<meta name="generator" content="Hexo 6.2.0"></head>
+
+  
+  <!-- 依赖于jquery和vue -->
+  
+    
+<script src="https://unpkg.com/jquery@3.5.1/dist/jquery.min.js"></script>
+
+  
+
+  
+    
+<script src="https://unpkg.com/vue@2.6.11/dist/vue.min.js"></script>
+
+  
+  
+  <body>
+    <!-- 预加载动画 -->
+    <!-- 页面预加载动画 -->
+
+<div id='loader'>
+  <link rel="stylesheet" href="/js/loaded/index.css" >
+  <div class="loading-left-bg"></div>
+  <div class="loading-right-bg"></div>
+  <div class="spinner-box">
+    <div class="configure-border-1">
+      <div class="configure-core"></div>
+    </div>
+    <div class="configure-border-2">
+      <div class="configure-core"></div>
+    </div>
+    <div class="loading-word">loading...</div>
+  </div>
+</div>
+
+<script>
+  var endLoading = function () {
+    document.body.style.overflow = 'auto';
+    document.getElementById('loader').classList.add("loading");
+  }
+  window.addEventListener('DOMContentLoaded',endLoading);
+  
+</script>
+
+    
+    <!-- 判断是否为暗黑风格 -->
+    <!-- 判断是否为黑夜模式 -->
+<script>
+  let isDark = JSON.parse(localStorage.getItem('dark')) || JSON.parse('false');
+
+  if (isDark) {
+    $(document.body).addClass('darkModel');
+  }
+</script>
+
+    <!-- 需要在上面加载的js -->
+    <script>
+  function loadScript(src, cb) {
+    return new Promise(resolve => {
+      setTimeout(function () {
+        var HEAD = document.getElementsByTagName("head")[0] || document.documentElement;
+        var script = document.createElement("script");
+        script.setAttribute("type", "text/javascript");
+        if (cb) {
+          if (JSON.stringify(cb)) {
+            for (let p in cb) {
+              if (p == "onload") {
+                script[p] = () => {
+                  cb[p]()
+                  resolve()
+                }
+              } else {
+                script[p] = cb[p]
+                script.onload = resolve
+              }
+            }
+          } else {
+            script.onload = () => {
+              cb()
+              resolve()
+            };
+          }
+        } else {
+          script.onload = resolve
+        }
+        script.setAttribute("src", src);
+        HEAD.appendChild(script);
+      });
+    });
+  }
+
+  //https://github.com/filamentgroup/loadCSS
+  var loadCSS = function (href, before, media, attributes) {
+    return new Promise(resolve => {
+      setTimeout(function () {
+        var link = document.createElement('link');
+        link.rel = "stylesheet";
+        link.href = src;
+        link.onload = resolve;
+        document.getElementsByTagName("head")[0].appendChild(link);
+      });
+    });
+  };
+
+</script> 
+
+<!-- 轮播图所需要的js -->
+<script src="/js/swiper/swiper.min.js"></script>
+<script src="/js/swiper/vue-awesome-swiper.js"></script>
+<script src="/js/swiper/swiper.animate1.0.3.min.js"></script>
+
+<script type="text/javascript">
+  Vue.use(window.VueAwesomeSwiper)
+</script>
+
+
+  <script src="/js/vue-typed-js/index.js"></script>
+
+
+<!-- 首页的公告滚动插件的js需要重新加载 -->
+<script src="/js/vue-seamless-scroll/index.js"></script>
+
+<!-- 打字机效果js -->
+<script src="https://unpkg.com/typed.js@2.0.11"></script>
+
+
+    <div id="safearea">
+      <main class="main" id="pjax-container">
+        <!-- 头部导航 -->
+        
+<header class="header   " 
+  id="navHeader"
+  style="position: fixed;
+  left: 0; top: 0; z-index: 10;width: 100%;"
+>
+  <div class="header-content">
+    <div class="bars">
+      <div id="appDrawer" class="sidebar-image">
+  <div class="drawer-box-icon">
+    <i class="fas fa-bars" aria-hidden="true" @click="showDialogDrawer"></i>
+  </div>
+  
+  <transition name="fade">
+    <div class="drawer-box_mask" v-cloak style="display: none;" v-show="visible" @click.self="cancelDialogDrawer">
+    </div>
+  </transition>
+  <div class="drawer-box" :class="{'active': visible}">
+    <div class="drawer-box-head bg-color">
+      <img class="drawer-box-head_logo lazyload placeholder" src="/medias/logo.png" class="lazyload placeholder" data-srcset="/medias/logo.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="logo">
+      <h3 class="drawer-box-head_title">Hexo</h3>
+      <h5 class="drawer-box-head_desc"></h5>
+    </div>
+    
+    <div class="drawer-box-content">
+      <ul class="drawer-box-content_menu">
+        
+        
+          <li class="drawer-box-content_item">
+            <a target="_blank" rel="noopener" href="https://github.com/yuang01/hexo-theme-bamboo">
+              <i class="fas fa-github" aria-hidden="true"></i>
+              <span>Github</span>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</div>
+
+<script>
+  var body = document.body || document.documentElement || window;
+  var vm = new Vue({
+    el: '#appDrawer',
+    data: {
+      visible: false,
+      top: 0,
+      openArr: [],
+    },
+    computed: {
+    },
+    mounted() {
+    },
+    methods: {
+      isOpen(index) {
+        if (this.openArr.includes(index)) {
+          return true;
+        } else {
+          return false;
+        }
+      },
+      openOrCloseMenu(curIndex) {
+        const index = this.openArr.indexOf(curIndex);
+        if (index !== -1) {
+          this.openArr.splice(index, 1);
+        } else {
+          this.openArr.push(curIndex);
+        }
+      },
+      showDialogDrawer() {
+        this.visible = true;
+        // 防止页面滚动，只能让弹框滚动
+        this.top = $(document).scrollTop()
+        body.style.cssText = 'width: 100%; height: 100%;overflow: hidden;';
+      },
+      cancelDialogDrawer() {
+        this.visible = false;
+        body.removeAttribute('style');
+        $(document).scrollTop(this.top)
+      }
+    },
+    created() {}
+  })
+</script>
+
+    </div>
+    <div class="blog-title" id="author-avatar">
+      
+        <div class="avatar">
+          <img src="/medias/logo.png" class="lazyload placeholder" data-srcset="/medias/logo.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="logo">
+        </div>
+      
+      <a href="/" class="logo">Hexo</a>
+    </div>
+    <nav class="navbar">
+      <ul class="menu">
+        
+      </ul>
+      
+      
+        <div id="appSearch">
+  <div class="search"  @click="showDialog()"><i class="fas fa-search" aria-hidden="true"></i></div>
+  <transition name="fade">
+    <div class="message-box_wrapper" style="display: none;" v-cloak v-show="dialogVisible" @click.self="cancelDialogVisible()">
+      <div class="message-box animated bounceInDown">
+        <h2>
+          <span>
+            <i class="fas fa-search" aria-hidden="true"></i>
+            <span class="title">Search</span>
+          </span>
+          <i class="fas fa-times close" pointer style="float:right;" aria-hidden="true" @click.self="cancelDialogVisible()"></i>
+        </h2>
+        <form class="site-search-form">
+          <input type="text"
+            placeholder="Please enter keywords"
+            id="local-search-input" 
+            @click="getSearchFile()"
+            class="st-search-input"
+            v-model="searchInput"
+          />
+        </form>
+        <div class="result-wrapper">
+          <div id="local-search-result" class="local-search-result-cls"></div>
+        </div>
+      </div>
+    </div>
+  </transition>
+</div>
+<script src="/js/local_search.js"></script>
+<script>
+  var body = document.body || document.documentElement || window;
+  var vm = new Vue({
+    el: '#appSearch',
+    data: {
+      dialogVisible: false,
+      searchInput: '',
+      top: 0,
+    },
+    computed: {
+    },
+    mounted() {
+      window.addEventListener('pjax:complete', () => {
+        this.cancelDialogVisible();
+      })
+    },
+    methods: {
+      showDialog() {
+        this.dialogVisible = true;
+        // 防止页面滚动，只能让弹框滚动
+        this.top = $(document).scrollTop()
+        body.style.cssText = 'overflow: hidden;';
+      },
+      getSearchFile() {
+        if (!this.searchInput) {
+          getSearchFile("/search.xml");
+        }
+      },
+      cancelDialogVisible() {
+        this.dialogVisible = false;
+        body.removeAttribute('style');
+        $(document).scrollTop(this.top)
+      },
+    },
+    created() {}
+  })
+</script>
+<!-- 解决刷新页面闪烁问题，可以在元素上添加display: none, 或者用vue.extend方法，详情：https://blog.csdn.net/qq_31393401/article/details/81017912 -->
+<!-- 下面是搜索基本写法 -->
+<!-- <script type="text/javascript" id="local.search.active">
+  var inputArea = document.querySelector("#local-search-input");
+  inputArea.onclick   = function(){ getSearchFile(); this.onclick = null }
+  inputArea.onkeydown = function(){ if(event.keyCode == 13) return false }
+</script> -->
+
+      
+
+    </nav>
+  </div>
+  
+    <a target="_blank" rel="noopener" href="https://github.com/yuang01/hexo-theme-bamboo" class="github-corner color-primary" aria-label="View source on GitHub"><svg width="60" height="60" viewBox="0 0 250 250" style="fill:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+  
+  
+</header>
+        <!-- 内容区域 -->
+        
+ <!-- prismjs 代码高亮 -->
+ 
+
+
+<div class="bg-dark-floor" style="position: fixed;left: 0;top: 0;width: 100%;height: 100%;z-index: -1;"></div>
+
+
+  <!-- 文章详情页顶部图片和标题 -->
+
+
+
+
+<div class="post-detail-header" id="thumbnail_canvas" style="background-repeat: no-repeat; background-size: cover; 
+  background-position: center center;position: relative;background-image:url('/medias/8.jpg')">
+  <div class="post-detail-header-mask"></div>
+  <canvas id="header_canvas"style="position:absolute;bottom:0;pointer-events:none;"></canvas>
+  
+  <div class="post-detail-header_info-box">
+    <div class="title-box">
+      <span class="title">
+        HTPP核心概念
+      </span>
+    </div>
+    
+    
+      
+        <span class="post-detail-header_date">
+          <i class="fas fa-calendar"></i> Published in：2022-05-03 |
+        </span>
+      
+
+      
+        <span class="post-detail-header_categories">
+          <i class="iconfont iconbookmark1"></i> category：
+          
+            <a href="/categories/HTTP/" class="post-detail-header_category">
+              HTTP
+            </a>
+          
+        </span>
+      
+
+      
+    
+  </div>
+  
+  
+    <script src="/js/bubble/bubble.js"></script>
+  
+</div>
+
+
+
+
+
+<div class="post-detail-content row justify-position" 
+  style="padding-top: 0px;">
+  <div class="main-content">
+    <article class="post post-detail">
+      <div class="post-content">
+        <h1 id="HTTP-核心概念"><a href="#HTTP-核心概念" class="headerlink" title="HTTP 核心概念"></a>HTTP 核心概念</h1><ul>
+<li><a href="#http-%E6%A0%B8%E5%BF%83%E6%A6%82%E5%BF%B5">HTTP 核心概念</a><ul>
+<li><a href="#http-%E6%A0%87%E5%A4%B4">HTTP 标头</a><ul>
+<li><a href="#%E9%80%9A%E7%94%A8%E6%A0%87%E5%A4%B4">通用标头</a><ul>
+<li><a href="#cache-control">Cache-Control</a></li>
+<li><a href="#connection">Connection</a></li>
+<li><a href="#date">Date</a></li>
+<li><a href="#pragma">Pragma</a></li>
+<li><a href="#trailer">Trailer</a></li>
+<li><a href="#transfer-encoding">Transfer-Encoding</a></li>
+<li><a href="#upgrade">Upgrade</a></li>
+<li><a href="#via">Via</a></li>
+<li><a href="#warning">Warning</a></li>
+</ul>
+</li>
+<li><a href="#%E8%AF%B7%E6%B1%82%E6%A0%87%E5%A4%B4">请求标头</a><ul>
+<li><a href="#accept">Accept</a></li>
+<li><a href="#accept-charset">Accept-Charset</a></li>
+<li><a href="#accept-encoding">Accept-Encoding</a></li>
+<li><a href="#accept-language">Accept-Language</a></li>
+<li><a href="#authorization">Authorization</a></li>
+<li><a href="#expect">Expect</a></li>
+<li><a href="#from">From</a></li>
+<li><a href="#host">Host</a></li>
+<li><a href="#if-match">If-Match</a></li>
+<li><a href="#if-modified-since">If-Modified-Since</a></li>
+<li><a href="#if-none-match">If-None-Match</a></li>
+<li><a href="#if-range">If-Range</a></li>
+<li><a href="#if-unmodified-since">If-Unmodified-Since</a></li>
+<li><a href="#max-forwards">Max-Forwards</a></li>
+<li><a href="#proxy-authorization">Proxy-Authorization</a></li>
+<li><a href="#range">Range</a></li>
+<li><a href="#referer">Referer</a></li>
+<li><a href="#te">TE</a></li>
+<li><a href="#user-agent">User-Agent</a></li>
+</ul>
+</li>
+<li><a href="#%E5%93%8D%E5%BA%94%E6%A0%87%E5%A4%B4">响应标头</a><ul>
+<li><a href="#accept-ranges">Accept-Ranges</a></li>
+<li><a href="#age">Age</a></li>
+<li><a href="#etag">ETag</a></li>
+<li><a href="#location">Location</a></li>
+<li><a href="#proxy-authenticate">Proxy-Authenticate</a></li>
+<li><a href="#retry-after">Retry-After</a></li>
+<li><a href="#server">Server</a></li>
+<li><a href="#vary">Vary</a></li>
+<li><a href="#www-authenticate">www-Authenticate</a></li>
+<li><a href="#access-control-allow-origin">Access-Control-Allow-Origin</a></li>
+</ul>
+</li>
+<li><a href="#%E5%AE%9E%E4%BD%93%E6%A0%87%E5%A4%B4">实体标头</a><ul>
+<li><a href="#allow">Allow</a></li>
+<li><a href="#content-encoding">Content-Encoding</a></li>
+<li><a href="#content-language">Content-Language</a></li>
+<li><a href="#content-length">Content-Length</a></li>
+<li><a href="#content-location">Content-Location</a></li>
+<li><a href="#content-md5">Content-MD5</a></li>
+<li><a href="#content-range">Content-Range</a></li>
+<li><a href="#content-type">Content-Type</a></li>
+<li><a href="#expires">Expires</a></li>
+<li><a href="#last-modified">Last-Modified</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#%E6%80%BB%E7%BB%93">总结</a></li>
+</ul>
+</li>
+</ul>
+<p>上一篇文章我们大致讲解了一下 HTTP 的基本特征和使用，大家反响很不错，那么本篇文章我们就来深究一下 HTTP 的特性。我们接着上篇文章没有说完的 HTTP 标头继续来介绍（此篇文章会介绍所有标头的概念，但没有深入底层）</p>
+<h2 id="HTTP-标头"><a href="#HTTP-标头" class="headerlink" title="HTTP 标头"></a>HTTP 标头</h2><p>先来回顾一下 HTTP1.1 标头都有哪几种</p>
+<p>HTTP 1.1 的标头主要分为四种，<code>通用标头</code>、<code>实体标头</code>、<code>请求标头</code>、<code>响应标头</code>，现在我们来对这几种标头进行介绍</p>
+<h3 id="通用标头"><a href="#通用标头" class="headerlink" title="通用标头"></a>通用标头</h3><p>HTTP 通用标头之所以这样命名，是因为与其他三个类别不同，它们不是限定于特定种类的消息或者消息组件（请求，响应或消息实体）的。HTTP 通用标头主要用于传达有关消息本身的信息，而不是它所携带的内容。它们提供一般信息并控制如何处理和处理消息。</p>
+<p>尽管通用标头不会限定于是请求还是响应报文，但是某些通用标头大部分或全部用于一种特定类型的请求中。也就是说，如果某个通用标头出现在请求报文中，那么大部分通用标头都会显示在该请求报文中。响应报文也是一样的。</p>
+<p>先列出来一个清单，讲明我们都需要介绍哪些通用标头</p>
+<ul>
+<li>Cache-Control</li>
+<li>Connection</li>
+<li>Date</li>
+<li>Pragma</li>
+<li>Trailer</li>
+<li>Transfer-Encoding</li>
+<li>Upgrade</li>
+<li>Via</li>
+<li>Warning</li>
+</ul>
+<h4 id="Cache-Control"><a href="#Cache-Control" class="headerlink" title="Cache-Control"></a>Cache-Control</h4><p><code>缓存（Cache）</code>是计算机领域里的一个重要概念，是优化系统性能的利器。不仅计算机中的 CPU 为了提高指令执行效率从而选择使用寄存器作为辅助，计算机网络同样存在缓存，下面我们就来介绍一下计算机网络中的缓存。</p>
+<p><code>Cache-Control</code> 是通用标头的指令，它能够管理如何对 HTTP 的请求或者响应使用缓存。</p>
+<p>因为计算机网络中是可以有<code>第三者</code>出现的，也就是<code>缓存服务器</code>，这个指令通过影响<code>请求/响应</code>中的缓存服务器从而达到控制缓存的目的；不仅有缓存服务器，还有浏览器内部缓存也会影响链路的缓存。</p>
+<p>这个标头中可以出现许多单独的指令，其详细信息可以在 RFC 2616 中找到，<strong>即使这是常规标头，某些指令也只能出现在请求或响应中</strong>。下表提供了一个 Cache-Control 选项的总结并告诉你如何去使用</p>
+<blockquote>
+<p>请注意，在 Cache-Control 标头中只能出现一个指令，但是在消息中可以出现多个这样的标头。</p>
+</blockquote>
+<p><img src="https://img2018.cnblogs.com/blog/1515111/202001/1515111-20200119202007799-1484558348.png" class="lazyload placeholder" data-srcset="https://img2018.cnblogs.com/blog/1515111/202001/1515111-20200119202007799-1484558348.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>上面这个表格其实会有四种分类</p>
+<ul>
+<li><code>可缓存性</code>： 它们分别是 <code>no-cache</code>、<code>no-store</code>、<code>private</code> 和 <code>public</code></li>
+<li><code>缓存有效性时间</code>： 它们分别是 <code>max-age</code>、<code>s-maxage</code>、<code>max-stale</code>、<code>min-fresh</code></li>
+<li><code>重新验证并重新加载</code>： 它们分别是 <code>must-revalidate</code> 和 <code>proxy-revalidate</code></li>
+<li><code>其他</code>： 它们分别是 <code>only-if-cached</code> 和 <code>no-transform</code></li>
+</ul>
+<p>分别对表格中的内容进行一下详细介绍</p>
+<p><strong>no-cache</strong></p>
+<p><code>no-cache</code> 很容易和 <code>no-store</code> 混淆，一般都会把 <code>no-cache</code> 认为是不缓存，其实不是这样。</p>
+<p>使用 no-cache 指令的目的是<strong>为了防止从缓存中返回过期的资源</strong>，例如下图所示</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">Cache-Control</span><span class="punctuation">: </span>no-cache</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://img2018.cnblogs.com/blog/1515111/202001/1515111-20200119202019720-545342359.png" class="lazyload placeholder" data-srcset="https://img2018.cnblogs.com/blog/1515111/202001/1515111-20200119202019720-545342359.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>举个例子你就明白了，No-Cache 就相当于是<code>吃着碗里的，占着锅里的</code>，如果锅里还有新的肉片，就先吃锅里的，如果锅里没有新的，再吃自己的，这里<code>锅里的</code>就相当于是源服务器产生的，<code>碗里的</code>就相当于是缓存的。</p>
+<p><strong>no-store</strong></p>
+<p><code>no-store</code> 才是真正意义上的<code>不缓存</code>，每次服务器接受到客户端的请求后，都会返回最新的资源给客户端。</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">Cache-Control</span><span class="punctuation">: </span>no-store</span><br></pre></td></tr></table></figure>
+
+<p><strong>max-age</strong></p>
+<p><code>max-age</code> 可以用在请求或者响应中，当客户端发送带有 max-age 的指令时，缓存服务器会判断自己缓存时间的数值和 max-age 的大小，如果比 max-age 小，那么缓存有效，可以继续给客户端返回缓存的数据，如果比 max-age 大，那么缓存服务器将不能返回给客户端缓存的数据。</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">Cache-Control</span><span class="punctuation">: </span>max-age=60</span><br></pre></td></tr></table></figure>
+
+<p>如果 <code>max-age = 0</code>，那么缓存服务器将会直接把请求转发到服务器</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">Cache-Control</span><span class="punctuation">: </span>max-age=0</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>注意：这个 max-age 的值是相对于请求时间的</p>
+</blockquote>
+<p><strong>must-revalidate</strong></p>
+<p>表示一旦资源过期，缓存就必须在原始服务器上没有成功验证的情况下才使用其过期的数据。</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">Cache-Control</span><span class="punctuation">: </span>must-revalidate</span><br></pre></td></tr></table></figure>
+
+<p><code>no-store</code> 、<code>no_cache</code> 、 <code>must-revalidate</code> 和 <code>max-age</code> 可以一起看，下面是一个这四个标头的流程图</p>
+<p><img src="https://img2018.cnblogs.com/blog/1515111/202001/1515111-20200119202031222-1829206010.png" class="lazyload placeholder" data-srcset="https://img2018.cnblogs.com/blog/1515111/202001/1515111-20200119202031222-1829206010.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p><strong>public</strong></p>
+<p><code>public</code> 属性只出现在客户端响应中，表示响应可以被任何缓存所缓存。在计算机网络中，分为两种缓存，共享缓存和私有缓存，如下所示</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">Cache-Control</span><span class="punctuation">: </span>public</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://img2018.cnblogs.com/blog/1515111/202001/1515111-20200119202044059-1156135091.png" class="lazyload placeholder" data-srcset="https://img2018.cnblogs.com/blog/1515111/202001/1515111-20200119202044059-1156135091.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p><strong>private</strong></p>
+<p>当指定 <code>private </code> 指令后，响应只以特定的用户作为对象，这与 <code>public</code> 的用法相反，缓存服务器只对特定的客户端进行缓存，其他客户端发送过来的请求，缓存服务器则不会返回缓存。</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">Cache-Control</span><span class="punctuation">: </span>private</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://img2018.cnblogs.com/blog/1515111/202001/1515111-20200119202102287-144066551.png" class="lazyload placeholder" data-srcset="https://img2018.cnblogs.com/blog/1515111/202001/1515111-20200119202102287-144066551.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p><strong>s-maxage</strong></p>
+<p><code>s-maxage</code> 指令的功能和 <code>max-age</code> 指令的功能相同，不同点之处在于 s-maxage 不能用于私有缓存，只能用于多用户使用的公共服务器，对于同一用户的重复请求和响应来说，这个指令没有任何作用。</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">Cache-Control</span><span class="punctuation">: </span>s-maxage=60</span><br></pre></td></tr></table></figure>
+
+<p><strong>min-fresh</strong></p>
+<p><code>min-fresh</code>只能出现在请求中，<code>min-fresh</code> 要求缓存服务器返回 min-fresh 时间内的缓存数据。例如 <code>Cache-Control:min-fresh=60</code>，这就要求缓存服务器发送60秒内的数据。</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">Cache-Control</span><span class="punctuation">: </span>min-fresh=60</span><br></pre></td></tr></table></figure>
+
+<p><strong>max-stable</strong></p>
+<p><code>max-stable</code> 只能出现在请求中，表示客户端会接受缓存数据，即使过期也照常接收。</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">Cache-Control</span><span class="punctuation">: </span>max-stable=60</span><br></pre></td></tr></table></figure>
+
+<p><strong>only-if-cached</strong></p>
+<p>这个标头只能出现在请求中，使用 <code>only-if-cached</code> 指令表示客户端仅在缓存服务器本地缓存目标资源的情况下才会要求其返回。</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">Cache-Control</span><span class="punctuation">: </span>only-if-cached</span><br></pre></td></tr></table></figure>
+
+<p><strong>proxy-revalidate</strong></p>
+<p><code>proxy-revalidate</code> 指令要求所有的缓存服务器在接收到客户端带有该指令的请求返回响应之前，必须再次验证缓存的有效性。</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">Cache-Control</span><span class="punctuation">: </span>proxy-revalidate</span><br></pre></td></tr></table></figure>
+
+<p><strong>no-transform</strong></p>
+<p>使用 <code>no-transform</code> 指令规定无论是在请求还是响应中，缓存都不能改变实体主体的媒体类型。</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">Cache-Control</span><span class="punctuation">: </span>no-transform</span><br></pre></td></tr></table></figure>
+
+<h4 id="Connection"><a href="#Connection" class="headerlink" title="Connection"></a>Connection</h4><p>HTTP 协议使用 TCP 来管理连接方式，主要有两种连接方式，<code>持久性连接</code> 和 <code>非持久性连接</code>。</p>
+<p><strong>持久性连接</strong></p>
+<p>持久性连接指的是一次会话完成后，TCP 连接并未关闭，第二次再次发送请求后，就不再需要建立 TCP 连接，而是可以直接进行请求和响应。它的一般表示形式如下</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">Connection</span><span class="punctuation">: </span>keep-alive</span><br></pre></td></tr></table></figure>
+
+<p><strong>从 HTTP 1.1 开始，默认使用持久性连接</strong>。</p>
+<p><code>keep-alive</code> 也是一个通用标头，一般 Connection 都会和 keep-alive 一起使用，keep-alive 有两个参数，一个是 <code>timeout</code>；另一个是 <code>max</code>，它们的主要表现形式如下</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">Connection</span><span class="punctuation">: </span>Keep-Alive</span><br><span class="line"><span class="attribute">Keep-Alive</span><span class="punctuation">: </span>timeout=5, max=1000</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>timeout: 指的是空闲连接必须打开的最短时间，也就是说这次请求的连接时间不能少于5秒，</p>
+</li>
+<li><p>max: 指的是在连接关闭之前服务器所能够收到的最大请求数。</p>
+</li>
+</ul>
+<p><strong>非持久性连接</strong></p>
+<p>非持久性连接表示一次会话请求&#x2F;响应后关闭连接的方式。HTTP 1.1 之前使用的连接都是非持久连接，也就是</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">Connection</span><span class="punctuation">: </span>close</span><br></pre></td></tr></table></figure>
+
+<h4 id="Date"><a href="#Date" class="headerlink" title="Date"></a>Date</h4><p>Date 是一个通用标头，它可以出现在请求标头和响应标头中，它的基本表示如下</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">Date</span><span class="punctuation">: </span>Wed, 21 Oct 2015 07:28:00 GMT </span><br></pre></td></tr></table></figure>
+
+<p>表示的是格林威治标准时间，这个时间要比北京时间慢八个小时</p>
+<p><img src="https://img2018.cnblogs.com/blog/1515111/202001/1515111-20200119202119831-657480710.png" class="lazyload placeholder" data-srcset="https://img2018.cnblogs.com/blog/1515111/202001/1515111-20200119202119831-657480710.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<h4 id="Pragma"><a href="#Pragma" class="headerlink" title="Pragma"></a>Pragma</h4><p><code>Pragma</code>是 http 1.1 之前版本的历史遗留字段，仅作为与 http 的向后兼容而定义。它的一般形式如下</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">Pragma</span><span class="punctuation">: </span>no-cache</span><br></pre></td></tr></table></figure>
+
+<p>只用于客户端发送的请求中。客户端会要求所有的中间服务器不返回缓存的资源。</p>
+<p>如果所有的中间服务器都以实现 HTTP &#x2F;1.1为标准，那么直接使用 Cache-Control: no-cache 即可，如果不是的话，就要包含两个字段，如下</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">Cache-Control</span><span class="punctuation">: </span>no-cache</span><br><span class="line"><span class="attribute">Pragma</span><span class="punctuation">: </span>no-cache</span><br></pre></td></tr></table></figure>
+
+<h4 id="Trailer"><a href="#Trailer" class="headerlink" title="Trailer"></a>Trailer</h4><p>首部字段 Trailer 会事先说明在报文主体后记录了哪些首部字段。该首部字段可应用在 HTTP&#x2F;1.1 版本分块传输编码时。一般用法如下</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">Transfer-Encoding</span><span class="punctuation">: </span>chunked</span><br><span class="line"><span class="attribute">Trailer</span><span class="punctuation">: </span>Expires</span><br></pre></td></tr></table></figure>
+
+<p>以上用例中，指定首部字段 Trailer 的值为 Expires，在报文主体之后（分块长度 0 之后）出现了首部字段 Expires。</p>
+<h4 id="Transfer-Encoding"><a href="#Transfer-Encoding" class="headerlink" title="Transfer-Encoding"></a>Transfer-Encoding</h4><p>Transfer-Encoding 属于内容协商的范畴，下面会具体介绍一下内容协商，现在先做个预告：<code>Transfer-Encoding</code> 规定了传输报文所采用的编码方式</p>
+<blockquote>
+<p>注意：HTTP 1.1 的传输编码方式仅对分块传输有效，但是 HTTP 2.0 就不再支持分块传输，而提供了自己更有效的数据传输机制。</p>
+</blockquote>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">Transfer-Encoding</span><span class="punctuation">: </span>chunked</span><br></pre></td></tr></table></figure>
+
+<p>Transfer-Encoding 也属于 <code>Hop-by-hop（逐跳） 首部</code> ，下面来回顾一下，HTTP 报文标头除了可以根据属性所在的位置分为 <code>通用标头</code>、<code>请求标头</code>、<code>响应标头</code> 和 <code>实体标头</code>；还可以按照是否被缓存分为 <code>端到端首部(End-to-End)</code> 和 <code>逐跳首部(Top-to-Top)</code>。</p>
+<p>除了下面八种属于逐跳首部外，其余都属于端到端首部</p>
+<p><strong>Connection、Keep-Alive、Proxy-Authenticate、Proxy-Authorization、Trailer、TE、Transfer-Encoding、Upgrade</strong></p>
+<p>下面回到讨论中来，Transfer-Encoding 用于两个节点之间传输消息，而不是资源本身。在多个节点传输消息的过程中，每一段消息的传输都可以使用不同的 <code>Transfer-Encoding</code>。如图所示</p>
+<p><img src="https://img2018.cnblogs.com/blog/1515111/202001/1515111-20200119202133383-1391705404.png" class="lazyload placeholder" data-srcset="https://img2018.cnblogs.com/blog/1515111/202001/1515111-20200119202133383-1391705404.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>Transfer-Encoding 支持文件压缩，如果你想要以文件压缩后的形式发送的话。Transfer-Encoding 所有可选类型如下</p>
+<ul>
+<li><code>chunked</code>： 数据按照一系列块发送，在这种情况下，将省略 <code>Content-Length</code> 标头，并在每个块的开头，需要以十六进制填充当前块的长度，后跟 <code>&#39;\r\n&#39;</code>，然后是块本身，然后是另一个<code>&#39;\r\n&#39;</code>。当将大量数据发送到客户端并且在请求已被完全处理之前，可能无法知道响应的总大小时，分块编码很有用。 例如，在生成由数据库查询产生的大型 HTML 表时或在传输大型图像时。 分块的响应看起来像这样</li>
+</ul>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">HTTP/1.1</span> <span class="number">200</span> OK </span><br><span class="line"><span class="attribute">Content-Type</span><span class="punctuation">: </span>text/plain </span><br><span class="line"><span class="attribute">Transfer-Encoding</span><span class="punctuation">: </span>chunked</span><br><span class="line"></span><br><span class="line"><span class="language-livescript"><span class="number">7</span><span class="string">\r\n</span></span></span><br><span class="line"><span class="language-livescript">Mozilla<span class="string">\r\n</span> </span></span><br><span class="line"><span class="language-livescript"><span class="number">9</span><span class="string">\r\n</span></span></span><br><span class="line"><span class="language-livescript">Developer<span class="string">\r\n</span></span></span><br><span class="line"><span class="language-livescript"><span class="number">7</span><span class="string">\r\n</span></span></span><br><span class="line"><span class="language-livescript">Network<span class="string">\r\n</span></span></span><br><span class="line"><span class="language-livescript"><span class="number">0</span><span class="string">\r\n</span> </span></span><br><span class="line"><span class="language-livescript"><span class="string">\r\n</span></span></span><br></pre></td></tr></table></figure>
+
+<p>终止块通常是0。紧随<code>Transfer-Encoding</code> 后面的是 <code>Trailer</code> 标头， Trailer 可能为空。</p>
+<ul>
+<li><code>compress</code>： 使用 <code>Lempel-Ziv-Welch(LZW)</code> 算法的格式。值名称取自 <code>UNIX</code> 压缩程序，该程序实现了该算法。现在几乎没有浏览器使用这种内容编码了，因为这个专利在 2003 年就停掉了。</li>
+<li><code>deflate</code>：使用 <code>zlib(在 RFC 1950 定义)</code> 结构和 deflate 压缩算法</li>
+<li><code>gzip</code>： 使用<code>Lempel-Ziv编码（LZ77）</code>和32位<code>CRC</code>的格式。这最初是 <code>UNIX gzip</code> 程序的格式。<code>HTTP / 1.1</code>标准还建议出于兼容性目的，支持此内容编码的服务器应将 x-gzip 识别为别名。</li>
+<li><code>identity</code>： 使用身份功能（即无压缩或修改）。</li>
+</ul>
+<p>也可以列出多个值，以逗号分隔，类似一个集合列表</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">Transfer-Encoding</span><span class="punctuation">: </span>gzip, chunked</span><br></pre></td></tr></table></figure>
+
+<h4 id="Upgrade"><a href="#Upgrade" class="headerlink" title="Upgrade"></a>Upgrade</h4><p>首部字段 Upgrade 用于检测 HTTP 协议及其他协议是否可使用更高的版本进行通信，其参数值可以用来指定一个完全不同的通信协议。</p>
+<p><img src="https://img2018.cnblogs.com/blog/1515111/202001/1515111-20200119202144084-1563076281.png" class="lazyload placeholder" data-srcset="https://img2018.cnblogs.com/blog/1515111/202001/1515111-20200119202144084-1563076281.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>上图用例中，首部字段 <code>Upgrade</code> 指定的值为 <code>TLS/1.0</code>。请注意此处两个字段首部字段的对应关系，Connection 的值被指定为 Upgrade。<br>Upgrade 首部字段产生作用的对象仅限于客户端和临近服务器之间。因此，使用首部字段 Upgrade 时，还需要额外指定 <code>Connection: Upgrade</code>。<br>对于附有首部字段 Upgrade 的请求，服务器可用 <code>101 Switching Protocols</code> 状态码作为响应返回。</p>
+<h4 id="Via"><a href="#Via" class="headerlink" title="Via"></a>Via</h4><p>使用 Via 是为了跟踪客户端和服务器之间的请求&#x2F;响应路径，避免请求循环以及能够识别<code>请求/响应</code>链中发送者协议的功能。Via 字段由代理服务器添加，不论是正向代理还是反向代理，并且可以出现在请求标头和响应标头中。它用于跟踪消息转发。例如下图所示</p>
+<p><img src="https://img2018.cnblogs.com/blog/1515111/202001/1515111-20200119202151270-1114942686.png" class="lazyload placeholder" data-srcset="https://img2018.cnblogs.com/blog/1515111/202001/1515111-20200119202151270-1114942686.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>Via 后面的的 <code>1.1, 1.0</code> 表示接收服务器上的 HTTP 版本，Via 首部是为了跟踪路径，经常和 <code>TRACE</code> 方法一起使用。</p>
+<h4 id="Warning"><a href="#Warning" class="headerlink" title="Warning"></a>Warning</h4><blockquote>
+<p>注意：Warning 字段即将被弃用</p>
+<p>查阅 <a target="_blank" rel="noopener" href="https://github.com/httpwg/http-core/issues/139">Warning (https://github.com/httpwg/http-core/issues/139)</a> and <a target="_blank" rel="noopener" href="https://github.com/whatwg/fetch/issues/913">Warning: header &amp; stale-while-revalidate (https://github.com/whatwg/fetch/issues/913)</a> 获取更多细节</p>
+</blockquote>
+<p>Warning 通用 HTTP 标头通常会告知用户一些与缓存相关的问题的警告</p>
+<p>HTTP&#x2F;1.1 中定义了 7 种警告。它们分别如下</p>
+<p><img src="https://img2018.cnblogs.com/blog/1515111/202001/1515111-20200119202159275-1980969426.png" class="lazyload placeholder" data-srcset="https://img2018.cnblogs.com/blog/1515111/202001/1515111-20200119202159275-1980969426.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<h3 id="请求标头"><a href="#请求标头" class="headerlink" title="请求标头"></a>请求标头</h3><p>请求标头用于客户端发送 HTTP 请求到服务器中所使用的字段，下面我们一起来看一下 HTTP 请求标头都包含哪些字段，分别是什么意思。下面会介绍</p>
+<ul>
+<li>Accept</li>
+<li>Accept-Charset</li>
+<li>Accept-Encoding</li>
+<li>Accept-Language</li>
+<li>Authorization</li>
+<li>Expect</li>
+<li>From</li>
+<li>Host</li>
+<li>If-Match</li>
+<li>If-Modified-Since</li>
+<li>If-None-Match</li>
+<li>If-Range</li>
+<li>If-Unmodified-Since</li>
+<li>Max-Forwards</li>
+<li>Proxy-Authorization</li>
+<li>RangeReferer</li>
+<li>TE</li>
+<li>User-Agent</li>
+</ul>
+<p>下面分别来介绍一下</p>
+<h4 id="Accept"><a href="#Accept" class="headerlink" title="Accept"></a>Accept</h4><p>HTTP 请求标头会告知客户端能够接收的 MIME 类型是什么</p>
+<p>那么什么是 MIME 类型呢？在回答这个问题前你应该先了解一下什么是 MIME</p>
+<blockquote>
+<p>MIME: MIME (Multipurpose Internet Mail Extensions) 是描述消息内容类型的因特网标准。MIME 消息能包含文本、图像、音频、视频以及其他应用程序专用的数据。</p>
+</blockquote>
+<p>也就是说，MIME 类型其实就是一系列消息内容类型的集合。那么 MIME 类型都有哪些呢？</p>
+<p><code>文本文件</code>： text&#x2F;html、text&#x2F;plain、text&#x2F;css、application&#x2F;xhtml+xml、application&#x2F;xml</p>
+<p><code>图片文件</code>： image&#x2F;jpeg、image&#x2F;gif、image&#x2F;png</p>
+<p><code>视频文件</code>： video&#x2F;mpeg、video&#x2F;quicktime</p>
+<p><code>应用程序二进制文件</code>： application&#x2F;octet-stream、application&#x2F;zip</p>
+<p>比如，如果浏览器不支持 PNG 图片的显示，那 Accept 就不指定image&#x2F;png，而指定可处理的 image&#x2F;gif 和 image&#x2F;jpeg 等图片类型。</p>
+<p>一般 MIME 类型也会和 <code>q</code> 这个属性一起使用，q 是什么？q 表示的是权重，来看一个例子</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">Accept</span><span class="punctuation">: </span>text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8</span><br></pre></td></tr></table></figure>
+
+<p>这是什么意思呢？若想要给显示的<strong>媒体类型增加优先级</strong>，则使用 q&#x3D; 来额外表示权重值，没有显示权重的时候默认值是1.0 ，我给你列个表格你就明白了</p>
+<table>
+<thead>
+<tr>
+<th>q</th>
+<th>MIME</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1.0</td>
+<td>text&#x2F;html</td>
+</tr>
+<tr>
+<td>1.0</td>
+<td>application&#x2F;xhtml+xml</td>
+</tr>
+<tr>
+<td>0.9</td>
+<td>application&#x2F;xml</td>
+</tr>
+<tr>
+<td>0.8</td>
+<td>* &#x2F; *</td>
+</tr>
+</tbody></table>
+<p>也就是说，这是一个放置顺序，权重高的在前，低的在后，<code>application/xml;q=0.9</code> 是不可分割的整体。</p>
+<h4 id="Accept-Charset"><a href="#Accept-Charset" class="headerlink" title="Accept-Charset"></a>Accept-Charset</h4><p><code>Accept-Charset</code> 表示客户端能够接受的字符编码。Accept-Charset 也是属于<code>内容协商</code>的一部分，它和 </p>
+<p><code>Accept</code> 一样，也可以用 q 来表示字符集，用<code>逗号</code>进行分割，例如</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">Accept-Charset</span><span class="punctuation">: </span>iso-8859-1</span><br><span class="line"><span class="attribute">Accept-Charset</span><span class="punctuation">: </span>utf-8, iso-8859-1;q=0.5</span><br><span class="line"><span class="attribute">Accept-Charset</span><span class="punctuation">: </span>utf-8, iso-8859-1;q=0.5, *;q=0.1</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>事实上，很多以 <code>Accept-*</code> 开头的标头，都是属于内容协商的范畴，关于内容协商我们下面会说。</p>
+</blockquote>
+<h4 id="Accept-Encoding"><a href="#Accept-Encoding" class="headerlink" title="Accept-Encoding"></a>Accept-Encoding</h4><p>表示 HTTP 标头会标明客户端希望服务端返回的内容编码，这通常是一种压缩算法。Accept-Encoding 也是属于<code>内容协商</code> 的一部分，使用并通过客户端选择 <code>Content-Encoding</code> 内容进行返回。</p>
+<p>即使客户端和服务器都能够支持相同的压缩算法，服务器也可能选择不压缩并返回，这种情况可能是由于这两种情况造成的:</p>
+<ul>
+<li>要发送的数据已经被压缩了一次，第二次压缩并不会导致发送的数据更小</li>
+<li>服务器过载，无法承受压缩带来的性能开销，通常，如果服务器使用 CPU 超过 80% ，<code>Microsoft</code> 则建议不要使用压缩</li>
+</ul>
+<p>下面是 Accept-Encoding 的使用方式</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">Accept-Encoding</span><span class="punctuation">: </span>gzip</span><br><span class="line"><span class="attribute">Accept-Encoding</span><span class="punctuation">: </span>compress</span><br><span class="line"><span class="attribute">Accept-Encoding</span><span class="punctuation">: </span>deflate</span><br><span class="line"><span class="attribute">Accept-Encoding</span><span class="punctuation">: </span>br</span><br><span class="line"><span class="attribute">Accept-Encoding</span><span class="punctuation">: </span>identity</span><br><span class="line"><span class="attribute">Accept-Encoding</span><span class="punctuation">: </span>*</span><br><span class="line"><span class="attribute">Accept-Encoding</span><span class="punctuation">: </span>deflate, gzip;q=1.0, *;q=0.5</span><br></pre></td></tr></table></figure>
+
+<p>上面的几种表述方式就已经把 Accept-Encoding 的属性列全了</p>
+<ul>
+<li><p><code>gzip</code>: 由文件压缩程序 gzip 生成的编码格式，使用 <code>Lempel-Ziv编码（LZ77）</code>和32位CRC的压缩格式，感兴趣的同学可以读一下 （<a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/LZ77_and_LZ78#LZ77%EF%BC%89">https://en.wikipedia.org/wiki/LZ77_and_LZ78#LZ77）</a></p>
+</li>
+<li><p><code>compress</code>: 使用<code>Lempel-Ziv-Welch（LZW）</code>算法的压缩格式，有兴趣的同学可以读 （<a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/LZW%EF%BC%89">https://en.wikipedia.org/wiki/LZW）</a></p>
+</li>
+<li><p><code>deflate</code>: 使用 zlib 结构和 deflate 压缩算法的压缩格式，参考 （<a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Zlib%EF%BC%89">https://en.wikipedia.org/wiki/Zlib）</a> 和 （<a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/DEFLATE%EF%BC%89">https://en.wikipedia.org/wiki/DEFLATE）</a></p>
+</li>
+<li><p><code>br</code>: 使用 Brotli 算法的压缩格式，参考 （<a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Brotli%EF%BC%89">https://en.wikipedia.org/wiki/Brotli）</a></p>
+</li>
+<li><p>不执行压缩或不会变化的默认编码格式</p>
+</li>
+<li><p><code>*</code> : 匹配标头中未列出的任何内容编码，如果没有列出 <code>Accept-Encoding</code> ，这就是默认值，并不意味着支</p>
+<p>持任何算法，只是表示没有偏好</p>
+</li>
+<li><p><code>;q=</code> 采用权重 q 值来表示相对优先级，这点与首部字段 Accept 相同。</p>
+</li>
+</ul>
+<h4 id="Accept-Language"><a href="#Accept-Language" class="headerlink" title="Accept-Language"></a>Accept-Language</h4><p><code>Accept-Language</code> 请求表示客户端需要服务端返回的语言类型，Accept-Language 也属于内容协商的范畴。服务端通过 <code>Content-Language</code> 进行响应，和 Accept 首部字段一样，按权重值 <code>q </code>来表示相对优先级。例如</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">Accept-Language</span><span class="punctuation">: </span>de</span><br><span class="line"><span class="attribute">Accept-Language</span><span class="punctuation">: </span>de-CH</span><br><span class="line"><span class="attribute">Accept-Language</span><span class="punctuation">: </span>en-US,en;q=0.5</span><br></pre></td></tr></table></figure>
+
+<h4 id="Authorization"><a href="#Authorization" class="headerlink" title="Authorization"></a>Authorization</h4><p>HTTP <code>Authorization</code> 请求头用于向服务器认证用户代理的凭据，通常用在服务器以401未经授权状态和WWW-Authenticate标头响应之后，啥意思呢？你不明白的话我画张图给你看</p>
+<p><img src="https://img2018.cnblogs.com/blog/1515111/202001/1515111-20200119202349931-1672351660.png" class="lazyload placeholder" data-srcset="https://img2018.cnblogs.com/blog/1515111/202001/1515111-20200119202349931-1672351660.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>请求标头 <code>Authorization</code> 是用来告知服务器，用户的认证信息，服务器在只有收到认证后才会返回给客户端 200 OK 的响应，如果没有认证信息，则会返回 401 并告知客户端需要认证信息。详细关于 Authorization 的信息，后面也会详细解释</p>
+<h4 id="Expect"><a href="#Expect" class="headerlink" title="Expect"></a>Expect</h4><p>Expect HTTP 请求标头指示服务器需要满足的期望才能正确处理请求。如果服务器没有办法完成客服端所期望完成的事情并且服务端存在错误的话，会返回 <code>417 Expectation Failed</code> 。HTTP 1.1 只规定了<code>100-continue</code> 。</p>
+<ul>
+<li>如果服务器能正常完成客户端所期望的事情，会返回 100</li>
+<li>如果不能满足期望或返回任何其他<code>4xx</code> 的状态码，会返回 417</li>
+</ul>
+<p>例如</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">PUT</span> <span class="string">/somewhere/fun</span> <span class="meta">HTTP/1.1</span></span><br><span class="line"><span class="attribute">Host</span><span class="punctuation">: </span>origin.example.com</span><br><span class="line"><span class="attribute">Content-Type</span><span class="punctuation">: </span>video/h264</span><br><span class="line"><span class="attribute">Content-Length</span><span class="punctuation">: </span>1234567890987</span><br><span class="line"><span class="attribute">Expect</span><span class="punctuation">: </span>100-continue</span><br></pre></td></tr></table></figure>
+
+<h4 id="From"><a href="#From" class="headerlink" title="From"></a>From</h4><p><code>From</code> 请求头用来告知服务器使用用户代理的电子邮件地址。通常情况下，其使用目的就是为了显示搜索引擎等用户代理的负责人的电子邮件联系方式。我们在使用代理的情况下，应尽可能包含 From 首部字段。例如 </p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">From</span><span class="punctuation">: </span>webmaster@example.org</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>你不应该将 From 用在访问控制或者身份验证中</p>
+</blockquote>
+<h4 id="Host"><a href="#Host" class="headerlink" title="Host"></a>Host</h4><p><code>Host</code> 请求头指明了服务器的域名（对于虚拟主机来说），以及（可选的）服务器监听的TCP端口号。如果没有给定端口号，会自动使用被请求服务的默认端口（比如请求一个 HTTP 的 URL 会自动使用80作为端口）。</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">Host</span><span class="punctuation">: </span>developer.mozilla.org</span><br></pre></td></tr></table></figure>
+
+<p>Host 首部字段在 HTTP&#x2F;1.1 规范内是唯一一个必须被包含在请求内的首部字段。</p>
+<h4 id="If-Match"><a href="#If-Match" class="headerlink" title="If-Match"></a>If-Match</h4><p>If-Match 后面可以跟一大堆属性，形式像 If-Match 这种的请求头称为<code>条件请求</code>，服务器接收到条件请求后，需要判定条件请求是否满足，只有条件请求为真，才会执行条件请求</p>
+<p>类似的还有 <strong>If-Match、If-Modified-Since、If-None-Match、If-Range、If-Unmodified-Since</strong></p>
+<p>对于 <code>GET</code> 和 <code>POST</code> 方法，服务器仅在与列出的 <code>ETag（响应标头）</code> 之一匹配时才返回请求的资源。这里又多了一个新词 <code>ETag</code>，我们稍后再说 ETag 的用法。对于像是 <code>PUT</code> 和其他非安全的方法，在这种情况下，它仅仅将上传资源。</p>
+<p>下面是两种常见的案例</p>
+<ul>
+<li>对于 <code>GET</code> 和 <code>POST</code> 方法，会结合使用 <code>Range</code> 标头，它可以确保新发送请求的范围与上一个请求的资源相同，如果不匹配的话，会返回 <code>416</code> 响应。</li>
+<li>对于其他方法，特别是 <code>PUT</code> 方法，<code>If-Match</code> 可以防止丢失更新，服务器会比对 If-Match 的字段值和资源的 ETag 值，仅当两者一致时，才会执行请求。反之，则返回状态码 412 Precondition Failed 的响应。例如</li>
+</ul>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">If-Match</span><span class="punctuation">: </span>&quot;bfc13a64729c4290ef5b2c2730249c88ca92d82d&quot;</span><br><span class="line"><span class="attribute">If-Match</span><span class="punctuation">: </span>*</span><br></pre></td></tr></table></figure>
+
+<h4 id="If-Modified-Since"><a href="#If-Modified-Since" class="headerlink" title="If-Modified-Since"></a>If-Modified-Since</h4><p><code>If-Modified-Since</code> 是 HTTP 条件请求的一部分，只有在给定日期之后，服务端修改了请求所需要的资源，才会返回 200 OK 的响应。如果在给定日期之后，服务端没有修改内容，响应会返回 <code>304</code> 并且不带任何响应体。If-Modified-Since 只能使用 <code>GET</code> 和 <code>HEAD</code> 请求。</p>
+<p>If-Modified-Since 与 If-None-Match 结合使用时，它将被忽略，除非服务器不支持 If-None-Match。一般表示如下</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">If-Modified-Since</span><span class="punctuation">: </span>Wed, 21 Oct 2015 07:28:00 GMT </span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>注意：这是格林威治标准时间。 HTTP 日期始终以格林尼治标准时间表示，而不是本地时间。</p>
+</blockquote>
+<h4 id="If-None-Match"><a href="#If-None-Match" class="headerlink" title="If-None-Match"></a>If-None-Match</h4><p>条件请求，它与 <code>If-Match</code> 的作用相反，仅当 <code>If-None-Match</code> 的字段值与 <code>ETag</code> 值不一致时，可处理该请求。对于<code>GET</code> 和 <code>HEAD</code> ，仅当服务器没有与给定资源匹配的 <code>ETag</code> 时，服务器将返回 200 作为响应。对于其他方法，仅当最终现有资源的 ETag 与列出的任何值都不匹配时，才会处理请求。</p>
+<p>当 <code>GET</code> 和 <code>POST</code> 发送的 <code>If-None-Match</code>与 <code>ETag</code> 匹配时，服务器会返回 <code>304</code>。</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">If-None-Match</span><span class="punctuation">: </span>&quot;bfc13a64729c4290ef5b2c2730249c88ca92d82d&quot;</span><br><span class="line"><span class="attribute">If-None-Match</span><span class="punctuation">: </span>W/&quot;67ab43&quot;, &quot;54ed21&quot;, &quot;7892dd&quot;</span><br><span class="line"><span class="attribute">If-None-Match</span><span class="punctuation">: </span>*</span><br></pre></td></tr></table></figure>
+
+<p>有同学可能会好奇 <code>W/</code> 是什么意思，这其实是 ETag 的弱匹配，关于 ETag 我们会在响应标头中详细讲述。</p>
+<h4 id="If-Range"><a href="#If-Range" class="headerlink" title="If-Range"></a>If-Range</h4><p><code>If-Range</code> 也是条件请求，如果满足条件（If-Range 的值和 ETag 值或者更新的日期时间一致），则会发出范围请求，否则将会返回全部资源。它的一般表示如下</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">If-Range</span><span class="punctuation">: </span>Wed, 21 Oct 2015 07:28:00 GMT </span><br></pre></td></tr></table></figure>
+
+<h4 id="If-Unmodified-Since"><a href="#If-Unmodified-Since" class="headerlink" title="If-Unmodified-Since"></a>If-Unmodified-Since</h4><p><code>If-Unmodified-Since</code> HTTP 请求标头也是一个条件请求，服务器只有在给定日期之后没有对其进行修改时，服务器才返回请求资源。如果在指定日期时间后发生了更新，则以状态码 <code>412 Precondition Failed</code> 作为响应返回。</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">If-Unmodified-Since</span><span class="punctuation">: </span>Wed, 21 Oct 2015 07:28:00 GMT </span><br></pre></td></tr></table></figure>
+
+<h4 id="Max-Forwards"><a href="#Max-Forwards" class="headerlink" title="Max-Forwards"></a>Max-Forwards</h4><p>MDN 把这个标头置灰了，所以下面内容取自《图解 HTTP》</p>
+<p><code>Max-Forwards</code> 一般用于 <code>TRACE</code> 和 <code>OPTION</code> 方法，发送包含 <code>Max-Forwards</code> 的首部字段时，每经过一个服务器，Max-Forwards 的值就会 -1，直到 Max-Forwards 为0时返回。Max-Forwards 是一个十进制的整数值。</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">Max-Forwards</span><span class="punctuation">: </span>10</span><br></pre></td></tr></table></figure>
+
+<p>可以灵活使用首部字段 Max-Forwards，针对以上问题产生的原因展开调查。由于当 Max-Forwards 字段值为 0 时，服务器就会立即返回响应，由此我们至少可以对以那台服务器为终点的传输路径的通信状况有所把握。</p>
+<h4 id="Proxy-Authorization"><a href="#Proxy-Authorization" class="headerlink" title="Proxy-Authorization"></a>Proxy-Authorization</h4><p><code>Proxy-Authorization</code> 是属于请求与认证的范畴，我们在上面提到一个认证的 HTTP 标头是 Authorization，不同于 Authorization 发生在客户端 - 服务器之间；<code>Proxy-Authorization</code> 发生在代理服务器和客户端之间。它表示接收到从代理服务器发来的认证时，客户端会发送包含首部字段 Proxy-Authorization 的请求，以告知服务器认证所需要的信息。</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">Proxy-Authorization</span><span class="punctuation">: </span>Basic YWxhZGRpbjpvcGVuc2VzYW1l</span><br></pre></td></tr></table></figure>
+
+<h4 id="Range"><a href="#Range" class="headerlink" title="Range"></a>Range</h4><p><code>Range</code> HTTP 请求标头指示服务器应返回文档指定部分的资源，可以一次请求一个 Range 来返回多个部分，服务器会将这些资源返回各个文档中。如果服务器成功返回，那么将返回 206 响应；如果 Range 范围无效，服务器返回<code>416 Range Not Satisfiable</code>错误；服务器还可以忽略 Range 标头，并且返回 200 作为响应。</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">Range</span><span class="punctuation">: </span>bytes=200-1000, 2000-6576, 19000-</span><br></pre></td></tr></table></figure>
+
+<h4 id="Referer"><a href="#Referer" class="headerlink" title="Referer"></a>Referer</h4><p>HTTP Referer 属性是请求标头的一部分，当浏览器向 web 服务器发送请求的时候，一般会带上 Referer，告诉服务器该网页是从哪个页面链接过来的，服务器因此可以获得一些信息用于处理。</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">Referer</span><span class="punctuation">: </span>https://developer.mozilla.org/testpage.html</span><br></pre></td></tr></table></figure>
+
+<h4 id="TE"><a href="#TE" class="headerlink" title="TE"></a>TE</h4><p>首部字段 <code>TE</code> 会告知服务器客户端能够处理响应的传输编码方式及相对优先级。它和首部字段 Accept-Encoding 的功能很相像，但是用于传输编码。</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">TE</span><span class="punctuation">: </span>gzip, deflate;q=0.5</span><br></pre></td></tr></table></figure>
+
+<p>首部字段 TE 除指定传输编码之外，还可以指定伴随 trailer 字段的分块传输编码的方式。应用后者时，只需把 trailers 赋值给该字段值。</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">TE</span><span class="punctuation">: </span>trailers, deflate;q=0.5</span><br></pre></td></tr></table></figure>
+
+<h4 id="User-Agent"><a href="#User-Agent" class="headerlink" title="User-Agent"></a>User-Agent</h4><p>首部字段 <code>User-Agent</code> 会将创建请求的浏览器和用户代理名称等信息传达给服务器。</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0</span><br></pre></td></tr></table></figure>
+
+<h3 id="响应标头"><a href="#响应标头" class="headerlink" title="响应标头"></a>响应标头</h3><p>刚刚我们的着重点一直放在客户端请求，现在我们把关注点转换一下放在服务器上。响应首部字段是由服务器发送给客户端响应中所包含的字段，用于补充相应信息等，这部分标头也是非常多，我们先一起来看一下</p>
+<ul>
+<li>Accept-Ranges</li>
+<li>Age</li>
+<li>ETag</li>
+<li>Location</li>
+<li>Proxy-Authenticate</li>
+<li>Retry-After</li>
+<li>Server</li>
+<li>Vary</li>
+<li>www-Authenticate</li>
+</ul>
+<h4 id="Accept-Ranges"><a href="#Accept-Ranges" class="headerlink" title="Accept-Ranges"></a>Accept-Ranges</h4><p>Accept-Ranges HTTP 响应标头，这个标头有两个值</p>
+<ul>
+<li>当服务器能够处理客户端发送过来的请求时，使用<code>bytes</code> 来指定</li>
+<li>当服务器不能处理客户端发来的请求时，使用 <code>none</code> 来指定</li>
+</ul>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">Accept-Ranges</span><span class="punctuation">: </span>bytes</span><br><span class="line"><span class="attribute">Accept-Ranges</span><span class="punctuation">: </span>none</span><br></pre></td></tr></table></figure>
+
+<h4 id="Age"><a href="#Age" class="headerlink" title="Age"></a>Age</h4><p>Age HTTP 响应标头告诉客户端源服务器在多久之前创建了响应，它的单位为<code>秒</code>，Age 标头通常接近于0，如果是0则可能是从源服务器获取的，如果不是表示可能是由代理服务器创建，那么 Age 的值表示的是缓存后的响应再次发起认证到认证完成的时间值。代理创建响应时必须加上首部字段 Age。一般表示如下</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">Age</span><span class="punctuation">: </span>24</span><br></pre></td></tr></table></figure>
+
+<h4 id="ETag"><a href="#ETag" class="headerlink" title="ETag"></a>ETag</h4><p>ETag 对于条件请求来说真是太重要了。因为条件请求就是根据 ETag 的值进行匹配的，下面我们就来详细了解一下。</p>
+<p>ETag 响应头是<code>特定版本</code>的标识，它能够使缓存变得更高效并能够节省带宽，因为如果缓存内容未发生变更，Web 服务器则不需要重新发送完整的响应。除此之外，ETag 能够防止资源同时更新互相覆盖。</p>
+<p><img src="https://img2018.cnblogs.com/blog/1515111/202001/1515111-20200119202414891-731084102.png" class="lazyload placeholder" data-srcset="https://img2018.cnblogs.com/blog/1515111/202001/1515111-20200119202414891-731084102.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>如果给定 URL 上的资源发生变更，必须生成一个新的 <code>ETag</code> 值，通过比较它们可以确定资源的两个表示形式是否相同。</p>
+<p>ETag 值有两种，一种是强 ETag，一种是弱 ETag；</p>
+<ul>
+<li>强 ETag 值，无论实体发生多么细微的变化都会改变其值，一般的表示如下</li>
+</ul>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">ETag</span><span class="punctuation">: </span>&quot;33a64df551425fcc55e4d42a148795d9f25f89d4&quot;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>弱 ETag 值，弱 ETag 值只用于提示资源是否相同。只有资源发生了根本改变，产生差异时才会改变 ETag 值。这时，会在字段值最开始处附加 W&#x2F;。</li>
+</ul>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">ETag</span><span class="punctuation">: </span>W/&quot;0815&quot;</span><br></pre></td></tr></table></figure>
+
+<h4 id="Location"><a href="#Location" class="headerlink" title="Location"></a>Location</h4><p>Location 响应标头表示 URL 需要重定向页面，它仅仅与 <code>3xx(重定向)</code> 或 <code>201(已创建)</code> 状态响应一起使用。下面是一个页面重定向的过程</p>
+<p><img src="https://img2018.cnblogs.com/blog/1515111/202001/1515111-20200119202423740-854658184.png" class="lazyload placeholder" data-srcset="https://img2018.cnblogs.com/blog/1515111/202001/1515111-20200119202423740-854658184.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>使用首部字段 Location 可以将响应接受方引导至某个与请求 URI 位置不同的资源。</p>
+<p><code>Location</code> 和 <code>content-Location</code> 是不一样的：Location 表示目标的重定向（或新创建资源的 URL）。然而 Content-Location 表示发生内容协商时用于访问资源的直接 URL，而无须进一步协商。Location 是与响应相关联的标头，而 Content-Location 与返回的实体相关联。</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">Location</span><span class="punctuation">: </span>/index.html</span><br></pre></td></tr></table></figure>
+
+<h4 id="Proxy-Authenticate"><a href="#Proxy-Authenticate" class="headerlink" title="Proxy-Authenticate"></a>Proxy-Authenticate</h4><p>HTTP 响应标头 <code>Proxy-Authenticate</code> 会定义认证方法，应该使用身份验证方法来访问代理服务器后面的资源即客户端。</p>
+<p>它与 HTTP 客户端和服务端之间的访问认证行为相似，不同之处在于 <code>Proxy-Authenticate</code> 的认证双方是客户端与代理之间。它的一般表示形式如下</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">Proxy-Authenticate</span><span class="punctuation">: </span>Basic</span><br><span class="line"><span class="attribute">Proxy-Authenticate</span><span class="punctuation">: </span>Basic realm=&quot;Access to the internal site&quot;</span><br></pre></td></tr></table></figure>
+
+<h4 id="Retry-After"><a href="#Retry-After" class="headerlink" title="Retry-After"></a>Retry-After</h4><p>HTTP 响应标头 Retry-After 告知客户端需要在多久之后重新发送请求，使用此标头主要有如下三种情况</p>
+<ul>
+<li>当发送 <code>503(服务不可用) </code>响应时，这表示该服务预计无法使用多长时间。</li>
+<li>当发送 <code>429(太多请求)</code>响应时，这表示发出新请求之前要等待多长时间。</li>
+<li>当发送重定向的响应像是 <code>301(永久移动)</code>，这表示在发出重定向请求之前要求用户客户端等待的最短时间。</li>
+</ul>
+<p>字段值可以指定为具体的日期时间，也可以是创建响应后所持续的秒数，例如</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">Retry-After</span><span class="punctuation">: </span>Wed, 21 Oct 2015 07:28:00 GMT</span><br><span class="line"><span class="attribute">Retry-After</span><span class="punctuation">: </span>120</span><br></pre></td></tr></table></figure>
+
+<h4 id="Server"><a href="#Server" class="headerlink" title="Server"></a>Server</h4><p>服务器标头包含有关原始服务器用来处理请求的软件的信息。</p>
+<p>应该避免使用过于冗长和详细的 Server 值，因为它们可能会泄露内部实施细节，这可能会使攻击者容易地发现并利用已知的安全漏洞。例如下面这种写法</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">Server</span><span class="punctuation">: </span>Apache/2.4.1 (Unix)</span><br></pre></td></tr></table></figure>
+
+<h4 id="Vary"><a href="#Vary" class="headerlink" title="Vary"></a>Vary</h4><p>Vary HTTP 响应标头确定如何匹配请求标头，以决定是否可以使用缓存的响应，而不是从原始服务器请求一个新的响应。</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">Vary</span><span class="punctuation">: </span>User-Agent</span><br></pre></td></tr></table></figure>
+
+<h4 id="www-Authenticate"><a href="#www-Authenticate" class="headerlink" title="www-Authenticate"></a>www-Authenticate</h4><p>HTTP <code>WWW-Authenticate</code> 响应标头定义了应用于获得对资源的访问权限的身份验证方法。WWW-Authenticate标头与401未经授权的响应一起发送。它的一般表示形式如下</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">WWW-Authenticate</span><span class="punctuation">: </span>Basic</span><br><span class="line"><span class="attribute">WWW-Authenticate</span><span class="punctuation">: </span>Basic realm=&quot;Access to the staging site&quot;, charset=&quot;UTF-8&quot;</span><br></pre></td></tr></table></figure>
+
+<h4 id="Access-Control-Allow-Origin"><a href="#Access-Control-Allow-Origin" class="headerlink" title="Access-Control-Allow-Origin"></a>Access-Control-Allow-Origin</h4><p>一个返回的 HTTP 标头可能会具有 Access-Control-Allow-Origin ，<code>Access-Control-Allow-Origin</code> 指定一个来源，它告诉浏览器允许该来源进行资源访问。 否则-对于没有凭据的请求 <code>*</code>通配符，告诉浏览器允许任何源访问资源。例如，要允许源 <code>https://mozilla.org</code> 的代码访问资源，可以指定：</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">Access-Control-Allow-Origin</span><span class="punctuation">: </span>https://mozilla.org</span><br><span class="line"><span class="attribute">Vary</span><span class="punctuation">: </span>Origin</span><br></pre></td></tr></table></figure>
+
+<p>如果服务器指定单个来源而不是 <code>* </code>通配符的话 ，则服务器还应在 Vary 响应标头中包含 <code>Origin</code> ，以向客户端指示 服务器响应将根据原始请求标头的值而有所不同。</p>
+<h3 id="实体标头"><a href="#实体标头" class="headerlink" title="实体标头"></a>实体标头</h3><p>实体标头用于HTTP请求和响应中，例如 Content-Length，Content-Language，Content-Encoding 的标头是实体标头。实体标头不局限于请求标头或者响应标头，下面例子中，<code>Content-Length</code> 是一个实体标头，但是却出现在了请求报文中</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">POST</span> <span class="string">/myform.html</span> <span class="meta">HTTP/1.1</span></span><br><span class="line"><span class="attribute">Host</span><span class="punctuation">: </span>developer.mozilla.org</span><br><span class="line"><span class="attribute">User-Agent</span><span class="punctuation">: </span>Mozilla/5.0 (Macintosh; Intel Mac OS X 10.9; rv:50.0) Gecko/20100101 Firefox/50.0</span><br><span class="line"><span class="attribute">Content-Length</span><span class="punctuation">: </span>128</span><br></pre></td></tr></table></figure>
+
+<p>下面就来说一下实体标头都包含哪些</p>
+<ul>
+<li>Allow</li>
+<li>Content-Encoding</li>
+<li>Content-Language</li>
+<li>Content-Length</li>
+<li>Content-Location</li>
+<li>Content-MD5</li>
+<li>Content-Range</li>
+<li>Content-Type</li>
+<li>Expires</li>
+<li>Last-Modified</li>
+</ul>
+<p>下面来分开说一下</p>
+<h4 id="Allow"><a href="#Allow" class="headerlink" title="Allow"></a>Allow</h4><p>HTTP 实体标头 <code>Allow</code> 列出了资源支持的方法集合。如果服务器响应<code>405 Method Not Allowed</code>状态码以指示可以使用哪些请求方法，则必须发送此标头。例如</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">Allow</span><span class="punctuation">: </span>GET, POST, HEAD</span><br></pre></td></tr></table></figure>
+
+<p>这段代码表示服务器允许支持 <code>GET</code> 、<code>POST</code> 和 <code>HEAD</code> 方法。当服务器接收到不支持的 HTTP 方法时，会以状态码 <code>405 Method Not Allowed</code> 作为响应返回。</p>
+<h4 id="Content-Encoding"><a href="#Content-Encoding" class="headerlink" title="Content-Encoding"></a>Content-Encoding</h4><p>我们上面讲过 <code>Accept-Encoding</code> 是客户端希望服务端返回的内容编码，但是实际上服务端返回给客户端的内容编码实际上是通过 <code>Content-Encoding</code> 返回的。内容编码是指在不丢失实体信息的前提下所进行的压缩。主要也是四种，和 Accept-Encoding 相同，它们是 <strong>gzip、compress、deflate、identity</strong>。下面是一组请求&#x2F;响应内容压缩编码</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">Accept-Encoding</span><span class="punctuation">: </span>gzip, deflate</span><br><span class="line"><span class="attribute">Content-Encoding</span><span class="punctuation">: </span>gzip</span><br></pre></td></tr></table></figure>
+
+<h4 id="Content-Language"><a href="#Content-Language" class="headerlink" title="Content-Language"></a>Content-Language</h4><p>首部字段 Content-Language 会告知客户端，服务器使用的自然语言是什么，它与 Accept-Language 相对，下面是一组请求&#x2F;响应使用的语言类型</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">Content-Language</span><span class="punctuation">: </span>de-DE, en-CA</span><br></pre></td></tr></table></figure>
+
+<h4 id="Content-Length"><a href="#Content-Length" class="headerlink" title="Content-Length"></a>Content-Length</h4><p>Content-Length 的实体标头指服务器发送给客户端的实际主体大小，以字节为单位。</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">Content-Length</span><span class="punctuation">: </span>3000</span><br></pre></td></tr></table></figure>
+
+<p>如上，服务器返回给客户端的主体大小是 3000 字节。</p>
+<h4 id="Content-Location"><a href="#Content-Location" class="headerlink" title="Content-Location"></a>Content-Location</h4><p>Content-Location 可不是对应 Accept-Location，因为没有这个标头哈哈哈哈。实际上 Content-Location 对应的是 <code>Location</code>。</p>
+<p>Location 和 Content-Location 是不一样的，Location 表示重定向的 URL，而 Content-Location 表示用于访问资源的直接 URL，以后无需进行进一步的内容协商。Location 是与响应关联的标头，而 Content-Location 是与返回的数据相关联的标头，如果你不好理解，看一下下面的表格</p>
+<table>
+<thead>
+<tr>
+<th>Request header</th>
+<th>Response header</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>Accept: application/json, text/json</code></td>
+<td><code>Content-Location: /documents/foo.json</code></td>
+</tr>
+<tr>
+<td><code>Accept: application/xml, text/xml</code></td>
+<td><code>Content-Location: /documents/foo.xml</code></td>
+</tr>
+<tr>
+<td><code>Accept: text/plain, text/*</code></td>
+<td><code>Content-Location: /documents/foo.txt</code></td>
+</tr>
+</tbody></table>
+<h4 id="Content-MD5"><a href="#Content-MD5" class="headerlink" title="Content-MD5"></a>Content-MD5</h4><p>客户端会对接收的报文主体执行相同的 MD5 算法，然后与首部字段 Content-MD5 的字段进行比较。</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">Content-MD5</span><span class="punctuation">: </span>e10adc3949ba59abbe56e057f20f883e</span><br></pre></td></tr></table></figure>
+
+<p>首部字段 Content-MD5 是一串由 MD5 算法生成的值，其目的在于检查报文主体在传输过程中是否保持完整，有无被修改的情况，以及确认传输到达。</p>
+<p><img src="https://img2018.cnblogs.com/blog/1515111/202001/1515111-20200119202441634-650508702.png" class="lazyload placeholder" data-srcset="https://img2018.cnblogs.com/blog/1515111/202001/1515111-20200119202441634-650508702.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<h4 id="Content-Range"><a href="#Content-Range" class="headerlink" title="Content-Range"></a>Content-Range</h4><p>HTTP 的 Content-Range 响应标头是针对范围请求而设定的，返回响应时使用首部字段 <code>Content-Range</code>，能够告知客户端响应实体的哪部分是符合客户端请求的，字段以字节为单位。它的一般表示如下</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">Content-Range</span><span class="punctuation">: </span>bytes 200-1000/67589 </span><br></pre></td></tr></table></figure>
+
+<p>上段代码表示从所有 <code>67589</code> 个字节中返回 <code>200-1000</code> 个字节的内容</p>
+<h4 id="Content-Type"><a href="#Content-Type" class="headerlink" title="Content-Type"></a>Content-Type</h4><p>HTTP 响应标头 Content-Type 说明了实体内对象的媒体类型，和首部字段 Accept 一样使用，表示服务器能够响应的媒体类型。</p>
+<h4 id="Expires"><a href="#Expires" class="headerlink" title="Expires"></a>Expires</h4><p>HTTP Expires 实体标头包含 <code>日期/时间</code>，在该日期&#x2F;时间之后，响应被认为过期；在响应时间之内被认为有效。特殊的值比如0表示过去的日期，表示资源已过期。</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">Expires</span><span class="punctuation">: </span>Wed, 21 Oct 2015 07:28:00 GMT</span><br></pre></td></tr></table></figure>
+
+<p>源服务器会将资源失效的日期或时间发送给客户端，缓存服务器在接受到 Expires 的响应后，会判断是否把缓存返回给客户端。</p>
+<p>源服务器不希望缓存服务器对资源缓存时，最好在 Expires 字段内写入与首部字段 Date 相同的时间值。但是，当首部字段 Cache-Control 有指定 max-age 指令时，比起首部字段 Expires，会优先处理 max-age 指令。</p>
+<h4 id="Last-Modified"><a href="#Last-Modified" class="headerlink" title="Last-Modified"></a>Last-Modified</h4><p>实体字段 <code>Last-Modified</code> 指明资源的最后修改时间，它用作验证器来确定接收或存储的资源是否相同。它的作用不如 <code>ETag</code> 那么准确，它可以作为一种后备机制，包含 <code>If-Modified-Since</code> 或 <code>If-Unmodified-Since</code> 标头的条件请求将使用此字段。它的一般表示如下</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">Last-Modified</span><span class="punctuation">: </span>Wed, 21 Oct 2015 07:28:00 GMT</span><br></pre></td></tr></table></figure>
+
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>本篇文章主要介绍了 HTTP 四种标头的基本概念，但是并没有涵盖全部，毕竟 HTTP 标头内容确实太多了，以上介绍的基本都是平常工作中常用的一些概念，下一篇文章预告 <strong>HTTP 的黑科技</strong></p>
+
+      </div>
+      <div class="post-tags-categories">
+        
+        <div class="tags">
+          
+            <a href="/tags/HTTP/" class="">
+              HTTP
+            </a>
+          
+        </div>
+        
+      </div>
+      
+        <div class="copyright">
+  <ul class="post-copyright">
+    <li class="post-copyright-author">
+    <strong>author:  </strong>John Doe</a>
+    </li>
+    <li class="post-copyright-link">
+    <strong>link:  </strong>
+    <a href="/2022/05/03/HTPP核心概念/" target="_blank" title="HTPP核心概念">http://example.com/2022/05/03/HTPP核心概念/</a>
+    </li>
+    <li class="post-copyright-license">
+      <strong>Copyright notice:   </strong>
+      All articles on this website, unless otherwise stated, adopt <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">CC BY-NC-ND 4.0</a>
+      reprint policy. If reproduced, please indicate source!
+    </li>
+  </ul>
+<div>
+      
+    </article>
+    <!-- 上一篇文章和下一篇文章 -->
+    
+      <!-- 文章详情页的上一页和下一页 -->
+<div class="post-nav">
+
+
+
+  
+  <div class="post-nav-prev post-nav-item">
+    <div class="post-nav-img" style="background-size: cover; 
+      background-position: center center;">
+      <img class="lazyload lazyload placeholder" src="/medias/14.jpg" class="lazyload placeholder" data-srcset="/medias/14.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="">
+    </div>
+    <a href="/2022/05/03/%E5%B8%A6%E4%BD%A0%E4%B8%80%E6%AD%A5%E6%AD%A5%E8%A7%A3%E6%9E%90-HTTPS/" class="post-nav-link">
+      <div class="title">
+        <i class="fas fa-angle-left"></i> Prev:
+        <div class="title-text">带你一步步解析 HTTPS</div>
+      </div>
+      
+      <!-- <div class="content">
+        带你一步步解析 HTTPS
+带你一步步解析 HTTPS
+HTTPS 为什么会出现
+HTTPS 解决了什么问题
+什么是 H
+      </div> -->
+    </a>
+  </div>
+
+
+
+  
+  <div class="post-nav-next post-nav-item">
+    <div class="post-nav-img" style="background-size: cover; 
+      background-position: center center;">
+      <img class="lazyload lazyload placeholder" src="/medias/5.jpg" class="lazyload placeholder" data-srcset="/medias/5.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" src="" alt="">
+    </div>
+    <a href="/2022/05/03/Cooke%E3%80%81Session-%E5%92%8C-Token/" class="post-nav-link">
+      <div class="title">
+        Next: <i class="fas fa-angle-right"></i>
+        <div class="title-text">Cooke、Session 和 Token</div>
+      </div>
+      <!-- <div class="content">
+        Cooke、Session 和 Token
+Cooke、Session 和 Token
+Cookie 和 Session
+      </div> -->
+    </a>
+  </div>
+
+</div>
+
+    
+    
+
+    <!-- 打赏 -->
+    
+      <div id="appDonate" class="post-donate">
+  <div id="donate_board" class="donate_bar center" ref="donate">
+    <a id="btn_donate" class="btn_donate" href="javascript:;" title="打赏" @click="showDialogDrawer()"></a>
+  </div>
+  <transition name="fade">
+    <div 
+      class="donate-box-mask"
+      v-cloak 
+      v-show="visible"
+      @click="cancelDialogDrawer()"
+    >
+    </div>
+  </transition>
+  <transition name="bounce">
+    <div class="donate-box" v-cloak v-show="visible">
+      <div class="donate-box_close">
+        <i class="fas fa-times" aria-hidden="true" @click="cancelDialogDrawer" pointer></i>
+      </div>
+      <div class="donate-box_title">
+        <h4>
+          你的赏识是我前进的动力
+        </h4>
+      </div>
+      <div class="donate-box_tab">
+        <div class="Alipay" pointer :class="{'active': tabActive === 'Alipay'}" @click="changeTabActive('Alipay')">
+          支付宝
+        </div>
+        <div class="WeChatpay" pointer :class="{'active': tabActive === 'WeChatpay'}" @click="changeTabActive('WeChatpay')">
+          微信
+        </div>
+      </div>
+      <div class="donate-box_img">
+        <div class="AlipayImg" v-show="tabActive === 'Alipay'">
+          <img src="/medias/1.jpg" class="lazyload placeholder" data-srcset="/medias/1.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="支付宝打赏" />
+        </div> 
+        <div class="WeChatpayImg" v-show="tabActive === 'WeChatpay'">
+          <img src="/medias/2.jpg" class="lazyload placeholder" data-srcset="/medias/2.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="微信打赏" />
+        </div>
+      </div>
+    </div>
+  </transition>
+</div>
+
+<script>
+  var body = document.body || document.documentElement || window;
+  var vm = new Vue({
+    el: '#appDonate',
+    data: {
+      visible: false,
+      tabActive: 'Alipay',
+      top: 0,
+    },
+    computed: {
+    },
+    mounted() {
+    },
+    methods: {
+      showDialogDrawer() {
+        this.visible = true;
+        // 防止页面滚动，只能让弹框滚动
+        // function getScroll() {
+        //   return {
+        //     left: window.pageXOffset || document.documentElement.scrollLeft || document.body.scrollLeft || 0,
+        //     top: window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0
+        //   };
+        // }
+        this.top = $(document).scrollTop() // or getScroll().top
+        // console.log('aa', $('.main-content'));
+        body.style.cssText = 'overflow: hidden;';
+      },
+      cancelDialogDrawer() {
+        this.visible = false;
+        body.removeAttribute('style');
+        $(document).scrollTop(this.top)
+      },
+      changeTabActive(name) {
+        this.tabActive = name;
+      }
+    },
+    created() {}
+  })
+</script>
+    
+
+    <!-- 分享 -->
+    
+      <!-- https://github.com/overtrue/share.js -->
+<!-- 文章详情页的分享 -->
+<div class="social-share" data-sites="twitter,facebook,google,qq,qzone,wechat,weibo,douban,linkedin" data-wechat-qrcode-helper="<p>微信扫一扫即可分享！</p>"></div>
+
+<script src="/js/shareJs/social-share.min.js"></script>
+</script>
+
+<style>
+  .social-share {
+    margin: 20px 0;
+  }
+</style>
+
+
+    
+    
+    <!-- 评论 -->
+    <!-- 评论 -->
+
+  <div id="myComment">
+    
+      <div id="gitment-container"></div>
+
+    
+  </div>
+
+<!-- comment script in themes\hexo-theme-bamboo\layout\_partial\scripts\index.ejs -->
+
+
+  </div>
+
+  <!-- 目录 -->
+  <!-- 文章详情页右侧目录 -->
+
+  <div class="toc-aside">
+    <div class="toc-main">
+      <div class="toc-aside-title">
+        <i class="fas fa-list-ul" aria-hidden="true"></i><span>catalog</span>
+        
+          <div class="toc-open-close">catalog</div>
+        
+      </div>
+      <div class="toc-content">
+        <div class="toc"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 手机端目录按钮 -->
+  <div id="toc-mobile-btn">
+    <i class="fas fa-list-ul" aria-hidden="true"></i>
+  </div>
+
+
+<script>
+  function closeToc(init) {
+    $(".toc-aside").css({'width': 0, 'padding': 0, 'transition': init ?  'noe' : 'width 0.3s' });
+    $(".toc-content").css({'width': 0});
+    $(".toc-aside-title span, .toc-aside-title i").css({'display': 'none'});
+    $(".main-content").css({'width': '75%', 'margin-left': 'auto', 'margin-right': 'auto',});
+  };
+  function openToc() {
+    $(".main-content").css({'width': '65%', 'margin-right': '10px', 'margin-left': 'calc(35% - 350px)'});
+    $(".toc-aside").css({'width': '300px', 'padding': '0 10px', 'transition': 'width 0.3s'});
+    $(".toc-content").css({'width': '300px'});
+    $(".toc-aside-title span, .toc-aside-title i").css({'display': 'inline-block'});
+  }
+  function openBtnClickFn () {
+    let openOrCloseBtn = $('.toc-aside .toc-aside-title .toc-open-close');
+    let open = eval('' || 'true');
+    openOrCloseBtn.click(function() {
+      if (open) {
+        closeToc();
+        open = false;
+      } else {
+        openToc();
+        open = true;
+      }
+    });
+  };
+  openBtnClickFn();
+  initCloseTocWidth(true);
+
+  function initCloseTocWidth(init) {
+    if (window.innerWidth >= 992) {
+      let isClose = false;
+      isClose && closeToc(init)
+    }
+  }
+
+  document.addEventListener('pjax:complete', function () {
+    $(".toc-aside").css({'transition': 'no'});
+  })
+  document.addEventListener('pjax:complete', function () {
+    openBtnClickFn();
+  })
+  
+</script>
+
+  <!-- 图片放大 Wrap images with fancybox support -->
+  <script src="/js/wrapImage.js"></script>
+</div>
+
+<!-- 文章详情页背景图 -->
+<div id="appBgSwiper" style="position: fixed;left: 0;top: 0;width: 100%;height: 100%;z-index: -2;"
+	:style="{'background-color': bgColor ? bgColor : 'transparent'}">
+	<transition-group tag="ul" :name="names">
+		<li v-for='(image,index) in img' :key='index' v-show="index === mark" class="bg-swiper-box">
+			<img :src="image" class="bg-swiper-img no-lazy">
+		</li>
+	</transition-group>
+</div>
+<script>
+	var vm = new Vue({
+		el: '#appBgSwiper',
+		data: {
+			names: '' || 'fade' || 'fade', // translate-fade fade
+			mark: 0,
+			img: [],
+			bgColor: '',
+			time: null
+		},
+		methods: {   //添加方法
+			change(i, m) {
+				if (i > m) {
+					// this.names = 'fade';
+				} else if (i < m) {
+					// this.names = 'fade';
+				} else {
+					return;
+				}
+				this.mark = i;
+			},
+			prev() {
+				// this.names = 'fade';
+				this.mark--;
+				if (this.mark === -1) {
+					this.mark = 3;
+					return
+				}
+			},
+			next() {
+				// this.names = 'fade';
+				this.mark++;
+				if (this.mark === this.img.length) {
+					this.mark = 0;
+					return
+				}
+			},
+			autoPlay() {
+				// this.names = 'fade';
+				this.mark++;
+				if (this.mark === this.img.length) {
+					this.mark = 0;
+					return
+				}
+			},
+			play() {
+				let bgImgDelay = '' || '180000'
+				let delay = parseInt(bgImgDelay) || 180000;
+				this.time = setInterval(this.autoPlay, delay);
+			},
+			enter() {
+				clearInterval(this.time);
+			},
+			leave() {
+				this.play();
+			}
+		},
+		created() {
+			this.play()
+		},
+		beforeDestroy() {
+			clearInterval(this.time);
+		},
+		mounted() {
+			let prop = '' || '';
+			let isImg = prop.includes('.bmp') || prop.includes('.jpg') || prop.includes('.png') || prop.includes('.tif') || prop.includes('.gif') || prop.includes('.pcx') || prop.includes('.tga') || prop.includes('.exif') || prop.includes('.fpx') || prop.includes('.psd') || prop.includes('.cdr') || prop.includes('.pcd') || prop.includes('.dxf') || prop.includes('.ufo') || prop.includes('.eps') || prop.includes('.ai') || prop.includes('.raw') || prop.includes('.WMF') || prop.includes('.webp') || prop.includes('.jpeg') || prop.includes('http://') || prop.includes('https://')
+			if (isImg) {
+				let img = prop.split(',');
+				let configRoot = '/'
+				let arrImg = [];
+				img.forEach(el => {
+					var Expression = /http(s)?:\/\/([\w-]+\.)+[\w-]+(\/[\w- .\/?%&=]*)?/;
+					var objExp = new RegExp(Expression);
+
+					if (objExp.test(el)) {
+						// http or https
+						arrImg.push(el);
+					} else {
+						// 非http or https开头
+						// 本地文件
+						let firstStr = el.charAt(0);
+						if (firstStr == '/') {
+							el = el.substr(1); // 删除第一个字符 '/',因为 configRoot最后一个字符为 /
+						}
+						el = configRoot + el;
+						arrImg.push(el);
+					}
+				})
+				this.img = arrImg;
+			} else {
+				this.bgColor = prop;
+			}
+		}
+	})
+</script>
+
+<style>
+	.bg-swiper-box {
+		position: absolute;
+		display: block;
+		width: 100%;
+		height: 100%;
+	}
+
+	.bg-swiper-img {
+		object-fit: cover;
+		width: 100%;
+		height: 100%;
+	}
+</style>
+
+
+
+
+  <script>
+  function loadMermaid() {
+    if (document.getElementsByClassName('mermaid').length) {
+      if (window.mermaidJsLoad) mermaid.init()
+      else {
+        loadScript('https://unpkg.com/mermaid/dist/mermaid.min.js').then(() => {
+          window.mermaidJsLoad = true
+          mermaid.initialize({
+            theme: 'default',
+          })
+          if ('true') {
+            mermaid.init();
+          }
+        })
+      }
+    }
+  };
+  document.addEventListener("DOMContentLoaded", function () {
+    loadMermaid();
+  })
+
+  document.addEventListener('pjax:complete', function () {
+    loadMermaid();
+  })
+  
+</script>
+
+
+      </main>
+    </div>
+
+    <!-- 页脚 -->
+    
+  
+  
+    <!-- 底部鱼儿跳动效果，依赖于jquery-->
+<div id="j-fish-skip" style=" position: relative;height: 153px;width: auto;"></div>
+<script>
+  var RENDERER = {
+    POINT_INTERVAL: 5,
+    FISH_COUNT: 3,
+    MAX_INTERVAL_COUNT: 50,
+    INIT_HEIGHT_RATE: .5,
+    THRESHOLD: 50,
+    FISH_COLOR: '',
+    init: function () {
+      this.setFishColor(); this.setParameters(), this.reconstructMethods(), this.setup(), this.bindEvent(), this.render()
+    },
+    setFishColor: function () {
+      let isDark = JSON.parse(localStorage.getItem('dark')) || JSON.parse('false');
+      if (isDark) {
+        this.FISH_COLOR = '#222'; // 暗黑色，有时间把这整成一个变量
+      } else {
+        this.FISH_COLOR = '' || '#42b983';
+      }
+    },
+    setParameters: function () {
+      this.$window = $(window), this.$container = $("#j-fish-skip"), this.$canvas = $("<canvas />"), this.context = this.$canvas.appendTo(this.$container).get(0).getContext("2d"), this.points = [], this.fishes = [], this.watchIds = []
+    },
+    createSurfacePoints: function () {
+      var t = Math.round(this.width / this.POINT_INTERVAL);
+      this.pointInterval = this.width / (t - 1), this.points.push(new SURFACE_POINT(this, 0));
+      for (var i = 1; i < t; i++) {
+        var e = new SURFACE_POINT(this, i * this.pointInterval),
+          h = this.points[i - 1];
+        e.setPreviousPoint(h), h.setNextPoint(e), this.points.push(e)
+      }
+    },
+    reconstructMethods: function () {
+      this.watchWindowSize = this.watchWindowSize.bind(this), this.jdugeToStopResize = this.jdugeToStopResize.bind(this), this.startEpicenter = this.startEpicenter.bind(this), this.moveEpicenter = this.moveEpicenter.bind(this), this.reverseVertical = this.reverseVertical.bind(this), this.render = this.render.bind(this)
+    },
+    setup: function () {
+      this.points.length = 0, this.fishes.length = 0, this.watchIds.length = 0, this.intervalCount = this.MAX_INTERVAL_COUNT, this.width = this.$container.width(), this.height = this.$container.height(), this.fishCount = this.FISH_COUNT * this.width / 500 * this.height / 500, this.$canvas.attr({
+        width: this.width,
+        height: this.height
+      }), this.reverse = !1, this.fishes.push(new FISH(this)), this.createSurfacePoints()
+    },
+    watchWindowSize: function () {
+      this.clearTimer(), this.tmpWidth = this.$window.width(), this.tmpHeight = this.$window.height(), this.watchIds.push(setTimeout(this.jdugeToStopResize, this.WATCH_INTERVAL))
+    },
+    clearTimer: function () {
+      for (; this.watchIds.length > 0;) clearTimeout(this.watchIds.pop())
+    },
+    jdugeToStopResize: function () {
+      var t = this.$window.width(),
+        i = this.$window.height(),
+        e = t == this.tmpWidth && i == this.tmpHeight;
+      this.tmpWidth = t, this.tmpHeight = i, e && this.setup()
+    },
+    bindEvent: function () {
+      this.$window.on("resize", this.watchWindowSize), this.$container.on("mouseenter", this.startEpicenter), this.$container.on("mousemove", this.moveEpicenter)
+    },
+    getAxis: function (t) {
+      var i = this.$container.offset();
+      return {
+        x: t.clientX - i.left + this.$window.scrollLeft(),
+        y: t.clientY - i.top + this.$window.scrollTop()
+      }
+    },
+    startEpicenter: function (t) {
+      this.axis = this.getAxis(t)
+    },
+    moveEpicenter: function (t) {
+      var i = this.getAxis(t);
+      this.axis || (this.axis = i), this.generateEpicenter(i.x, i.y, i.y - this.axis.y), this.axis = i
+    },
+    generateEpicenter: function (t, i, e) {
+      if (!(i < this.height / 2 - this.THRESHOLD || i > this.height / 2 + this.THRESHOLD)) {
+        var h = Math.round(t / this.pointInterval);
+        h < 0 || h >= this.points.length || this.points[h].interfere(i, e)
+      }
+    },
+    reverseVertical: function () {
+      this.reverse = !this.reverse;
+      for (var t = 0, i = this.fishes.length; t < i; t++) this.fishes[t].reverseVertical()
+    },
+    controlStatus: function () {
+      for (var t = 0, i = this.points.length; t < i; t++) this.points[t].updateSelf();
+      for (t = 0, i = this.points.length; t < i; t++) this.points[t].updateNeighbors();
+      this.fishes.length < this.fishCount && 0 == --this.intervalCount && (this.intervalCount = this.MAX_INTERVAL_COUNT, this.fishes.push(new FISH(this)))
+    },
+    render: function () {
+      requestAnimationFrame(this.render), this.controlStatus(), this.context.clearRect(0, 0, this.width, this.height), this.context.fillStyle = this.FISH_COLOR;
+      for (var t = 0, i = this.fishes.length; t < i; t++) this.fishes[t].render(this.context);
+      this.context.save(), this.context.globalCompositeOperation = "xor", this.context.beginPath(), this.context.moveTo(0, this.reverse ? 0 : this.height);
+      for (t = 0, i = this.points.length; t < i; t++) this.points[t].render(this.context);
+      this.context.lineTo(this.width, this.reverse ? 0 : this.height), this.context.closePath(), this.context.fill(), this.context.restore()
+    }
+  },
+  SURFACE_POINT = function (t, i) {
+    this.renderer = t, this.x = i, this.init()
+  };
+  SURFACE_POINT.prototype = {
+    SPRING_CONSTANT: .03,
+    SPRING_FRICTION: .9,
+    WAVE_SPREAD: .3,
+    ACCELARATION_RATE: .01,
+    init: function () {
+      this.initHeight = this.renderer.height * this.renderer.INIT_HEIGHT_RATE, this.height = this.initHeight, this.fy = 0, this.force = {
+        previous: 0,
+        next: 0
+      }
+    },
+    setPreviousPoint: function (t) {
+      this.previous = t
+    },
+    setNextPoint: function (t) {
+      this.next = t
+    },
+    interfere: function (t, i) {
+      this.fy = this.renderer.height * this.ACCELARATION_RATE * (this.renderer.height - this.height - t >= 0 ? -1 : 1) * Math.abs(i)
+    },
+    updateSelf: function () {
+      this.fy += this.SPRING_CONSTANT * (this.initHeight - this.height), this.fy *= this.SPRING_FRICTION, this.height += this.fy
+    },
+    updateNeighbors: function () {
+      this.previous && (this.force.previous = this.WAVE_SPREAD * (this.height - this.previous.height)), this.next && (this.force.next = this.WAVE_SPREAD * (this.height - this.next.height))
+    },
+    render: function (t) {
+      this.previous && (this.previous.height += this.force.previous, this.previous.fy += this.force.previous), this.next && (this.next.height += this.force.next, this.next.fy += this.force.next), t.lineTo(this.x, this.renderer.height - this.height)
+    }
+  };
+  var FISH = function (t) {
+    this.renderer = t, this.init()
+  };
+  FISH.prototype = {
+    GRAVITY: .4,
+    init: function () {
+      this.direction = Math.random() < .5, this.x = this.direction ? this.renderer.width + this.renderer.THRESHOLD : -this.renderer.THRESHOLD, this.previousY = this.y, this.vx = this.getRandomValue(4, 10) * (this.direction ? -1 : 1), this.renderer.reverse ? (this.y = this.getRandomValue(1 * this.renderer.height / 10, 4 * this.renderer.height / 10), this.vy = this.getRandomValue(2, 5), this.ay = this.getRandomValue(.05, .2)) : (this.y = this.getRandomValue(6 * this.renderer.height / 10, 9 * this.renderer.height / 10), this.vy = this.getRandomValue(-5, -2), this.ay = this.getRandomValue(-.2, -.05)), this.isOut = !1, this.theta = 0, this.phi = 0
+    },
+    getRandomValue: function (t, i) {
+      return t + (i - t) * Math.random()
+    },
+    reverseVertical: function () {
+      this.isOut = !this.isOut, this.ay *= -1
+    },
+    controlStatus: function (t) {
+      this.previousY = this.y, this.x += this.vx, this.y += this.vy, this.vy += this.ay, this.renderer.reverse ? this.y > this.renderer.height * this.renderer.INIT_HEIGHT_RATE ? (this.vy -= this.GRAVITY, this.isOut = !0) : (this.isOut && (this.ay = this.getRandomValue(.05, .2)), this.isOut = !1) : this.y < this.renderer.height * this.renderer.INIT_HEIGHT_RATE ? (this.vy += this.GRAVITY, this.isOut = !0) : (this.isOut && (this.ay = this.getRandomValue(-.2, -.05)), this.isOut = !1), this.isOut || (this.theta += Math.PI / 20, this.theta %= 2 * Math.PI, this.phi += Math.PI / 30, this.phi %= 2 * Math.PI), this.renderer.generateEpicenter(this.x + (this.direction ? -1 : 1) * this.renderer.THRESHOLD, this.y, this.y - this.previousY), (this.vx > 0 && this.x > this.renderer.width + this.renderer.THRESHOLD || this.vx < 0 && this.x < -this.renderer.THRESHOLD) && this.init()
+    },
+    render: function (t) {
+      t.save(), t.translate(this.x, this.y), t.rotate(Math.PI + Math.atan2(this.vy, this.vx)), t.scale(1, this.direction ? 1 : -1), t.beginPath(), t.moveTo(-30, 0), t.bezierCurveTo(-20, 15, 15, 10, 40, 0), t.bezierCurveTo(15, -10, -20, -15, -30, 0), t.fill(), t.save(), t.translate(40, 0), t.scale(.9 + .2 * Math.sin(this.theta), 1), t.beginPath(), t.moveTo(0, 0), t.quadraticCurveTo(5, 10, 20, 8), t.quadraticCurveTo(12, 5, 10, 0), t.quadraticCurveTo(12, -5, 20, -8), t.quadraticCurveTo(5, -10, 0, 0), t.fill(), t.restore(), t.save(), t.translate(-3, 0), t.rotate((Math.PI / 3 + Math.PI / 10 * Math.sin(this.phi)) * (this.renderer.reverse ? -1 : 1)), t.beginPath(), this.renderer.reverse ? (t.moveTo(5, 0), t.bezierCurveTo(10, 10, 10, 30, 0, 40), t.bezierCurveTo(-12, 25, -8, 10, 0, 0)) : (t.moveTo(-5, 0), t.bezierCurveTo(-10, -10, -10, -30, 0, -40), t.bezierCurveTo(12, -25, 8, -10, 0, 0)), t.closePath(), t.fill(), t.restore(), t.restore(), this.controlStatus(t)
+    }
+  }, $(function () {
+    RENDERER.init()
+    $('.dark').click(function () {
+      setTimeout(() => {
+        RENDERER.setFishColor();
+        RENDERER.context.fill();
+      });
+    })
+  });
+</script>
+  
+  <div class="footer bg-color">
+    <div class="footer-main">
+      
+        
+          <div class="link">
+            
+          </div>
+        
+      
+        
+          <div class="footer-copyright">
+            <p>Copyright © 2019 - 2020 <a target="_blank" rel="noopener" href="https://github.com/yuang01">yuang01</a> | Powered by <a target="_blank" rel="noopener" href="https://hexo.io/zh-cn/docs/">Hexo</a> | Theme <a target="_blank" rel="noopener" href="https://github.com/yuang01/theme">Bamboo</a> </p>
+
+          </div>
+        
+      
+        
+          
+            <!-- 不蒜子统计 -->
+            <!-- 不蒜子统计 -->
+<span id="busuanzi_container_site_pv">
+      <i class="fas fa-eye" aria-hidden="true"></i>Total visits：<span id="busuanzi_value_site_pv"></span> times
+</span>
+<span class="post-meta-divider">|</span>
+<span id="busuanzi_container_site_uv" style='display:none'>
+      <i class="fas fa-users" aria-hidden="true"></i>Number of visitors：<span id="busuanzi_value_site_uv"></span> people
+</span>
+
+          
+        
+      
+        
+          <div class="footer-custom">
+            
+          </div>
+        
+      
+    </div>
+  </div>
+
+
+
+    <!-- 渲染暗黑按钮 -->
+    
+      <div class="dark">
+  <div class="dark-content">
+    <i class="fas fa-moon" aria-hidden="true"></i>
+    <!-- <span>关灯</span> -->
+  </div>
+  
+</div>
+
+<script>
+  $(function() {
+    let isDark = JSON.parse(localStorage.getItem('dark'))  || JSON.parse('false');
+    if (isDark) {
+      $(".dark-content").replaceWith(
+          `
+          <div class='dark-content'>
+            <i class="fas fa-lightbulb" aria-hidden="true"></i>
+          </div>
+          `
+        );
+    }
+    $('.dark').click(function() {
+      if ($(document.body).is('.darkModel')) {
+        $(document.body).removeClass('darkModel');
+        localStorage.setItem('dark', false);
+        $(".dark-content").replaceWith(
+          `
+          <div class='dark-content'>
+            <i class="fas fa-moon" aria-hidden="true"></i>
+          </div>
+          `
+        );
+      } else {
+        $(document.body).addClass('darkModel');
+        localStorage.setItem('dark', true);
+        $(".dark-content").replaceWith(
+          `
+          <div class='dark-content'>
+            <i class="fas fa-lightbulb" aria-hidden="true"></i>
+          </div>
+          `
+        );
+      }
+    })
+  })
+</script>
+    
+    <!-- 渲染回到顶部按钮 -->
+    
+      <div class="goTop top-btn-color" pointer>
+  <i class="fas fa-arrow-up" aria-hidden="true"></i>
+</div>
+<script src="/js/goTop.js"></script>
+
+    
+    <!-- 渲染左下角音乐播放器 -->
+    
+      <link rel="stylesheet" href="/js/aplayer/APlayer@1.10.1.min.css">
+<style>
+.aplayer .aplayer-lrc p {
+  
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 16px !important;
+}
+
+.aplayer .aplayer-lrc p.aplayer-lrc-current {
+  
+  font-size: 15px;
+  color: #42b983;
+}
+
+
+.aplayer.aplayer-fixed.aplayer-narrow .aplayer-body {
+  left: -66px !important;
+}
+
+.aplayer.aplayer-fixed.aplayer-narrow .aplayer-body:hover {
+  left: 0px !important;
+}
+
+
+</style>
+<meting-js  
+  class=""
+  server="tencent"
+  type="playlist"
+  id="8062553743"
+  fixed='true'
+  autoplay='false'
+  theme='#42b983'
+  loop='all'
+  order='random'
+  preload='auto'
+  volume='0.7'
+  list-folded='true'
+>
+</meting-js>
+
+<!-- <style>
+  #aplayer {
+    position: fixed;
+    left: 0;
+    bottom: 300px;
+  }
+</style> -->
+<script src="https://unpkg.com/aplayer@1.10.1/dist/APlayer.min.js"></script>
+<script src="https://unpkg.com/meting@2/dist/Meting.min.js"></script>
+    
+
+    <!-- 图片放大 -->
+    
+      <script src="/js/fancybox/jquery.fancybox.min.js"></script>
+    
+
+    <!-- 百度解析 -->
+    <!-- Baidu Analytics -->
+
+    <!-- Baidu Push -->
+
+<script>
+    (function () {
+        var bp = document.createElement('script');
+        var curProtocol = window.location.protocol.split(':')[0];
+        if (curProtocol === 'https') {
+            bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+        } else {
+            bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+        }
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(bp, s);
+    })();
+</script>
+
+    
+    <!-- 背景彩带 -->
+    
+      <script type="text/javascript" size="100" alpha='0.4' zIndex="-1" src="/js/ribbon.min.js"></script>
+    
+
+    <script src="/js/utils/index.js"></script>
+    <script src="/js/app.js"></script>
+    
+    <!-- 文章目录所需js -->
+<link href="/js/tocbot/tocbot.css" rel="stylesheet">
+<script src="/js/tocbot/tocbot.min.js"></script>
+
+<script>
+  var headerEl = 'h2, h3, h4',  //headers 
+    content = '.post-detail',//文章容器
+    idArr = {};  //标题数组以确定是否增加索引id
+  //add #id
+  var option = {
+    // Where to render the table of contents.
+    tocSelector: '.toc',
+    // Where to grab the headings to build the table of contents.
+    contentSelector: content,
+    // Which headings to grab inside of the contentSelector element.
+    headingSelector: headerEl,
+    scrollSmooth: true,
+    scrollSmoothOffset: -80,
+    headingsOffset: -($(window).height() * 0.4 - 45),
+    positionFixedSelector: '.toc-main',
+    positionFixedClass: 'is-position-fixed',
+    fixedSidebarOffset: 'auto',
+    activeLinkClass: 'is-active-link',
+    // onClick: function (e) {},
+  }
+  if ($('.toc').length > 0) {
+
+    $(content).children(headerEl).each(function () {
+      //去除空格以及多余标点
+      var headerId = $(this).text().replace(/[\s|\~|`|\!|\@|\#|\$|\%|\^|\&|\*|\(|\)|\_|\+|\=|\||\|\[|\]|\{|\}|\;|\:|\"|\'|\,|\<|\.|\>|\/|\?|\：|\，|\。]/g, '');
+
+      headerId = headerId.toLowerCase();
+      if (idArr[headerId]) {
+        //id已经存在
+        $(this).attr('id', headerId + '-' + idArr[headerId]);
+        idArr[headerId]++;
+      }
+      else {
+        //id未存在
+        idArr[headerId] = 1;
+        $(this).attr('id', headerId);
+      }
+    });
+
+    document.addEventListener("DOMContentLoaded", function () {
+      tocbot.init(option);
+      mobileTocClick();
+    });
+
+  }
+
+  window.tocScrollFn = function () {
+    return bamboo.throttle(function () {
+      findHeadPosition();
+    }, 100)()
+  }
+  window.addEventListener('scroll', tocScrollFn);
+
+  const findHeadPosition = function (top) {
+    if ($('.toc-list').length <= 0) {
+      return false;
+    }
+    setTimeout(() => {  // or DOMContentLoaded 
+      autoScrollToc();
+    }, 0);
+  }
+
+  const autoScrollToc = function () {
+    const $activeItem = document.querySelector('.is-active-link');
+    const $cardToc = document.querySelector('.toc-content');
+    const activePosition = $activeItem.getBoundingClientRect().top
+    const sidebarScrollTop = $cardToc.scrollTop
+    if (activePosition > (document.documentElement.clientHeight - 100)) {
+      $cardToc.scrollTop = sidebarScrollTop + 150
+    }
+    if (activePosition < 100) {
+      $cardToc.scrollTop = sidebarScrollTop - 150
+    }
+  }
+
+  document.addEventListener('pjax:send', function () {
+    if ($('.toc').length) {
+      tocbot.destroy();
+    }
+  });
+
+  document.addEventListener('pjax:complete', function () {
+    if ($('.toc').length) {
+      tocbot.init(option);
+      mobileTocClick();
+    }
+  });
+  
+  // 手机端toc按钮点击出现目录
+  const mobileTocClick = function () {
+    const $cardTocLayout = document.getElementsByClassName('toc-aside')[0];
+    const $cardToc = $cardTocLayout.getElementsByClassName('toc-content')[0];
+    let right = '45px';
+    if (window.innerWidth >= 551 && window.innerWidth <= 992) {
+      right = '100px'
+    }
+    const mobileToc = {
+      open: () => {
+        $cardTocLayout.style.cssText = 'animation: toc-open .3s; opacity: 1; right: ' + right
+      },
+
+      close: () => {
+        $cardTocLayout.style.animation = 'toc-close .2s'
+        setTimeout(() => {
+          $cardTocLayout.style.cssText = "opacity:''; animation: ''; right: ''"
+        }, 100)
+      }
+    }
+    document.getElementById('toc-mobile-btn').addEventListener('click', () => {
+      if (window.getComputedStyle($cardTocLayout).getPropertyValue('opacity') === '0') mobileToc.open()
+      else mobileToc.close()
+    })
+
+    $cardToc.addEventListener('click', (e) => {
+      if (window.innerWidth < 992) { // 小于992px的时候
+        mobileToc.close()
+      }
+    })
+  }
+</script>
+
+<style>
+  .is-position-fixed {
+    position: sticky !important;
+    top: 74px;
+  }
+
+  .toc-main ul {
+    counter-reset: show-list;
+  }
+
+  .toc-main ul li::before {
+    content: counter(item)".";
+    display: block;
+    position: absolute;
+    left: 12px;
+    top: 0;
+  }
+</style> 
+
+<!-- 设置导航背景 -->
+<script>
+  let setHeaderClass = () => {
+    const headerMenuTransparent = true;
+    if (!headerMenuTransparent) { return; }
+    const nav = $('#navHeader');
+    const navTop = nav.outerHeight();
+    const winTop = $(window).scrollTop();
+    if(winTop > navTop) {
+      nav.addClass('header-bg-color');
+    }
+    else {
+      nav.removeClass('header-bg-color');
+    }
+  };
+
+  let scrollCollect = () => {
+    return bamboo.throttle(function (e) {
+      setHeaderClass();
+    }, 200)()
+  }
+
+  let initHeaderBg = () => {
+    setHeaderClass();
+  }
+
+  setHeaderClass();
+  window.addEventListener('scroll', scrollCollect);
+
+  document.addEventListener('pjax:send', function () {
+    window.removeEventListener('scroll', scrollCollect)
+  })
+  document.addEventListener('pjax:complete', function () {
+    window.addEventListener('scroll', scrollCollect);
+    setHeaderClass();
+  })
+</script> 
+
+<!-- 渲染issues标签里的内容 -->
+<script>
+  function loadIssuesJS() {
+    if ($(".post-detail").find(".issues-api").length == 0) {
+      return;
+    } 
+    loadScript('/js/issues/index.js');
+  };
+  $(function () {
+    loadIssuesJS();
+  });
+  document.addEventListener('pjax:complete', function () {
+    if (typeof IssuesAPI == "undefined") {
+      loadIssuesJS();
+    }
+  })
+</script>
+
+<!-- 输入框打字特效 -->
+<!-- 输入框打字特效 -->
+
+  <script src="/js/activate-power-mode.js"></script>
+  <script>
+    POWERMODE.colorful = true;  // 打开随机颜色特效
+    POWERMODE.shake = false;    // 关闭输入框抖动
+    document.body.addEventListener('input', POWERMODE);//监听打字事件
+  </script>
+
+
+<!-- markdown代码一键复制功能 -->
+
+  <link rel="stylesheet" href="https://unpkg.com/v-plugs-ayu/lib/ayu.css">
+  <script src="https://unpkg.com/v-plugs-ayu/lib/ayu.umd.min.js"></script>
+  <script src="/js/clipboard/clipboard.min.js"></script>
+  <div id="appCopy">
+  </div>
+  <script data-pjax>
+    var vm = new Vue({
+      el: '#appCopy',
+      data: {
+      },
+      computed: {
+      },
+      mounted() {
+        const that = this;
+        var copy = 'copy';
+        /* code */
+        var initCopyCode = function () {
+          var copyHtml = '';
+          copyHtml += '<button class="btn-copy" data-clipboard-snippet="" style="position:absolute;top:0;right:0;z-index:1;">';
+          copyHtml += '<i class="fas fa-copy"></i><span>' + copy + '</span>';
+          copyHtml += '</button>';
+          $(".post-detail pre").not('.gutter pre').wrap("<div class='codeBox' style='position:relative;width:100%;'></div>")
+          $(".post-detail pre").not('.gutter pre').before(copyHtml);
+          new ClipboardJS('.btn-copy', {
+            target: function (trigger) {
+              return trigger.nextElementSibling;
+            }
+          });
+        }
+        initCopyCode();
+        $('.btn-copy').unbind('click').bind('click', function () {
+          doSomething();
+        })
+        $(document).unbind('keypress').bind('keypress', function (e) {
+          if (e.ctrlKey && e.keyCode == 67) {
+            doSomething();
+          }
+        })
+
+        function doSomething() {
+          that.$notify({
+            title: "成功",
+            content: "代码已复制，请遵守相关授权协议。",
+            type: 'success'
+          })
+        }
+      },
+      methods: {
+      },
+      created() { }
+    })
+  </script>
+  
+
+<!-- 图片懒加载 -->
+<script defer src="https://unpkg.com/vanilla-lazyload@17.1.0/dist/lazyload.min.js"></script>
+<script>
+  // https://www.npmjs.com/package/vanilla-lazyload
+  // Set the options globally
+  // to make LazyLoad self-initialize
+  window.lazyLoadOptions = {
+    elements_selector: ".lazyload",
+    threshold: 0
+  };
+  // Listen to the initialization event
+  // and get the instance of LazyLoad
+  window.addEventListener(
+    "LazyLoad::Initialized",
+    function (event) {
+      window.lazyLoadInstance = event.detail.instance;
+    },
+    false
+  );
+  document.addEventListener('DOMContentLoaded', function () {
+    lazyLoadInstance.update();
+  });
+  document.addEventListener('pjax:complete', function () {
+    lazyLoadInstance.update();
+  });
+</script>
+
+
+<!-- 卡片滚动动画 -->
+   
+
+<!-- 评论所需js -->
+
+  
+    <script type="text/javascript">
+  var utteranceCommon = {};
+
+  function check_utterance() {
+    let isDark = JSON.parse(localStorage.getItem('dark')) || JSON.parse('false');
+    if (isDark) {
+      utteranceCommon.Theme = 'github-dark';
+    } else {
+      utteranceCommon.Theme = 'github-light';
+    }
+
+    return document.getElementById("gitment-container");
+  }
+  comment_el = '#gitment-container';
+  load_utterance = function () {
+    if ($(comment_el).length) {
+      // 匿名函数，防止污染全局变量
+      const HEAD = check_utterance();
+
+      var utterances = document.createElement('script');
+      utterances.type = 'text/javascript';
+      utterances.async = true;
+      utterances.setAttribute('issue-term', 'pathname')
+      utterances.setAttribute('theme', utteranceCommon.Theme)
+      utterances.setAttribute('repo', '')
+      utterances.crossorigin = 'anonymous';
+      utterances.src = 'https://utteranc.es/client.js';
+      // content 是要插入评论的地方
+      document.getElementById('gitment-container').appendChild(utterances);
+
+    }
+  }
+
+  function dark_utterance() {
+    const HEAD = check_utterance();
+    if (!HEAD) return;
+    const message = {
+      type: 'set-theme',
+      theme: utteranceCommon.Theme
+    };
+    const utteranceIframe = document.querySelector('iframe');
+    utteranceIframe.contentWindow.postMessage(message, 'https://utteranc.es');
+  }
+
+  $(document).ready(load_utterance);
+  document.addEventListener('pjax:complete', function () {
+    load_utterance();
+  });
+
+  $('.dark').click(function () {
+    setTimeout(() => {
+      dark_utterance();
+    });
+  })
+
+</script>
+
+<style>
+  .utterances {
+    max-width: inherit !important;
+  }
+</style>
+  
+
+
+<!-- 鼠标点击特效 -->
+<!-- 爱心点击 -->
+
+  
+    <canvas class="fireworks" style="position: fixed;left: 0;top: 0;z-index: 999; pointer-events: none;" ></canvas>
+    <script src="//cdn.bootcss.com/animejs/2.2.0/anime.min.js"></script>
+    <script src="/js/cursor/explosion.min.js"></script>
+  
+
+
+
+
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" data-pjax></script>
+
+
+    <!-- pjax -->
+    
+
+<!-- pjax -->
+
+
+  <script src="/js/pjax@0.2.8/index.js"></script>
+  
+    <!-- 样式位于：source/css/_third-party/pjaxanimate.styl -->
+
+<div class="pjax-animate">
+  
+    <div class="loading-circle"><div id="loader-circle"></div></div>
+    <script>
+      window.ShowLoading = function() {
+        $(".loading-circle").css("display", "block");
+      };
+      window.HideLoading = function() {
+        $(".loading-circle").css("display", "none");
+      }
+    </script>
+  
+	<script>
+    document.addEventListener('pjax:complete', function () {
+      window.HideLoading();
+    })
+    document.addEventListener('pjax:send', function () {
+      window.ShowLoading();
+    })
+    document.addEventListener('pjax:error', function () {
+      window.HideLoading();
+    })
+	</script>
+</div>
+
+  
+
+  <script>
+    var pjax = new Pjax({
+      elements: 'a[href]:not([href^="#"]):not([href="javascript:void(0)"]):not([no-pjax])',   // 拦截正常带链接的 a 标签
+      selectors: ["#pjax-container","title"],                                   // 根据实际需要确认重载区域
+      cacheBust: false,   // url 地址追加时间戳，用以避免浏览器缓存
+      timeout: 5000
+    });
+
+    document.addEventListener('pjax:send', function (e) {
+
+      try {
+        var currentUrl = window.location.pathname;
+        var targetUrl = e.triggerElement.href;
+        var banUrl = [""];
+        if (banUrl[0] != "") {
+          banUrl.forEach(item => {
+            if(currentUrl.indexOf(item) != -1 || targetUrl.indexOf(item) != -1) {
+              window.location.href = targetUrl;
+            }
+          });
+        }
+      } catch (error) {}
+
+      $(window).unbind('resize');
+      $(window).unbind('scroll');
+      $(document).unbind('scroll');
+      $(document).unbind('click');
+      $('body').unbind('click');
+
+    })
+    
+    document.addEventListener('pjax:complete', function () {
+      $('script[data-pjax], .pjax-reload script').each(function () {
+        $(this).parent().append($(this).remove());
+      });
+    });
+
+    document.addEventListener('pjax:error', function (e) {
+      window.location.href = e.triggerElement.href;
+    })
+    
+    // 刷新不从顶部开始
+    document.addEventListener("DOMContentLoaded", function () {
+      history.scrollRestoration = 'auto';
+    })
+  </script>
+
+
+
+  </body>
+</html>

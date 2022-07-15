@@ -1,0 +1,2052 @@
+<!DOCTYPE html>
+<html>
+  <!-- meta/link... -->
+  
+
+
+
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport">
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+
+
+  <title>万字长文带你还原进程和线程 | Hexo</title>
+
+  <link rel="icon" type="image/x-icon, image/vnd.microsoft.icon" href="/favicon.ico">
+  <link rel="stylesheet" href="https://at.alicdn.com/t/font_1911880_c1nvbyezg17.css">
+  <link href="https://unpkg.com/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet">
+  <link href="/js/swiper/swiper@5.4.1.min.css" rel="stylesheet">
+  
+  
+  
+  
+<link rel="stylesheet" href="/css/animate.min.css">
+
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+  
+    
+<link rel="stylesheet" href="/js/fancybox/jquery.fancybox.min.css">
+
+  
+  
+    
+<link rel="stylesheet" href="/js/shareJs/share.min.css">
+
+  
+  <style>
+        @media (max-width: 992px) {
+            #waifu {
+                display: none;
+            }
+        }
+    </style>
+    <script src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
+    <link href="//cdn.bootcss.com/pace/1.0.2/themes/pink/pace-theme-flash.css" rel="stylesheet">
+
+    
+
+    <!-- import link -->
+    
+        
+            
+        
+            
+        
+    
+    <!-- import script -->
+    
+        
+            
+        
+            
+        
+    
+
+<meta name="generator" content="Hexo 6.2.0"></head>
+
+  
+  <!-- 依赖于jquery和vue -->
+  
+    
+<script src="https://unpkg.com/jquery@3.5.1/dist/jquery.min.js"></script>
+
+  
+
+  
+    
+<script src="https://unpkg.com/vue@2.6.11/dist/vue.min.js"></script>
+
+  
+  
+  <body>
+    <!-- 预加载动画 -->
+    <!-- 页面预加载动画 -->
+
+<div id='loader'>
+  <link rel="stylesheet" href="/js/loaded/index.css" >
+  <div class="loading-left-bg"></div>
+  <div class="loading-right-bg"></div>
+  <div class="spinner-box">
+    <div class="configure-border-1">
+      <div class="configure-core"></div>
+    </div>
+    <div class="configure-border-2">
+      <div class="configure-core"></div>
+    </div>
+    <div class="loading-word">loading...</div>
+  </div>
+</div>
+
+<script>
+  var endLoading = function () {
+    document.body.style.overflow = 'auto';
+    document.getElementById('loader').classList.add("loading");
+  }
+  window.addEventListener('DOMContentLoaded',endLoading);
+  
+</script>
+
+    
+    <!-- 判断是否为暗黑风格 -->
+    <!-- 判断是否为黑夜模式 -->
+<script>
+  let isDark = JSON.parse(localStorage.getItem('dark')) || JSON.parse('false');
+
+  if (isDark) {
+    $(document.body).addClass('darkModel');
+  }
+</script>
+
+    <!-- 需要在上面加载的js -->
+    <script>
+  function loadScript(src, cb) {
+    return new Promise(resolve => {
+      setTimeout(function () {
+        var HEAD = document.getElementsByTagName("head")[0] || document.documentElement;
+        var script = document.createElement("script");
+        script.setAttribute("type", "text/javascript");
+        if (cb) {
+          if (JSON.stringify(cb)) {
+            for (let p in cb) {
+              if (p == "onload") {
+                script[p] = () => {
+                  cb[p]()
+                  resolve()
+                }
+              } else {
+                script[p] = cb[p]
+                script.onload = resolve
+              }
+            }
+          } else {
+            script.onload = () => {
+              cb()
+              resolve()
+            };
+          }
+        } else {
+          script.onload = resolve
+        }
+        script.setAttribute("src", src);
+        HEAD.appendChild(script);
+      });
+    });
+  }
+
+  //https://github.com/filamentgroup/loadCSS
+  var loadCSS = function (href, before, media, attributes) {
+    return new Promise(resolve => {
+      setTimeout(function () {
+        var link = document.createElement('link');
+        link.rel = "stylesheet";
+        link.href = src;
+        link.onload = resolve;
+        document.getElementsByTagName("head")[0].appendChild(link);
+      });
+    });
+  };
+
+</script> 
+
+<!-- 轮播图所需要的js -->
+<script src="/js/swiper/swiper.min.js"></script>
+<script src="/js/swiper/vue-awesome-swiper.js"></script>
+<script src="/js/swiper/swiper.animate1.0.3.min.js"></script>
+
+<script type="text/javascript">
+  Vue.use(window.VueAwesomeSwiper)
+</script>
+
+
+  <script src="/js/vue-typed-js/index.js"></script>
+
+
+<!-- 首页的公告滚动插件的js需要重新加载 -->
+<script src="/js/vue-seamless-scroll/index.js"></script>
+
+<!-- 打字机效果js -->
+<script src="https://unpkg.com/typed.js@2.0.11"></script>
+
+
+    <div id="safearea">
+      <main class="main" id="pjax-container">
+        <!-- 头部导航 -->
+        
+<header class="header   " 
+  id="navHeader"
+  style="position: fixed;
+  left: 0; top: 0; z-index: 10;width: 100%;"
+>
+  <div class="header-content">
+    <div class="bars">
+      <div id="appDrawer" class="sidebar-image">
+  <div class="drawer-box-icon">
+    <i class="fas fa-bars" aria-hidden="true" @click="showDialogDrawer"></i>
+  </div>
+  
+  <transition name="fade">
+    <div class="drawer-box_mask" v-cloak style="display: none;" v-show="visible" @click.self="cancelDialogDrawer">
+    </div>
+  </transition>
+  <div class="drawer-box" :class="{'active': visible}">
+    <div class="drawer-box-head bg-color">
+      <img class="drawer-box-head_logo lazyload placeholder" src="/medias/logo.png" class="lazyload placeholder" data-srcset="/medias/logo.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="logo">
+      <h3 class="drawer-box-head_title">Hexo</h3>
+      <h5 class="drawer-box-head_desc"></h5>
+    </div>
+    
+    <div class="drawer-box-content">
+      <ul class="drawer-box-content_menu">
+        
+        
+          <li class="drawer-box-content_item">
+            <a target="_blank" rel="noopener" href="https://github.com/yuang01/hexo-theme-bamboo">
+              <i class="fas fa-github" aria-hidden="true"></i>
+              <span>Github</span>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</div>
+
+<script>
+  var body = document.body || document.documentElement || window;
+  var vm = new Vue({
+    el: '#appDrawer',
+    data: {
+      visible: false,
+      top: 0,
+      openArr: [],
+    },
+    computed: {
+    },
+    mounted() {
+    },
+    methods: {
+      isOpen(index) {
+        if (this.openArr.includes(index)) {
+          return true;
+        } else {
+          return false;
+        }
+      },
+      openOrCloseMenu(curIndex) {
+        const index = this.openArr.indexOf(curIndex);
+        if (index !== -1) {
+          this.openArr.splice(index, 1);
+        } else {
+          this.openArr.push(curIndex);
+        }
+      },
+      showDialogDrawer() {
+        this.visible = true;
+        // 防止页面滚动，只能让弹框滚动
+        this.top = $(document).scrollTop()
+        body.style.cssText = 'width: 100%; height: 100%;overflow: hidden;';
+      },
+      cancelDialogDrawer() {
+        this.visible = false;
+        body.removeAttribute('style');
+        $(document).scrollTop(this.top)
+      }
+    },
+    created() {}
+  })
+</script>
+
+    </div>
+    <div class="blog-title" id="author-avatar">
+      
+        <div class="avatar">
+          <img src="/medias/logo.png" class="lazyload placeholder" data-srcset="/medias/logo.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="logo">
+        </div>
+      
+      <a href="/" class="logo">Hexo</a>
+    </div>
+    <nav class="navbar">
+      <ul class="menu">
+        
+      </ul>
+      
+      
+        <div id="appSearch">
+  <div class="search"  @click="showDialog()"><i class="fas fa-search" aria-hidden="true"></i></div>
+  <transition name="fade">
+    <div class="message-box_wrapper" style="display: none;" v-cloak v-show="dialogVisible" @click.self="cancelDialogVisible()">
+      <div class="message-box animated bounceInDown">
+        <h2>
+          <span>
+            <i class="fas fa-search" aria-hidden="true"></i>
+            <span class="title">Search</span>
+          </span>
+          <i class="fas fa-times close" pointer style="float:right;" aria-hidden="true" @click.self="cancelDialogVisible()"></i>
+        </h2>
+        <form class="site-search-form">
+          <input type="text"
+            placeholder="Please enter keywords"
+            id="local-search-input" 
+            @click="getSearchFile()"
+            class="st-search-input"
+            v-model="searchInput"
+          />
+        </form>
+        <div class="result-wrapper">
+          <div id="local-search-result" class="local-search-result-cls"></div>
+        </div>
+      </div>
+    </div>
+  </transition>
+</div>
+<script src="/js/local_search.js"></script>
+<script>
+  var body = document.body || document.documentElement || window;
+  var vm = new Vue({
+    el: '#appSearch',
+    data: {
+      dialogVisible: false,
+      searchInput: '',
+      top: 0,
+    },
+    computed: {
+    },
+    mounted() {
+      window.addEventListener('pjax:complete', () => {
+        this.cancelDialogVisible();
+      })
+    },
+    methods: {
+      showDialog() {
+        this.dialogVisible = true;
+        // 防止页面滚动，只能让弹框滚动
+        this.top = $(document).scrollTop()
+        body.style.cssText = 'overflow: hidden;';
+      },
+      getSearchFile() {
+        if (!this.searchInput) {
+          getSearchFile("/search.xml");
+        }
+      },
+      cancelDialogVisible() {
+        this.dialogVisible = false;
+        body.removeAttribute('style');
+        $(document).scrollTop(this.top)
+      },
+    },
+    created() {}
+  })
+</script>
+<!-- 解决刷新页面闪烁问题，可以在元素上添加display: none, 或者用vue.extend方法，详情：https://blog.csdn.net/qq_31393401/article/details/81017912 -->
+<!-- 下面是搜索基本写法 -->
+<!-- <script type="text/javascript" id="local.search.active">
+  var inputArea = document.querySelector("#local-search-input");
+  inputArea.onclick   = function(){ getSearchFile(); this.onclick = null }
+  inputArea.onkeydown = function(){ if(event.keyCode == 13) return false }
+</script> -->
+
+      
+
+    </nav>
+  </div>
+  
+    <a target="_blank" rel="noopener" href="https://github.com/yuang01/hexo-theme-bamboo" class="github-corner color-primary" aria-label="View source on GitHub"><svg width="60" height="60" viewBox="0 0 250 250" style="fill:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+  
+  
+</header>
+        <!-- 内容区域 -->
+        
+ <!-- prismjs 代码高亮 -->
+ 
+
+
+<div class="bg-dark-floor" style="position: fixed;left: 0;top: 0;width: 100%;height: 100%;z-index: -1;"></div>
+
+
+  <!-- 文章详情页顶部图片和标题 -->
+
+
+
+
+<div class="post-detail-header" id="thumbnail_canvas" style="background-repeat: no-repeat; background-size: cover; 
+  background-position: center center;position: relative;background-image:url('/medias/14.jpg')">
+  <div class="post-detail-header-mask"></div>
+  <canvas id="header_canvas"style="position:absolute;bottom:0;pointer-events:none;"></canvas>
+  
+  <div class="post-detail-header_info-box">
+    <div class="title-box">
+      <span class="title">
+        万字长文带你还原进程和线程
+      </span>
+    </div>
+    
+    
+      
+        <span class="post-detail-header_date">
+          <i class="fas fa-calendar"></i> Published in：2022-05-16 |
+        </span>
+      
+
+      
+        <span class="post-detail-header_categories">
+          <i class="iconfont iconbookmark1"></i> category：
+          
+            <a href="/categories/%E5%A4%9A%E7%BA%BF%E7%A8%8B/" class="post-detail-header_category">
+              多线程
+            </a>
+          
+        </span>
+      
+
+      
+    
+  </div>
+  
+  
+    <script src="/js/bubble/bubble.js"></script>
+  
+</div>
+
+
+
+
+
+<div class="post-detail-content row justify-position" 
+  style="padding-top: 0px;">
+  <div class="main-content">
+    <article class="post post-detail">
+      <div class="post-content">
+        <h1 id="万字长文带你还原进程和线程"><a href="#万字长文带你还原进程和线程" class="headerlink" title="万字长文带你还原进程和线程"></a>万字长文带你还原进程和线程</h1><blockquote>
+<p>我们平常说的进程和线程更多的是基于编程语言的角度来说的，那么你真的了解什么是线程和进程吗？那么我们就从操作系统的角度来了解一下什么是进程和线程。</p>
+</blockquote>
+<h2 id="进程"><a href="#进程" class="headerlink" title="进程"></a>进程</h2><p>操作系统中最核心的概念就是 <code>进程</code>，进程是对正在运行中的程序的一个抽象。操作系统的其他所有内容都是围绕着进程展开的。进程是操作系统提供的最古老也是最重要的概念之一。即使可以使用的 CPU 只有一个，但它们也支持（伪）并发操作。它们会将一个单独的 CPU 变换为多个虚拟机的 CPU。没有进程的抽象，现代操作系统将不复存在。</p>
+<p>所有现代的计算机会在同一时刻做很多事情，过去使用计算机的人可能完全无法理解现在这种变化，举个例子更能说明这一点：首先考虑一个 Web 服务器，请求都来自于 Web 网页。当一个请求到达时，服务器会检查当前页是否在缓存中，如果是在缓存中，就直接把缓存中的内容返回。如果缓存中没有的话，那么请求就会交给磁盘来处理。但是，从 CPU 的角度来看，磁盘请求需要更长的时间，因为磁盘请求会很慢。当硬盘请求完成时，更多其他请求才会进入。如果有多个磁盘的话，可以在第一个请求完成前就可以连续的对其他磁盘发出部分或全部请求。很显然，这是一种并发现象，需要有并发控制条件来控制并发现象。</p>
+<p>现在考虑只有一个用户的 PC。当系统启动时，许多进程也在后台启动，用户通常不知道这些进程的启动，试想一下，当你自己的计算机启动的时候，你能知道哪些进程是需要启动的么？这些后台进程可能是一个需要输入电子邮件的电子邮件进程，或者是一个计算机病毒查杀进程来周期性的更新病毒库。某个用户进程可能会在所有用户上网的时候打印文件以及刻录 CD-ROM，这些活动都需要管理。于是一个支持多进程的多道程序系统就会显得很有必要了。</p>
+<p>在许多多道程序系统中，CPU 会在<code>进程</code>间快速切换，使每个程序运行几十或者几百毫秒。然而，严格意义来说，在某一个瞬间，CPU 只能运行一个进程，然而我们如果把时间定位为 1 秒内的话，它可能运行多个进程。这样就会让我们产生<code>并行</code>的错觉。有时候人们说的 <code>伪并行(pseudoparallelism)</code> 就是这种情况，以此来区分多处理器系统(该系统由两个或多个 CPU 来共享同一个物理内存)</p>
+<blockquote>
+<p>再来详细解释一下伪并行：<code>伪并行</code>是指单核或多核处理器同时执行多个进程，从而使程序更快。 通过以非常有限的时间间隔在程序之间快速切换CPU，因此会产生并行感。 缺点是时间可能分配给下一个进程，也可能不分配给下一个进程。</p>
+</blockquote>
+<p>我们很难对多个并行进程进行跟踪，因此，在经过多年的努力后，操作系统的设计者开发了用于描述并行的一种概念模型（顺序进程），使得并行更加容易理解和分析，对该模型的探讨，也是本篇文章的主题</p>
+<h3 id="进程模型"><a href="#进程模型" class="headerlink" title="进程模型"></a>进程模型</h3><p>在进程模型中，所有计算机上运行的软件，通常也包括操作系统，被组织为若干<code>顺序进程(sequential processes)</code>，简称为 <code>进程(process)</code> 。一个进程就是一个正在执行的程序的实例，进程也包括程序计数器、寄存器和变量的当前值。从概念上来说，每个进程都有各自的虚拟 CPU，但是实际情况是 CPU 会在各个进程之间进行来回切换。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20220512111410867.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20220512111410867.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20220512111410867"></p>
+<p>如上图所示，这是一个具有 4 个程序的多道处理程序，在进程不断切换的过程中，程序计数器也在不同的变化。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20220512111431484.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20220512111431484.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20220512111431484"></p>
+<p>在上图中，这 4 道程序被抽象为 4 个拥有各自控制流程（即每个自己的程序计数器）的进程，并且每个程序都独立的运行。当然，实际上只有一个物理程序计数器，每个程序要运行时，其逻辑程序计数器会装载到物理程序计数器中。当程序运行结束后，其物理程序计数器就会是真正的程序计数器，然后再把它放回进程的逻辑计数器中。</p>
+<p>从下图我们可以看到，在观察足够长的一段时间后，所有的进程都运行了， <strong>但在任何一个给定的瞬间仅有一个进程真正运行</strong> 。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20220512111445473.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20220512111445473.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20220512111445473"></p>
+<p>在我们接下来的讨论中，我们假设只有一个 CPU 的情形。当然，这个假设通常放到现在不会存在了，因为新的芯片通常是多核芯片，包含 2 个、4 个或更多的 CPU。但是现在，一次只考虑一个 CPU 会便于我们分析问题。因此，当我们说一个 CPU 只能真正一次运行一个进程的时候，即使有 2 个核（或 CPU），每一个核也只能一次运行一个线程。</p>
+<p>由于 CPU 会在各个进程之间来回快速切换，所以每个进程在 CPU 中的运行时间是无法确定的。并且当同一个进程再次在 CPU 中运行时，其在 CPU 内部的运行时间往往也是不固定的。进程和程序之间的区别是非常微妙的，但是通过一个例子可以让你加以区分：想想一位会做饭的计算机科学家正在为他的女儿制作生日蛋糕。他有做生日蛋糕的食谱，厨房里有所需的原谅：面粉、鸡蛋、糖、香草汁等。在这个比喻中，做蛋糕的食谱就是程序、计算机科学家就是 CPU、而做蛋糕的各种原谅都是输入数据。进程就是科学家阅读食谱、取来各种原料以及烘焙蛋糕等一系例了动作的总和。</p>
+<p>现在假设科学家的儿子跑过来告诉他，说他的头被蜜蜂蜇了一下，那么此时科学家会记录出来他做蛋糕这个过程到了哪一步，然后拿出急救手册，按照上面的步骤给他儿子实施救助。这里，会涉及到进程之间的切换，科学家（CPU）会从做蛋糕（进程）切换到实施医疗救助（另一个进程）。等待伤口处理完毕后，科学家会回到刚刚记录做蛋糕的那一步，继续制作。</p>
+<p>这里的关键思想是<code>认识到一个进程所需的条件</code>，进程是某一类特定活动的总和，它有程序、输入输出以及状态。单个处理器可以被若干进程共享，它使用某种调度算法决定何时停止一个进程的工作，并转而为另外一个进程提供服务。另外需要注意的是，如果一个进程运行了两遍，则被认为是两个进程。</p>
+<h3 id="进程的创建"><a href="#进程的创建" class="headerlink" title="进程的创建"></a>进程的创建</h3><p>操作系统需要一些方式来创建进程。在非常简单的系统中，或者操作系统被设计用来运行单个应用程序（例如微波炉中的控制器），可能在系统启动时，也需要所有的进程一起启动。但在通用系统中，然而，需要有某种方法在运行时按需创建或销毁进程，现在需要考察这个问题，下面是创建进程的方式</p>
+<ul>
+<li>系统初始化</li>
+<li>正在运行的程序执行了创建进程的系统调用（比如 fork）</li>
+<li>用户请求创建一个新进程</li>
+<li>初始化一个批处理工作</li>
+</ul>
+<p>启动操作系统时，通常会创建若干个进程。其中有些是<code>前台进程(numerous processes)</code>，也就是同用户进行交互并替他们完成工作的进程。一些运行在后台，并不与特定的用户进行交互，但是后台进程也有特定的功能。例如，设计一个后台进程来接收发来的电子邮件，这个进程大部分的时间都在休眠但是只要邮件到来后这个进程就会被唤醒。还可以设计一个后台进程来接收对该计算机上网页的传入请求，在请求到达的进程唤醒来处理网页的传入请求。进程运行在后台用来处理一些活动像是 e-mail，web 网页，新闻，打印等等被称为 <code>守护进程(daemons)</code>。大型系统会有很多守护进程。在 UNIX 中，<code>ps</code> 程序可以列出正在运行的进程， 在 Windows 中，可以使用任务管理器。</p>
+<p>除了在启动阶段创建进程之外，一些新的进程也可以在后面创建。通常，一个正在运行的进程会发出系统调用以创建一个或多个新进程来帮助其完成工作。当可以轻松地根据几个相关但相互独立的交互过程来共同完成一项工作时，创建新进程就显得特别有用。例如，如果有大量的数据需要经过网络调取并进行顺序处理，那么创建一个进程读数据，并把数据放到共享缓冲区中，而让第二个进程取走并正确处理会比较容易些。在多处理器中，让每个进程运行在不同的 CPU 上也可以使工作做的更快。</p>
+<p>在许多交互式系统中，输入一个命令或者双击图标就可以启动程序，以上任意一种操作都可以选择开启一个新的进程，在基本的 UNIX 系统中运行 X，新进程将接管启动它的窗口。在 Windows 中启动进程时，它一般没有窗口，但是它可以创建一个或多个窗口。每个窗口都可以运行进程。通过鼠标或者命令就可以切换窗口并与进程进行交互。</p>
+<blockquote>
+<p>交互式系统是以人与计算机之间大量交互为特征的计算机系统，比如游戏、web浏览器，IDE 等集成开发环境。</p>
+</blockquote>
+<p>最后一种创建进程的情形会在大型机的批处理系统中应用。用户在这种系统中提交批处理作业。当操作系统决定它有资源来运行另一个任务时，它将创建一个新进程并从其中的输入队列中运行下一个作业。</p>
+<p>从技术上讲，在所有这些情况下，让现有流程执行流程是通过创建系统调用来创建新流程的。该进程可能是正在运行的用户进程，是从键盘或鼠标调用的系统进程或批处理程序。这些就是系统调用创建新进程的过程。该系统调用告诉操作系统创建一个新进程，并直接或间接指示在其中运行哪个程序。</p>
+<p>在 UNIX 中，这仅有一个系统调用来创建一个新的进程，这个系统调用就是 <code>fork</code>。这个调用会创建一个与调用进程相关的副本。在 fork 后，一个父进程和子进程会有相同的内存映像，相同的环境字符串和相同的打开文件。通常，子进程会执行 <code>execve</code> 或者一个简单的系统调用来改变内存映像并运行一个新的程序。例如，当一个用户在 shell 中输出 sort 命令时，shell 会 fork 一个子进程然后子进程去执行 sort 命令。这两步过程的原因是允许子进程在 fork 之后但在 execve 之前操作其文件描述符，以完成标准输入，标准输出和标准错误的重定向。</p>
+<p>在 Windows 中，情况正相反，一个简单的 Win32 功能调用 <code>CreateProcess</code>，会处理流程创建并将正确的程序加载到新的进程中。这个调用会有 10 个参数，包括了需要执行的程序、输入给程序的命令行参数、各种安全属性、有关打开的文件是否继承控制位、优先级信息、进程所需要创建的窗口规格以及指向一个结构的指针，在该结构中新创建进程的信息被返回给调用者。除了 <code>CreateProcess</code> Win 32 中大概有 100 个其他的函数用于处理进程的管理，同步以及相关的事务。下面是 UNIX 操作系统和 Windows 操作系统系统调用的对比</p>
+<table>
+<thead>
+<tr>
+<th>UNIX</th>
+<th>Win32</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>fork</td>
+<td>CreateProcess</td>
+<td>创建一个新进程</td>
+</tr>
+<tr>
+<td>waitpid</td>
+<td>WaitForSingleObject</td>
+<td>等待一个进程退出</td>
+</tr>
+<tr>
+<td>execve</td>
+<td>none</td>
+<td>CraeteProcess&#x3D;fork+servvice</td>
+</tr>
+<tr>
+<td>exit</td>
+<td>ExitProcess</td>
+<td>终止执行</td>
+</tr>
+<tr>
+<td>open</td>
+<td>CreateFile</td>
+<td>创建一个文件或打开一个已有的文件</td>
+</tr>
+<tr>
+<td>close</td>
+<td>CloseHandle</td>
+<td>关闭文件</td>
+</tr>
+<tr>
+<td>read</td>
+<td>ReadFile</td>
+<td>从单个文件中读取数据</td>
+</tr>
+<tr>
+<td>write</td>
+<td>WriteFile</td>
+<td>向单个文件写数据</td>
+</tr>
+<tr>
+<td>lseek</td>
+<td>SetFilePointer</td>
+<td>移动文件指针</td>
+</tr>
+<tr>
+<td>stat</td>
+<td>GetFileAttributesEx</td>
+<td>获得不同的文件属性</td>
+</tr>
+<tr>
+<td>mkdir</td>
+<td>CreateDirectory</td>
+<td>创建一个新的目录</td>
+</tr>
+<tr>
+<td>rmdir</td>
+<td>RemoveDirectory</td>
+<td>移除一个空的目录</td>
+</tr>
+<tr>
+<td>link</td>
+<td>none</td>
+<td>Win32不支持link</td>
+</tr>
+<tr>
+<td>unlink</td>
+<td>DeleteFile</td>
+<td>销毁一个已有的文件</td>
+</tr>
+<tr>
+<td>mount</td>
+<td>none</td>
+<td>Win32不支持mount</td>
+</tr>
+<tr>
+<td>umount</td>
+<td>none</td>
+<td>Win32不支持mount，所以也不支持mount</td>
+</tr>
+<tr>
+<td>chdir</td>
+<td>SetCurrentDirectory</td>
+<td>切换当前工作目录</td>
+</tr>
+<tr>
+<td>chmod</td>
+<td>none</td>
+<td>Win32不支持安全</td>
+</tr>
+<tr>
+<td>kill</td>
+<td>none</td>
+<td>Win32不支持信号</td>
+</tr>
+<tr>
+<td>time</td>
+<td>GetLocalTime</td>
+<td>获取当前时间</td>
+</tr>
+</tbody></table>
+<p>在 UNIX 和 Windows 中，进程创建之后，父进程和子进程有各自不同的地址空间。如果其中某个进程在其地址空间中修改了一个词，这个修改将对另一个进程不可见。在 UNIX 中，子进程的地址空间是父进程的一个拷贝，但是确是两个不同的地址空间；不可写的内存区域是共享的。某些 UNIX 实现是正文区在两者之间共享，因为它不能被修改。或者，子进程共享父进程的所有内存，但是这种情况下内存通过 <code>写时复制(copy-on-write)</code> 共享，这意味着一旦两者之一想要修改部分内存，则这块内存首先被明确的复制，以确保修改发生在私有内存区域。再次强调，可写的内存是不能被共享的。但是，对于一个新创建的进程来说，确实有可能共享创建者的资源，比如可以共享打开的文件呢。在 Windows 中，从一开始父进程的地址空间和子进程的地址空间就是不同的。</p>
+<h3 id="进程的终止"><a href="#进程的终止" class="headerlink" title="进程的终止"></a>进程的终止</h3><p>进程在创建之后，它就开始运行并做完成任务。然而，没有什么事儿是永不停歇的，包括进程也一样。进程早晚会发生终止，但是通常是由于以下情况触发的</p>
+<ul>
+<li><code>正常退出(自愿的)</code></li>
+<li><code>错误退出(自愿的)</code></li>
+<li><code>严重错误(非自愿的)</code></li>
+<li><code>被其他进程杀死(非自愿的)</code></li>
+</ul>
+<p>多数进程是由于完成了工作而终止。当编译器完成了所给定程序的编译之后，编译器会执行一个系统调用告诉操作系统它完成了工作。这个调用在 UNIX 中是 <code>exit</code> ，在 Windows 中是 <code>ExitProcess</code>。面向屏幕中的软件也支持自愿终止操作。字处理软件、Internet 浏览器和类似的程序中总有一个供用户点击的图标或菜单项，用来通知进程删除它锁打开的任何临时文件，然后终止。</p>
+<p>进程发生终止的第二个原因是发现严重错误，例如，如果用户执行如下命令</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">此代码由 【Java 技术驿站】整理        cc foo.c	            </span><br></pre></td></tr></table></figure>
+
+<p>为了能够编译 foo.c 但是该文件不存在，于是编译器就会发出声明并退出。在给出了错误参数时，面向屏幕的交互式进程通常并不会直接退出，因为这从用户的角度来说并不合理，用户需要知道发生了什么并想要进行重试，所以这时候应用程序通常会弹出一个对话框告知用户发生了系统错误，是需要重试还是退出。</p>
+<p>进程终止的第三个原因是由进程引起的错误，通常是由于程序中的错误所导致的。例如，执行了一条非法指令，引用不存在的内存，或者除数是 0 等。在有些系统比如 UNIX 中，进程可以通知操作系统，它希望自行处理某种类型的错误，在这类错误中，进程会收到信号（中断），而不是在这类错误出现时直接终止进程。</p>
+<p>第四个终止进程的原因是，某个进程执行系统调用告诉操作系统杀死某个进程。在 UNIX 中，这个系统调用是 kill。在 Win32 中对应的函数是 <code>TerminateProcess</code>（注意不是系统调用），</p>
+<h3 id="进程的层次结构"><a href="#进程的层次结构" class="headerlink" title="进程的层次结构"></a>进程的层次结构</h3><p>在一些系统中，当一个进程创建了其他进程后，父进程和子进程就会以某种方式进行关联。子进程它自己就会创建更多进程，从而形成一个进程层次结构。</p>
+<p>在 UNIX 中，进程和它的所有子进程以及后裔共同组成一个进程组。当用户从键盘中发出一个信号后，该信号被发送给当前与键盘相关的进程组中的所有成员（它们通常是在当前窗口创建的所有活动进程）。每个进程可以分别捕获该信号、忽略该信号或采取默认的动作，即被信号 kill 掉。</p>
+<p>这里有另一个例子，可以用来说明层次的作用，考虑 <code>UNIX</code> 在启动时如何初始化自己。一个称为 <code>init</code> 的特殊进程出现在启动映像中 。当 init 进程开始运行时，它会读取一个文件，文件会告诉它有多少个终端。然后为每个终端创建一个新进程。这些进程等待用户登录。如果登录成功，该登录进程就执行一个 shell 来等待接收用户输入指令，这些命令可能会启动更多的进程，以此类推。因此，整个操作系统中所有的进程都隶属于一个单个以 init 为根的进程树。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20220512111506595.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20220512111506595.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20220512111506595"></p>
+<p>相反，Windows 中没有进程层次的概念，Windows 中所有进程都是平等的，唯一类似于层次结构的是在创建进程的时候，父进程得到一个特别的令牌（称为句柄），该句柄可以用来控制子进程。然而，这个令牌可能也会移交给别的操作系统，这样就不存在层次结构了。而在 UNIX 中，进程不能剥夺其子进程的 <code>进程权</code>。（这样看来，还是 Windows 比较<code>渣</code>）。</p>
+<h3 id="进程状态"><a href="#进程状态" class="headerlink" title="进程状态"></a>进程状态</h3><p>尽管每个进程是一个独立的实体，有其自己的程序计数器和内部状态，但是，进程之间仍然需要相互作用。一个进程的结果可以作为另一个进程的输入，在 shell 命令中</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">此代码由 【Java 技术驿站】整理        cat chapter1 chapter2 chapter3 | grep tree            </span><br></pre></td></tr></table></figure>
+
+<p>第一个进程是 cat，将三个文件级联并输出。第二个进程是 grep，它从输入中选择具有包含关键字 <code>tree</code> 的内容，根据这两个进程的相对速度（这取决于两个程序的相对复杂度和各自所分配到的 CPU 时间片），可能会发生下面这种情况，<code>grep</code> 准备就绪开始运行，但是输入进程还没有完成，于是必须阻塞 grep 进程，直到输入完毕。</p>
+<p>当一个进程在逻辑上无法继续运行时，它就会被阻塞，比如进程在等待可以使用的输入。还有可能是这样的情况：由于操作系统已经决定暂时将 CPU 分配给另一个进程，因此准备就绪的进程也有可能会终止。导致这两种情况的因素是完全不同的：</p>
+<ul>
+<li>第一种情况的本质是进程的挂起，你必须先输入用户的命令行，才能执行接下来的操作。</li>
+<li>第二种情况完全是操作系统的技术问题：没有足够的 CPU 来为每个进程提供自己私有的处理器。</li>
+</ul>
+<p>当一个进程开始运行时，它可能会经历下面这几种状态</p>
+<p><img src="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20220512111539665.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20220512111539665.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20220512111539665"></p>
+<p>图中会涉及三种状态</p>
+<ol>
+<li>运行态，运行态指的就是进程实际占用 CPU 运行时</li>
+<li>就绪态，就绪态指的是可运行，但因为其他进程正在运行而终止</li>
+<li>阻塞态，除非某种外部事件发生，否则进程不能运行</li>
+</ol>
+<p>逻辑上来说，运行态和就绪态是很相似的。这两种情况下都表示进程<code>可运行</code>，但是第二种情况没有获得 CPU 时间分片。第三种状态与前两种状态不同是因为这个进程不能运行，CPU 空闲或者没有任何事情去做的时候也不能运行。</p>
+<p>三种状态会涉及四种状态间的切换，在操作系统发现进程不能继续执行时会发生<code>状态1</code>的轮转，在某些系统中进程执行系统调用，例如 <code>pause</code>，来获取一个阻塞的状态。在其他系统中包括 UNIX，当进程从管道或特殊文件（例如终端）中读取没有可用的输入时，该进程会被自动终止。</p>
+<p>转换 2 和转换 3 都是由进程调度程序（操作系统的一部分）引起的，而进程甚至不知道它们。转换 2 的出现说明进程调度器认定当前进程已经运行了足够长的时间，是时候让其他进程运行 CPU 时间片了。当所有其他进程都运行过后，这时候该是让第一个进程重新获得 CPU 时间片的时候了，就会发生转换 3。</p>
+<blockquote>
+<p><strong>程序调度指的是，决定哪个进程优先被运行和运行多久，这是很重要的一点</strong> 。已经设计出许多算法来尝试平衡系统整体效率与各个流程之间的竞争需求。</p>
+</blockquote>
+<p>当进程等待的一个外部事件发生时（如一些输入到达），则发生转换 4。如果此时没有其他进程在运行，则立刻触发转换 3，该进程便开始运行，否则该进程会处于就绪阶段，等待 CPU 空闲后再轮到它运行。</p>
+<p>使用进程模型，会让我们更容易理解操作系统内部的工作状况。一些进程运行执行用户键入的命令的程序。另一些进程是系统的一部分，它们的任务是完成下列一些工作：比如，执行文件服务请求，管理磁盘驱动和磁带机的运行细节等。当发生一个磁盘中断时，系统会做出决定，停止运行当前进程，转而运行磁盘进程，该进程在此之前因等待中断而处于阻塞态。这样可以不再考虑中断，而只是考虑用户进程、磁盘进程、终端进程等。这些进程在等待时总是处于阻塞态。在已经读如磁盘或者输入字符后，等待它们的进程就被解除阻塞，并成为可调度运行的进程。</p>
+<p>从上面的观点引入了下面的模型</p>
+<p><img src="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20220512111554064.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20220512111554064.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20220512111554064"></p>
+<p><strong>操作系统最底层的就是调度程序</strong> ，在它上面有许多进程。所有关于中断处理、启动进程和停止进程的具体细节都隐藏在调度程序中。事实上，调度程序只是一段非常小的程序。</p>
+<h3 id="进程的实现"><a href="#进程的实现" class="headerlink" title="进程的实现"></a>进程的实现</h3><p>我们之前提过，操作系统为了执行进程间的切换，会维护着一张表格，即 <code>进程表(process table)</code>。每个进程占用一个进程表项。该表项包含了进程状态的重要信息，包括程序计数器、堆栈指针、内存分配状况、所打开文件的状态、账号和调度信息，以及其他在进程由运行态转换到就绪态或阻塞态时所必须保存的信息，从而保证该进程随后能再次启动，就像从未被中断过一样。</p>
+<p>下面展示了一个典型系统中的关键字段</p>
+<p><img src="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20220512111611992.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20220512111611992.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20220512111611992"></p>
+<p>第一列内容与<code>进程管理</code>有关，第二列内容与 <code>存储管理</code>有关，第三列内容与<code>文件管理</code>有关。</p>
+<p>存储管理的 text segment 、 data segment、stack segment 更多了解见下面这篇文章</p>
+<p><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s?__biz=MzU2NDg0OTgyMA==&mid=2247484788&idx=1&sn=8a17224cabe09d3bd564dfdf22e2ff5d&chksm=fc45f887cb3271914f0e688a3cce4d7e3ce9077cdde199648e72aa92ad08fba2047b4483b7e8&token=504034995&lang=zh_CN#rd">程序员需要了解的硬核知识之汇编语言(全)</a></p>
+<p>现在我们应该对进程表有个大致的了解了，就可以在对单个 CPU 上如何运行多个顺序进程的错觉做更多的解释。与每一 I&#x2F;O 类相关联的是一个称作 <code>中断向量(interrupt vector)</code> 的位置（靠近内存底部的固定区域）。它包含中断服务程序的入口地址。假设当一个磁盘中断发生时，用户进程 3 正在运行，则中断硬件将程序计数器、程序状态字、有时还有一个或多个寄存器压入堆栈，计算机随即跳转到中断向量所指示的地址。这就是硬件所做的事情。然后软件就随即接管一切剩余的工作。</p>
+<p><strong>所有的中断都从保存寄存器开始</strong> ，对于当前进程而言，通常是保存在进程表项中。随后，会从堆栈中删除由中断硬件机制存入堆栈的那部分信息，并将堆栈指针指向一个由进程处理程序所使用的临时堆栈。一些诸如保存寄存器的值和设置堆栈指针等操作，无法用 C 语言等高级语言描述，所以这些操作通过一个短小的汇编语言来完成，通常可以供所有的中断来使用，无论中断是怎样引起的，其保存寄存器的工作是一样的。</p>
+<p>当中断结束后，操作系统会调用一个 C 程序来处理中断剩下的工作。在完成剩下的工作后，会使某些进程就绪，接着调用调度程序，决定随后运行哪个进程。随后将控制权转移给一段汇编语言代码，为当前的进程装入寄存器值以及内存映射并启动该进程运行，下面显示了中断处理和调度的过程。</p>
+<ol>
+<li>硬件压入堆栈程序计数器等</li>
+<li>硬件从中断向量装入新的程序计数器</li>
+<li>汇编语言过程保存寄存器的值</li>
+<li>汇编语言过程设置新的堆栈</li>
+<li>C 中断服务器运行（典型的读和缓存写入）</li>
+<li>调度器决定下面哪个程序先运行</li>
+<li>C 过程返回至汇编代码</li>
+<li>汇编语言过程开始运行新的当前进程</li>
+</ol>
+<p>一个进程在执行过程中可能被中断数千次，但关键每次中断后，被中断的进程都返回到与中断发生前完全相同的状态。</p>
+<h2 id="线程"><a href="#线程" class="headerlink" title="线程"></a>线程</h2><p>在传统的操作系统中，每个进程都有一个地址空间和一个控制线程。事实上，这是大部分进程的定义。不过，在许多情况下，经常存在在同一地址空间中运行多个控制线程的情形，这些线程就像是分离的进程。下面我们就着重探讨一下什么是线程</p>
+<h3 id="线程的使用"><a href="#线程的使用" class="headerlink" title="线程的使用"></a>线程的使用</h3><p>或许这个疑问也是你的疑问，为什么要在进程的基础上再创建一个线程的概念，准确的说，这其实是进程模型和线程模型的讨论，回答这个问题，可能需要分三步来回答</p>
+<ul>
+<li>多线程之间会共享同一块地址空间和所有可用数据的能力，这是进程所不具备的</li>
+<li>线程要比进程<code>更轻量级</code>，由于线程更轻，所以它比进程更容易创建，也更容易撤销。在许多系统中，创建一个线程要比创建一个进程快 10 - 100 倍。</li>
+<li>第三个原因可能是性能方面的探讨，如果多个线程都是 CPU 密集型的，那么并不能获得性能上的增强，但是如果存在着大量的计算和大量的 I&#x2F;O 处理，拥有多个线程能在这些活动中彼此重叠进行，从而会加快应用程序的执行速度</li>
+</ul>
+<h4 id="多线程解决方案"><a href="#多线程解决方案" class="headerlink" title="多线程解决方案"></a>多线程解决方案</h4><p>现在考虑一个线程使用的例子：一个万维网服务器，对页面的请求发送给服务器，而所请求的页面发送回客户端。在多数 web 站点上，某些页面较其他页面相比有更多的访问。例如，索尼的主页比任何一个照相机详情介绍页面具有更多的访问，Web 服务器可以把获得大量访问的页面集合保存在内存中，避免到磁盘去调入这些页面，从而改善性能。这种页面的集合称为 <code>高速缓存(cache)</code>，高速缓存也应用在许多场合中，比如说 CPU 缓存。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20220512111644443.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20220512111644443.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20220512111644443"></p>
+<p>上面是一个 web 服务器的组织方式，一个叫做 <code>调度线程(dispatcher thread)</code> 的线程从网络中读入工作请求，在调度线程检查完请求后，它会选择一个空闲的（阻塞的）工作线程来处理请求，通常是将消息的指针写入到每个线程关联的特殊字中。然后调度线程会唤醒正在睡眠中的工作线程，把工作线程的状态从阻塞态变为就绪态。</p>
+<p>当工作线程启动后，它会检查请求是否在 web 页面的高速缓存中存在，这个高速缓存是所有线程都可以访问的。如果高速缓存不存在这个 web 页面的话，它会调用一个 <code>read</code> 操作从磁盘中获取页面并且阻塞线程直到磁盘操作完成。当线程阻塞在硬盘操作的期间，为了完成更多的工作，调度线程可能挑选另一个线程运行，也可能把另一个当前就绪的工作线程投入运行。</p>
+<p>这种模型允许将服务器编写为顺序线程的集合，在分派线程的程序中包含一个死循环，该循环用来获得工作请求并且把请求派给工作线程。每个工作线程的代码包含一个从调度线程接收的请求，并且检查 web 高速缓存中是否存在所需页面，如果有，直接把该页面返回给客户，接着工作线程阻塞，等待一个新请求的到达。如果没有，工作线程就从磁盘调入该页面，将该页面返回给客户机，然后工作线程阻塞，等待一个新请求。</p>
+<p>下面是调度线程和工作线程的代码，这里假设 TRUE 为常数 1 ，buf 和 page 分别是保存工作请求和 Web 页面的相应结构。</p>
+<p><strong>调度线程的大致逻辑</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">此代码由 【Java 技术驿站】整理        while(TRUE)&#123;          get_next_request(&amp;buf);          handoff_work(&amp;buf);        &#125;            </span><br></pre></td></tr></table></figure>
+
+<p><strong>工作线程的大致逻辑</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">此代码由 【Java 技术驿站】整理        while(TRUE)&#123;          wait_for_work(&amp;buf);          look_for_page_in_cache(&amp;buf,&amp;page);          if(page_not_in_cache(&amp;page))&#123;            read_page_from_disk(&amp;buf,&amp;page);          &#125;          return _page(&amp;page);        &#125;            </span><br></pre></td></tr></table></figure>
+
+<h4 id="单线程解决方案"><a href="#单线程解决方案" class="headerlink" title="单线程解决方案"></a>单线程解决方案</h4><p>现在考虑没有多线程的情况下，如何编写 Web 服务器。我们很容易的就想象为单个线程了，Web 服务器的主循环获取请求并检查请求，并争取在下一个请求之前完成工作。在等待磁盘操作时，服务器空转，并且不处理任何到来的其他请求。结果会导致每秒中只有很少的请求被处理，所以这个例子能够说明多线程提高了程序的并行性并提高了程序的性能。</p>
+<h4 id="状态机解决方案"><a href="#状态机解决方案" class="headerlink" title="状态机解决方案"></a>状态机解决方案</h4><p>到现在为止，我们已经有了两种解决方案，单线程解决方案和多线程解决方案，其实还有一种解决方案就是 <code>状态机解决方案</code>，它的流程如下</p>
+<p>如果目前只有一个非阻塞版本的 read 系统调用可以使用，那么当请求到达服务器时，这个唯一的 read 调用的线程会进行检查，如果能够从高速缓存中得到响应，那么直接返回，如果不能，则启动一个非阻塞的磁盘操作</p>
+<p>服务器在表中记录当前请求的状态，然后进入并获取下一个事件，紧接着下一个事件可能就是一个新工作的请求或是磁盘对先前操作的回答。如果是新工作的请求，那么就开始处理请求。如果是磁盘的响应，就从表中取出对应的状态信息进行处理。对于非阻塞式磁盘 I&#x2F;O 而言，这种响应一般都是信号中断响应。</p>
+<p>每次服务器从某个请求工作的状态切换到另一个状态时，都必须显示的保存或者重新装入相应的计算状态。这里，每个计算都有一个被保存的状态，存在一个会发生且使得相关状态发生改变的事件集合，我们把这类设计称为<code>有限状态机(finite-state machine)</code>，有限状态机杯广泛的应用在计算机科学中。</p>
+<p>这三种解决方案各有各的特性，多线程使得顺序进程的思想得以保留下来，并且实现了并行性，但是顺序进程会阻塞系统调用；单线程服务器保留了阻塞系统的简易性，但是却放弃了性能。有限状态机的处理方法运用了非阻塞调用和中断，通过并行实现了高性能，但是给编程增加了困难。</p>
+<table>
+<thead>
+<tr>
+<th>模型</th>
+<th>特性</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>单线程</td>
+<td>无并行性，性能较差，阻塞系统调用</td>
+</tr>
+<tr>
+<td>多线程</td>
+<td>有并行性，阻塞系统调用</td>
+</tr>
+<tr>
+<td>有限状态机</td>
+<td>并行性，非阻塞系统调用、中断</td>
+</tr>
+</tbody></table>
+<h3 id="经典的线程模型"><a href="#经典的线程模型" class="headerlink" title="经典的线程模型"></a>经典的线程模型</h3><p>理解进程的另一个角度是，用某种方法把相关的资源集中在一起。进程有存放程序正文和数据以及其他资源的地址空间。这些资源包括打开的文件、子进程、即将发生的定时器、信号处理程序、账号信息等。把这些信息放在进程中会比较容易管理。</p>
+<p>另一个概念是，进程中拥有一个执行的线程，通常简写为 <code>线程(thread)</code>。线程会有程序计数器，用来记录接着要执行哪一条指令；线程还拥有寄存器，用来保存线程当前正在使用的变量；线程还会有堆栈，用来记录程序的执行路径。尽管线程必须在某个进程中执行，但是进程和线程完完全全是两个不同的概，并且他们可以分开处理。进程用于把资源集中在一起，而线程则是 CPU 上调度执行的实体。</p>
+<p>线程给进程模型增加了一项内容，即在同一个进程中，允许彼此之间有较大的独立性且互不干扰。在一个进程中并行运行多个线程类似于在一台计算机上运行多个进程。在多个线程中，多个线程共享同一地址空间和其他资源。在多个进程中，进程共享物理内存、磁盘、打印机和其他资源。因为线程会包含有一些进程的属性，所以线程被称为<code>轻量的进程(lightweight processes)</code>。<code>多线程(multithreading)</code>一词还用于描述在同一进程中多个线程的情况。</p>
+<p>下图我们可以看到三个传统的进程，每个进程有自己的地址空间和单个控制线程。每个线程都在不同的地址空间中运行</p>
+<p><img src="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20220512111704540.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20220512111704540.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20220512111704540"></p>
+<p>下图中，我们可以看到有一个进程三个线程的情况。每个线程都在相同的地址空间中运行。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20220512111713456.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20220512111713456.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20220512111713456"></p>
+<p>当多个线程在单 CPU 系统中运行时，线程轮流运行，在对进程进行描述的过程中，我们知道了进程的多道程序是如何工作的。通过在多个进程之间来回切换，系统制造了不同的顺序进程并行运行的假象。多线程的工作方式也是类似。CPU 在线程之间来回切换，系统制造了不同的顺序进程并行运行的假象。</p>
+<p>但是进程中的不同线程没有不同进程间较强的独立性。同一个进程中的所有线程都会有完全一样的地址空间，这意味着它们也共享同样的全局变量。由于每个线程都可以访问进程地址空间内每个内存地址， <strong>因此一个线程可以读取、写入甚至擦除另一个线程的堆栈</strong> 。线程之间为什么没有保护呢？<code>既不可能也没有必要</code>。这与不同进程间是有差别的，不同的进程会来自不同的用户，它们彼此之间可能有敌意，因为彼此不同的进程间会互相争抢资源。而一个进程总是由一个用户所拥有，所以操作系统设计者把线程设计出来是为了让他们 <strong>相互合作而不是相互斗争的</strong> 。线程之间除了共享同一内存空间外，还具有如下不同的内容</p>
+<p><img src="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20220512111722528.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20220512111722528.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20220512111722528"></p>
+<p>上图左边的是同一个进程中每个线程共享的内容，上图右边是每个线程中的内容。也就是说左边的列表是进程的属性，右边的列表是线程的属性。</p>
+<p>线程概念试图实现的是，共享一组资源的多个线程的执行能力，以便这些线程可以为完成某一任务而共同工作。和进程一样，线程可以处于下面这几种状态： <strong>运行中、阻塞、就绪和终止（进程图中没有画）</strong> 。正在运行的线程拥有 CPU 时间片并且状态是运行中。一个被阻塞的线程会等待某个释放它的事件。例如，当一个线程执行从键盘读入数据的系统调用时，该线程就被阻塞直到有输入为止。线程通常会被阻塞，直到它等待某个外部事件的发生或者有其他线程来释放它。 <strong>线程之间的状态转换和进程之间的状态转换是一样的</strong> 。</p>
+<p>每个线程都会有自己的堆栈，如下图所示</p>
+<p><img src="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20220512111731822.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20220512111731822.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20220512111731822"></p>
+<p>在多线程情况下，进程通常会从当前的某个单线程开始，然后这个线程通过调用一个库函数（比如 <code>thread_create</code>）创建新的线程。线程创建的函数会要求指定新创建线程的名称。创建的线程通常都返回一个线程标识符，该标识符就是新线程的名字。</p>
+<p>当一个线程完成工作后，可以通过调用一个函数（比如 <code>thread_exit</code>）来退出。紧接着线程消失，状态变为死亡，不能再进行调度。在某些线程的运行过程中，可以通过调用函数例如 <code>thread_join</code> ，表示一个线程可以等待另一个线程退出。这个过程阻塞调用线程直到等待特定的线程退出。在这种情况下，线程的创建和终止非常类似于进程的创建和终止。</p>
+<p>另一个常见的线程是调用 <code>thread_yield</code>，它允许线程自动放弃 CPU 从而让另一个线程运行。这样一个调用还是很重要的，因为不同于进程，线程是无法利用时钟中断强制让线程让出 CPU 的。所以设法让线程的行为 <code>高大上</code>一些还是比较重要的，并且随着时间的推移让线程让出 CPU，以便让其他线程获得运行的机会。线程会带来很多的问题，必须要在设计时考虑全面。</p>
+<h3 id="POSIX-线程"><a href="#POSIX-线程" class="headerlink" title="POSIX 线程"></a>POSIX 线程</h3><p>为了使编写可移植线程程序成为可能，IEEE 在 IEEE 标准 1003.1c 中定义了线程标准。线程包被定义为 <code>Pthreads</code>。大部分的 UNIX 系统支持它。这个标准定义了 60 多种功能调用，一一列举不太现实，下面为你列举了一些常用的系统调用。</p>
+<blockquote>
+<p><strong>POSIX线程</strong> （通常称为 <strong>pthreads</strong> ）是一种独立于语言而存在的执行模型，以及并行执行模型。它允许程序控制时间上重叠的多个不同的工作流程。每个工作流程都称为一个线程，可以通过调用POSIX Threads API来实现对这些流程的创建和控制。可以把它理解为线程的标准。</p>
+<p>POSIX Threads 的实现在许多类似且符合POSIX的操作系统上可用，例如 <strong>FreeBSD、NetBSD、OpenBSD、Linux、macOS、Android、Solaris</strong> ，它在现有 Windows API 之上实现了 <strong>pthread</strong> 。</p>
+<p>IEEE 是世界上最大的技术专业组织，致力于为人类的利益而发展技术。</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>线程调用</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>pthread_create</td>
+<td>创建一个新线程</td>
+</tr>
+<tr>
+<td>pthread_exit</td>
+<td>结束调用的线程</td>
+</tr>
+<tr>
+<td>pthread_join</td>
+<td>等待一个特定的线程退出</td>
+</tr>
+<tr>
+<td>pthread_yield</td>
+<td>释放CPU来运行另外一个线程</td>
+</tr>
+<tr>
+<td>pthread_attr_init</td>
+<td>创建并初始化一个线程的属性结构</td>
+</tr>
+<tr>
+<td>pthread_attr_destory</td>
+<td>删除一个线程的属性结构</td>
+</tr>
+</tbody></table>
+<p>所有的 Pthreads 都有特定的属性，每一个都含有标识符、一组寄存器（包括程序计数器）和一组存储在结构中的属性。这个属性包括堆栈大小、调度参数以及其他线程需要的项目。</p>
+<p>新的线程会通过 <code>pthread_create</code> 创建，新创建的线程的标识符会作为函数值返回。这个调用非常像是 UNIX 中的 <code>fork</code> 系统调用（除了参数之外），其中线程标识符起着 <code>PID</code> 的作用，这么做的目的是为了和其他线程进行区分。</p>
+<p>当线程完成指派给他的工作后，会通过 <code>pthread_exit</code> 来终止。这个调用会停止线程并释放堆栈。</p>
+<p>一般一个线程在继续运行前需要等待另一个线程完成它的工作并退出。可以通过 <code>pthread_join</code> 线程调用来等待别的特定线程的终止。而要等待线程的线程标识符作为一个参数给出。</p>
+<p>有时会出现这种情况：一个线程逻辑上没有阻塞，但感觉上它已经运行了足够长的时间并且希望给另外一个线程机会去运行。这时候可以通过 <code>pthread_yield</code> 来完成。</p>
+<p>下面两个线程调用是处理属性的。<code>pthread_attr_init</code> 建立关联一个线程的属性结构并初始化成默认值，这些值（例如优先级）可以通过修改属性结构的值来改变。</p>
+<p>最后，<code>pthread_attr_destroy</code> 删除一个线程的结构，释放它占用的内存。它不会影响调用它的线程，这些线程会一直存在。</p>
+<p>为了更好的理解 pthread 是如何工作的，考虑下面这个例子</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">此代码由 【Java 技术驿站】整理        #include &lt;pthread.h&gt;        #include &lt;stdio.h&gt;        #include &lt;stdlib.h&gt;                #define NUMBER_OF_THREADS 10                void *print_hello_world(vvoid *tid)&#123;          /* 输出线程的标识符，然后退出 */          printf(&quot;Hello World. Greetings from thread %d\n&quot;,tid);          pthread_exit(NULL);        &#125;                int main(int argc,char *argv[])&#123;          /* 主程序创建 10 个线程，然后退出 */          pthread_t threads[NUMBER_OF_THREADS];          int status,i;         	          for(int i = 0;i &lt; NUMBER_OF_THREADS;i++)&#123;            printf(&quot;Main here. Creating thread %d\n&quot;,i);            status = pthread_create(&amp;threads[i], NULL, print_hello_world, (void *)i);                        if(status != 0)&#123;              printf(&quot;Oops. pthread_create returned error code %d\n&quot;,status);              exit(-1);            &#125;          &#125;          exit(NULL);        &#125;            </span><br></pre></td></tr></table></figure>
+
+<p>主线程在宣布它的指责之后，循环 <code>NUMBER_OF_THREADS</code> 次，每次创建一个新的线程。如果线程创建失败，会打印出一条信息后退出。在创建完成所有的工作后，主程序退出。</p>
+<h3 id="线程实现"><a href="#线程实现" class="headerlink" title="线程实现"></a>线程实现</h3><p>主要有三种实现，一种是在用户空间中实现线程，一种是在内核空间中实现线程，一种是在用户和内核空间中混合实现线程。下面我们分开讨论一下</p>
+<h4 id="在用户空间中实现线程"><a href="#在用户空间中实现线程" class="headerlink" title="在用户空间中实现线程"></a>在用户空间中实现线程</h4><p>第一种方法是把整个线程包放在用户空间中，内核对线程一无所知，它不知道线程的存在。所有的这类实现都有同样的通用结构</p>
+<p><img src="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20220512111747494.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20220512111747494.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20220512111747494"></p>
+<p>线程在运行时系统之上运行，运行时系统是管理线程过程的集合，包括前面提到的四个过程： pthread_create, pthread_exit, pthread_join 和 pthread_yield。</p>
+<blockquote>
+<p><code>运行时系统(Runtime System)</code> 也叫做运行时环境，该运行时系统提供了程序在其中运行的环境。此环境可能会解决许多问题，包括应用程序内存的布局，程序如何访问变量，在过程之间传递参数的机制，与操作系统的接口等等。编译器根据特定的运行时系统进行假设以生成正确的代码。通常，运行时系统将负责设置和管理堆栈，并且会包含诸如垃圾收集，线程或语言内置的其他动态的功能。</p>
+</blockquote>
+<p>在用户空间管理线程时，每个进程需要有其专用的<code>线程表(thread table)</code>，用来跟踪该进程中的线程。这些表和内核中的进程表类似，不过它仅仅记录各个线程的属性，如每个线程的程序计数器、堆栈指针、寄存器和状态。该线程标由运行时系统统一管理。当一个线程转换到就绪状态或阻塞状态时，在该线程表中存放重新启动该线程的所有信息，与内核在进程表中存放的信息完全一样。</p>
+<h4 id="在用户空间实现线程的优势"><a href="#在用户空间实现线程的优势" class="headerlink" title="在用户空间实现线程的优势"></a>在用户空间实现线程的优势</h4><p>在用户空间中实现线程要比在内核空间中实现线程具有这些方面的优势：考虑如果在线程完成时或者是在调用 <code>pthread_yield</code> 时，必要时会进程线程切换，然后线程的信息会被保存在运行时环境所提供的线程表中，进而，线程调度程序来选择另外一个需要运行的线程。保存线程的状态和调度程序都是本地过程，所以启动他们比进行内核调用效率更高。因而不需要陷入内核，也就不需要上下文切换，也不需要对内存高速缓存进行刷新，因为线程调度非常便捷，因此效率比较高。</p>
+<p>在用户空间实现线程还有一个优势就是它允许每个进程有自己定制的调度算法。例如在某些应用程序中，那些具有垃圾收集线程的应用程序（知道是谁了吧）就不用担心自己线程会不会在不合适的时候停止，这是一个优势。用户线程还具有较好的可扩展性，因为内核空间中的内核线程需要一些表空间和堆栈空间，如果内核线程数量比较大，容易造成问题。</p>
+<h4 id="在用户空间实现线程的劣势"><a href="#在用户空间实现线程的劣势" class="headerlink" title="在用户空间实现线程的劣势"></a>在用户空间实现线程的劣势</h4><p>尽管在用户空间实现线程会具有一定的性能优势，但是劣势还是很明显的，你如何实现<code>阻塞系统调用</code>呢？假设在还没有任何键盘输入之前，一个线程读取键盘，让线程进行系统调用是不可能的，因为这会停止所有的线程。所以， <strong>使用线程的一个目标是能够让线程进行阻塞调用，并且要避免被阻塞的线程影响其他线程</strong> 。</p>
+<p>与阻塞调用类似的问题是<code>缺页中断</code>问题，实际上，计算机并不会把所有的程序都一次性的放入内存中，如果某个程序发生函数调用或者跳转指令到了一条不在内存的指令上，就会发生页面故障，而操作系统将到磁盘上取回这个丢失的指令，这就称为<code>缺页故障</code>。而在对所需的指令进行读入和执行时，相关的进程就会被阻塞。如果只有一个线程引起页面故障，内核由于甚至不知道有线程存在，通常会吧整个进程阻塞直到磁盘 I&#x2F;O 完成为止，尽管其他的线程是可以运行的。</p>
+<p>在用户空间实现线程的另外一个问题是，如果一个线程开始运行，该线程所在进程中的其他线程都不能运行，除非第一个线程自愿的放弃 CPU，在一个单进程内部，没有时钟中断，所以不可能使用轮转调度的方式调度线程。除非其他线程能够以自己的意愿进入运行时环境，否则调度程序没有可以调度线程的机会。</p>
+<h3 id="在内核中实现线程"><a href="#在内核中实现线程" class="headerlink" title="在内核中实现线程"></a>在内核中实现线程</h3><p>现在我们考虑使用内核来实现线程的情况，此时不再需要运行时环境了。另外，每个进程中也没有线程表。相反，在内核中会有用来记录系统中所有线程的线程表。当某个线程希望创建一个新线程或撤销一个已有线程时，它会进行一个系统调用，这个系统调用通过对线程表的更新来完成线程创建或销毁工作。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20220512111758898.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20220512111758898.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20220512111758898"></p>
+<p>内核中的线程表持有每个线程的寄存器、状态和其他信息。这些信息和用户空间中的线程信息相同，但是位置却被放在了内核中而不是用户空间中。另外，内核还维护了一张进程表用来跟踪系统状态。</p>
+<p>所有能够阻塞的调用都会通过系统调用的方式来实现，当一个线程阻塞时，内核可以进行选择，是运行在同一个进程中的另一个线程（如果有就绪线程的话）还是运行一个另一个进程中的线程。但是在用户实现中，运行时系统始终运行自己的线程，直到内核剥夺它的 CPU 时间片（或者没有可运行的线程存在了）为止。</p>
+<p>由于在内核中创建或者销毁线程的开销比较大，所以某些系统会采用可循环利用的方式来回收线程。当某个线程被销毁时，就把它标志为不可运行的状态，但是其内部结构没有受到影响。稍后，在必须创建一个新线程时，就会重新启用旧线程，把它标志为可用状态。其实在用户空间也可以循环利用线程，但是由于用户空间创建或者销毁线程开销小，因此没有必要。</p>
+<p>如果某个进程中的线程造成缺页故障后，内核很容易的就能检查出来是否有其他可运行的线程，如果有的话，在等待所需要的页面从磁盘读入时，就选择一个可运行的线程运行。这样做的缺点是系统调用的代价比较大，所以如果线程的操作（创建、终止）比较多，就会带来很大的开销。</p>
+<h3 id="混合实现"><a href="#混合实现" class="headerlink" title="混合实现"></a>混合实现</h3><p>结合用户空间和内核空间的优点，设计人员采用了一种<code>内核级线程</code>的方式，然后将用户级线程与某些或者全部内核线程多路复用起来</p>
+<p><img src="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20220512111807083.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20220512111807083.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20220512111807083"></p>
+<p>在这种模型中，编程人员可以自由控制用户线程和内核线程的数量，具有很大的灵活度。采用这种方法，内核只识别内核级线程，并对其进行调度。其中一些内核级线程会被多个用户级线程多路复用。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>这篇文章为你讲述操作系统的层面来说，进程和线程分别是什么？进程模型和线程模型的区别，进程和线程的状态、层次结构、还有许多的专业术语描述。</p>
+<h2 id="文章参考："><a href="#文章参考：" class="headerlink" title="文章参考："></a>文章参考：</h2><p>《现代操作系统》</p>
+<p>《Modern Operating System》forth edition</p>
+<p><a target="_blank" rel="noopener" href="https://www.encyclopedia.com/computing/news-wires-white-papers-and-books/interactive-systems">https://www.encyclopedia.com/computing/news-wires-white-papers-and-books/interactive-systems</a></p>
+<p><a target="_blank" rel="noopener" href="https://j00ru.vexillium.org/syscalls/nt/32/">https://j00ru.vexillium.org/syscalls/nt/32/</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.bottomupcs.com/process_hierarchy.xhtml">https://www.bottomupcs.com/process_hierarchy.xhtml</a></p>
+<p><a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Runtime_system">https://en.wikipedia.org/wiki/Runtime_system</a></p>
+<p><a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Execution_model">https://en.wikipedia.org/wiki/Execution_model</a></p>
+
+      </div>
+      <div class="post-tags-categories">
+        
+        <div class="tags">
+          
+            <a href="/tags/Java/" class="">
+              Java
+            </a>
+          
+            <a href="/tags/%E5%A4%9A%E7%BA%BF%E7%A8%8B/" class="">
+              多线程
+            </a>
+          
+        </div>
+        
+      </div>
+      
+        <div class="copyright">
+  <ul class="post-copyright">
+    <li class="post-copyright-author">
+    <strong>author:  </strong>John Doe</a>
+    </li>
+    <li class="post-copyright-link">
+    <strong>link:  </strong>
+    <a href="/2022/05/16/万字长文带你还原进程和线程/" target="_blank" title="万字长文带你还原进程和线程">http://example.com/2022/05/16/万字长文带你还原进程和线程/</a>
+    </li>
+    <li class="post-copyright-license">
+      <strong>Copyright notice:   </strong>
+      All articles on this website, unless otherwise stated, adopt <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">CC BY-NC-ND 4.0</a>
+      reprint policy. If reproduced, please indicate source!
+    </li>
+  </ul>
+<div>
+      
+    </article>
+    <!-- 上一篇文章和下一篇文章 -->
+    
+      <!-- 文章详情页的上一页和下一页 -->
+<div class="post-nav">
+
+
+
+  
+  <div class="post-nav-prev post-nav-item">
+    <div class="post-nav-img" style="background-size: cover; 
+      background-position: center center;">
+      <img class="lazyload lazyload placeholder" src="/medias/2.jpg" class="lazyload placeholder" data-srcset="/medias/2.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="">
+    </div>
+    <a href="/2022/05/16/%E7%8B%82%E7%A5%9E%E8%AF%B4%E7%AC%94%E8%AE%B0%E2%80%94%E2%80%94Java-SE%E5%9F%BA%E7%A1%8001/" class="post-nav-link">
+      <div class="title">
+        <i class="fas fa-angle-left"></i> Prev:
+        <div class="title-text">狂神说笔记——Java SE基础01</div>
+      </div>
+      
+      <!-- <div class="content">
+        狂神说笔记——Java SE基础01计算机预科1.打开CMD的方式
+开始 + 系统 + 命令提示符。
+Win + R 输
+      </div> -->
+    </a>
+  </div>
+
+
+
+  
+  <div class="post-nav-next post-nav-item">
+    <div class="post-nav-img" style="background-size: cover; 
+      background-position: center center;">
+      <img class="lazyload lazyload placeholder" src="/medias/9.jpg" class="lazyload placeholder" data-srcset="/medias/9.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" src="" alt="">
+    </div>
+    <a href="/2022/05/16/05-%E5%88%86%E6%9E%90GC%E6%97%A5%E5%BF%97/" class="post-nav-link">
+      <div class="title">
+        Next: <i class="fas fa-angle-right"></i>
+        <div class="title-text">05-分析GC日志</div>
+      </div>
+      <!-- <div class="content">
+        05-分析GC日志
+笔记来源：尚硅谷 JVM 全套教程，百万播放，全网巅峰（宋红康详解 java 虚拟机）
+
+5. 分析
+      </div> -->
+    </a>
+  </div>
+
+</div>
+
+    
+    
+
+    <!-- 打赏 -->
+    
+      <div id="appDonate" class="post-donate">
+  <div id="donate_board" class="donate_bar center" ref="donate">
+    <a id="btn_donate" class="btn_donate" href="javascript:;" title="打赏" @click="showDialogDrawer()"></a>
+  </div>
+  <transition name="fade">
+    <div 
+      class="donate-box-mask"
+      v-cloak 
+      v-show="visible"
+      @click="cancelDialogDrawer()"
+    >
+    </div>
+  </transition>
+  <transition name="bounce">
+    <div class="donate-box" v-cloak v-show="visible">
+      <div class="donate-box_close">
+        <i class="fas fa-times" aria-hidden="true" @click="cancelDialogDrawer" pointer></i>
+      </div>
+      <div class="donate-box_title">
+        <h4>
+          你的赏识是我前进的动力
+        </h4>
+      </div>
+      <div class="donate-box_tab">
+        <div class="Alipay" pointer :class="{'active': tabActive === 'Alipay'}" @click="changeTabActive('Alipay')">
+          支付宝
+        </div>
+        <div class="WeChatpay" pointer :class="{'active': tabActive === 'WeChatpay'}" @click="changeTabActive('WeChatpay')">
+          微信
+        </div>
+      </div>
+      <div class="donate-box_img">
+        <div class="AlipayImg" v-show="tabActive === 'Alipay'">
+          <img src="/medias/1.jpg" class="lazyload placeholder" data-srcset="/medias/1.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="支付宝打赏" />
+        </div> 
+        <div class="WeChatpayImg" v-show="tabActive === 'WeChatpay'">
+          <img src="/medias/2.jpg" class="lazyload placeholder" data-srcset="/medias/2.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="微信打赏" />
+        </div>
+      </div>
+    </div>
+  </transition>
+</div>
+
+<script>
+  var body = document.body || document.documentElement || window;
+  var vm = new Vue({
+    el: '#appDonate',
+    data: {
+      visible: false,
+      tabActive: 'Alipay',
+      top: 0,
+    },
+    computed: {
+    },
+    mounted() {
+    },
+    methods: {
+      showDialogDrawer() {
+        this.visible = true;
+        // 防止页面滚动，只能让弹框滚动
+        // function getScroll() {
+        //   return {
+        //     left: window.pageXOffset || document.documentElement.scrollLeft || document.body.scrollLeft || 0,
+        //     top: window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0
+        //   };
+        // }
+        this.top = $(document).scrollTop() // or getScroll().top
+        // console.log('aa', $('.main-content'));
+        body.style.cssText = 'overflow: hidden;';
+      },
+      cancelDialogDrawer() {
+        this.visible = false;
+        body.removeAttribute('style');
+        $(document).scrollTop(this.top)
+      },
+      changeTabActive(name) {
+        this.tabActive = name;
+      }
+    },
+    created() {}
+  })
+</script>
+    
+
+    <!-- 分享 -->
+    
+      <!-- https://github.com/overtrue/share.js -->
+<!-- 文章详情页的分享 -->
+<div class="social-share" data-sites="twitter,facebook,google,qq,qzone,wechat,weibo,douban,linkedin" data-wechat-qrcode-helper="<p>微信扫一扫即可分享！</p>"></div>
+
+<script src="/js/shareJs/social-share.min.js"></script>
+</script>
+
+<style>
+  .social-share {
+    margin: 20px 0;
+  }
+</style>
+
+
+    
+    
+    <!-- 评论 -->
+    <!-- 评论 -->
+
+  <div id="myComment">
+    
+      <div id="gitment-container"></div>
+
+    
+  </div>
+
+<!-- comment script in themes\hexo-theme-bamboo\layout\_partial\scripts\index.ejs -->
+
+
+  </div>
+
+  <!-- 目录 -->
+  <!-- 文章详情页右侧目录 -->
+
+  <div class="toc-aside">
+    <div class="toc-main">
+      <div class="toc-aside-title">
+        <i class="fas fa-list-ul" aria-hidden="true"></i><span>catalog</span>
+        
+          <div class="toc-open-close">catalog</div>
+        
+      </div>
+      <div class="toc-content">
+        <div class="toc"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 手机端目录按钮 -->
+  <div id="toc-mobile-btn">
+    <i class="fas fa-list-ul" aria-hidden="true"></i>
+  </div>
+
+
+<script>
+  function closeToc(init) {
+    $(".toc-aside").css({'width': 0, 'padding': 0, 'transition': init ?  'noe' : 'width 0.3s' });
+    $(".toc-content").css({'width': 0});
+    $(".toc-aside-title span, .toc-aside-title i").css({'display': 'none'});
+    $(".main-content").css({'width': '75%', 'margin-left': 'auto', 'margin-right': 'auto',});
+  };
+  function openToc() {
+    $(".main-content").css({'width': '65%', 'margin-right': '10px', 'margin-left': 'calc(35% - 350px)'});
+    $(".toc-aside").css({'width': '300px', 'padding': '0 10px', 'transition': 'width 0.3s'});
+    $(".toc-content").css({'width': '300px'});
+    $(".toc-aside-title span, .toc-aside-title i").css({'display': 'inline-block'});
+  }
+  function openBtnClickFn () {
+    let openOrCloseBtn = $('.toc-aside .toc-aside-title .toc-open-close');
+    let open = eval('' || 'true');
+    openOrCloseBtn.click(function() {
+      if (open) {
+        closeToc();
+        open = false;
+      } else {
+        openToc();
+        open = true;
+      }
+    });
+  };
+  openBtnClickFn();
+  initCloseTocWidth(true);
+
+  function initCloseTocWidth(init) {
+    if (window.innerWidth >= 992) {
+      let isClose = false;
+      isClose && closeToc(init)
+    }
+  }
+
+  document.addEventListener('pjax:complete', function () {
+    $(".toc-aside").css({'transition': 'no'});
+  })
+  document.addEventListener('pjax:complete', function () {
+    openBtnClickFn();
+  })
+  
+</script>
+
+  <!-- 图片放大 Wrap images with fancybox support -->
+  <script src="/js/wrapImage.js"></script>
+</div>
+
+<!-- 文章详情页背景图 -->
+<div id="appBgSwiper" style="position: fixed;left: 0;top: 0;width: 100%;height: 100%;z-index: -2;"
+	:style="{'background-color': bgColor ? bgColor : 'transparent'}">
+	<transition-group tag="ul" :name="names">
+		<li v-for='(image,index) in img' :key='index' v-show="index === mark" class="bg-swiper-box">
+			<img :src="image" class="bg-swiper-img no-lazy">
+		</li>
+	</transition-group>
+</div>
+<script>
+	var vm = new Vue({
+		el: '#appBgSwiper',
+		data: {
+			names: '' || 'fade' || 'fade', // translate-fade fade
+			mark: 0,
+			img: [],
+			bgColor: '',
+			time: null
+		},
+		methods: {   //添加方法
+			change(i, m) {
+				if (i > m) {
+					// this.names = 'fade';
+				} else if (i < m) {
+					// this.names = 'fade';
+				} else {
+					return;
+				}
+				this.mark = i;
+			},
+			prev() {
+				// this.names = 'fade';
+				this.mark--;
+				if (this.mark === -1) {
+					this.mark = 3;
+					return
+				}
+			},
+			next() {
+				// this.names = 'fade';
+				this.mark++;
+				if (this.mark === this.img.length) {
+					this.mark = 0;
+					return
+				}
+			},
+			autoPlay() {
+				// this.names = 'fade';
+				this.mark++;
+				if (this.mark === this.img.length) {
+					this.mark = 0;
+					return
+				}
+			},
+			play() {
+				let bgImgDelay = '' || '180000'
+				let delay = parseInt(bgImgDelay) || 180000;
+				this.time = setInterval(this.autoPlay, delay);
+			},
+			enter() {
+				clearInterval(this.time);
+			},
+			leave() {
+				this.play();
+			}
+		},
+		created() {
+			this.play()
+		},
+		beforeDestroy() {
+			clearInterval(this.time);
+		},
+		mounted() {
+			let prop = '' || '';
+			let isImg = prop.includes('.bmp') || prop.includes('.jpg') || prop.includes('.png') || prop.includes('.tif') || prop.includes('.gif') || prop.includes('.pcx') || prop.includes('.tga') || prop.includes('.exif') || prop.includes('.fpx') || prop.includes('.psd') || prop.includes('.cdr') || prop.includes('.pcd') || prop.includes('.dxf') || prop.includes('.ufo') || prop.includes('.eps') || prop.includes('.ai') || prop.includes('.raw') || prop.includes('.WMF') || prop.includes('.webp') || prop.includes('.jpeg') || prop.includes('http://') || prop.includes('https://')
+			if (isImg) {
+				let img = prop.split(',');
+				let configRoot = '/'
+				let arrImg = [];
+				img.forEach(el => {
+					var Expression = /http(s)?:\/\/([\w-]+\.)+[\w-]+(\/[\w- .\/?%&=]*)?/;
+					var objExp = new RegExp(Expression);
+
+					if (objExp.test(el)) {
+						// http or https
+						arrImg.push(el);
+					} else {
+						// 非http or https开头
+						// 本地文件
+						let firstStr = el.charAt(0);
+						if (firstStr == '/') {
+							el = el.substr(1); // 删除第一个字符 '/',因为 configRoot最后一个字符为 /
+						}
+						el = configRoot + el;
+						arrImg.push(el);
+					}
+				})
+				this.img = arrImg;
+			} else {
+				this.bgColor = prop;
+			}
+		}
+	})
+</script>
+
+<style>
+	.bg-swiper-box {
+		position: absolute;
+		display: block;
+		width: 100%;
+		height: 100%;
+	}
+
+	.bg-swiper-img {
+		object-fit: cover;
+		width: 100%;
+		height: 100%;
+	}
+</style>
+
+
+
+
+  <script>
+  function loadMermaid() {
+    if (document.getElementsByClassName('mermaid').length) {
+      if (window.mermaidJsLoad) mermaid.init()
+      else {
+        loadScript('https://unpkg.com/mermaid/dist/mermaid.min.js').then(() => {
+          window.mermaidJsLoad = true
+          mermaid.initialize({
+            theme: 'default',
+          })
+          if ('true') {
+            mermaid.init();
+          }
+        })
+      }
+    }
+  };
+  document.addEventListener("DOMContentLoaded", function () {
+    loadMermaid();
+  })
+
+  document.addEventListener('pjax:complete', function () {
+    loadMermaid();
+  })
+  
+</script>
+
+
+      </main>
+    </div>
+
+    <!-- 页脚 -->
+    
+  
+  
+    <!-- 底部鱼儿跳动效果，依赖于jquery-->
+<div id="j-fish-skip" style=" position: relative;height: 153px;width: auto;"></div>
+<script>
+  var RENDERER = {
+    POINT_INTERVAL: 5,
+    FISH_COUNT: 3,
+    MAX_INTERVAL_COUNT: 50,
+    INIT_HEIGHT_RATE: .5,
+    THRESHOLD: 50,
+    FISH_COLOR: '',
+    init: function () {
+      this.setFishColor(); this.setParameters(), this.reconstructMethods(), this.setup(), this.bindEvent(), this.render()
+    },
+    setFishColor: function () {
+      let isDark = JSON.parse(localStorage.getItem('dark')) || JSON.parse('false');
+      if (isDark) {
+        this.FISH_COLOR = '#222'; // 暗黑色，有时间把这整成一个变量
+      } else {
+        this.FISH_COLOR = '' || '#42b983';
+      }
+    },
+    setParameters: function () {
+      this.$window = $(window), this.$container = $("#j-fish-skip"), this.$canvas = $("<canvas />"), this.context = this.$canvas.appendTo(this.$container).get(0).getContext("2d"), this.points = [], this.fishes = [], this.watchIds = []
+    },
+    createSurfacePoints: function () {
+      var t = Math.round(this.width / this.POINT_INTERVAL);
+      this.pointInterval = this.width / (t - 1), this.points.push(new SURFACE_POINT(this, 0));
+      for (var i = 1; i < t; i++) {
+        var e = new SURFACE_POINT(this, i * this.pointInterval),
+          h = this.points[i - 1];
+        e.setPreviousPoint(h), h.setNextPoint(e), this.points.push(e)
+      }
+    },
+    reconstructMethods: function () {
+      this.watchWindowSize = this.watchWindowSize.bind(this), this.jdugeToStopResize = this.jdugeToStopResize.bind(this), this.startEpicenter = this.startEpicenter.bind(this), this.moveEpicenter = this.moveEpicenter.bind(this), this.reverseVertical = this.reverseVertical.bind(this), this.render = this.render.bind(this)
+    },
+    setup: function () {
+      this.points.length = 0, this.fishes.length = 0, this.watchIds.length = 0, this.intervalCount = this.MAX_INTERVAL_COUNT, this.width = this.$container.width(), this.height = this.$container.height(), this.fishCount = this.FISH_COUNT * this.width / 500 * this.height / 500, this.$canvas.attr({
+        width: this.width,
+        height: this.height
+      }), this.reverse = !1, this.fishes.push(new FISH(this)), this.createSurfacePoints()
+    },
+    watchWindowSize: function () {
+      this.clearTimer(), this.tmpWidth = this.$window.width(), this.tmpHeight = this.$window.height(), this.watchIds.push(setTimeout(this.jdugeToStopResize, this.WATCH_INTERVAL))
+    },
+    clearTimer: function () {
+      for (; this.watchIds.length > 0;) clearTimeout(this.watchIds.pop())
+    },
+    jdugeToStopResize: function () {
+      var t = this.$window.width(),
+        i = this.$window.height(),
+        e = t == this.tmpWidth && i == this.tmpHeight;
+      this.tmpWidth = t, this.tmpHeight = i, e && this.setup()
+    },
+    bindEvent: function () {
+      this.$window.on("resize", this.watchWindowSize), this.$container.on("mouseenter", this.startEpicenter), this.$container.on("mousemove", this.moveEpicenter)
+    },
+    getAxis: function (t) {
+      var i = this.$container.offset();
+      return {
+        x: t.clientX - i.left + this.$window.scrollLeft(),
+        y: t.clientY - i.top + this.$window.scrollTop()
+      }
+    },
+    startEpicenter: function (t) {
+      this.axis = this.getAxis(t)
+    },
+    moveEpicenter: function (t) {
+      var i = this.getAxis(t);
+      this.axis || (this.axis = i), this.generateEpicenter(i.x, i.y, i.y - this.axis.y), this.axis = i
+    },
+    generateEpicenter: function (t, i, e) {
+      if (!(i < this.height / 2 - this.THRESHOLD || i > this.height / 2 + this.THRESHOLD)) {
+        var h = Math.round(t / this.pointInterval);
+        h < 0 || h >= this.points.length || this.points[h].interfere(i, e)
+      }
+    },
+    reverseVertical: function () {
+      this.reverse = !this.reverse;
+      for (var t = 0, i = this.fishes.length; t < i; t++) this.fishes[t].reverseVertical()
+    },
+    controlStatus: function () {
+      for (var t = 0, i = this.points.length; t < i; t++) this.points[t].updateSelf();
+      for (t = 0, i = this.points.length; t < i; t++) this.points[t].updateNeighbors();
+      this.fishes.length < this.fishCount && 0 == --this.intervalCount && (this.intervalCount = this.MAX_INTERVAL_COUNT, this.fishes.push(new FISH(this)))
+    },
+    render: function () {
+      requestAnimationFrame(this.render), this.controlStatus(), this.context.clearRect(0, 0, this.width, this.height), this.context.fillStyle = this.FISH_COLOR;
+      for (var t = 0, i = this.fishes.length; t < i; t++) this.fishes[t].render(this.context);
+      this.context.save(), this.context.globalCompositeOperation = "xor", this.context.beginPath(), this.context.moveTo(0, this.reverse ? 0 : this.height);
+      for (t = 0, i = this.points.length; t < i; t++) this.points[t].render(this.context);
+      this.context.lineTo(this.width, this.reverse ? 0 : this.height), this.context.closePath(), this.context.fill(), this.context.restore()
+    }
+  },
+  SURFACE_POINT = function (t, i) {
+    this.renderer = t, this.x = i, this.init()
+  };
+  SURFACE_POINT.prototype = {
+    SPRING_CONSTANT: .03,
+    SPRING_FRICTION: .9,
+    WAVE_SPREAD: .3,
+    ACCELARATION_RATE: .01,
+    init: function () {
+      this.initHeight = this.renderer.height * this.renderer.INIT_HEIGHT_RATE, this.height = this.initHeight, this.fy = 0, this.force = {
+        previous: 0,
+        next: 0
+      }
+    },
+    setPreviousPoint: function (t) {
+      this.previous = t
+    },
+    setNextPoint: function (t) {
+      this.next = t
+    },
+    interfere: function (t, i) {
+      this.fy = this.renderer.height * this.ACCELARATION_RATE * (this.renderer.height - this.height - t >= 0 ? -1 : 1) * Math.abs(i)
+    },
+    updateSelf: function () {
+      this.fy += this.SPRING_CONSTANT * (this.initHeight - this.height), this.fy *= this.SPRING_FRICTION, this.height += this.fy
+    },
+    updateNeighbors: function () {
+      this.previous && (this.force.previous = this.WAVE_SPREAD * (this.height - this.previous.height)), this.next && (this.force.next = this.WAVE_SPREAD * (this.height - this.next.height))
+    },
+    render: function (t) {
+      this.previous && (this.previous.height += this.force.previous, this.previous.fy += this.force.previous), this.next && (this.next.height += this.force.next, this.next.fy += this.force.next), t.lineTo(this.x, this.renderer.height - this.height)
+    }
+  };
+  var FISH = function (t) {
+    this.renderer = t, this.init()
+  };
+  FISH.prototype = {
+    GRAVITY: .4,
+    init: function () {
+      this.direction = Math.random() < .5, this.x = this.direction ? this.renderer.width + this.renderer.THRESHOLD : -this.renderer.THRESHOLD, this.previousY = this.y, this.vx = this.getRandomValue(4, 10) * (this.direction ? -1 : 1), this.renderer.reverse ? (this.y = this.getRandomValue(1 * this.renderer.height / 10, 4 * this.renderer.height / 10), this.vy = this.getRandomValue(2, 5), this.ay = this.getRandomValue(.05, .2)) : (this.y = this.getRandomValue(6 * this.renderer.height / 10, 9 * this.renderer.height / 10), this.vy = this.getRandomValue(-5, -2), this.ay = this.getRandomValue(-.2, -.05)), this.isOut = !1, this.theta = 0, this.phi = 0
+    },
+    getRandomValue: function (t, i) {
+      return t + (i - t) * Math.random()
+    },
+    reverseVertical: function () {
+      this.isOut = !this.isOut, this.ay *= -1
+    },
+    controlStatus: function (t) {
+      this.previousY = this.y, this.x += this.vx, this.y += this.vy, this.vy += this.ay, this.renderer.reverse ? this.y > this.renderer.height * this.renderer.INIT_HEIGHT_RATE ? (this.vy -= this.GRAVITY, this.isOut = !0) : (this.isOut && (this.ay = this.getRandomValue(.05, .2)), this.isOut = !1) : this.y < this.renderer.height * this.renderer.INIT_HEIGHT_RATE ? (this.vy += this.GRAVITY, this.isOut = !0) : (this.isOut && (this.ay = this.getRandomValue(-.2, -.05)), this.isOut = !1), this.isOut || (this.theta += Math.PI / 20, this.theta %= 2 * Math.PI, this.phi += Math.PI / 30, this.phi %= 2 * Math.PI), this.renderer.generateEpicenter(this.x + (this.direction ? -1 : 1) * this.renderer.THRESHOLD, this.y, this.y - this.previousY), (this.vx > 0 && this.x > this.renderer.width + this.renderer.THRESHOLD || this.vx < 0 && this.x < -this.renderer.THRESHOLD) && this.init()
+    },
+    render: function (t) {
+      t.save(), t.translate(this.x, this.y), t.rotate(Math.PI + Math.atan2(this.vy, this.vx)), t.scale(1, this.direction ? 1 : -1), t.beginPath(), t.moveTo(-30, 0), t.bezierCurveTo(-20, 15, 15, 10, 40, 0), t.bezierCurveTo(15, -10, -20, -15, -30, 0), t.fill(), t.save(), t.translate(40, 0), t.scale(.9 + .2 * Math.sin(this.theta), 1), t.beginPath(), t.moveTo(0, 0), t.quadraticCurveTo(5, 10, 20, 8), t.quadraticCurveTo(12, 5, 10, 0), t.quadraticCurveTo(12, -5, 20, -8), t.quadraticCurveTo(5, -10, 0, 0), t.fill(), t.restore(), t.save(), t.translate(-3, 0), t.rotate((Math.PI / 3 + Math.PI / 10 * Math.sin(this.phi)) * (this.renderer.reverse ? -1 : 1)), t.beginPath(), this.renderer.reverse ? (t.moveTo(5, 0), t.bezierCurveTo(10, 10, 10, 30, 0, 40), t.bezierCurveTo(-12, 25, -8, 10, 0, 0)) : (t.moveTo(-5, 0), t.bezierCurveTo(-10, -10, -10, -30, 0, -40), t.bezierCurveTo(12, -25, 8, -10, 0, 0)), t.closePath(), t.fill(), t.restore(), t.restore(), this.controlStatus(t)
+    }
+  }, $(function () {
+    RENDERER.init()
+    $('.dark').click(function () {
+      setTimeout(() => {
+        RENDERER.setFishColor();
+        RENDERER.context.fill();
+      });
+    })
+  });
+</script>
+  
+  <div class="footer bg-color">
+    <div class="footer-main">
+      
+        
+          <div class="link">
+            
+          </div>
+        
+      
+        
+          <div class="footer-copyright">
+            <p>Copyright © 2019 - 2020 <a target="_blank" rel="noopener" href="https://github.com/yuang01">yuang01</a> | Powered by <a target="_blank" rel="noopener" href="https://hexo.io/zh-cn/docs/">Hexo</a> | Theme <a target="_blank" rel="noopener" href="https://github.com/yuang01/theme">Bamboo</a> </p>
+
+          </div>
+        
+      
+        
+          
+            <!-- 不蒜子统计 -->
+            <!-- 不蒜子统计 -->
+<span id="busuanzi_container_site_pv">
+      <i class="fas fa-eye" aria-hidden="true"></i>Total visits：<span id="busuanzi_value_site_pv"></span> times
+</span>
+<span class="post-meta-divider">|</span>
+<span id="busuanzi_container_site_uv" style='display:none'>
+      <i class="fas fa-users" aria-hidden="true"></i>Number of visitors：<span id="busuanzi_value_site_uv"></span> people
+</span>
+
+          
+        
+      
+        
+          <div class="footer-custom">
+            
+          </div>
+        
+      
+    </div>
+  </div>
+
+
+
+    <!-- 渲染暗黑按钮 -->
+    
+      <div class="dark">
+  <div class="dark-content">
+    <i class="fas fa-moon" aria-hidden="true"></i>
+    <!-- <span>关灯</span> -->
+  </div>
+  
+</div>
+
+<script>
+  $(function() {
+    let isDark = JSON.parse(localStorage.getItem('dark'))  || JSON.parse('false');
+    if (isDark) {
+      $(".dark-content").replaceWith(
+          `
+          <div class='dark-content'>
+            <i class="fas fa-lightbulb" aria-hidden="true"></i>
+          </div>
+          `
+        );
+    }
+    $('.dark').click(function() {
+      if ($(document.body).is('.darkModel')) {
+        $(document.body).removeClass('darkModel');
+        localStorage.setItem('dark', false);
+        $(".dark-content").replaceWith(
+          `
+          <div class='dark-content'>
+            <i class="fas fa-moon" aria-hidden="true"></i>
+          </div>
+          `
+        );
+      } else {
+        $(document.body).addClass('darkModel');
+        localStorage.setItem('dark', true);
+        $(".dark-content").replaceWith(
+          `
+          <div class='dark-content'>
+            <i class="fas fa-lightbulb" aria-hidden="true"></i>
+          </div>
+          `
+        );
+      }
+    })
+  })
+</script>
+    
+    <!-- 渲染回到顶部按钮 -->
+    
+      <div class="goTop top-btn-color" pointer>
+  <i class="fas fa-arrow-up" aria-hidden="true"></i>
+</div>
+<script src="/js/goTop.js"></script>
+
+    
+    <!-- 渲染左下角音乐播放器 -->
+    
+      <link rel="stylesheet" href="/js/aplayer/APlayer@1.10.1.min.css">
+<style>
+.aplayer .aplayer-lrc p {
+  
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 16px !important;
+}
+
+.aplayer .aplayer-lrc p.aplayer-lrc-current {
+  
+  font-size: 15px;
+  color: #42b983;
+}
+
+
+.aplayer.aplayer-fixed.aplayer-narrow .aplayer-body {
+  left: -66px !important;
+}
+
+.aplayer.aplayer-fixed.aplayer-narrow .aplayer-body:hover {
+  left: 0px !important;
+}
+
+
+</style>
+<meting-js  
+  class=""
+  server="tencent"
+  type="playlist"
+  id="8062553743"
+  fixed='true'
+  autoplay='false'
+  theme='#42b983'
+  loop='all'
+  order='random'
+  preload='auto'
+  volume='0.7'
+  list-folded='true'
+>
+</meting-js>
+
+<!-- <style>
+  #aplayer {
+    position: fixed;
+    left: 0;
+    bottom: 300px;
+  }
+</style> -->
+<script src="https://unpkg.com/aplayer@1.10.1/dist/APlayer.min.js"></script>
+<script src="https://unpkg.com/meting@2/dist/Meting.min.js"></script>
+    
+
+    <!-- 图片放大 -->
+    
+      <script src="/js/fancybox/jquery.fancybox.min.js"></script>
+    
+
+    <!-- 百度解析 -->
+    <!-- Baidu Analytics -->
+
+    <!-- Baidu Push -->
+
+<script>
+    (function () {
+        var bp = document.createElement('script');
+        var curProtocol = window.location.protocol.split(':')[0];
+        if (curProtocol === 'https') {
+            bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+        } else {
+            bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+        }
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(bp, s);
+    })();
+</script>
+
+    
+    <!-- 背景彩带 -->
+    
+      <script type="text/javascript" size="100" alpha='0.4' zIndex="-1" src="/js/ribbon.min.js"></script>
+    
+
+    <script src="/js/utils/index.js"></script>
+    <script src="/js/app.js"></script>
+    
+    <!-- 文章目录所需js -->
+<link href="/js/tocbot/tocbot.css" rel="stylesheet">
+<script src="/js/tocbot/tocbot.min.js"></script>
+
+<script>
+  var headerEl = 'h2, h3, h4',  //headers 
+    content = '.post-detail',//文章容器
+    idArr = {};  //标题数组以确定是否增加索引id
+  //add #id
+  var option = {
+    // Where to render the table of contents.
+    tocSelector: '.toc',
+    // Where to grab the headings to build the table of contents.
+    contentSelector: content,
+    // Which headings to grab inside of the contentSelector element.
+    headingSelector: headerEl,
+    scrollSmooth: true,
+    scrollSmoothOffset: -80,
+    headingsOffset: -($(window).height() * 0.4 - 45),
+    positionFixedSelector: '.toc-main',
+    positionFixedClass: 'is-position-fixed',
+    fixedSidebarOffset: 'auto',
+    activeLinkClass: 'is-active-link',
+    // onClick: function (e) {},
+  }
+  if ($('.toc').length > 0) {
+
+    $(content).children(headerEl).each(function () {
+      //去除空格以及多余标点
+      var headerId = $(this).text().replace(/[\s|\~|`|\!|\@|\#|\$|\%|\^|\&|\*|\(|\)|\_|\+|\=|\||\|\[|\]|\{|\}|\;|\:|\"|\'|\,|\<|\.|\>|\/|\?|\：|\，|\。]/g, '');
+
+      headerId = headerId.toLowerCase();
+      if (idArr[headerId]) {
+        //id已经存在
+        $(this).attr('id', headerId + '-' + idArr[headerId]);
+        idArr[headerId]++;
+      }
+      else {
+        //id未存在
+        idArr[headerId] = 1;
+        $(this).attr('id', headerId);
+      }
+    });
+
+    document.addEventListener("DOMContentLoaded", function () {
+      tocbot.init(option);
+      mobileTocClick();
+    });
+
+  }
+
+  window.tocScrollFn = function () {
+    return bamboo.throttle(function () {
+      findHeadPosition();
+    }, 100)()
+  }
+  window.addEventListener('scroll', tocScrollFn);
+
+  const findHeadPosition = function (top) {
+    if ($('.toc-list').length <= 0) {
+      return false;
+    }
+    setTimeout(() => {  // or DOMContentLoaded 
+      autoScrollToc();
+    }, 0);
+  }
+
+  const autoScrollToc = function () {
+    const $activeItem = document.querySelector('.is-active-link');
+    const $cardToc = document.querySelector('.toc-content');
+    const activePosition = $activeItem.getBoundingClientRect().top
+    const sidebarScrollTop = $cardToc.scrollTop
+    if (activePosition > (document.documentElement.clientHeight - 100)) {
+      $cardToc.scrollTop = sidebarScrollTop + 150
+    }
+    if (activePosition < 100) {
+      $cardToc.scrollTop = sidebarScrollTop - 150
+    }
+  }
+
+  document.addEventListener('pjax:send', function () {
+    if ($('.toc').length) {
+      tocbot.destroy();
+    }
+  });
+
+  document.addEventListener('pjax:complete', function () {
+    if ($('.toc').length) {
+      tocbot.init(option);
+      mobileTocClick();
+    }
+  });
+  
+  // 手机端toc按钮点击出现目录
+  const mobileTocClick = function () {
+    const $cardTocLayout = document.getElementsByClassName('toc-aside')[0];
+    const $cardToc = $cardTocLayout.getElementsByClassName('toc-content')[0];
+    let right = '45px';
+    if (window.innerWidth >= 551 && window.innerWidth <= 992) {
+      right = '100px'
+    }
+    const mobileToc = {
+      open: () => {
+        $cardTocLayout.style.cssText = 'animation: toc-open .3s; opacity: 1; right: ' + right
+      },
+
+      close: () => {
+        $cardTocLayout.style.animation = 'toc-close .2s'
+        setTimeout(() => {
+          $cardTocLayout.style.cssText = "opacity:''; animation: ''; right: ''"
+        }, 100)
+      }
+    }
+    document.getElementById('toc-mobile-btn').addEventListener('click', () => {
+      if (window.getComputedStyle($cardTocLayout).getPropertyValue('opacity') === '0') mobileToc.open()
+      else mobileToc.close()
+    })
+
+    $cardToc.addEventListener('click', (e) => {
+      if (window.innerWidth < 992) { // 小于992px的时候
+        mobileToc.close()
+      }
+    })
+  }
+</script>
+
+<style>
+  .is-position-fixed {
+    position: sticky !important;
+    top: 74px;
+  }
+
+  .toc-main ul {
+    counter-reset: show-list;
+  }
+
+  .toc-main ul li::before {
+    content: counter(item)".";
+    display: block;
+    position: absolute;
+    left: 12px;
+    top: 0;
+  }
+</style> 
+
+<!-- 设置导航背景 -->
+<script>
+  let setHeaderClass = () => {
+    const headerMenuTransparent = true;
+    if (!headerMenuTransparent) { return; }
+    const nav = $('#navHeader');
+    const navTop = nav.outerHeight();
+    const winTop = $(window).scrollTop();
+    if(winTop > navTop) {
+      nav.addClass('header-bg-color');
+    }
+    else {
+      nav.removeClass('header-bg-color');
+    }
+  };
+
+  let scrollCollect = () => {
+    return bamboo.throttle(function (e) {
+      setHeaderClass();
+    }, 200)()
+  }
+
+  let initHeaderBg = () => {
+    setHeaderClass();
+  }
+
+  setHeaderClass();
+  window.addEventListener('scroll', scrollCollect);
+
+  document.addEventListener('pjax:send', function () {
+    window.removeEventListener('scroll', scrollCollect)
+  })
+  document.addEventListener('pjax:complete', function () {
+    window.addEventListener('scroll', scrollCollect);
+    setHeaderClass();
+  })
+</script> 
+
+<!-- 渲染issues标签里的内容 -->
+<script>
+  function loadIssuesJS() {
+    if ($(".post-detail").find(".issues-api").length == 0) {
+      return;
+    } 
+    loadScript('/js/issues/index.js');
+  };
+  $(function () {
+    loadIssuesJS();
+  });
+  document.addEventListener('pjax:complete', function () {
+    if (typeof IssuesAPI == "undefined") {
+      loadIssuesJS();
+    }
+  })
+</script>
+
+<!-- 输入框打字特效 -->
+<!-- 输入框打字特效 -->
+
+  <script src="/js/activate-power-mode.js"></script>
+  <script>
+    POWERMODE.colorful = true;  // 打开随机颜色特效
+    POWERMODE.shake = false;    // 关闭输入框抖动
+    document.body.addEventListener('input', POWERMODE);//监听打字事件
+  </script>
+
+
+<!-- markdown代码一键复制功能 -->
+
+  <link rel="stylesheet" href="https://unpkg.com/v-plugs-ayu/lib/ayu.css">
+  <script src="https://unpkg.com/v-plugs-ayu/lib/ayu.umd.min.js"></script>
+  <script src="/js/clipboard/clipboard.min.js"></script>
+  <div id="appCopy">
+  </div>
+  <script data-pjax>
+    var vm = new Vue({
+      el: '#appCopy',
+      data: {
+      },
+      computed: {
+      },
+      mounted() {
+        const that = this;
+        var copy = 'copy';
+        /* code */
+        var initCopyCode = function () {
+          var copyHtml = '';
+          copyHtml += '<button class="btn-copy" data-clipboard-snippet="" style="position:absolute;top:0;right:0;z-index:1;">';
+          copyHtml += '<i class="fas fa-copy"></i><span>' + copy + '</span>';
+          copyHtml += '</button>';
+          $(".post-detail pre").not('.gutter pre').wrap("<div class='codeBox' style='position:relative;width:100%;'></div>")
+          $(".post-detail pre").not('.gutter pre').before(copyHtml);
+          new ClipboardJS('.btn-copy', {
+            target: function (trigger) {
+              return trigger.nextElementSibling;
+            }
+          });
+        }
+        initCopyCode();
+        $('.btn-copy').unbind('click').bind('click', function () {
+          doSomething();
+        })
+        $(document).unbind('keypress').bind('keypress', function (e) {
+          if (e.ctrlKey && e.keyCode == 67) {
+            doSomething();
+          }
+        })
+
+        function doSomething() {
+          that.$notify({
+            title: "成功",
+            content: "代码已复制，请遵守相关授权协议。",
+            type: 'success'
+          })
+        }
+      },
+      methods: {
+      },
+      created() { }
+    })
+  </script>
+  
+
+<!-- 图片懒加载 -->
+<script defer src="https://unpkg.com/vanilla-lazyload@17.1.0/dist/lazyload.min.js"></script>
+<script>
+  // https://www.npmjs.com/package/vanilla-lazyload
+  // Set the options globally
+  // to make LazyLoad self-initialize
+  window.lazyLoadOptions = {
+    elements_selector: ".lazyload",
+    threshold: 0
+  };
+  // Listen to the initialization event
+  // and get the instance of LazyLoad
+  window.addEventListener(
+    "LazyLoad::Initialized",
+    function (event) {
+      window.lazyLoadInstance = event.detail.instance;
+    },
+    false
+  );
+  document.addEventListener('DOMContentLoaded', function () {
+    lazyLoadInstance.update();
+  });
+  document.addEventListener('pjax:complete', function () {
+    lazyLoadInstance.update();
+  });
+</script>
+
+
+<!-- 卡片滚动动画 -->
+   
+
+<!-- 评论所需js -->
+
+  
+    <script type="text/javascript">
+  var utteranceCommon = {};
+
+  function check_utterance() {
+    let isDark = JSON.parse(localStorage.getItem('dark')) || JSON.parse('false');
+    if (isDark) {
+      utteranceCommon.Theme = 'github-dark';
+    } else {
+      utteranceCommon.Theme = 'github-light';
+    }
+
+    return document.getElementById("gitment-container");
+  }
+  comment_el = '#gitment-container';
+  load_utterance = function () {
+    if ($(comment_el).length) {
+      // 匿名函数，防止污染全局变量
+      const HEAD = check_utterance();
+
+      var utterances = document.createElement('script');
+      utterances.type = 'text/javascript';
+      utterances.async = true;
+      utterances.setAttribute('issue-term', 'pathname')
+      utterances.setAttribute('theme', utteranceCommon.Theme)
+      utterances.setAttribute('repo', '')
+      utterances.crossorigin = 'anonymous';
+      utterances.src = 'https://utteranc.es/client.js';
+      // content 是要插入评论的地方
+      document.getElementById('gitment-container').appendChild(utterances);
+
+    }
+  }
+
+  function dark_utterance() {
+    const HEAD = check_utterance();
+    if (!HEAD) return;
+    const message = {
+      type: 'set-theme',
+      theme: utteranceCommon.Theme
+    };
+    const utteranceIframe = document.querySelector('iframe');
+    utteranceIframe.contentWindow.postMessage(message, 'https://utteranc.es');
+  }
+
+  $(document).ready(load_utterance);
+  document.addEventListener('pjax:complete', function () {
+    load_utterance();
+  });
+
+  $('.dark').click(function () {
+    setTimeout(() => {
+      dark_utterance();
+    });
+  })
+
+</script>
+
+<style>
+  .utterances {
+    max-width: inherit !important;
+  }
+</style>
+  
+
+
+<!-- 鼠标点击特效 -->
+<!-- 爱心点击 -->
+
+  
+    <canvas class="fireworks" style="position: fixed;left: 0;top: 0;z-index: 999; pointer-events: none;" ></canvas>
+    <script src="//cdn.bootcss.com/animejs/2.2.0/anime.min.js"></script>
+    <script src="/js/cursor/explosion.min.js"></script>
+  
+
+
+
+
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" data-pjax></script>
+
+
+    <!-- pjax -->
+    
+
+<!-- pjax -->
+
+
+  <script src="/js/pjax@0.2.8/index.js"></script>
+  
+    <!-- 样式位于：source/css/_third-party/pjaxanimate.styl -->
+
+<div class="pjax-animate">
+  
+    <div class="loading-circle"><div id="loader-circle"></div></div>
+    <script>
+      window.ShowLoading = function() {
+        $(".loading-circle").css("display", "block");
+      };
+      window.HideLoading = function() {
+        $(".loading-circle").css("display", "none");
+      }
+    </script>
+  
+	<script>
+    document.addEventListener('pjax:complete', function () {
+      window.HideLoading();
+    })
+    document.addEventListener('pjax:send', function () {
+      window.ShowLoading();
+    })
+    document.addEventListener('pjax:error', function () {
+      window.HideLoading();
+    })
+	</script>
+</div>
+
+  
+
+  <script>
+    var pjax = new Pjax({
+      elements: 'a[href]:not([href^="#"]):not([href="javascript:void(0)"]):not([no-pjax])',   // 拦截正常带链接的 a 标签
+      selectors: ["#pjax-container","title"],                                   // 根据实际需要确认重载区域
+      cacheBust: false,   // url 地址追加时间戳，用以避免浏览器缓存
+      timeout: 5000
+    });
+
+    document.addEventListener('pjax:send', function (e) {
+
+      try {
+        var currentUrl = window.location.pathname;
+        var targetUrl = e.triggerElement.href;
+        var banUrl = [""];
+        if (banUrl[0] != "") {
+          banUrl.forEach(item => {
+            if(currentUrl.indexOf(item) != -1 || targetUrl.indexOf(item) != -1) {
+              window.location.href = targetUrl;
+            }
+          });
+        }
+      } catch (error) {}
+
+      $(window).unbind('resize');
+      $(window).unbind('scroll');
+      $(document).unbind('scroll');
+      $(document).unbind('click');
+      $('body').unbind('click');
+
+    })
+    
+    document.addEventListener('pjax:complete', function () {
+      $('script[data-pjax], .pjax-reload script').each(function () {
+        $(this).parent().append($(this).remove());
+      });
+    });
+
+    document.addEventListener('pjax:error', function (e) {
+      window.location.href = e.triggerElement.href;
+    })
+    
+    // 刷新不从顶部开始
+    document.addEventListener("DOMContentLoaded", function () {
+      history.scrollRestoration = 'auto';
+    })
+  </script>
+
+
+
+  </body>
+</html>

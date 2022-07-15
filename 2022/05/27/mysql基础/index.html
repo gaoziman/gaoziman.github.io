@@ -1,0 +1,2457 @@
+<!DOCTYPE html>
+<html>
+  <!-- meta/link... -->
+  
+
+
+
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport">
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+
+
+  <title>hm-MySQL基础 | Hexo</title>
+
+  <link rel="icon" type="image/x-icon, image/vnd.microsoft.icon" href="/favicon.ico">
+  <link rel="stylesheet" href="https://at.alicdn.com/t/font_1911880_c1nvbyezg17.css">
+  <link href="https://unpkg.com/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet">
+  <link href="/js/swiper/swiper@5.4.1.min.css" rel="stylesheet">
+  
+  
+  
+  
+<link rel="stylesheet" href="/css/animate.min.css">
+
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+  
+    
+<link rel="stylesheet" href="/js/fancybox/jquery.fancybox.min.css">
+
+  
+  
+    
+<link rel="stylesheet" href="/js/shareJs/share.min.css">
+
+  
+  <style>
+        @media (max-width: 992px) {
+            #waifu {
+                display: none;
+            }
+        }
+    </style>
+    <script src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
+    <link href="//cdn.bootcss.com/pace/1.0.2/themes/pink/pace-theme-flash.css" rel="stylesheet">
+
+    
+
+    <!-- import link -->
+    
+        
+            
+        
+            
+        
+    
+    <!-- import script -->
+    
+        
+            
+        
+            
+        
+    
+
+<meta name="generator" content="Hexo 6.2.0"></head>
+
+  
+  <!-- 依赖于jquery和vue -->
+  
+    
+<script src="https://unpkg.com/jquery@3.5.1/dist/jquery.min.js"></script>
+
+  
+
+  
+    
+<script src="https://unpkg.com/vue@2.6.11/dist/vue.min.js"></script>
+
+  
+  
+  <body>
+    <!-- 预加载动画 -->
+    <!-- 页面预加载动画 -->
+
+<div id='loader'>
+  <link rel="stylesheet" href="/js/loaded/index.css" >
+  <div class="loading-left-bg"></div>
+  <div class="loading-right-bg"></div>
+  <div class="spinner-box">
+    <div class="configure-border-1">
+      <div class="configure-core"></div>
+    </div>
+    <div class="configure-border-2">
+      <div class="configure-core"></div>
+    </div>
+    <div class="loading-word">loading...</div>
+  </div>
+</div>
+
+<script>
+  var endLoading = function () {
+    document.body.style.overflow = 'auto';
+    document.getElementById('loader').classList.add("loading");
+  }
+  window.addEventListener('DOMContentLoaded',endLoading);
+  
+</script>
+
+    
+    <!-- 判断是否为暗黑风格 -->
+    <!-- 判断是否为黑夜模式 -->
+<script>
+  let isDark = JSON.parse(localStorage.getItem('dark')) || JSON.parse('false');
+
+  if (isDark) {
+    $(document.body).addClass('darkModel');
+  }
+</script>
+
+    <!-- 需要在上面加载的js -->
+    <script>
+  function loadScript(src, cb) {
+    return new Promise(resolve => {
+      setTimeout(function () {
+        var HEAD = document.getElementsByTagName("head")[0] || document.documentElement;
+        var script = document.createElement("script");
+        script.setAttribute("type", "text/javascript");
+        if (cb) {
+          if (JSON.stringify(cb)) {
+            for (let p in cb) {
+              if (p == "onload") {
+                script[p] = () => {
+                  cb[p]()
+                  resolve()
+                }
+              } else {
+                script[p] = cb[p]
+                script.onload = resolve
+              }
+            }
+          } else {
+            script.onload = () => {
+              cb()
+              resolve()
+            };
+          }
+        } else {
+          script.onload = resolve
+        }
+        script.setAttribute("src", src);
+        HEAD.appendChild(script);
+      });
+    });
+  }
+
+  //https://github.com/filamentgroup/loadCSS
+  var loadCSS = function (href, before, media, attributes) {
+    return new Promise(resolve => {
+      setTimeout(function () {
+        var link = document.createElement('link');
+        link.rel = "stylesheet";
+        link.href = src;
+        link.onload = resolve;
+        document.getElementsByTagName("head")[0].appendChild(link);
+      });
+    });
+  };
+
+</script> 
+
+<!-- 轮播图所需要的js -->
+<script src="/js/swiper/swiper.min.js"></script>
+<script src="/js/swiper/vue-awesome-swiper.js"></script>
+<script src="/js/swiper/swiper.animate1.0.3.min.js"></script>
+
+<script type="text/javascript">
+  Vue.use(window.VueAwesomeSwiper)
+</script>
+
+
+  <script src="/js/vue-typed-js/index.js"></script>
+
+
+<!-- 首页的公告滚动插件的js需要重新加载 -->
+<script src="/js/vue-seamless-scroll/index.js"></script>
+
+<!-- 打字机效果js -->
+<script src="https://unpkg.com/typed.js@2.0.11"></script>
+
+
+    <div id="safearea">
+      <main class="main" id="pjax-container">
+        <!-- 头部导航 -->
+        
+<header class="header   " 
+  id="navHeader"
+  style="position: fixed;
+  left: 0; top: 0; z-index: 10;width: 100%;"
+>
+  <div class="header-content">
+    <div class="bars">
+      <div id="appDrawer" class="sidebar-image">
+  <div class="drawer-box-icon">
+    <i class="fas fa-bars" aria-hidden="true" @click="showDialogDrawer"></i>
+  </div>
+  
+  <transition name="fade">
+    <div class="drawer-box_mask" v-cloak style="display: none;" v-show="visible" @click.self="cancelDialogDrawer">
+    </div>
+  </transition>
+  <div class="drawer-box" :class="{'active': visible}">
+    <div class="drawer-box-head bg-color">
+      <img class="drawer-box-head_logo lazyload placeholder" src="/medias/logo.png" class="lazyload placeholder" data-srcset="/medias/logo.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="logo">
+      <h3 class="drawer-box-head_title">Hexo</h3>
+      <h5 class="drawer-box-head_desc"></h5>
+    </div>
+    
+    <div class="drawer-box-content">
+      <ul class="drawer-box-content_menu">
+        
+        
+          <li class="drawer-box-content_item">
+            <a target="_blank" rel="noopener" href="https://github.com/yuang01/hexo-theme-bamboo">
+              <i class="fas fa-github" aria-hidden="true"></i>
+              <span>Github</span>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</div>
+
+<script>
+  var body = document.body || document.documentElement || window;
+  var vm = new Vue({
+    el: '#appDrawer',
+    data: {
+      visible: false,
+      top: 0,
+      openArr: [],
+    },
+    computed: {
+    },
+    mounted() {
+    },
+    methods: {
+      isOpen(index) {
+        if (this.openArr.includes(index)) {
+          return true;
+        } else {
+          return false;
+        }
+      },
+      openOrCloseMenu(curIndex) {
+        const index = this.openArr.indexOf(curIndex);
+        if (index !== -1) {
+          this.openArr.splice(index, 1);
+        } else {
+          this.openArr.push(curIndex);
+        }
+      },
+      showDialogDrawer() {
+        this.visible = true;
+        // 防止页面滚动，只能让弹框滚动
+        this.top = $(document).scrollTop()
+        body.style.cssText = 'width: 100%; height: 100%;overflow: hidden;';
+      },
+      cancelDialogDrawer() {
+        this.visible = false;
+        body.removeAttribute('style');
+        $(document).scrollTop(this.top)
+      }
+    },
+    created() {}
+  })
+</script>
+
+    </div>
+    <div class="blog-title" id="author-avatar">
+      
+        <div class="avatar">
+          <img src="/medias/logo.png" class="lazyload placeholder" data-srcset="/medias/logo.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="logo">
+        </div>
+      
+      <a href="/" class="logo">Hexo</a>
+    </div>
+    <nav class="navbar">
+      <ul class="menu">
+        
+      </ul>
+      
+      
+        <div id="appSearch">
+  <div class="search"  @click="showDialog()"><i class="fas fa-search" aria-hidden="true"></i></div>
+  <transition name="fade">
+    <div class="message-box_wrapper" style="display: none;" v-cloak v-show="dialogVisible" @click.self="cancelDialogVisible()">
+      <div class="message-box animated bounceInDown">
+        <h2>
+          <span>
+            <i class="fas fa-search" aria-hidden="true"></i>
+            <span class="title">Search</span>
+          </span>
+          <i class="fas fa-times close" pointer style="float:right;" aria-hidden="true" @click.self="cancelDialogVisible()"></i>
+        </h2>
+        <form class="site-search-form">
+          <input type="text"
+            placeholder="Please enter keywords"
+            id="local-search-input" 
+            @click="getSearchFile()"
+            class="st-search-input"
+            v-model="searchInput"
+          />
+        </form>
+        <div class="result-wrapper">
+          <div id="local-search-result" class="local-search-result-cls"></div>
+        </div>
+      </div>
+    </div>
+  </transition>
+</div>
+<script src="/js/local_search.js"></script>
+<script>
+  var body = document.body || document.documentElement || window;
+  var vm = new Vue({
+    el: '#appSearch',
+    data: {
+      dialogVisible: false,
+      searchInput: '',
+      top: 0,
+    },
+    computed: {
+    },
+    mounted() {
+      window.addEventListener('pjax:complete', () => {
+        this.cancelDialogVisible();
+      })
+    },
+    methods: {
+      showDialog() {
+        this.dialogVisible = true;
+        // 防止页面滚动，只能让弹框滚动
+        this.top = $(document).scrollTop()
+        body.style.cssText = 'overflow: hidden;';
+      },
+      getSearchFile() {
+        if (!this.searchInput) {
+          getSearchFile("/search.xml");
+        }
+      },
+      cancelDialogVisible() {
+        this.dialogVisible = false;
+        body.removeAttribute('style');
+        $(document).scrollTop(this.top)
+      },
+    },
+    created() {}
+  })
+</script>
+<!-- 解决刷新页面闪烁问题，可以在元素上添加display: none, 或者用vue.extend方法，详情：https://blog.csdn.net/qq_31393401/article/details/81017912 -->
+<!-- 下面是搜索基本写法 -->
+<!-- <script type="text/javascript" id="local.search.active">
+  var inputArea = document.querySelector("#local-search-input");
+  inputArea.onclick   = function(){ getSearchFile(); this.onclick = null }
+  inputArea.onkeydown = function(){ if(event.keyCode == 13) return false }
+</script> -->
+
+      
+
+    </nav>
+  </div>
+  
+    <a target="_blank" rel="noopener" href="https://github.com/yuang01/hexo-theme-bamboo" class="github-corner color-primary" aria-label="View source on GitHub"><svg width="60" height="60" viewBox="0 0 250 250" style="fill:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+  
+  
+</header>
+        <!-- 内容区域 -->
+        
+ <!-- prismjs 代码高亮 -->
+ 
+
+
+<div class="bg-dark-floor" style="position: fixed;left: 0;top: 0;width: 100%;height: 100%;z-index: -1;"></div>
+
+
+  <!-- 文章详情页顶部图片和标题 -->
+
+
+
+
+<div class="post-detail-header" id="thumbnail_canvas" style="background-repeat: no-repeat; background-size: cover; 
+  background-position: center center;position: relative;background-image:url('/medias/9.jpg')">
+  <div class="post-detail-header-mask"></div>
+  <canvas id="header_canvas"style="position:absolute;bottom:0;pointer-events:none;"></canvas>
+  
+  <div class="post-detail-header_info-box">
+    <div class="title-box">
+      <span class="title">
+        hm-MySQL基础
+      </span>
+    </div>
+    
+    
+      
+        <span class="post-detail-header_date">
+          <i class="fas fa-calendar"></i> Published in：2022-05-27 |
+        </span>
+      
+
+      
+        <span class="post-detail-header_categories">
+          <i class="iconfont iconbookmark1"></i> category：
+          
+            <a href="/categories/hmJavaWeb/" class="post-detail-header_category">
+              hmJavaWeb
+            </a>
+          
+        </span>
+      
+
+      
+    
+  </div>
+  
+  
+    <script src="/js/bubble/bubble.js"></script>
+  
+</div>
+
+
+
+
+
+<div class="post-detail-content row justify-position" 
+  style="padding-top: 0px;">
+  <div class="main-content">
+    <article class="post post-detail">
+      <div class="post-content">
+        <h2 id="MySQL基础"><a href="#MySQL基础" class="headerlink" title="MySQL基础"></a>MySQL基础</h2><p><strong>今日目标：</strong></p>
+<blockquote>
+<ul>
+<li>完成MySQL的安装及登陆基本操作</li>
+<li>能通过SQL对数据库进行CRUD</li>
+<li>能通过SQL对表进行CRUD</li>
+<li>能通过SQL对数据进行CRUD</li>
+</ul>
+</blockquote>
+<h2 id="1，数据库相关概念"><a href="#1，数据库相关概念" class="headerlink" title="1，数据库相关概念"></a>1，数据库相关概念</h2><p>以前我们做系统，数据持久化的存储采用的是文件存储。存储到文件中可以达到系统关闭数据不会丢失的效果，当然文件存储也有它的弊端。</p>
+<p>假设在文件中存储以下的数据：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">姓名	年龄	性别	住址</span><br><span class="line">张三	23	男	北京西三旗</span><br><span class="line">李四	24	女	北京西二旗</span><br><span class="line">王五	25	男	西安软件新城</span><br></pre></td></tr></table></figure>
+
+<p>现要修改李四这条数据的性别数据改为男，我们现学习的IO技术可以通过将所有的数据读取到内存中，然后进行修改再存到该文件中。通过这种方式操作存在很大问题，现在只有三条数据，如果文件中存储1T的数据，那么就会发现内存根本就存储不了。</p>
+<p>现需要既能持久化存储数据，也要能避免上述问题的技术使用在我们的系统中。数据库就是这样的一门技术。</p>
+<h3 id="1-1-数据库"><a href="#1-1-数据库" class="headerlink" title="1.1  数据库"></a>1.1  数据库</h3><ul>
+<li><p>&#x3D;&#x3D;存储和管理数据的仓库，数据是有组织的进行存储。&#x3D;&#x3D;</p>
+</li>
+<li><p>数据库英文名是 DataBase，简称DB。</p>
+</li>
+</ul>
+<p>数据库就是将数据存储在硬盘上，可以达到持久化存储的效果。那又是如何解决上述问题的？使用数据库管理系统。</p>
+<h3 id="1-2-数据库管理系统"><a href="#1-2-数据库管理系统" class="headerlink" title="1.2  数据库管理系统"></a>1.2  数据库管理系统</h3><ul>
+<li>&#x3D;&#x3D;管理数据库的大型软件&#x3D;&#x3D;</li>
+<li>英文：DataBase Management System，简称 DBMS</li>
+</ul>
+<p>在电脑上安装了数据库管理系统后，就可以通过数据库管理系统创建数据库来存储数据，也可以通过该系统对数据库中的数据进行数据的增删改查相关的操作。我们平时说的MySQL数据库其实是MySQL数据库管理系统。</p>
+<img src="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210721185923635.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210721185923635.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20210721185923635" style="zoom:80%;" />
+
+<p>通过上面的描述，大家应该已经知道了 <code>数据库管理系统</code> 和 <code>数据库</code> 的关系。那么有有哪些常见的数据库管理系统呢？</p>
+<h3 id="1-3-常见的数据库管理系统"><a href="#1-3-常见的数据库管理系统" class="headerlink" title="1.3  常见的数据库管理系统"></a>1.3  常见的数据库管理系统</h3><img src="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210721184354001.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210721184354001.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20210721184354001" style="zoom:70%;" />
+
+<p>接下来对上面列举的数据库管理系统进行简单的介绍：</p>
+<ul>
+<li>Oracle：收费的大型数据库，Oracle 公司的产品</li>
+<li>&#x3D;&#x3D;MySQL&#x3D;&#x3D;： 开源免费的中小型数据库。后来 Sun公司收购了 MySQL，而 Sun 公司又被 Oracle 收购</li>
+<li>SQL Server：MicroSoft 公司收费的中型的数据库。C#、.net 等语言常使用</li>
+<li>PostgreSQL：开源免费中小型的数据库</li>
+<li>DB2：IBM 公司的大型收费数据库产品</li>
+<li>SQLite：嵌入式的微型数据库。如：作为 Android 内置数据库</li>
+<li>MariaDB：开源免费中小型的数据库</li>
+</ul>
+<p>我们课程上学习的是MySQL数据库管理系统，PostgreSQL在一些公司也有使用，此时大家肯定会想以后在公司中如果使用我们没有学习过程的PostgreSQL数据库管理系统怎么办？这点大家大可不必担心，如下图所示：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20220522205711883.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20220522205711883.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20220522205711883"></p>
+<p>我们可以通过数据库管理系统操作数据库，对数据库中的数据进行增删改查操作，而怎么样让用户跟数据库管理系统打交道呢？就可以通过一门编程语言（SQL）来实现。</p>
+<h3 id="1-4-SQL"><a href="#1-4-SQL" class="headerlink" title="1.4  SQL"></a>1.4  SQL</h3><ul>
+<li>英文：Structured Query Language，简称 SQL，结构化查询语言</li>
+<li>操作关系型数据库的编程语言</li>
+<li>定义操作所有关系型数据库的统一标准，可以使用SQL操作所有的关系型数据库管理系统，以后工作中如果使用到了其他的数据库管理系统，也同样的使用SQL来操作。</li>
+</ul>
+<h2 id="2，MySQL"><a href="#2，MySQL" class="headerlink" title="2，MySQL"></a>2，MySQL</h2><h3 id="2-1-MySQL安装"><a href="#2-1-MySQL安装" class="headerlink" title="2.1  MySQL安装"></a>2.1  MySQL安装</h3><blockquote>
+<p><strong>安装环境:Win10 64位</strong><br><strong>软件版本:MySQL 5.7.24 解压版</strong></p>
+</blockquote>
+<h4 id="2-1-1-下载"><a href="#2-1-1-下载" class="headerlink" title="2.1.1  下载"></a>2.1.1  下载</h4><p><a target="_blank" rel="noopener" href="https://downloads.mysql.com/archives/community/">https://downloads.mysql.com/archives/community/</a></p>
+<p>点开上面的链接就能看到如下界面：</p>
+<img src="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210404200055449.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210404200055449.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20210404200055449" style="zoom:80%;" />
+
+<p>选择选择和自己<strong>系统位数</strong>相对应的版本点击右边的<code>Download</code>，此时会进到另一个页面，同样在接近页面底部的地方找到如下图所示的位置：</p>
+<img src="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20220527152319379.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20220527152319379.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20220527152319379" style="zoom:67%;" />
+
+
+
+<p>不用理会上面的登录和注册按钮，直接点击 <code>No thanks, just start my download.</code> 就可以下载。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20201109134805641.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20201109134805641.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20201109134805641"></p>
+<h4 id="2-1-2-安装-解压"><a href="#2-1-2-安装-解压" class="headerlink" title="2.1.2  安装(解压)"></a>2.1.2  安装(解压)</h4><p>下载完成后我们得到的是一个压缩包，将其解压，我们就可以得到MySQL 5.7.24的软件本体了(就是一个文件夹)，我们可以把它放在你想安装的位置。</p>
+<hr>
+<p><img src="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20201109134948046.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20201109134948046.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20201109134948046"></p>
+<h3 id="2-2-MySQL卸载"><a href="#2-2-MySQL卸载" class="headerlink" title="2.2  MySQL卸载"></a>2.2  MySQL卸载</h3><p>如果你想卸载MySQL，也很简单。</p>
+<p>右键开始菜单，选择<code>命令提示符(管理员)</code>，打开黑框。</p>
+<ol>
+<li>敲入<code>net stop mysql</code>，回车。</li>
+</ol>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">net stop mysql</span><br></pre></td></tr></table></figure>
+
+
+
+<p><img src="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/1556823-20181220222924783-57600848.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/1556823-20181220222924783-57600848.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="img"></p>
+<ol start="2">
+<li>再敲入<code>mysqld -remove mysql</code>，回车。</li>
+</ol>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mysqld -remove mysql</span><br></pre></td></tr></table></figure>
+
+
+
+<p><img src="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/1556823-20181220223025128-587235464.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/1556823-20181220223025128-587235464.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="img"></p>
+<ol start="3">
+<li>最后删除MySQL目录及相关的环境变量。</li>
+</ol>
+<p><strong>至此，MySQL卸载完成！</strong></p>
+<h3 id="2-3-MySQL配置"><a href="#2-3-MySQL配置" class="headerlink" title="2.3  MySQL配置"></a>2.3  MySQL配置</h3><h4 id="2-3-1-添加环境变量"><a href="#2-3-1-添加环境变量" class="headerlink" title="2.3.1  添加环境变量"></a>2.3.1  添加环境变量</h4><blockquote>
+<p>环境变量里面有很多选项，这里我们只用到<code>Path</code>这个参数。为什么在初始化的开始要添加环境变量呢？<br>在黑框(即CMD)中输入一个可执行程序的名字，Windows会先在环境变量中的<code>Path</code>所指的路径中寻找一遍，如果找到了就直接执行，没找到就在当前工作目录找，如果还没找到，就报错。我们添加环境变量的目的就是能够在任意一个黑框直接调用MySQL中的相关程序而不用总是修改工作目录，大大简化了操作。</p>
+</blockquote>
+<p>右键<code>此电脑</code>→<code>属性</code>，点击<code>高级系统设置</code></p>
+<img src="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/1556823-20181220220242472-524708778.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/1556823-20181220220242472-524708778.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="img" style="zoom:90%;" />
+
+<p>点击<code>环境变量</code></p>
+<img src="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/1556823-20181220220359609-736422950.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/1556823-20181220220359609-736422950.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="img" style="zoom:90%;" />
+
+<p>在<code>系统变量</code>中新建MYSQL_HOME</p>
+<img src="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20201109140222488.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20201109140222488.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20201109140222488" style="zoom:80%;" />
+
+<p>在<code>系统变量</code>中找到并<strong>双击</strong><code>Path</code></p>
+<img src="D:%5CJava%E5%AD%A6%E4%B9%A0%E8%B5%84%E6%96%99%5CJavaWeb-%E8%B5%84%E6%96%99%5Cday01-MySQL%E5%9F%BA%E7%A1%80%5Cppt%5Cassets%5C1556823-20181220220551145-1198958872.png" class="lazyload placeholder" data-srcset="D:%5CJava%E5%AD%A6%E4%B9%A0%E8%B5%84%E6%96%99%5CJavaWeb-%E8%B5%84%E6%96%99%5Cday01-MySQL%E5%9F%BA%E7%A1%80%5Cppt%5Cassets%5C1556823-20181220220551145-1198958872.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="img" style="zoom:80%;" />
+
+<p>点击<code>新建</code></p>
+<img src="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20201109135248104.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20201109135248104.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20201109135248104" style="zoom:80%;" />
+
+<p>最后点击确定。</p>
+<p><strong>如何验证是否添加成功？</strong></p>
+<p>右键开始菜单(就是屏幕左下角)，选择<code>命令提示符(管理员)</code>，打开黑框，敲入<code>mysql</code>，回车。<br>如果提示<code>Can&#39;t connect to MySQL server on &#39;localhost&#39;</code>则证明添加成功；<br>如果提示<code>mysql不是内部或外部命令，也不是可运行的程序或批处理文件</code>则表示添加添加失败，请重新检查步骤并重试。</p>
+<h4 id="2-3-2-新建配置文件"><a href="#2-3-2-新建配置文件" class="headerlink" title="2.3.2  新建配置文件"></a>2.3.2  新建配置文件</h4><p>新建一个文本文件，内容如下：</p>
+<figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">[mysql]</span></span><br><span class="line"><span class="attr">default-character-set</span>=<span class="string">utf8</span></span><br><span class="line"></span><br><span class="line"><span class="attr">[mysqld]</span></span><br><span class="line"><span class="attr">character-set-server</span>=<span class="string">utf8</span></span><br><span class="line"><span class="attr">default-storage-engine</span>=<span class="string">INNODB</span></span><br><span class="line"><span class="attr">sql_mode</span>=<span class="string">STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION</span></span><br></pre></td></tr></table></figure>
+
+<p>把上面的文本文件另存为，在保存类型里选<code>所有文件 (*.*)</code>，文件名叫<code>my.ini</code>，存放的路径为MySQL的<code>根目录</code>(例如我的是<code>D:\software\mysql-5.7.24-winx64</code>,根据自己的MySQL目录位置修改)。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20201109142704951.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20201109142704951.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20201109142704951"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20201109142737584.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20201109142737584.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20201109142737584"></p>
+<p>上面代码意思就是配置数据库的默认编码集为utf-8和默认存储引擎为INNODB。</p>
+<h4 id="2-3-3-初始化MySQL"><a href="#2-3-3-初始化MySQL" class="headerlink" title="2.3.3  初始化MySQL"></a>2.3.3  初始化MySQL</h4><p>在刚才的黑框中敲入<code>mysqld --initialize-insecure</code>，回车，稍微等待一会，如果出现没有出现报错信息(如下图)则证明data目录初始化没有问题，此时再查看MySQL目录下已经有data目录生成。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mysqld --initialize-insecure</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20201109140955772.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20201109140955772.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20201109140955772"></p>
+<p>tips：如果出现如下错误</p>
+<p><img src="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20201109135848054.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20201109135848054.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20201109135848054"></p>
+<p>是由于权限不足导致的，去<code>C:\Windows\System32</code> 下以管理员方式运行 cmd.exe</p>
+<p><img src="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20201109140423691.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20201109140423691.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20201109140423691"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20201109140001186.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20201109140001186.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20201109140001186"></p>
+<h4 id="2-3-4-注册MySQL服务"><a href="#2-3-4-注册MySQL服务" class="headerlink" title="2.3.4  注册MySQL服务"></a>2.3.4  注册MySQL服务</h4><p>在黑框里敲入<code>mysqld -install</code>，回车。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mysqld -install</span><br></pre></td></tr></table></figure>
+
+
+
+<p><img src="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20201109141325810.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20201109141325810.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20201109141325810"></p>
+<p>现在你的计算机上已经安装好了MySQL服务了。</p>
+<p>MySQL服务器</p>
+<h4 id="2-3-5-启动MySQL服务"><a href="#2-3-5-启动MySQL服务" class="headerlink" title="2.3.5  启动MySQL服务"></a>2.3.5  启动MySQL服务</h4><p>在黑框里敲入<code>net start mysql</code>，回车。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">net start mysql  <span class="comment">// 启动mysql服务</span></span><br><span class="line">    </span><br><span class="line">net stop mysql  <span class="comment">// 停止mysql服务</span></span><br></pre></td></tr></table></figure>
+
+
+
+<p><img src="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/1556823-20181221093036851-1317238155.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/1556823-20181221093036851-1317238155.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="img"></p>
+<h4 id="2-3-6-修改默认账户密码"><a href="#2-3-6-修改默认账户密码" class="headerlink" title="2.3.6  修改默认账户密码"></a>2.3.6  修改默认账户密码</h4><p>在黑框里敲入<code>mysqladmin -u root password 1234</code>，这里的<code>1234</code>就是指默认管理员(即root账户)的密码，可以自行修改成你喜欢的。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mysqladmin -u root password 1234</span><br></pre></td></tr></table></figure>
+
+
+
+<p><img src="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/1556823-20181221093251250-819416425.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/1556823-20181221093251250-819416425.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="img"></p>
+<p><strong>至此，MySQL 5.7 解压版安装完毕！</strong></p>
+<h3 id="2-4-MySQL登陆和退出"><a href="#2-4-MySQL登陆和退出" class="headerlink" title="2.4  MySQL登陆和退出"></a>2.4  MySQL登陆和退出</h3><h4 id="2-4-1-登陆"><a href="#2-4-1-登陆" class="headerlink" title="2.4.1  登陆"></a>2.4.1  登陆</h4><p>右键开始菜单，选择<code>命令提示符</code>，打开黑框。<br>在黑框中输入，<code>mysql -uroot -p1234</code>，回车，出现下图且左下角为<code>mysql&gt;</code>，则登录成功。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mysql -uroot -p1234</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/1556823-20181220222422178-61579658.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/1556823-20181220222422178-61579658.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="img"></p>
+<p><strong>到这里你就可以开始你的MySQL之旅了！</strong></p>
+<p>登陆参数：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mysql -u用户名 -p密码 -h要连接的mysql服务器的ip地址(默认127.0.0.1) -P端口号(默认3306)</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="2-4-2-退出"><a href="#2-4-2-退出" class="headerlink" title="2.4.2  退出"></a>2.4.2  退出</h4><p>退出mysql：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">exit</span><br><span class="line">quit</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="2-5-MySQL数据模型"><a href="#2-5-MySQL数据模型" class="headerlink" title="2.5  MySQL数据模型"></a>2.5  MySQL数据模型</h3><p><strong>关系型数据库：</strong></p>
+<blockquote>
+<p>关系型数据库是建立在关系模型基础上的数据库，简单说，关系型数据库是由多张能互相连接的 二维表 组成的数据库</p>
+</blockquote>
+<p>如下图，<code>订单信息表</code> 和 <code>客户信息表</code> 都是有行有列二维表我们将这样的称为关系型数据库。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210721205130231.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210721205130231.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20210721205130231"></p>
+<p>接下来看关系型数据库的优点：</p>
+<ul>
+<li>都是使用表结构，格式一致，易于维护。</li>
+<li>使用通用的 SQL 语言操作，使用方便，可用于复杂查询。<ul>
+<li>关系型数据库都可以通过SQL进行操作，所以使用方便。</li>
+<li>复杂查询。现在需要查询001号订单数据，我们可以看到该订单是1号客户的订单，而1号订单是李聪这个客户。以后也可以在一张表中进行统计分析等操作。</li>
+</ul>
+</li>
+<li>数据存储在磁盘中，安全。</li>
+</ul>
+<p><strong>数据模型：</strong></p>
+<img src="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210721212754568.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210721212754568.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20210721212754568" style="zoom:70%;" />
+
+<p>如上图，我们通过客户端可以通过数据库管理系统创建数据库，在数据库中创建表，在表中添加数据。创建的每一个数据库对应到磁盘上都是一个文件夹。比如可以通过SQL语句创建一个数据库（数据库名称为db1），语句如下。该语句咱们后面会学习。</p>
+<img src="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210721213349761.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210721213349761.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20210721213349761" style="zoom:80%;" />
+
+
+
+<p>我们可以在数据库安装目录下的data目录下看到多了一个 <code>db1</code> 的文件夹。所以，<strong>在MySQL中一个数据库对应到磁盘上的一个文件夹。</strong></p>
+<p>而一个数据库下可以创建多张表，我们到MySQL中自带的mysql数据库的文件夹目录下：</p>
+<img src="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210721214029913.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210721214029913.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20210721214029913" style="zoom:80%;" />
+
+<p>而上图中右边的 <code>db.frm</code> 是表文件，<code>db.MYD</code> 是数据文件，通过这两个文件就可以查询到数据展示成二维表的效果。</p>
+<p><strong>小结：</strong></p>
+<ul>
+<li>MySQL中可以创建多个数据库，每个数据库对应到磁盘上的一个文件夹</li>
+<li>在每个数据库中可以创建多个表，每张都对应到磁盘上一个 frm 文件</li>
+<li>每张表可以存储多条数据，数据会被存储到磁盘中  MYD 文件中</li>
+</ul>
+<h2 id="3，SQL概述"><a href="#3，SQL概述" class="headerlink" title="3，SQL概述"></a>3，SQL概述</h2><p>了解了数据模型后，接下来我们就学习SQL语句，通过SQL语句对数据库、表、数据进行增删改查操作。 </p>
+<h3 id="3-1-SQL简介"><a href="#3-1-SQL简介" class="headerlink" title="3.1  SQL简介"></a>3.1  SQL简介</h3><ul>
+<li>英文：Structured Query Language，简称 SQL</li>
+<li>结构化查询语言，一门操作关系型数据库的编程语言</li>
+<li>定义操作所有关系型数据库的统一标准</li>
+<li>对于同一个需求，每一种数据库操作的方式可能会存在一些不一样的地方，我们称为“方言”</li>
+</ul>
+<h3 id="3-2-通用语法"><a href="#3-2-通用语法" class="headerlink" title="3.2  通用语法"></a>3.2  通用语法</h3><ul>
+<li><p>SQL 语句可以单行或多行书写，以分号结尾。</p>
+<img src="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210721215223872.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210721215223872.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20210721215223872" style="zoom:80%;" /> 
+
+<p>如上，以分号结尾才是一个完整的sql语句。</p>
+</li>
+<li><p>MySQL 数据库的 SQL 语句不区分大小写，关键字建议使用大写。</p>
+<p>同样的一条sql语句写成下图的样子，一样可以运行处结果。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20220527152648977.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20220527152648977.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20220527152648977"> </p>
+</li>
+<li><p>注释</p>
+<ul>
+<li><p>单行注释: – 注释内容 或 #注释内容(MySQL 特有) </p>
+<img src="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210721215517293.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210721215517293.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20210721215517293" style="zoom:80%;" /> 
+
+<p><img src="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20220527152725694.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20220527152725694.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20220527152725694"> </p>
+<blockquote>
+<p>注意：使用– 添加单行注释时，–后面一定要加空格，而#没有要求。</p>
+</blockquote>
+</li>
+<li><p>多行注释: &#x2F;* 注释 *&#x2F;</p>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="3-3-SQL分类"><a href="#3-3-SQL分类" class="headerlink" title="3.3  SQL分类"></a>3.3  SQL分类</h3><ul>
+<li><p>DDL(Data Definition Language) ： 数据定义语言，用来定义数据库对象：数据库，表，列等</p>
+<p>DDL简单理解就是用来操作数据库，表等</p>
+<img src="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210721220032047.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210721220032047.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20210721220032047" style="zoom:60%;" />
+</li>
+<li><p>DML(Data Manipulation Language) 数据操作语言，用来对数据库中表的数据进行增删改</p>
+<p>DML简单理解就对表中数据进行增删改</p>
+<img src="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210721220132919.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210721220132919.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20210721220132919" style="zoom:60%;" />
+</li>
+<li><p>DQL(Data Query Language) 数据查询语言，用来查询数据库中表的记录(数据)</p>
+<p>DQL简单理解就是对数据进行查询操作。从数据库表中查询到我们想要的数据。</p>
+</li>
+<li><p>DCL(Data Control Language) 数据控制语言，用来定义数据库的访问权限和安全级别，及创建用户</p>
+<p>DML简单理解就是对数据库进行权限控制。比如我让某一个数据库表只能让某一个用户进行操作等。</p>
+</li>
+</ul>
+<blockquote>
+<p>注意： 以后我们最常操作的是 <code>DML</code> 和 <code>DQL</code>  ，因为我们开发中最常操作的就是数据。</p>
+</blockquote>
+<h2 id="4，DDL-操作数据库"><a href="#4，DDL-操作数据库" class="headerlink" title="4，DDL:操作数据库"></a>4，DDL:操作数据库</h2><p>我们先来学习DDL来操作数据库。而操作数据库主要就是对数据库的增删查操作。</p>
+<h3 id="4-1-查询"><a href="#4-1-查询" class="headerlink" title="4.1  查询"></a>4.1  查询</h3><p>查询所有的数据库</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SHOW</span> DATABASES;</span><br></pre></td></tr></table></figure>
+
+<p>运行上面语句效果如下：</p>
+<img src="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210721221107014.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210721221107014.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20210721221107014" style="zoom:80%;" />
+
+<p>上述查询到的是的这些数据库是mysql安装好自带的数据库，我们以后不要操作这些数据库。</p>
+<h3 id="4-2-创建数据库"><a href="#4-2-创建数据库" class="headerlink" title="4.2  创建数据库"></a>4.2  创建数据库</h3><ul>
+<li><strong>创建数据库</strong>：</li>
+</ul>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> DATABASE 数据库名称;</span><br></pre></td></tr></table></figure>
+
+<p>运行语句效果如下：</p>
+<img src="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210721223450755.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210721223450755.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20210721223450755" style="zoom:80%;" />
+
+<p>而在创建数据库的时候，我并不知道db1数据库有没有创建，直接再次创建名为db1的数据库就会出现错误。</p>
+<img src="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210721223745490.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210721223745490.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20210721223745490" style="zoom:80%;" />
+
+<p>为了避免上面的错误，在创建数据库的时候先做判断，如果不存在再创建。</p>
+<ul>
+<li><strong>创建数据库(判断，如果不存在则创建)</strong></li>
+</ul>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> DATABASE IF <span class="keyword">NOT</span> <span class="keyword">EXISTS</span> 数据库名称;</span><br></pre></td></tr></table></figure>
+
+<p>运行语句效果如下：</p>
+<img src="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210721224056476.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210721224056476.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20210721224056476" style="zoom:80%;" />
+
+<p>从上面的效果可以看到虽然db1数据库已经存在，再创建db1也没有报错，而创建db2数据库则创建成功。</p>
+<h3 id="4-3-删除数据库"><a href="#4-3-删除数据库" class="headerlink" title="4.3  删除数据库"></a>4.3  删除数据库</h3><ul>
+<li><strong>删除数据库</strong></li>
+</ul>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">DROP</span> DATABASE 数据库名称;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>删除数据库(判断，如果存在则删除)</strong></li>
+</ul>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">DROP</span> DATABASE IF <span class="keyword">EXISTS</span> 数据库名称;</span><br></pre></td></tr></table></figure>
+
+<p>运行语句效果如下：</p>
+<img src="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210721224435251.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210721224435251.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20210721224435251" style="zoom:80%;" />
+
+<h3 id="4-4-使用数据库"><a href="#4-4-使用数据库" class="headerlink" title="4.4  使用数据库"></a>4.4  使用数据库</h3><p>数据库创建好了，要在数据库中创建表，得先明确在哪儿个数据库中操作，此时就需要使用数据库。</p>
+<ul>
+<li><strong>使用数据库</strong></li>
+</ul>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">USE 数据库名称;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>查看当前使用的数据库</strong></li>
+</ul>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> DATABASE();</span><br></pre></td></tr></table></figure>
+
+<p>运行语句效果如下：</p>
+<img src="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210721224720841.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210721224720841.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20210721224720841" style="zoom:80%;" />
+
+<h2 id="5，DDL-操作表"><a href="#5，DDL-操作表" class="headerlink" title="5，DDL:操作表"></a>5，DDL:操作表</h2><p>操作表也就是对表进行增（Create）删（Retrieve）改（Update）查（Delete）。</p>
+<h3 id="5-1-查询表"><a href="#5-1-查询表" class="headerlink" title="5.1  查询表"></a>5.1  查询表</h3><ul>
+<li><strong>查询当前数据库下所有表名称</strong></li>
+</ul>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SHOW</span> TABLES;</span><br></pre></td></tr></table></figure>
+
+<p>我们创建的数据库中没有任何表，因此我们进入mysql自带的mysql数据库，执行上述语句查看</p>
+<p><img src="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210721230202814.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210721230202814.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20210721230202814"></p>
+<ul>
+<li><strong>查询表结构</strong></li>
+</ul>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">DESC</span> 表名称;</span><br></pre></td></tr></table></figure>
+
+<p>查看mysql数据库中func表的结构，运行语句如下：</p>
+<img src="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210721230332428.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210721230332428.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20210721230332428" style="zoom:80%;" />
+
+<h3 id="5-2-创建表"><a href="#5-2-创建表" class="headerlink" title="5.2  创建表"></a>5.2  创建表</h3><ul>
+<li><strong>创建表</strong></li>
+</ul>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> 表名 (</span><br><span class="line">	字段名<span class="number">1</span>  数据类型<span class="number">1</span>,</span><br><span class="line">	字段名<span class="number">2</span>  数据类型<span class="number">2</span>,</span><br><span class="line">	…</span><br><span class="line">	字段名n  数据类型n</span><br><span class="line">);</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>注意：最后一行末尾，不能加逗号</p>
+</blockquote>
+<p>知道了创建表的语句，那么我们创建创建如下结构的表</p>
+<img src="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210721230824097.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210721230824097.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20210721230824097" style="zoom:80%;" />
+
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">create</span> <span class="keyword">table</span> tb_user (</span><br><span class="line">	id <span class="type">int</span>,</span><br><span class="line">    username <span class="type">varchar</span>(<span class="number">20</span>),</span><br><span class="line">    password <span class="type">varchar</span>(<span class="number">32</span>)</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+
+<p>运行语句如下：</p>
+<img src="assets/image-20210721231142326.png" class="lazyload placeholder" data-srcset="assets/image-20210721231142326.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20210721231142326" style="zoom:80%;" />
+
+<h3 id="5-3-数据类型"><a href="#5-3-数据类型" class="headerlink" title="5.3  数据类型"></a>5.3  数据类型</h3><p>MySQL 支持多种类型，可以分为三类：</p>
+<ul>
+<li><p>数值</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">tinyint : 小整数型，占一个字节</span><br><span class="line"><span class="type">int</span>	： 大整数类型，占四个字节</span><br><span class="line">	eg ： age <span class="type">int</span></span><br><span class="line"><span class="keyword">double</span> ： 浮点类型</span><br><span class="line">	使用格式： 字段名 <span class="keyword">double</span>(总长度,小数点后保留的位数)</span><br><span class="line">	eg ： score <span class="keyword">double</span>(<span class="number">5</span>,<span class="number">2</span>)   </span><br></pre></td></tr></table></figure>
+</li>
+<li><p>日期</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">date</span> ： 日期值。只包含年月日</span><br><span class="line">	eg ：birthday <span class="type">date</span> ： </span><br><span class="line">datetime ： 混合日期和时间值。包含年月日时分秒</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>字符串</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">char</span> ： 定长字符串。</span><br><span class="line">	优点：存储性能高</span><br><span class="line">	缺点：浪费空间</span><br><span class="line">	eg ： name <span class="type">char</span>(<span class="number">10</span>)  如果存储的数据字符个数不足<span class="number">10</span>个，也会占<span class="number">10</span>个的空间</span><br><span class="line"><span class="type">varchar</span> ： 变长字符串。</span><br><span class="line">	优点：节约空间</span><br><span class="line">	缺点：存储性能底</span><br><span class="line">	eg ： name <span class="type">varchar</span>(<span class="number">10</span>) 如果存储的数据字符个数不足<span class="number">10</span>个，那就数据字符个数是几就占几个的空间	</span><br></pre></td></tr></table></figure></li>
+</ul>
+<blockquote>
+<p>注意：其他类型参考资料中的《MySQL数据类型].xlsx》</p>
+</blockquote>
+<p><strong>案例：</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">需求：设计一张学生表，请注重数据类型、长度的合理性</span><br><span class="line">	1. 编号</span><br><span class="line">	2. 姓名，姓名最长不超过10个汉字</span><br><span class="line">	3. 性别，因为取值只有两种可能，因此最多一个汉字</span><br><span class="line">	4. 生日，取值为年月日</span><br><span class="line">	5. 入学成绩，小数点后保留两位</span><br><span class="line">	6. 邮件地址，最大长度不超过 64</span><br><span class="line">	7. 家庭联系电话，不一定是手机号码，可能会出现 - 等字符</span><br><span class="line">	8. 学生状态（用数字表示，正常、休学、毕业...）</span><br></pre></td></tr></table></figure>
+
+<p>语句设计如下：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">create</span> <span class="keyword">table</span> student (</span><br><span class="line">	id <span class="type">int</span>,</span><br><span class="line">    name <span class="type">varchar</span>(<span class="number">10</span>),</span><br><span class="line">    gender <span class="type">char</span>(<span class="number">1</span>),</span><br><span class="line">    birthday <span class="type">date</span>,</span><br><span class="line">    score <span class="keyword">double</span>(<span class="number">5</span>,<span class="number">2</span>),</span><br><span class="line">    email <span class="type">varchar</span>(<span class="number">15</span>),</span><br><span class="line">    tel <span class="type">varchar</span>(<span class="number">15</span>),</span><br><span class="line">    status tinyint</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+
+<h3 id="5-4-删除表"><a href="#5-4-删除表" class="headerlink" title="5.4  删除表"></a>5.4  删除表</h3><ul>
+<li><strong>删除表</strong></li>
+</ul>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">DROP</span> <span class="keyword">TABLE</span> 表名;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>删除表时判断表是否存在</strong></li>
+</ul>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">DROP</span> <span class="keyword">TABLE</span> IF <span class="keyword">EXISTS</span> 表名;</span><br></pre></td></tr></table></figure>
+
+<p>运行语句效果如下：</p>
+<img src="assets/image-20210721235108267.png" class="lazyload placeholder" data-srcset="assets/image-20210721235108267.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20210721235108267" style="zoom:80%;" />
+
+<h3 id="5-5-修改表"><a href="#5-5-修改表" class="headerlink" title="5.5  修改表"></a>5.5  修改表</h3><ul>
+<li><strong>修改表名</strong></li>
+</ul>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">ALTER</span> <span class="keyword">TABLE</span> 表名 RENAME <span class="keyword">TO</span> 新的表名;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 将表名student修改为stu</span></span><br><span class="line"><span class="keyword">alter</span> <span class="keyword">table</span> student rename <span class="keyword">to</span> stu;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>添加一列</strong></li>
+</ul>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">ALTER</span> <span class="keyword">TABLE</span> 表名 <span class="keyword">ADD</span> 列名 数据类型;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 给stu表添加一列address，该字段类型是varchar(50)</span></span><br><span class="line"><span class="keyword">alter</span> <span class="keyword">table</span> stu <span class="keyword">add</span> address <span class="type">varchar</span>(<span class="number">50</span>);</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>修改数据类型</strong></li>
+</ul>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">ALTER</span> <span class="keyword">TABLE</span> 表名 MODIFY 列名 新数据类型;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 将stu表中的address字段的类型改为 char(50)</span></span><br><span class="line"><span class="keyword">alter</span> <span class="keyword">table</span> stu modify address <span class="type">char</span>(<span class="number">50</span>);</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>修改列名和数据类型</strong></li>
+</ul>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">ALTER</span> <span class="keyword">TABLE</span> 表名 CHANGE 列名 新列名 新数据类型;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 将stu表中的address字段名改为 addr，类型改为varchar(50)</span></span><br><span class="line"><span class="keyword">alter</span> <span class="keyword">table</span> stu change address addr <span class="type">varchar</span>(<span class="number">50</span>);</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>删除列</strong></li>
+</ul>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">ALTER</span> <span class="keyword">TABLE</span> 表名 <span class="keyword">DROP</span> 列名;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 将stu表中的addr字段 删除</span></span><br><span class="line"><span class="keyword">alter</span> <span class="keyword">table</span> stu <span class="keyword">drop</span> addr;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="6，navicat使用"><a href="#6，navicat使用" class="headerlink" title="6，navicat使用"></a>6，navicat使用</h2><p>通过上面的学习，我们发现在命令行中写sql语句特别不方便，尤其是编写创建表的语句，我们只能在记事本上写好后直接复制到命令行进行执行。那么有没有刚好的工具提供给我们进行使用呢？ 有。</p>
+<h3 id="6-1-navicat概述"><a href="#6-1-navicat概述" class="headerlink" title="6.1  navicat概述"></a>6.1  navicat概述</h3><ul>
+<li>Navicat for MySQL 是管理和开发 MySQL 或 MariaDB 的理想解决方案。</li>
+<li>这套全面的前端工具为数据库管理、开发和维护提供了一款直观而强大的图形界面。</li>
+<li>官网： <a target="_blank" rel="noopener" href="http://www.navicat.com.cn/">http://www.navicat.com.cn</a></li>
+</ul>
+<h3 id="6-2-navicat安装"><a href="#6-2-navicat安装" class="headerlink" title="6.2  navicat安装"></a>6.2  navicat安装</h3><p>参考 : 资料\navicat安装包\navicat_mysql_x86\navicat安装步骤.md</p>
+<h3 id="6-3-navicat使用"><a href="#6-3-navicat使用" class="headerlink" title="6.3  navicat使用"></a>6.3  navicat使用</h3><h4 id="6-3-1-建立和mysql服务的连接"><a href="#6-3-1-建立和mysql服务的连接" class="headerlink" title="6.3.1  建立和mysql服务的连接"></a>6.3.1  建立和mysql服务的连接</h4><p>第一步： 点击连接，选择MySQL</p>
+<img src="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210721235928346.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210721235928346.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20210721235928346" style="zoom:70%;" />
+
+<p>第二步：填写连接数据库必要的信息</p>
+<img src="assets/image-20210722000116080.png" class="lazyload placeholder" data-srcset="assets/image-20210722000116080.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20210722000116080" style="zoom:80%;" />
+
+<p>以上操作没有问题就会出现如下图所示界面：</p>
+<img src="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210722000345349.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210722000345349.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20210722000345349" style="zoom:80%;" />
+
+<h4 id="6-3-2-操作"><a href="#6-3-2-操作" class="headerlink" title="6.3.2  操作"></a>6.3.2  操作</h4><p>连接成功后就能看到如下图界面：</p>
+<img src="assets/image-20210722000521997.png" class="lazyload placeholder" data-srcset="assets/image-20210722000521997.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20210722000521997" style="zoom:80%;" />
+
+<ul>
+<li><strong>修改表结构</strong></li>
+</ul>
+<p>通过下图操作修改表结构：</p>
+<img src="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210722000740661.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210722000740661.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20210722000740661" style="zoom:80%;" />
+
+<p>点击了设计表后即出现如下图所示界面，在图中红框中直接修改字段名，类型等信息：</p>
+<img src="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210722000929075.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210722000929075.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20210722000929075" style="zoom:80%;" />
+
+<ul>
+<li><strong>编写SQL语句并执行</strong></li>
+</ul>
+<p>按照如下图所示进行操作即可书写SQL语句并执行sql语句。</p>
+<img src="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210722001333817.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210722001333817.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20210722001333817" style="zoom:80%;" />
+
+<h2 id="7，DML"><a href="#7，DML" class="headerlink" title="7，DML"></a>7，DML</h2><p>DML主要是对数据进行增（insert）删（delete）改（update）操作。</p>
+<h3 id="7-1-添加数据"><a href="#7-1-添加数据" class="headerlink" title="7.1  添加数据"></a>7.1  添加数据</h3><ul>
+<li><strong>给指定列添加数据</strong></li>
+</ul>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 表名(列名<span class="number">1</span>,列名<span class="number">2</span>,…) <span class="keyword">VALUES</span>(值<span class="number">1</span>,值<span class="number">2</span>,…);</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>给全部列添加数据</strong></li>
+</ul>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 表名 <span class="keyword">VALUES</span>(值<span class="number">1</span>,值<span class="number">2</span>,…);</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>批量添加数据</strong></li>
+</ul>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 表名(列名<span class="number">1</span>,列名<span class="number">2</span>,…) <span class="keyword">VALUES</span>(值<span class="number">1</span>,值<span class="number">2</span>,…),(值<span class="number">1</span>,值<span class="number">2</span>,…),(值<span class="number">1</span>,值<span class="number">2</span>,…)…;</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> 表名 <span class="keyword">VALUES</span>(值<span class="number">1</span>,值<span class="number">2</span>,…),(值<span class="number">1</span>,值<span class="number">2</span>,…),(值<span class="number">1</span>,值<span class="number">2</span>,…)…;</span><br></pre></td></tr></table></figure>
+
+
+
+<ul>
+<li><strong>练习</strong></li>
+</ul>
+<p>为了演示以下的增删改操作是否操作成功，故先将查询所有数据的语句介绍给大家：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> stu;</span><br></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 给指定列添加数据</span></span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> stu (id, NAME) <span class="keyword">VALUES</span> (<span class="number">1</span>, <span class="string">&#x27;张三&#x27;</span>);</span><br><span class="line"><span class="comment">-- 给所有列添加数据，列名的列表可以省略的</span></span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> stu (id,NAME,sex,birthday,score,email,tel,STATUS) <span class="keyword">VALUES</span> (<span class="number">2</span>,<span class="string">&#x27;李四&#x27;</span>,<span class="string">&#x27;男&#x27;</span>,<span class="string">&#x27;1999-11-11&#x27;</span>,<span class="number">88.88</span>,<span class="string">&#x27;lisi@itcast.cn&#x27;</span>,<span class="string">&#x27;13888888888&#x27;</span>,<span class="number">1</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> stu <span class="keyword">VALUES</span> (<span class="number">2</span>,<span class="string">&#x27;李四&#x27;</span>,<span class="string">&#x27;男&#x27;</span>,<span class="string">&#x27;1999-11-11&#x27;</span>,<span class="number">88.88</span>,<span class="string">&#x27;lisi@itcast.cn&#x27;</span>,<span class="string">&#x27;13888888888&#x27;</span>,<span class="number">1</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 批量添加数据</span></span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> stu <span class="keyword">VALUES</span> </span><br><span class="line">	(<span class="number">2</span>,<span class="string">&#x27;李四&#x27;</span>,<span class="string">&#x27;男&#x27;</span>,<span class="string">&#x27;1999-11-11&#x27;</span>,<span class="number">88.88</span>,<span class="string">&#x27;lisi@itcast.cn&#x27;</span>,<span class="string">&#x27;13888888888&#x27;</span>,<span class="number">1</span>),</span><br><span class="line">	(<span class="number">2</span>,<span class="string">&#x27;李四&#x27;</span>,<span class="string">&#x27;男&#x27;</span>,<span class="string">&#x27;1999-11-11&#x27;</span>,<span class="number">88.88</span>,<span class="string">&#x27;lisi@itcast.cn&#x27;</span>,<span class="string">&#x27;13888888888&#x27;</span>,<span class="number">1</span>),</span><br><span class="line">	(<span class="number">2</span>,<span class="string">&#x27;李四&#x27;</span>,<span class="string">&#x27;男&#x27;</span>,<span class="string">&#x27;1999-11-11&#x27;</span>,<span class="number">88.88</span>,<span class="string">&#x27;lisi@itcast.cn&#x27;</span>,<span class="string">&#x27;13888888888&#x27;</span>,<span class="number">1</span>);</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="7-2-修改数据"><a href="#7-2-修改数据" class="headerlink" title="7.2  修改数据"></a>7.2  修改数据</h3><ul>
+<li><strong>修改表数据</strong></li>
+</ul>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">UPDATE</span> 表名 <span class="keyword">SET</span> 列名<span class="number">1</span><span class="operator">=</span>值<span class="number">1</span>,列名<span class="number">2</span><span class="operator">=</span>值<span class="number">2</span>,… [<span class="keyword">WHERE</span> 条件] ;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>注意：</p>
+<ol>
+<li>修改语句中如果不加条件，则将所有数据都修改！</li>
+<li>像上面的语句中的中括号，表示在写sql语句中可以省略这部分</li>
+</ol>
+</blockquote>
+<ul>
+<li><p><strong>练习</strong></p>
+<ul>
+<li>将张三的性别改为女</li>
+</ul>
+  <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">update</span> stu <span class="keyword">set</span> sex <span class="operator">=</span> <span class="string">&#x27;女&#x27;</span> <span class="keyword">where</span> name <span class="operator">=</span> <span class="string">&#x27;张三&#x27;</span>;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>将张三的生日改为 1999-12-12 分数改为99.99</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">update</span> stu <span class="keyword">set</span> birthday <span class="operator">=</span> <span class="string">&#x27;1999-12-12&#x27;</span>, score <span class="operator">=</span> <span class="number">99.99</span> <span class="keyword">where</span> name <span class="operator">=</span> <span class="string">&#x27;张三&#x27;</span>;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>注意：如果update语句没有加where条件，则会将表中所有数据全部修改！</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">update</span> stu <span class="keyword">set</span> sex <span class="operator">=</span> <span class="string">&#x27;女&#x27;</span>;</span><br></pre></td></tr></table></figure>
+
+<p>上面语句的执行完后查询到的结果是：</p>
+<p><img src="/assets/image-20210722204233305.png" class="lazyload placeholder" data-srcset="/assets/image-20210722204233305.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20210722204233305"></p>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="7-3-删除数据"><a href="#7-3-删除数据" class="headerlink" title="7.3  删除数据"></a>7.3  删除数据</h3><ul>
+<li><strong>删除数据</strong></li>
+</ul>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">DELETE</span> <span class="keyword">FROM</span> 表名 [<span class="keyword">WHERE</span> 条件] ;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>练习</strong></li>
+</ul>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 删除张三记录</span></span><br><span class="line"><span class="keyword">delete</span> <span class="keyword">from</span> stu <span class="keyword">where</span> name <span class="operator">=</span> <span class="string">&#x27;张三&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 删除stu表中所有的数据</span></span><br><span class="line"><span class="keyword">delete</span> <span class="keyword">from</span> stu;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="8，DQL"><a href="#8，DQL" class="headerlink" title="8，DQL"></a>8，DQL</h2><p>下面是黑马程序员展示试题库数据的页面</p>
+<img src="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210722215838144.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210722215838144.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20210722215838144" style="zoom:80%;" />
+
+<p>页面上展示的数据肯定是在数据库中的试题库表中进行存储，而我们需要将数据库中的数据查询出来并展示在页面给用户看。上图中的是最基本的查询效果，那么数据库其实是很多的，不可能在将所有的数据在一页进行全部展示，而页面上会有分页展示的效果，如下：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210722220139174.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210722220139174.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20210722220139174"></p>
+<p>当然上图中的难度字段当我们点击也可以实现排序查询操作。从这个例子我们就可以看出，对于数据库的查询时灵活多变的，需要根据具体的需求来实现，而数据库查询操作也是最重要的操作，所以此部分需要大家重点掌握。</p>
+<p>接下来我们先介绍查询的完整语法：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> </span><br><span class="line">    字段列表</span><br><span class="line"><span class="keyword">FROM</span> </span><br><span class="line">    表名列表 </span><br><span class="line"><span class="keyword">WHERE</span> </span><br><span class="line">    条件列表</span><br><span class="line"><span class="keyword">GROUP</span> <span class="keyword">BY</span></span><br><span class="line">    分组字段</span><br><span class="line"><span class="keyword">HAVING</span></span><br><span class="line">    分组后条件</span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span></span><br><span class="line">    排序字段</span><br><span class="line">LIMIT</span><br><span class="line">    分页限定</span><br></pre></td></tr></table></figure>
+
+<p>为了给大家演示查询的语句，我们需要先准备表及一些数据：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 删除stu表</span></span><br><span class="line"><span class="keyword">drop</span> <span class="keyword">table</span> if <span class="keyword">exists</span> stu;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">-- 创建stu表</span></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> stu (</span><br><span class="line"> id <span class="type">int</span>, <span class="comment">-- 编号</span></span><br><span class="line"> name <span class="type">varchar</span>(<span class="number">20</span>), <span class="comment">-- 姓名</span></span><br><span class="line"> age <span class="type">int</span>, <span class="comment">-- 年龄</span></span><br><span class="line"> sex <span class="type">varchar</span>(<span class="number">5</span>), <span class="comment">-- 性别</span></span><br><span class="line"> address <span class="type">varchar</span>(<span class="number">100</span>), <span class="comment">-- 地址</span></span><br><span class="line"> math <span class="keyword">double</span>(<span class="number">5</span>,<span class="number">2</span>), <span class="comment">-- 数学成绩</span></span><br><span class="line"> english <span class="keyword">double</span>(<span class="number">5</span>,<span class="number">2</span>), <span class="comment">-- 英语成绩</span></span><br><span class="line"> hire_date <span class="type">date</span> <span class="comment">-- 入学时间</span></span><br><span class="line">);</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 添加数据</span></span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> stu(id,NAME,age,sex,address,math,english,hire_date) </span><br><span class="line"><span class="keyword">VALUES</span> </span><br><span class="line">(<span class="number">1</span>,<span class="string">&#x27;马运&#x27;</span>,<span class="number">55</span>,<span class="string">&#x27;男&#x27;</span>,<span class="string">&#x27;杭州&#x27;</span>,<span class="number">66</span>,<span class="number">78</span>,<span class="string">&#x27;1995-09-01&#x27;</span>),</span><br><span class="line">(<span class="number">2</span>,<span class="string">&#x27;马花疼&#x27;</span>,<span class="number">45</span>,<span class="string">&#x27;女&#x27;</span>,<span class="string">&#x27;深圳&#x27;</span>,<span class="number">98</span>,<span class="number">87</span>,<span class="string">&#x27;1998-09-01&#x27;</span>),</span><br><span class="line">(<span class="number">3</span>,<span class="string">&#x27;马斯克&#x27;</span>,<span class="number">55</span>,<span class="string">&#x27;男&#x27;</span>,<span class="string">&#x27;香港&#x27;</span>,<span class="number">56</span>,<span class="number">77</span>,<span class="string">&#x27;1999-09-02&#x27;</span>),</span><br><span class="line">(<span class="number">4</span>,<span class="string">&#x27;柳白&#x27;</span>,<span class="number">20</span>,<span class="string">&#x27;女&#x27;</span>,<span class="string">&#x27;湖南&#x27;</span>,<span class="number">76</span>,<span class="number">65</span>,<span class="string">&#x27;1997-09-05&#x27;</span>),</span><br><span class="line">(<span class="number">5</span>,<span class="string">&#x27;柳青&#x27;</span>,<span class="number">20</span>,<span class="string">&#x27;男&#x27;</span>,<span class="string">&#x27;湖南&#x27;</span>,<span class="number">86</span>,<span class="keyword">NULL</span>,<span class="string">&#x27;1998-09-01&#x27;</span>),</span><br><span class="line">(<span class="number">6</span>,<span class="string">&#x27;刘德花&#x27;</span>,<span class="number">57</span>,<span class="string">&#x27;男&#x27;</span>,<span class="string">&#x27;香港&#x27;</span>,<span class="number">99</span>,<span class="number">99</span>,<span class="string">&#x27;1998-09-01&#x27;</span>),</span><br><span class="line">(<span class="number">7</span>,<span class="string">&#x27;张学右&#x27;</span>,<span class="number">22</span>,<span class="string">&#x27;女&#x27;</span>,<span class="string">&#x27;香港&#x27;</span>,<span class="number">99</span>,<span class="number">99</span>,<span class="string">&#x27;1998-09-01&#x27;</span>),</span><br><span class="line">(<span class="number">8</span>,<span class="string">&#x27;德玛西亚&#x27;</span>,<span class="number">18</span>,<span class="string">&#x27;男&#x27;</span>,<span class="string">&#x27;南京&#x27;</span>,<span class="number">56</span>,<span class="number">65</span>,<span class="string">&#x27;1994-09-02&#x27;</span>);</span><br></pre></td></tr></table></figure>
+
+<p>接下来咱们从最基本的查询语句开始学起。</p>
+<h3 id="8-1-基础查询"><a href="#8-1-基础查询" class="headerlink" title="8.1  基础查询"></a>8.1  基础查询</h3><h4 id="8-1-1-语法"><a href="#8-1-1-语法" class="headerlink" title="8.1.1  语法"></a>8.1.1  语法</h4><ul>
+<li><strong>查询多个字段</strong></li>
+</ul>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> 字段列表 <span class="keyword">FROM</span> 表名;</span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> 表名; <span class="comment">-- 查询所有数据</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>去除重复记录</strong></li>
+</ul>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="keyword">DISTINCT</span> 字段列表 <span class="keyword">FROM</span> 表名;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>起别名</strong></li>
+</ul>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">AS</span>: <span class="keyword">AS</span> 也可以省略</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="8-1-2-练习"><a href="#8-1-2-练习" class="headerlink" title="8.1.2  练习"></a>8.1.2  练习</h4><ul>
+<li><p>查询name、age两列</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> name,age <span class="keyword">from</span> stu;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>查询所有列的数据，列名的列表可以使用*替代</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> stu;</span><br></pre></td></tr></table></figure>
+
+<p>上面语句中的*不建议大家使用，因为在这写*不方便我们阅读sql语句。我们写字段列表的话，可以添加注释对每一个字段进行说明</p>
+<img src="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210722221534870.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210722221534870.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20210722221534870" style="zoom:80%;" />
+
+<p>而在上课期间为了简约课程的时间，老师很多地方都会写*。</p>
+</li>
+<li><p>查询地址信息</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> address <span class="keyword">from</span> stu;</span><br></pre></td></tr></table></figure>
+
+<p>执行上面语句结果如下：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210722221756380.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210722221756380.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20210722221756380"></p>
+<p>从上面的结果我们可以看到有重复的数据，我们也可以使用 <code>distinct</code> 关键字去重重复数据。</p>
+</li>
+<li><p>去除重复记录</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="keyword">distinct</span> address <span class="keyword">from</span> stu;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>查询姓名、数学成绩、英语成绩。并通过as给math和english起别名（as关键字可以省略）</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> name,math <span class="keyword">as</span> 数学成绩,english <span class="keyword">as</span> 英文成绩 <span class="keyword">from</span> stu;</span><br><span class="line"><span class="keyword">select</span> name,math 数学成绩,english 英文成绩 <span class="keyword">from</span> stu;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h3 id="8-2-条件查询"><a href="#8-2-条件查询" class="headerlink" title="8.2  条件查询"></a>8.2  条件查询</h3><h4 id="8-2-1-语法"><a href="#8-2-1-语法" class="headerlink" title="8.2.1  语法"></a>8.2.1  语法</h4><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> 字段列表 <span class="keyword">FROM</span> 表名 <span class="keyword">WHERE</span> 条件列表;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>条件</strong></li>
+</ul>
+<p>条件列表可以使用以下运算符</p>
+<img src="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210722190508272.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210722190508272.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20210722190508272" style="zoom:60%;" />
+
+<h4 id="8-2-2-条件查询练习"><a href="#8-2-2-条件查询练习" class="headerlink" title="8.2.2  条件查询练习"></a>8.2.2  条件查询练习</h4><ul>
+<li><p>查询年龄大于20岁的学员信息</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> stu <span class="keyword">where</span> age <span class="operator">&gt;</span> <span class="number">20</span>;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>查询年龄大于等于20岁的学员信息</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> stu <span class="keyword">where</span> age <span class="operator">&gt;=</span> <span class="number">20</span>;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>查询年龄大于等于20岁 并且 年龄 小于等于 30岁 的学员信息</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> stu <span class="keyword">where</span> age <span class="operator">&gt;=</span> <span class="number">20</span> <span class="operator">&amp;&amp;</span>  age <span class="operator">&lt;=</span> <span class="number">30</span>;</span><br><span class="line"><span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> stu <span class="keyword">where</span> age <span class="operator">&gt;=</span> <span class="number">20</span> <span class="keyword">and</span>  age <span class="operator">&lt;=</span> <span class="number">30</span>;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>上面语句中 &amp;&amp;  和  and  都表示并且的意思。建议使用 and 。</p>
+<p>也可以使用  between … and 来实现上面需求</p>
+</blockquote>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> stu <span class="keyword">where</span> age <span class="keyword">BETWEEN</span> <span class="number">20</span> <span class="keyword">and</span> <span class="number">30</span>;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>查询入学日期在’1998-09-01’ 到 ‘1999-09-01’  之间的学员信息</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> stu <span class="keyword">where</span> hire_date <span class="keyword">BETWEEN</span> <span class="string">&#x27;1998-09-01&#x27;</span> <span class="keyword">and</span> <span class="string">&#x27;1999-09-01&#x27;</span>;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>查询年龄等于18岁的学员信息</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> stu <span class="keyword">where</span> age <span class="operator">=</span> <span class="number">18</span>;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>查询年龄不等于18岁的学员信息</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> stu <span class="keyword">where</span> age <span class="operator">!=</span> <span class="number">18</span>;</span><br><span class="line"><span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> stu <span class="keyword">where</span> age <span class="operator">&lt;&gt;</span> <span class="number">18</span>;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>查询年龄等于18岁 或者 年龄等于20岁 或者 年龄等于22岁的学员信息</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> stu <span class="keyword">where</span> age <span class="operator">=</span> <span class="number">18</span> <span class="keyword">or</span> age <span class="operator">=</span> <span class="number">20</span> <span class="keyword">or</span> age <span class="operator">=</span> <span class="number">22</span>;</span><br><span class="line"><span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> stu <span class="keyword">where</span> age <span class="keyword">in</span> (<span class="number">18</span>,<span class="number">20</span> ,<span class="number">22</span>);</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>查询英语成绩为 null的学员信息</p>
+<p>null值的比较不能使用 &#x3D;  或者 !&#x3D; 。需要使用 is  或者 is not</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> stu <span class="keyword">where</span> english <span class="operator">=</span> <span class="keyword">null</span>; <span class="comment">-- 这个语句是不行的</span></span><br><span class="line"><span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> stu <span class="keyword">where</span> english <span class="keyword">is</span> <span class="keyword">null</span>;</span><br><span class="line"><span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> stu <span class="keyword">where</span> english <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">null</span>;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h4 id="8-2-3-模糊查询练习"><a href="#8-2-3-模糊查询练习" class="headerlink" title="8.2.3  模糊查询练习"></a>8.2.3  模糊查询练习</h4><blockquote>
+<p>模糊查询使用like关键字，可以使用通配符进行占位:</p>
+<p>（1）_ : 代表单个任意字符</p>
+<p>（2）% : 代表任意个数字符</p>
+</blockquote>
+<ul>
+<li><p>查询姓’马’的学员信息</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> stu <span class="keyword">where</span> name <span class="keyword">like</span> <span class="string">&#x27;马%&#x27;</span>;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>查询第二个字是’花’的学员信息  </p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> stu <span class="keyword">where</span> name <span class="keyword">like</span> <span class="string">&#x27;_花%&#x27;</span>;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>查询名字中包含 ‘德’ 的学员信息</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> stu <span class="keyword">where</span> name <span class="keyword">like</span> <span class="string">&#x27;%德%&#x27;</span>;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h3 id="8-3-排序查询"><a href="#8-3-排序查询" class="headerlink" title="8.3  排序查询"></a>8.3  排序查询</h3><h4 id="8-3-1-语法"><a href="#8-3-1-语法" class="headerlink" title="8.3.1  语法"></a>8.3.1  语法</h4><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> 字段列表 <span class="keyword">FROM</span> 表名 <span class="keyword">ORDER</span> <span class="keyword">BY</span> 排序字段名<span class="number">1</span> [排序方式<span class="number">1</span>],排序字段名<span class="number">2</span> [排序方式<span class="number">2</span>] …;</span><br></pre></td></tr></table></figure>
+
+<p>上述语句中的排序方式有两种，分别是：</p>
+<ul>
+<li>ASC ： 升序排列 <strong>（默认值）</strong></li>
+<li>DESC ： 降序排列</li>
+</ul>
+<blockquote>
+<p>注意：如果有多个排序条件，当前边的条件值一样时，才会根据第二条件进行排序</p>
+</blockquote>
+<h4 id="8-3-2-练习"><a href="#8-3-2-练习" class="headerlink" title="8.3.2  练习"></a>8.3.2  练习</h4><ul>
+<li><p>查询学生信息，按照年龄升序排列 </p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> stu <span class="keyword">order</span> <span class="keyword">by</span> age ;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>查询学生信息，按照数学成绩降序排列</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> stu <span class="keyword">order</span> <span class="keyword">by</span> math <span class="keyword">desc</span> ;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>查询学生信息，按照数学成绩降序排列，如果数学成绩一样，再按照英语成绩升序排列</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> stu <span class="keyword">order</span> <span class="keyword">by</span> math <span class="keyword">desc</span> , english <span class="keyword">asc</span> ;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h3 id="8-4-聚合函数"><a href="#8-4-聚合函数" class="headerlink" title="8.4  聚合函数"></a>8.4  聚合函数</h3><h4 id="8-4-1-概念"><a href="#8-4-1-概念" class="headerlink" title="8.4.1  概念"></a>8.4.1  概念</h4><p> &#x3D;&#x3D;将一列数据作为一个整体，进行纵向计算。&#x3D;&#x3D;</p>
+<p>如何理解呢？假设有如下表</p>
+<img src="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210722194410628.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210722194410628.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20210722194410628" style="zoom:80%;" />
+
+<p>现有一需求让我们求表中所有数据的数学成绩的总和。这就是对math字段进行纵向求和。</p>
+<h4 id="8-4-2-聚合函数分类"><a href="#8-4-2-聚合函数分类" class="headerlink" title="8.4.2  聚合函数分类"></a>8.4.2  聚合函数分类</h4><table>
+<thead>
+<tr>
+<th>函数名</th>
+<th>功能</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>count(列名)</td>
+<td>统计数量（一般选用不为null的列）</td>
+</tr>
+<tr>
+<td>max(列名)</td>
+<td>最大值</td>
+</tr>
+<tr>
+<td>min(列名)</td>
+<td>最小值</td>
+</tr>
+<tr>
+<td>sum(列名)</td>
+<td>求和</td>
+</tr>
+<tr>
+<td>avg(列名)</td>
+<td>平均值</td>
+</tr>
+</tbody></table>
+<h4 id="8-4-3-聚合函数语法"><a href="#8-4-3-聚合函数语法" class="headerlink" title="8.4.3  聚合函数语法"></a>8.4.3  聚合函数语法</h4><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> 聚合函数名(列名) <span class="keyword">FROM</span> 表;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>注意：null 值不参与所有聚合函数运算</p>
+</blockquote>
+<h4 id="8-4-4-练习"><a href="#8-4-4-练习" class="headerlink" title="8.4.4  练习"></a>8.4.4  练习</h4><ul>
+<li><p>统计班级一共有多少个学生</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="built_in">count</span>(id) <span class="keyword">from</span> stu;</span><br><span class="line"><span class="keyword">select</span> <span class="built_in">count</span>(english) <span class="keyword">from</span> stu;</span><br></pre></td></tr></table></figure>
+
+<p>上面语句根据某个字段进行统计，如果该字段某一行的值为null的话，将不会被统计。所以可以在count(*) 来实现。* 表示所有字段数据，一行中也不可能所有的数据都为null，所以建议使用 count(*)</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="built_in">count</span>(<span class="operator">*</span>) <span class="keyword">from</span> stu;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>查询数学成绩的最高分</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="built_in">max</span>(math) <span class="keyword">from</span> stu;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>查询数学成绩的最低分</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="built_in">min</span>(math) <span class="keyword">from</span> stu;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>查询数学成绩的总分</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="built_in">sum</span>(math) <span class="keyword">from</span> stu;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>查询数学成绩的平均分</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="built_in">avg</span>(math) <span class="keyword">from</span> stu;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>查询英语成绩的最低分</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="built_in">min</span>(english) <span class="keyword">from</span> stu;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h3 id="8-5-分组查询"><a href="#8-5-分组查询" class="headerlink" title="8.5  分组查询"></a>8.5  分组查询</h3><h4 id="8-5-1-语法"><a href="#8-5-1-语法" class="headerlink" title="8.5.1  语法"></a>8.5.1  语法</h4><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> 字段列表 <span class="keyword">FROM</span> 表名 [<span class="keyword">WHERE</span> 分组前条件限定] <span class="keyword">GROUP</span> <span class="keyword">BY</span> 分组字段名 [<span class="keyword">HAVING</span> 分组后条件过滤];</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>注意：分组之后，查询的字段为聚合函数和分组字段，查询其他字段无任何意义</p>
+</blockquote>
+<h4 id="8-5-2-练习"><a href="#8-5-2-练习" class="headerlink" title="8.5.2  练习"></a>8.5.2  练习</h4><ul>
+<li><p>查询男同学和女同学各自的数学平均分</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> sex, <span class="built_in">avg</span>(math) <span class="keyword">from</span> stu <span class="keyword">group</span> <span class="keyword">by</span> sex;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>注意：分组之后，查询的字段为聚合函数和分组字段，查询其他字段无任何意义</p>
+</blockquote>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> name, sex, <span class="built_in">avg</span>(math) <span class="keyword">from</span> stu <span class="keyword">group</span> <span class="keyword">by</span> sex;  <span class="comment">-- 这里查询name字段就没有任何意义</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>查询男同学和女同学各自的数学平均分，以及各自人数</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> sex, <span class="built_in">avg</span>(math),<span class="built_in">count</span>(<span class="operator">*</span>) <span class="keyword">from</span> stu <span class="keyword">group</span> <span class="keyword">by</span> sex;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>查询男同学和女同学各自的数学平均分，以及各自人数，要求：分数低于70分的不参与分组</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> sex, <span class="built_in">avg</span>(math),<span class="built_in">count</span>(<span class="operator">*</span>) <span class="keyword">from</span> stu <span class="keyword">where</span> math <span class="operator">&gt;</span> <span class="number">70</span> <span class="keyword">group</span> <span class="keyword">by</span> sex;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>查询男同学和女同学各自的数学平均分，以及各自人数，要求：分数低于70分的不参与分组，分组之后人数大于2个的</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> sex, <span class="built_in">avg</span>(math),<span class="built_in">count</span>(<span class="operator">*</span>) <span class="keyword">from</span> stu <span class="keyword">where</span> math <span class="operator">&gt;</span> <span class="number">70</span> <span class="keyword">group</span> <span class="keyword">by</span> sex <span class="keyword">having</span> <span class="built_in">count</span>(<span class="operator">*</span>)  <span class="operator">&gt;</span> <span class="number">2</span>;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<p><strong>where 和 having 区别：</strong></p>
+<ul>
+<li><p>执行时机不一样：where 是分组之前进行限定，不满足where条件，则不参与分组，而having是分组之后对结果进行过滤。</p>
+</li>
+<li><p>可判断的条件不一样：where 不能对聚合函数进行判断，having 可以。</p>
+</li>
+</ul>
+<h3 id="8-6-分页查询"><a href="#8-6-分页查询" class="headerlink" title="8.6  分页查询"></a>8.6  分页查询</h3><p>如下图所示，大家在很多网站都见过类似的效果，如京东、百度、淘宝等。分页查询是将数据一页一页的展示给用户看，用户也可以通过点击查看下一页的数据。</p>
+<img src="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210722230330366.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210722230330366.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20210722230330366" style="zoom:80%;" />
+
+<p>接下来我们先说分页查询的语法。</p>
+<h4 id="8-6-1-语法"><a href="#8-6-1-语法" class="headerlink" title="8.6.1  语法"></a>8.6.1  语法</h4><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> 字段列表 <span class="keyword">FROM</span> 表名 LIMIT  起始索引 , 查询条目数;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>注意： 上述语句中的起始索引是从0开始</p>
+</blockquote>
+<h4 id="8-6-2-练习"><a href="#8-6-2-练习" class="headerlink" title="8.6.2  练习"></a>8.6.2  练习</h4><ul>
+<li><p>从0开始查询，查询3条数据</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> stu limit <span class="number">0</span> , <span class="number">3</span>;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>每页显示3条数据，查询第1页数据</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> stu limit <span class="number">0</span> , <span class="number">3</span>;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>每页显示3条数据，查询第2页数据</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> stu limit <span class="number">3</span> , <span class="number">3</span>;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>每页显示3条数据，查询第3页数据</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> stu limit <span class="number">6</span> , <span class="number">3</span>;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<p>从上面的练习推导出起始索引计算公式：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">起始索引 <span class="operator">=</span> (当前页码 <span class="operator">-</span> <span class="number">1</span>) <span class="operator">*</span> 每页显示的条数</span><br></pre></td></tr></table></figure>
+
+
+      </div>
+      <div class="post-tags-categories">
+        
+        <div class="tags">
+          
+            <a href="/tags/JavaWeb/" class="">
+              JavaWeb
+            </a>
+          
+            <a href="/tags/MySQL/" class="">
+              MySQL
+            </a>
+          
+            <a href="/tags/hm/" class="">
+              hm
+            </a>
+          
+        </div>
+        
+      </div>
+      
+        <div class="copyright">
+  <ul class="post-copyright">
+    <li class="post-copyright-author">
+    <strong>author:  </strong>John Doe</a>
+    </li>
+    <li class="post-copyright-link">
+    <strong>link:  </strong>
+    <a href="/2022/05/27/mysql基础/" target="_blank" title="hm-MySQL基础">http://example.com/2022/05/27/mysql基础/</a>
+    </li>
+    <li class="post-copyright-license">
+      <strong>Copyright notice:   </strong>
+      All articles on this website, unless otherwise stated, adopt <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">CC BY-NC-ND 4.0</a>
+      reprint policy. If reproduced, please indicate source!
+    </li>
+  </ul>
+<div>
+      
+    </article>
+    <!-- 上一篇文章和下一篇文章 -->
+    
+      <!-- 文章详情页的上一页和下一页 -->
+<div class="post-nav">
+
+
+
+  
+  <div class="post-nav-prev post-nav-item">
+    <div class="post-nav-img" style="background-size: cover; 
+      background-position: center center;">
+      <img class="lazyload lazyload placeholder" src="/medias/9.jpg" class="lazyload placeholder" data-srcset="/medias/9.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="">
+    </div>
+    <a href="/2022/05/27/mysql%E8%BF%9B%E9%98%B6/" class="post-nav-link">
+      <div class="title">
+        <i class="fas fa-angle-left"></i> Prev:
+        <div class="title-text">hm-MySQL进阶</div>
+      </div>
+      
+      <!-- <div class="content">
+        mysql高级今日目标
+
+
+掌握约束的使用
+
+掌握表关系及建表原则
+
+重点掌握多表查询操作
+
+掌握事务操作
+
+
+
+1，约
+      </div> -->
+    </a>
+  </div>
+
+
+
+  
+  <div class="post-nav-next post-nav-item">
+    <div class="post-nav-img" style="background-size: cover; 
+      background-position: center center;">
+      <img class="lazyload lazyload placeholder" src="/medias/13.jpg" class="lazyload placeholder" data-srcset="/medias/13.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" src="" alt="">
+    </div>
+    <a href="/2022/05/26/%E4%BA%92%E8%81%94%E7%BD%91%E9%80%9A%E4%BF%A1/" class="post-nav-link">
+      <div class="title">
+        Next: <i class="fas fa-angle-right"></i>
+        <div class="title-text">互联网通信</div>
+      </div>
+      <!-- <div class="content">
+        互联网通信一、关于系统架构C&#x2F;S结构优点:
+1.速度快(大量的数据都是集成在客户端软件当中，所以服务器只需要传
+      </div> -->
+    </a>
+  </div>
+
+</div>
+
+    
+    
+
+    <!-- 打赏 -->
+    
+      <div id="appDonate" class="post-donate">
+  <div id="donate_board" class="donate_bar center" ref="donate">
+    <a id="btn_donate" class="btn_donate" href="javascript:;" title="打赏" @click="showDialogDrawer()"></a>
+  </div>
+  <transition name="fade">
+    <div 
+      class="donate-box-mask"
+      v-cloak 
+      v-show="visible"
+      @click="cancelDialogDrawer()"
+    >
+    </div>
+  </transition>
+  <transition name="bounce">
+    <div class="donate-box" v-cloak v-show="visible">
+      <div class="donate-box_close">
+        <i class="fas fa-times" aria-hidden="true" @click="cancelDialogDrawer" pointer></i>
+      </div>
+      <div class="donate-box_title">
+        <h4>
+          你的赏识是我前进的动力
+        </h4>
+      </div>
+      <div class="donate-box_tab">
+        <div class="Alipay" pointer :class="{'active': tabActive === 'Alipay'}" @click="changeTabActive('Alipay')">
+          支付宝
+        </div>
+        <div class="WeChatpay" pointer :class="{'active': tabActive === 'WeChatpay'}" @click="changeTabActive('WeChatpay')">
+          微信
+        </div>
+      </div>
+      <div class="donate-box_img">
+        <div class="AlipayImg" v-show="tabActive === 'Alipay'">
+          <img src="/medias/1.jpg" class="lazyload placeholder" data-srcset="/medias/1.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="支付宝打赏" />
+        </div> 
+        <div class="WeChatpayImg" v-show="tabActive === 'WeChatpay'">
+          <img src="/medias/2.jpg" class="lazyload placeholder" data-srcset="/medias/2.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="微信打赏" />
+        </div>
+      </div>
+    </div>
+  </transition>
+</div>
+
+<script>
+  var body = document.body || document.documentElement || window;
+  var vm = new Vue({
+    el: '#appDonate',
+    data: {
+      visible: false,
+      tabActive: 'Alipay',
+      top: 0,
+    },
+    computed: {
+    },
+    mounted() {
+    },
+    methods: {
+      showDialogDrawer() {
+        this.visible = true;
+        // 防止页面滚动，只能让弹框滚动
+        // function getScroll() {
+        //   return {
+        //     left: window.pageXOffset || document.documentElement.scrollLeft || document.body.scrollLeft || 0,
+        //     top: window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0
+        //   };
+        // }
+        this.top = $(document).scrollTop() // or getScroll().top
+        // console.log('aa', $('.main-content'));
+        body.style.cssText = 'overflow: hidden;';
+      },
+      cancelDialogDrawer() {
+        this.visible = false;
+        body.removeAttribute('style');
+        $(document).scrollTop(this.top)
+      },
+      changeTabActive(name) {
+        this.tabActive = name;
+      }
+    },
+    created() {}
+  })
+</script>
+    
+
+    <!-- 分享 -->
+    
+      <!-- https://github.com/overtrue/share.js -->
+<!-- 文章详情页的分享 -->
+<div class="social-share" data-sites="twitter,facebook,google,qq,qzone,wechat,weibo,douban,linkedin" data-wechat-qrcode-helper="<p>微信扫一扫即可分享！</p>"></div>
+
+<script src="/js/shareJs/social-share.min.js"></script>
+</script>
+
+<style>
+  .social-share {
+    margin: 20px 0;
+  }
+</style>
+
+
+    
+    
+    <!-- 评论 -->
+    <!-- 评论 -->
+
+  <div id="myComment">
+    
+      <div id="gitment-container"></div>
+
+    
+  </div>
+
+<!-- comment script in themes\hexo-theme-bamboo\layout\_partial\scripts\index.ejs -->
+
+
+  </div>
+
+  <!-- 目录 -->
+  <!-- 文章详情页右侧目录 -->
+
+  <div class="toc-aside">
+    <div class="toc-main">
+      <div class="toc-aside-title">
+        <i class="fas fa-list-ul" aria-hidden="true"></i><span>catalog</span>
+        
+          <div class="toc-open-close">catalog</div>
+        
+      </div>
+      <div class="toc-content">
+        <div class="toc"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 手机端目录按钮 -->
+  <div id="toc-mobile-btn">
+    <i class="fas fa-list-ul" aria-hidden="true"></i>
+  </div>
+
+
+<script>
+  function closeToc(init) {
+    $(".toc-aside").css({'width': 0, 'padding': 0, 'transition': init ?  'noe' : 'width 0.3s' });
+    $(".toc-content").css({'width': 0});
+    $(".toc-aside-title span, .toc-aside-title i").css({'display': 'none'});
+    $(".main-content").css({'width': '75%', 'margin-left': 'auto', 'margin-right': 'auto',});
+  };
+  function openToc() {
+    $(".main-content").css({'width': '65%', 'margin-right': '10px', 'margin-left': 'calc(35% - 350px)'});
+    $(".toc-aside").css({'width': '300px', 'padding': '0 10px', 'transition': 'width 0.3s'});
+    $(".toc-content").css({'width': '300px'});
+    $(".toc-aside-title span, .toc-aside-title i").css({'display': 'inline-block'});
+  }
+  function openBtnClickFn () {
+    let openOrCloseBtn = $('.toc-aside .toc-aside-title .toc-open-close');
+    let open = eval('' || 'true');
+    openOrCloseBtn.click(function() {
+      if (open) {
+        closeToc();
+        open = false;
+      } else {
+        openToc();
+        open = true;
+      }
+    });
+  };
+  openBtnClickFn();
+  initCloseTocWidth(true);
+
+  function initCloseTocWidth(init) {
+    if (window.innerWidth >= 992) {
+      let isClose = false;
+      isClose && closeToc(init)
+    }
+  }
+
+  document.addEventListener('pjax:complete', function () {
+    $(".toc-aside").css({'transition': 'no'});
+  })
+  document.addEventListener('pjax:complete', function () {
+    openBtnClickFn();
+  })
+  
+</script>
+
+  <!-- 图片放大 Wrap images with fancybox support -->
+  <script src="/js/wrapImage.js"></script>
+</div>
+
+<!-- 文章详情页背景图 -->
+<div id="appBgSwiper" style="position: fixed;left: 0;top: 0;width: 100%;height: 100%;z-index: -2;"
+	:style="{'background-color': bgColor ? bgColor : 'transparent'}">
+	<transition-group tag="ul" :name="names">
+		<li v-for='(image,index) in img' :key='index' v-show="index === mark" class="bg-swiper-box">
+			<img :src="image" class="bg-swiper-img no-lazy">
+		</li>
+	</transition-group>
+</div>
+<script>
+	var vm = new Vue({
+		el: '#appBgSwiper',
+		data: {
+			names: '' || 'fade' || 'fade', // translate-fade fade
+			mark: 0,
+			img: [],
+			bgColor: '',
+			time: null
+		},
+		methods: {   //添加方法
+			change(i, m) {
+				if (i > m) {
+					// this.names = 'fade';
+				} else if (i < m) {
+					// this.names = 'fade';
+				} else {
+					return;
+				}
+				this.mark = i;
+			},
+			prev() {
+				// this.names = 'fade';
+				this.mark--;
+				if (this.mark === -1) {
+					this.mark = 3;
+					return
+				}
+			},
+			next() {
+				// this.names = 'fade';
+				this.mark++;
+				if (this.mark === this.img.length) {
+					this.mark = 0;
+					return
+				}
+			},
+			autoPlay() {
+				// this.names = 'fade';
+				this.mark++;
+				if (this.mark === this.img.length) {
+					this.mark = 0;
+					return
+				}
+			},
+			play() {
+				let bgImgDelay = '' || '180000'
+				let delay = parseInt(bgImgDelay) || 180000;
+				this.time = setInterval(this.autoPlay, delay);
+			},
+			enter() {
+				clearInterval(this.time);
+			},
+			leave() {
+				this.play();
+			}
+		},
+		created() {
+			this.play()
+		},
+		beforeDestroy() {
+			clearInterval(this.time);
+		},
+		mounted() {
+			let prop = '' || '';
+			let isImg = prop.includes('.bmp') || prop.includes('.jpg') || prop.includes('.png') || prop.includes('.tif') || prop.includes('.gif') || prop.includes('.pcx') || prop.includes('.tga') || prop.includes('.exif') || prop.includes('.fpx') || prop.includes('.psd') || prop.includes('.cdr') || prop.includes('.pcd') || prop.includes('.dxf') || prop.includes('.ufo') || prop.includes('.eps') || prop.includes('.ai') || prop.includes('.raw') || prop.includes('.WMF') || prop.includes('.webp') || prop.includes('.jpeg') || prop.includes('http://') || prop.includes('https://')
+			if (isImg) {
+				let img = prop.split(',');
+				let configRoot = '/'
+				let arrImg = [];
+				img.forEach(el => {
+					var Expression = /http(s)?:\/\/([\w-]+\.)+[\w-]+(\/[\w- .\/?%&=]*)?/;
+					var objExp = new RegExp(Expression);
+
+					if (objExp.test(el)) {
+						// http or https
+						arrImg.push(el);
+					} else {
+						// 非http or https开头
+						// 本地文件
+						let firstStr = el.charAt(0);
+						if (firstStr == '/') {
+							el = el.substr(1); // 删除第一个字符 '/',因为 configRoot最后一个字符为 /
+						}
+						el = configRoot + el;
+						arrImg.push(el);
+					}
+				})
+				this.img = arrImg;
+			} else {
+				this.bgColor = prop;
+			}
+		}
+	})
+</script>
+
+<style>
+	.bg-swiper-box {
+		position: absolute;
+		display: block;
+		width: 100%;
+		height: 100%;
+	}
+
+	.bg-swiper-img {
+		object-fit: cover;
+		width: 100%;
+		height: 100%;
+	}
+</style>
+
+
+
+
+  <script>
+  function loadMermaid() {
+    if (document.getElementsByClassName('mermaid').length) {
+      if (window.mermaidJsLoad) mermaid.init()
+      else {
+        loadScript('https://unpkg.com/mermaid/dist/mermaid.min.js').then(() => {
+          window.mermaidJsLoad = true
+          mermaid.initialize({
+            theme: 'default',
+          })
+          if ('true') {
+            mermaid.init();
+          }
+        })
+      }
+    }
+  };
+  document.addEventListener("DOMContentLoaded", function () {
+    loadMermaid();
+  })
+
+  document.addEventListener('pjax:complete', function () {
+    loadMermaid();
+  })
+  
+</script>
+
+
+      </main>
+    </div>
+
+    <!-- 页脚 -->
+    
+  
+  
+    <!-- 底部鱼儿跳动效果，依赖于jquery-->
+<div id="j-fish-skip" style=" position: relative;height: 153px;width: auto;"></div>
+<script>
+  var RENDERER = {
+    POINT_INTERVAL: 5,
+    FISH_COUNT: 3,
+    MAX_INTERVAL_COUNT: 50,
+    INIT_HEIGHT_RATE: .5,
+    THRESHOLD: 50,
+    FISH_COLOR: '',
+    init: function () {
+      this.setFishColor(); this.setParameters(), this.reconstructMethods(), this.setup(), this.bindEvent(), this.render()
+    },
+    setFishColor: function () {
+      let isDark = JSON.parse(localStorage.getItem('dark')) || JSON.parse('false');
+      if (isDark) {
+        this.FISH_COLOR = '#222'; // 暗黑色，有时间把这整成一个变量
+      } else {
+        this.FISH_COLOR = '' || '#42b983';
+      }
+    },
+    setParameters: function () {
+      this.$window = $(window), this.$container = $("#j-fish-skip"), this.$canvas = $("<canvas />"), this.context = this.$canvas.appendTo(this.$container).get(0).getContext("2d"), this.points = [], this.fishes = [], this.watchIds = []
+    },
+    createSurfacePoints: function () {
+      var t = Math.round(this.width / this.POINT_INTERVAL);
+      this.pointInterval = this.width / (t - 1), this.points.push(new SURFACE_POINT(this, 0));
+      for (var i = 1; i < t; i++) {
+        var e = new SURFACE_POINT(this, i * this.pointInterval),
+          h = this.points[i - 1];
+        e.setPreviousPoint(h), h.setNextPoint(e), this.points.push(e)
+      }
+    },
+    reconstructMethods: function () {
+      this.watchWindowSize = this.watchWindowSize.bind(this), this.jdugeToStopResize = this.jdugeToStopResize.bind(this), this.startEpicenter = this.startEpicenter.bind(this), this.moveEpicenter = this.moveEpicenter.bind(this), this.reverseVertical = this.reverseVertical.bind(this), this.render = this.render.bind(this)
+    },
+    setup: function () {
+      this.points.length = 0, this.fishes.length = 0, this.watchIds.length = 0, this.intervalCount = this.MAX_INTERVAL_COUNT, this.width = this.$container.width(), this.height = this.$container.height(), this.fishCount = this.FISH_COUNT * this.width / 500 * this.height / 500, this.$canvas.attr({
+        width: this.width,
+        height: this.height
+      }), this.reverse = !1, this.fishes.push(new FISH(this)), this.createSurfacePoints()
+    },
+    watchWindowSize: function () {
+      this.clearTimer(), this.tmpWidth = this.$window.width(), this.tmpHeight = this.$window.height(), this.watchIds.push(setTimeout(this.jdugeToStopResize, this.WATCH_INTERVAL))
+    },
+    clearTimer: function () {
+      for (; this.watchIds.length > 0;) clearTimeout(this.watchIds.pop())
+    },
+    jdugeToStopResize: function () {
+      var t = this.$window.width(),
+        i = this.$window.height(),
+        e = t == this.tmpWidth && i == this.tmpHeight;
+      this.tmpWidth = t, this.tmpHeight = i, e && this.setup()
+    },
+    bindEvent: function () {
+      this.$window.on("resize", this.watchWindowSize), this.$container.on("mouseenter", this.startEpicenter), this.$container.on("mousemove", this.moveEpicenter)
+    },
+    getAxis: function (t) {
+      var i = this.$container.offset();
+      return {
+        x: t.clientX - i.left + this.$window.scrollLeft(),
+        y: t.clientY - i.top + this.$window.scrollTop()
+      }
+    },
+    startEpicenter: function (t) {
+      this.axis = this.getAxis(t)
+    },
+    moveEpicenter: function (t) {
+      var i = this.getAxis(t);
+      this.axis || (this.axis = i), this.generateEpicenter(i.x, i.y, i.y - this.axis.y), this.axis = i
+    },
+    generateEpicenter: function (t, i, e) {
+      if (!(i < this.height / 2 - this.THRESHOLD || i > this.height / 2 + this.THRESHOLD)) {
+        var h = Math.round(t / this.pointInterval);
+        h < 0 || h >= this.points.length || this.points[h].interfere(i, e)
+      }
+    },
+    reverseVertical: function () {
+      this.reverse = !this.reverse;
+      for (var t = 0, i = this.fishes.length; t < i; t++) this.fishes[t].reverseVertical()
+    },
+    controlStatus: function () {
+      for (var t = 0, i = this.points.length; t < i; t++) this.points[t].updateSelf();
+      for (t = 0, i = this.points.length; t < i; t++) this.points[t].updateNeighbors();
+      this.fishes.length < this.fishCount && 0 == --this.intervalCount && (this.intervalCount = this.MAX_INTERVAL_COUNT, this.fishes.push(new FISH(this)))
+    },
+    render: function () {
+      requestAnimationFrame(this.render), this.controlStatus(), this.context.clearRect(0, 0, this.width, this.height), this.context.fillStyle = this.FISH_COLOR;
+      for (var t = 0, i = this.fishes.length; t < i; t++) this.fishes[t].render(this.context);
+      this.context.save(), this.context.globalCompositeOperation = "xor", this.context.beginPath(), this.context.moveTo(0, this.reverse ? 0 : this.height);
+      for (t = 0, i = this.points.length; t < i; t++) this.points[t].render(this.context);
+      this.context.lineTo(this.width, this.reverse ? 0 : this.height), this.context.closePath(), this.context.fill(), this.context.restore()
+    }
+  },
+  SURFACE_POINT = function (t, i) {
+    this.renderer = t, this.x = i, this.init()
+  };
+  SURFACE_POINT.prototype = {
+    SPRING_CONSTANT: .03,
+    SPRING_FRICTION: .9,
+    WAVE_SPREAD: .3,
+    ACCELARATION_RATE: .01,
+    init: function () {
+      this.initHeight = this.renderer.height * this.renderer.INIT_HEIGHT_RATE, this.height = this.initHeight, this.fy = 0, this.force = {
+        previous: 0,
+        next: 0
+      }
+    },
+    setPreviousPoint: function (t) {
+      this.previous = t
+    },
+    setNextPoint: function (t) {
+      this.next = t
+    },
+    interfere: function (t, i) {
+      this.fy = this.renderer.height * this.ACCELARATION_RATE * (this.renderer.height - this.height - t >= 0 ? -1 : 1) * Math.abs(i)
+    },
+    updateSelf: function () {
+      this.fy += this.SPRING_CONSTANT * (this.initHeight - this.height), this.fy *= this.SPRING_FRICTION, this.height += this.fy
+    },
+    updateNeighbors: function () {
+      this.previous && (this.force.previous = this.WAVE_SPREAD * (this.height - this.previous.height)), this.next && (this.force.next = this.WAVE_SPREAD * (this.height - this.next.height))
+    },
+    render: function (t) {
+      this.previous && (this.previous.height += this.force.previous, this.previous.fy += this.force.previous), this.next && (this.next.height += this.force.next, this.next.fy += this.force.next), t.lineTo(this.x, this.renderer.height - this.height)
+    }
+  };
+  var FISH = function (t) {
+    this.renderer = t, this.init()
+  };
+  FISH.prototype = {
+    GRAVITY: .4,
+    init: function () {
+      this.direction = Math.random() < .5, this.x = this.direction ? this.renderer.width + this.renderer.THRESHOLD : -this.renderer.THRESHOLD, this.previousY = this.y, this.vx = this.getRandomValue(4, 10) * (this.direction ? -1 : 1), this.renderer.reverse ? (this.y = this.getRandomValue(1 * this.renderer.height / 10, 4 * this.renderer.height / 10), this.vy = this.getRandomValue(2, 5), this.ay = this.getRandomValue(.05, .2)) : (this.y = this.getRandomValue(6 * this.renderer.height / 10, 9 * this.renderer.height / 10), this.vy = this.getRandomValue(-5, -2), this.ay = this.getRandomValue(-.2, -.05)), this.isOut = !1, this.theta = 0, this.phi = 0
+    },
+    getRandomValue: function (t, i) {
+      return t + (i - t) * Math.random()
+    },
+    reverseVertical: function () {
+      this.isOut = !this.isOut, this.ay *= -1
+    },
+    controlStatus: function (t) {
+      this.previousY = this.y, this.x += this.vx, this.y += this.vy, this.vy += this.ay, this.renderer.reverse ? this.y > this.renderer.height * this.renderer.INIT_HEIGHT_RATE ? (this.vy -= this.GRAVITY, this.isOut = !0) : (this.isOut && (this.ay = this.getRandomValue(.05, .2)), this.isOut = !1) : this.y < this.renderer.height * this.renderer.INIT_HEIGHT_RATE ? (this.vy += this.GRAVITY, this.isOut = !0) : (this.isOut && (this.ay = this.getRandomValue(-.2, -.05)), this.isOut = !1), this.isOut || (this.theta += Math.PI / 20, this.theta %= 2 * Math.PI, this.phi += Math.PI / 30, this.phi %= 2 * Math.PI), this.renderer.generateEpicenter(this.x + (this.direction ? -1 : 1) * this.renderer.THRESHOLD, this.y, this.y - this.previousY), (this.vx > 0 && this.x > this.renderer.width + this.renderer.THRESHOLD || this.vx < 0 && this.x < -this.renderer.THRESHOLD) && this.init()
+    },
+    render: function (t) {
+      t.save(), t.translate(this.x, this.y), t.rotate(Math.PI + Math.atan2(this.vy, this.vx)), t.scale(1, this.direction ? 1 : -1), t.beginPath(), t.moveTo(-30, 0), t.bezierCurveTo(-20, 15, 15, 10, 40, 0), t.bezierCurveTo(15, -10, -20, -15, -30, 0), t.fill(), t.save(), t.translate(40, 0), t.scale(.9 + .2 * Math.sin(this.theta), 1), t.beginPath(), t.moveTo(0, 0), t.quadraticCurveTo(5, 10, 20, 8), t.quadraticCurveTo(12, 5, 10, 0), t.quadraticCurveTo(12, -5, 20, -8), t.quadraticCurveTo(5, -10, 0, 0), t.fill(), t.restore(), t.save(), t.translate(-3, 0), t.rotate((Math.PI / 3 + Math.PI / 10 * Math.sin(this.phi)) * (this.renderer.reverse ? -1 : 1)), t.beginPath(), this.renderer.reverse ? (t.moveTo(5, 0), t.bezierCurveTo(10, 10, 10, 30, 0, 40), t.bezierCurveTo(-12, 25, -8, 10, 0, 0)) : (t.moveTo(-5, 0), t.bezierCurveTo(-10, -10, -10, -30, 0, -40), t.bezierCurveTo(12, -25, 8, -10, 0, 0)), t.closePath(), t.fill(), t.restore(), t.restore(), this.controlStatus(t)
+    }
+  }, $(function () {
+    RENDERER.init()
+    $('.dark').click(function () {
+      setTimeout(() => {
+        RENDERER.setFishColor();
+        RENDERER.context.fill();
+      });
+    })
+  });
+</script>
+  
+  <div class="footer bg-color">
+    <div class="footer-main">
+      
+        
+          <div class="link">
+            
+          </div>
+        
+      
+        
+          <div class="footer-copyright">
+            <p>Copyright © 2019 - 2020 <a target="_blank" rel="noopener" href="https://github.com/yuang01">yuang01</a> | Powered by <a target="_blank" rel="noopener" href="https://hexo.io/zh-cn/docs/">Hexo</a> | Theme <a target="_blank" rel="noopener" href="https://github.com/yuang01/theme">Bamboo</a> </p>
+
+          </div>
+        
+      
+        
+          
+            <!-- 不蒜子统计 -->
+            <!-- 不蒜子统计 -->
+<span id="busuanzi_container_site_pv">
+      <i class="fas fa-eye" aria-hidden="true"></i>Total visits：<span id="busuanzi_value_site_pv"></span> times
+</span>
+<span class="post-meta-divider">|</span>
+<span id="busuanzi_container_site_uv" style='display:none'>
+      <i class="fas fa-users" aria-hidden="true"></i>Number of visitors：<span id="busuanzi_value_site_uv"></span> people
+</span>
+
+          
+        
+      
+        
+          <div class="footer-custom">
+            
+          </div>
+        
+      
+    </div>
+  </div>
+
+
+
+    <!-- 渲染暗黑按钮 -->
+    
+      <div class="dark">
+  <div class="dark-content">
+    <i class="fas fa-moon" aria-hidden="true"></i>
+    <!-- <span>关灯</span> -->
+  </div>
+  
+</div>
+
+<script>
+  $(function() {
+    let isDark = JSON.parse(localStorage.getItem('dark'))  || JSON.parse('false');
+    if (isDark) {
+      $(".dark-content").replaceWith(
+          `
+          <div class='dark-content'>
+            <i class="fas fa-lightbulb" aria-hidden="true"></i>
+          </div>
+          `
+        );
+    }
+    $('.dark').click(function() {
+      if ($(document.body).is('.darkModel')) {
+        $(document.body).removeClass('darkModel');
+        localStorage.setItem('dark', false);
+        $(".dark-content").replaceWith(
+          `
+          <div class='dark-content'>
+            <i class="fas fa-moon" aria-hidden="true"></i>
+          </div>
+          `
+        );
+      } else {
+        $(document.body).addClass('darkModel');
+        localStorage.setItem('dark', true);
+        $(".dark-content").replaceWith(
+          `
+          <div class='dark-content'>
+            <i class="fas fa-lightbulb" aria-hidden="true"></i>
+          </div>
+          `
+        );
+      }
+    })
+  })
+</script>
+    
+    <!-- 渲染回到顶部按钮 -->
+    
+      <div class="goTop top-btn-color" pointer>
+  <i class="fas fa-arrow-up" aria-hidden="true"></i>
+</div>
+<script src="/js/goTop.js"></script>
+
+    
+    <!-- 渲染左下角音乐播放器 -->
+    
+      <link rel="stylesheet" href="/js/aplayer/APlayer@1.10.1.min.css">
+<style>
+.aplayer .aplayer-lrc p {
+  
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 16px !important;
+}
+
+.aplayer .aplayer-lrc p.aplayer-lrc-current {
+  
+  font-size: 15px;
+  color: #42b983;
+}
+
+
+.aplayer.aplayer-fixed.aplayer-narrow .aplayer-body {
+  left: -66px !important;
+}
+
+.aplayer.aplayer-fixed.aplayer-narrow .aplayer-body:hover {
+  left: 0px !important;
+}
+
+
+</style>
+<meting-js  
+  class=""
+  server="tencent"
+  type="playlist"
+  id="8062553743"
+  fixed='true'
+  autoplay='false'
+  theme='#42b983'
+  loop='all'
+  order='random'
+  preload='auto'
+  volume='0.7'
+  list-folded='true'
+>
+</meting-js>
+
+<!-- <style>
+  #aplayer {
+    position: fixed;
+    left: 0;
+    bottom: 300px;
+  }
+</style> -->
+<script src="https://unpkg.com/aplayer@1.10.1/dist/APlayer.min.js"></script>
+<script src="https://unpkg.com/meting@2/dist/Meting.min.js"></script>
+    
+
+    <!-- 图片放大 -->
+    
+      <script src="/js/fancybox/jquery.fancybox.min.js"></script>
+    
+
+    <!-- 百度解析 -->
+    <!-- Baidu Analytics -->
+
+    <!-- Baidu Push -->
+
+<script>
+    (function () {
+        var bp = document.createElement('script');
+        var curProtocol = window.location.protocol.split(':')[0];
+        if (curProtocol === 'https') {
+            bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+        } else {
+            bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+        }
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(bp, s);
+    })();
+</script>
+
+    
+    <!-- 背景彩带 -->
+    
+      <script type="text/javascript" size="100" alpha='0.4' zIndex="-1" src="/js/ribbon.min.js"></script>
+    
+
+    <script src="/js/utils/index.js"></script>
+    <script src="/js/app.js"></script>
+    
+    <!-- 文章目录所需js -->
+<link href="/js/tocbot/tocbot.css" rel="stylesheet">
+<script src="/js/tocbot/tocbot.min.js"></script>
+
+<script>
+  var headerEl = 'h2, h3, h4',  //headers 
+    content = '.post-detail',//文章容器
+    idArr = {};  //标题数组以确定是否增加索引id
+  //add #id
+  var option = {
+    // Where to render the table of contents.
+    tocSelector: '.toc',
+    // Where to grab the headings to build the table of contents.
+    contentSelector: content,
+    // Which headings to grab inside of the contentSelector element.
+    headingSelector: headerEl,
+    scrollSmooth: true,
+    scrollSmoothOffset: -80,
+    headingsOffset: -($(window).height() * 0.4 - 45),
+    positionFixedSelector: '.toc-main',
+    positionFixedClass: 'is-position-fixed',
+    fixedSidebarOffset: 'auto',
+    activeLinkClass: 'is-active-link',
+    // onClick: function (e) {},
+  }
+  if ($('.toc').length > 0) {
+
+    $(content).children(headerEl).each(function () {
+      //去除空格以及多余标点
+      var headerId = $(this).text().replace(/[\s|\~|`|\!|\@|\#|\$|\%|\^|\&|\*|\(|\)|\_|\+|\=|\||\|\[|\]|\{|\}|\;|\:|\"|\'|\,|\<|\.|\>|\/|\?|\：|\，|\。]/g, '');
+
+      headerId = headerId.toLowerCase();
+      if (idArr[headerId]) {
+        //id已经存在
+        $(this).attr('id', headerId + '-' + idArr[headerId]);
+        idArr[headerId]++;
+      }
+      else {
+        //id未存在
+        idArr[headerId] = 1;
+        $(this).attr('id', headerId);
+      }
+    });
+
+    document.addEventListener("DOMContentLoaded", function () {
+      tocbot.init(option);
+      mobileTocClick();
+    });
+
+  }
+
+  window.tocScrollFn = function () {
+    return bamboo.throttle(function () {
+      findHeadPosition();
+    }, 100)()
+  }
+  window.addEventListener('scroll', tocScrollFn);
+
+  const findHeadPosition = function (top) {
+    if ($('.toc-list').length <= 0) {
+      return false;
+    }
+    setTimeout(() => {  // or DOMContentLoaded 
+      autoScrollToc();
+    }, 0);
+  }
+
+  const autoScrollToc = function () {
+    const $activeItem = document.querySelector('.is-active-link');
+    const $cardToc = document.querySelector('.toc-content');
+    const activePosition = $activeItem.getBoundingClientRect().top
+    const sidebarScrollTop = $cardToc.scrollTop
+    if (activePosition > (document.documentElement.clientHeight - 100)) {
+      $cardToc.scrollTop = sidebarScrollTop + 150
+    }
+    if (activePosition < 100) {
+      $cardToc.scrollTop = sidebarScrollTop - 150
+    }
+  }
+
+  document.addEventListener('pjax:send', function () {
+    if ($('.toc').length) {
+      tocbot.destroy();
+    }
+  });
+
+  document.addEventListener('pjax:complete', function () {
+    if ($('.toc').length) {
+      tocbot.init(option);
+      mobileTocClick();
+    }
+  });
+  
+  // 手机端toc按钮点击出现目录
+  const mobileTocClick = function () {
+    const $cardTocLayout = document.getElementsByClassName('toc-aside')[0];
+    const $cardToc = $cardTocLayout.getElementsByClassName('toc-content')[0];
+    let right = '45px';
+    if (window.innerWidth >= 551 && window.innerWidth <= 992) {
+      right = '100px'
+    }
+    const mobileToc = {
+      open: () => {
+        $cardTocLayout.style.cssText = 'animation: toc-open .3s; opacity: 1; right: ' + right
+      },
+
+      close: () => {
+        $cardTocLayout.style.animation = 'toc-close .2s'
+        setTimeout(() => {
+          $cardTocLayout.style.cssText = "opacity:''; animation: ''; right: ''"
+        }, 100)
+      }
+    }
+    document.getElementById('toc-mobile-btn').addEventListener('click', () => {
+      if (window.getComputedStyle($cardTocLayout).getPropertyValue('opacity') === '0') mobileToc.open()
+      else mobileToc.close()
+    })
+
+    $cardToc.addEventListener('click', (e) => {
+      if (window.innerWidth < 992) { // 小于992px的时候
+        mobileToc.close()
+      }
+    })
+  }
+</script>
+
+<style>
+  .is-position-fixed {
+    position: sticky !important;
+    top: 74px;
+  }
+
+  .toc-main ul {
+    counter-reset: show-list;
+  }
+
+  .toc-main ul li::before {
+    content: counter(item)".";
+    display: block;
+    position: absolute;
+    left: 12px;
+    top: 0;
+  }
+</style> 
+
+<!-- 设置导航背景 -->
+<script>
+  let setHeaderClass = () => {
+    const headerMenuTransparent = true;
+    if (!headerMenuTransparent) { return; }
+    const nav = $('#navHeader');
+    const navTop = nav.outerHeight();
+    const winTop = $(window).scrollTop();
+    if(winTop > navTop) {
+      nav.addClass('header-bg-color');
+    }
+    else {
+      nav.removeClass('header-bg-color');
+    }
+  };
+
+  let scrollCollect = () => {
+    return bamboo.throttle(function (e) {
+      setHeaderClass();
+    }, 200)()
+  }
+
+  let initHeaderBg = () => {
+    setHeaderClass();
+  }
+
+  setHeaderClass();
+  window.addEventListener('scroll', scrollCollect);
+
+  document.addEventListener('pjax:send', function () {
+    window.removeEventListener('scroll', scrollCollect)
+  })
+  document.addEventListener('pjax:complete', function () {
+    window.addEventListener('scroll', scrollCollect);
+    setHeaderClass();
+  })
+</script> 
+
+<!-- 渲染issues标签里的内容 -->
+<script>
+  function loadIssuesJS() {
+    if ($(".post-detail").find(".issues-api").length == 0) {
+      return;
+    } 
+    loadScript('/js/issues/index.js');
+  };
+  $(function () {
+    loadIssuesJS();
+  });
+  document.addEventListener('pjax:complete', function () {
+    if (typeof IssuesAPI == "undefined") {
+      loadIssuesJS();
+    }
+  })
+</script>
+
+<!-- 输入框打字特效 -->
+<!-- 输入框打字特效 -->
+
+  <script src="/js/activate-power-mode.js"></script>
+  <script>
+    POWERMODE.colorful = true;  // 打开随机颜色特效
+    POWERMODE.shake = false;    // 关闭输入框抖动
+    document.body.addEventListener('input', POWERMODE);//监听打字事件
+  </script>
+
+
+<!-- markdown代码一键复制功能 -->
+
+  <link rel="stylesheet" href="https://unpkg.com/v-plugs-ayu/lib/ayu.css">
+  <script src="https://unpkg.com/v-plugs-ayu/lib/ayu.umd.min.js"></script>
+  <script src="/js/clipboard/clipboard.min.js"></script>
+  <div id="appCopy">
+  </div>
+  <script data-pjax>
+    var vm = new Vue({
+      el: '#appCopy',
+      data: {
+      },
+      computed: {
+      },
+      mounted() {
+        const that = this;
+        var copy = 'copy';
+        /* code */
+        var initCopyCode = function () {
+          var copyHtml = '';
+          copyHtml += '<button class="btn-copy" data-clipboard-snippet="" style="position:absolute;top:0;right:0;z-index:1;">';
+          copyHtml += '<i class="fas fa-copy"></i><span>' + copy + '</span>';
+          copyHtml += '</button>';
+          $(".post-detail pre").not('.gutter pre').wrap("<div class='codeBox' style='position:relative;width:100%;'></div>")
+          $(".post-detail pre").not('.gutter pre').before(copyHtml);
+          new ClipboardJS('.btn-copy', {
+            target: function (trigger) {
+              return trigger.nextElementSibling;
+            }
+          });
+        }
+        initCopyCode();
+        $('.btn-copy').unbind('click').bind('click', function () {
+          doSomething();
+        })
+        $(document).unbind('keypress').bind('keypress', function (e) {
+          if (e.ctrlKey && e.keyCode == 67) {
+            doSomething();
+          }
+        })
+
+        function doSomething() {
+          that.$notify({
+            title: "成功",
+            content: "代码已复制，请遵守相关授权协议。",
+            type: 'success'
+          })
+        }
+      },
+      methods: {
+      },
+      created() { }
+    })
+  </script>
+  
+
+<!-- 图片懒加载 -->
+<script defer src="https://unpkg.com/vanilla-lazyload@17.1.0/dist/lazyload.min.js"></script>
+<script>
+  // https://www.npmjs.com/package/vanilla-lazyload
+  // Set the options globally
+  // to make LazyLoad self-initialize
+  window.lazyLoadOptions = {
+    elements_selector: ".lazyload",
+    threshold: 0
+  };
+  // Listen to the initialization event
+  // and get the instance of LazyLoad
+  window.addEventListener(
+    "LazyLoad::Initialized",
+    function (event) {
+      window.lazyLoadInstance = event.detail.instance;
+    },
+    false
+  );
+  document.addEventListener('DOMContentLoaded', function () {
+    lazyLoadInstance.update();
+  });
+  document.addEventListener('pjax:complete', function () {
+    lazyLoadInstance.update();
+  });
+</script>
+
+
+<!-- 卡片滚动动画 -->
+   
+
+<!-- 评论所需js -->
+
+  
+    <script type="text/javascript">
+  var utteranceCommon = {};
+
+  function check_utterance() {
+    let isDark = JSON.parse(localStorage.getItem('dark')) || JSON.parse('false');
+    if (isDark) {
+      utteranceCommon.Theme = 'github-dark';
+    } else {
+      utteranceCommon.Theme = 'github-light';
+    }
+
+    return document.getElementById("gitment-container");
+  }
+  comment_el = '#gitment-container';
+  load_utterance = function () {
+    if ($(comment_el).length) {
+      // 匿名函数，防止污染全局变量
+      const HEAD = check_utterance();
+
+      var utterances = document.createElement('script');
+      utterances.type = 'text/javascript';
+      utterances.async = true;
+      utterances.setAttribute('issue-term', 'pathname')
+      utterances.setAttribute('theme', utteranceCommon.Theme)
+      utterances.setAttribute('repo', '')
+      utterances.crossorigin = 'anonymous';
+      utterances.src = 'https://utteranc.es/client.js';
+      // content 是要插入评论的地方
+      document.getElementById('gitment-container').appendChild(utterances);
+
+    }
+  }
+
+  function dark_utterance() {
+    const HEAD = check_utterance();
+    if (!HEAD) return;
+    const message = {
+      type: 'set-theme',
+      theme: utteranceCommon.Theme
+    };
+    const utteranceIframe = document.querySelector('iframe');
+    utteranceIframe.contentWindow.postMessage(message, 'https://utteranc.es');
+  }
+
+  $(document).ready(load_utterance);
+  document.addEventListener('pjax:complete', function () {
+    load_utterance();
+  });
+
+  $('.dark').click(function () {
+    setTimeout(() => {
+      dark_utterance();
+    });
+  })
+
+</script>
+
+<style>
+  .utterances {
+    max-width: inherit !important;
+  }
+</style>
+  
+
+
+<!-- 鼠标点击特效 -->
+<!-- 爱心点击 -->
+
+  
+    <canvas class="fireworks" style="position: fixed;left: 0;top: 0;z-index: 999; pointer-events: none;" ></canvas>
+    <script src="//cdn.bootcss.com/animejs/2.2.0/anime.min.js"></script>
+    <script src="/js/cursor/explosion.min.js"></script>
+  
+
+
+
+
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" data-pjax></script>
+
+
+    <!-- pjax -->
+    
+
+<!-- pjax -->
+
+
+  <script src="/js/pjax@0.2.8/index.js"></script>
+  
+    <!-- 样式位于：source/css/_third-party/pjaxanimate.styl -->
+
+<div class="pjax-animate">
+  
+    <div class="loading-circle"><div id="loader-circle"></div></div>
+    <script>
+      window.ShowLoading = function() {
+        $(".loading-circle").css("display", "block");
+      };
+      window.HideLoading = function() {
+        $(".loading-circle").css("display", "none");
+      }
+    </script>
+  
+	<script>
+    document.addEventListener('pjax:complete', function () {
+      window.HideLoading();
+    })
+    document.addEventListener('pjax:send', function () {
+      window.ShowLoading();
+    })
+    document.addEventListener('pjax:error', function () {
+      window.HideLoading();
+    })
+	</script>
+</div>
+
+  
+
+  <script>
+    var pjax = new Pjax({
+      elements: 'a[href]:not([href^="#"]):not([href="javascript:void(0)"]):not([no-pjax])',   // 拦截正常带链接的 a 标签
+      selectors: ["#pjax-container","title"],                                   // 根据实际需要确认重载区域
+      cacheBust: false,   // url 地址追加时间戳，用以避免浏览器缓存
+      timeout: 5000
+    });
+
+    document.addEventListener('pjax:send', function (e) {
+
+      try {
+        var currentUrl = window.location.pathname;
+        var targetUrl = e.triggerElement.href;
+        var banUrl = [""];
+        if (banUrl[0] != "") {
+          banUrl.forEach(item => {
+            if(currentUrl.indexOf(item) != -1 || targetUrl.indexOf(item) != -1) {
+              window.location.href = targetUrl;
+            }
+          });
+        }
+      } catch (error) {}
+
+      $(window).unbind('resize');
+      $(window).unbind('scroll');
+      $(document).unbind('scroll');
+      $(document).unbind('click');
+      $('body').unbind('click');
+
+    })
+    
+    document.addEventListener('pjax:complete', function () {
+      $('script[data-pjax], .pjax-reload script').each(function () {
+        $(this).parent().append($(this).remove());
+      });
+    });
+
+    document.addEventListener('pjax:error', function (e) {
+      window.location.href = e.triggerElement.href;
+    })
+    
+    // 刷新不从顶部开始
+    document.addEventListener("DOMContentLoaded", function () {
+      history.scrollRestoration = 'auto';
+    })
+  </script>
+
+
+
+  </body>
+</html>

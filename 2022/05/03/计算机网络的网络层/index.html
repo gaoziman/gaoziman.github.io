@@ -1,0 +1,1991 @@
+<!DOCTYPE html>
+<html>
+  <!-- meta/link... -->
+  
+
+
+
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport">
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+
+
+  <title>计算机网络的网络层 | Hexo</title>
+
+  <link rel="icon" type="image/x-icon, image/vnd.microsoft.icon" href="/favicon.ico">
+  <link rel="stylesheet" href="https://at.alicdn.com/t/font_1911880_c1nvbyezg17.css">
+  <link href="https://unpkg.com/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet">
+  <link href="/js/swiper/swiper@5.4.1.min.css" rel="stylesheet">
+  
+  
+  
+  
+<link rel="stylesheet" href="/css/animate.min.css">
+
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+  
+    
+<link rel="stylesheet" href="/js/fancybox/jquery.fancybox.min.css">
+
+  
+  
+    
+<link rel="stylesheet" href="/js/shareJs/share.min.css">
+
+  
+  <style>
+        @media (max-width: 992px) {
+            #waifu {
+                display: none;
+            }
+        }
+    </style>
+    <script src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
+    <link href="//cdn.bootcss.com/pace/1.0.2/themes/pink/pace-theme-flash.css" rel="stylesheet">
+
+    
+
+    <!-- import link -->
+    
+        
+            
+        
+            
+        
+    
+    <!-- import script -->
+    
+        
+            
+        
+            
+        
+    
+
+<meta name="generator" content="Hexo 6.2.0"></head>
+
+  
+  <!-- 依赖于jquery和vue -->
+  
+    
+<script src="https://unpkg.com/jquery@3.5.1/dist/jquery.min.js"></script>
+
+  
+
+  
+    
+<script src="https://unpkg.com/vue@2.6.11/dist/vue.min.js"></script>
+
+  
+  
+  <body>
+    <!-- 预加载动画 -->
+    <!-- 页面预加载动画 -->
+
+<div id='loader'>
+  <link rel="stylesheet" href="/js/loaded/index.css" >
+  <div class="loading-left-bg"></div>
+  <div class="loading-right-bg"></div>
+  <div class="spinner-box">
+    <div class="configure-border-1">
+      <div class="configure-core"></div>
+    </div>
+    <div class="configure-border-2">
+      <div class="configure-core"></div>
+    </div>
+    <div class="loading-word">loading...</div>
+  </div>
+</div>
+
+<script>
+  var endLoading = function () {
+    document.body.style.overflow = 'auto';
+    document.getElementById('loader').classList.add("loading");
+  }
+  window.addEventListener('DOMContentLoaded',endLoading);
+  
+</script>
+
+    
+    <!-- 判断是否为暗黑风格 -->
+    <!-- 判断是否为黑夜模式 -->
+<script>
+  let isDark = JSON.parse(localStorage.getItem('dark')) || JSON.parse('false');
+
+  if (isDark) {
+    $(document.body).addClass('darkModel');
+  }
+</script>
+
+    <!-- 需要在上面加载的js -->
+    <script>
+  function loadScript(src, cb) {
+    return new Promise(resolve => {
+      setTimeout(function () {
+        var HEAD = document.getElementsByTagName("head")[0] || document.documentElement;
+        var script = document.createElement("script");
+        script.setAttribute("type", "text/javascript");
+        if (cb) {
+          if (JSON.stringify(cb)) {
+            for (let p in cb) {
+              if (p == "onload") {
+                script[p] = () => {
+                  cb[p]()
+                  resolve()
+                }
+              } else {
+                script[p] = cb[p]
+                script.onload = resolve
+              }
+            }
+          } else {
+            script.onload = () => {
+              cb()
+              resolve()
+            };
+          }
+        } else {
+          script.onload = resolve
+        }
+        script.setAttribute("src", src);
+        HEAD.appendChild(script);
+      });
+    });
+  }
+
+  //https://github.com/filamentgroup/loadCSS
+  var loadCSS = function (href, before, media, attributes) {
+    return new Promise(resolve => {
+      setTimeout(function () {
+        var link = document.createElement('link');
+        link.rel = "stylesheet";
+        link.href = src;
+        link.onload = resolve;
+        document.getElementsByTagName("head")[0].appendChild(link);
+      });
+    });
+  };
+
+</script> 
+
+<!-- 轮播图所需要的js -->
+<script src="/js/swiper/swiper.min.js"></script>
+<script src="/js/swiper/vue-awesome-swiper.js"></script>
+<script src="/js/swiper/swiper.animate1.0.3.min.js"></script>
+
+<script type="text/javascript">
+  Vue.use(window.VueAwesomeSwiper)
+</script>
+
+
+  <script src="/js/vue-typed-js/index.js"></script>
+
+
+<!-- 首页的公告滚动插件的js需要重新加载 -->
+<script src="/js/vue-seamless-scroll/index.js"></script>
+
+<!-- 打字机效果js -->
+<script src="https://unpkg.com/typed.js@2.0.11"></script>
+
+
+    <div id="safearea">
+      <main class="main" id="pjax-container">
+        <!-- 头部导航 -->
+        
+<header class="header   " 
+  id="navHeader"
+  style="position: fixed;
+  left: 0; top: 0; z-index: 10;width: 100%;"
+>
+  <div class="header-content">
+    <div class="bars">
+      <div id="appDrawer" class="sidebar-image">
+  <div class="drawer-box-icon">
+    <i class="fas fa-bars" aria-hidden="true" @click="showDialogDrawer"></i>
+  </div>
+  
+  <transition name="fade">
+    <div class="drawer-box_mask" v-cloak style="display: none;" v-show="visible" @click.self="cancelDialogDrawer">
+    </div>
+  </transition>
+  <div class="drawer-box" :class="{'active': visible}">
+    <div class="drawer-box-head bg-color">
+      <img class="drawer-box-head_logo lazyload placeholder" src="/medias/logo.png" class="lazyload placeholder" data-srcset="/medias/logo.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="logo">
+      <h3 class="drawer-box-head_title">Hexo</h3>
+      <h5 class="drawer-box-head_desc"></h5>
+    </div>
+    
+    <div class="drawer-box-content">
+      <ul class="drawer-box-content_menu">
+        
+        
+          <li class="drawer-box-content_item">
+            <a target="_blank" rel="noopener" href="https://github.com/yuang01/hexo-theme-bamboo">
+              <i class="fas fa-github" aria-hidden="true"></i>
+              <span>Github</span>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</div>
+
+<script>
+  var body = document.body || document.documentElement || window;
+  var vm = new Vue({
+    el: '#appDrawer',
+    data: {
+      visible: false,
+      top: 0,
+      openArr: [],
+    },
+    computed: {
+    },
+    mounted() {
+    },
+    methods: {
+      isOpen(index) {
+        if (this.openArr.includes(index)) {
+          return true;
+        } else {
+          return false;
+        }
+      },
+      openOrCloseMenu(curIndex) {
+        const index = this.openArr.indexOf(curIndex);
+        if (index !== -1) {
+          this.openArr.splice(index, 1);
+        } else {
+          this.openArr.push(curIndex);
+        }
+      },
+      showDialogDrawer() {
+        this.visible = true;
+        // 防止页面滚动，只能让弹框滚动
+        this.top = $(document).scrollTop()
+        body.style.cssText = 'width: 100%; height: 100%;overflow: hidden;';
+      },
+      cancelDialogDrawer() {
+        this.visible = false;
+        body.removeAttribute('style');
+        $(document).scrollTop(this.top)
+      }
+    },
+    created() {}
+  })
+</script>
+
+    </div>
+    <div class="blog-title" id="author-avatar">
+      
+        <div class="avatar">
+          <img src="/medias/logo.png" class="lazyload placeholder" data-srcset="/medias/logo.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="logo">
+        </div>
+      
+      <a href="/" class="logo">Hexo</a>
+    </div>
+    <nav class="navbar">
+      <ul class="menu">
+        
+      </ul>
+      
+      
+        <div id="appSearch">
+  <div class="search"  @click="showDialog()"><i class="fas fa-search" aria-hidden="true"></i></div>
+  <transition name="fade">
+    <div class="message-box_wrapper" style="display: none;" v-cloak v-show="dialogVisible" @click.self="cancelDialogVisible()">
+      <div class="message-box animated bounceInDown">
+        <h2>
+          <span>
+            <i class="fas fa-search" aria-hidden="true"></i>
+            <span class="title">Search</span>
+          </span>
+          <i class="fas fa-times close" pointer style="float:right;" aria-hidden="true" @click.self="cancelDialogVisible()"></i>
+        </h2>
+        <form class="site-search-form">
+          <input type="text"
+            placeholder="Please enter keywords"
+            id="local-search-input" 
+            @click="getSearchFile()"
+            class="st-search-input"
+            v-model="searchInput"
+          />
+        </form>
+        <div class="result-wrapper">
+          <div id="local-search-result" class="local-search-result-cls"></div>
+        </div>
+      </div>
+    </div>
+  </transition>
+</div>
+<script src="/js/local_search.js"></script>
+<script>
+  var body = document.body || document.documentElement || window;
+  var vm = new Vue({
+    el: '#appSearch',
+    data: {
+      dialogVisible: false,
+      searchInput: '',
+      top: 0,
+    },
+    computed: {
+    },
+    mounted() {
+      window.addEventListener('pjax:complete', () => {
+        this.cancelDialogVisible();
+      })
+    },
+    methods: {
+      showDialog() {
+        this.dialogVisible = true;
+        // 防止页面滚动，只能让弹框滚动
+        this.top = $(document).scrollTop()
+        body.style.cssText = 'overflow: hidden;';
+      },
+      getSearchFile() {
+        if (!this.searchInput) {
+          getSearchFile("/search.xml");
+        }
+      },
+      cancelDialogVisible() {
+        this.dialogVisible = false;
+        body.removeAttribute('style');
+        $(document).scrollTop(this.top)
+      },
+    },
+    created() {}
+  })
+</script>
+<!-- 解决刷新页面闪烁问题，可以在元素上添加display: none, 或者用vue.extend方法，详情：https://blog.csdn.net/qq_31393401/article/details/81017912 -->
+<!-- 下面是搜索基本写法 -->
+<!-- <script type="text/javascript" id="local.search.active">
+  var inputArea = document.querySelector("#local-search-input");
+  inputArea.onclick   = function(){ getSearchFile(); this.onclick = null }
+  inputArea.onkeydown = function(){ if(event.keyCode == 13) return false }
+</script> -->
+
+      
+
+    </nav>
+  </div>
+  
+    <a target="_blank" rel="noopener" href="https://github.com/yuang01/hexo-theme-bamboo" class="github-corner color-primary" aria-label="View source on GitHub"><svg width="60" height="60" viewBox="0 0 250 250" style="fill:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+  
+  
+</header>
+        <!-- 内容区域 -->
+        
+ <!-- prismjs 代码高亮 -->
+ 
+
+
+<div class="bg-dark-floor" style="position: fixed;left: 0;top: 0;width: 100%;height: 100%;z-index: -1;"></div>
+
+
+  <!-- 文章详情页顶部图片和标题 -->
+
+
+
+
+<div class="post-detail-header" id="thumbnail_canvas" style="background-repeat: no-repeat; background-size: cover; 
+  background-position: center center;position: relative;background-image:url('/medias/10.jpg')">
+  <div class="post-detail-header-mask"></div>
+  <canvas id="header_canvas"style="position:absolute;bottom:0;pointer-events:none;"></canvas>
+  
+  <div class="post-detail-header_info-box">
+    <div class="title-box">
+      <span class="title">
+        计算机网络的网络层
+      </span>
+    </div>
+    
+    
+      
+        <span class="post-detail-header_date">
+          <i class="fas fa-calendar"></i> Published in：2022-05-03 |
+        </span>
+      
+
+      
+        <span class="post-detail-header_categories">
+          <i class="iconfont iconbookmark1"></i> category：
+          
+            <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" class="post-detail-header_category">
+              计算机网络
+            </a>
+          
+        </span>
+      
+
+      
+    
+  </div>
+  
+  
+    <script src="/js/bubble/bubble.js"></script>
+  
+</div>
+
+
+
+
+
+<div class="post-detail-content row justify-position" 
+  style="padding-top: 0px;">
+  <div class="main-content">
+    <article class="post post-detail">
+      <div class="post-content">
+        <h1 id="计算机网络的网络层"><a href="#计算机网络的网络层" class="headerlink" title="计算机网络的网络层"></a>计算机网络的网络层</h1><p><img src="https://s3.ax1x.com/2021/01/03/spO8e0.png" class="lazyload placeholder" data-srcset="https://s3.ax1x.com/2021/01/03/spO8e0.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>前面我们学习了运输层如何为客户端和服务器输送数据的，提供进程端到端的通信。那么下面我们将学习网络层实际上是怎样实现主机到主机的通信服务的。<strong>几乎每个端系统都有网络层这一部分</strong>。所以，网络层必然是很复杂的。下面我将花费大量篇幅来介绍一下计算机网络层的知识。</p>
+<h2 id="网络层概述"><a href="#网络层概述" class="headerlink" title="网络层概述"></a>网络层概述</h2><p>网络层是 OSI 参考模型的第三层，它位于传输层和链路层之间，网络层的主要目的是实现两个端系统之间透明的数据传输。</p>
+<img src="https://s3.ax1x.com/2020/12/22/rBOInf.png" class="lazyload placeholder" data-srcset="https://s3.ax1x.com/2020/12/22/rBOInf.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" style="zoom:50%;" />
+
+<p>网络层的作用从表面看上去非常简单，即将<code>分组</code>从一台主机移动到另外一台主机。为了实现这个功能，网络层需要两种功能</p>
+<ul>
+<li><code>转发</code>：因为在互联网中有很多<code>路由器</code>的存在，而路由器是构成互联网的根本，路由器最重要的一个功能就是<code>分组转发</code>，当一个分组到达某路由器的一条输入链路时，该路由器会将分组移动到适当的输出链路。转发是在数据平面中实现的唯一功能。</li>
+</ul>
+<blockquote>
+<p>在网络中存在两种平面的选择</p>
+<ul>
+<li>数据平面(data plane)：负责转发网络流量，如路由器交换机中的转发表（我们后面会说）。</li>
+<li>控制平面(control plane)：控制网络的行为，比如网络路径的选择。</li>
+</ul>
+</blockquote>
+<ul>
+<li><code>路由选择</code>：当分组由发送方流向接收方时，网络层必须选择这些分组的路径。计算这些路径选择的算法被称为 <code>路由选择算法(routing algorithm)</code>。</li>
+</ul>
+<p>也就是说，<strong>转发是指将分组从一个输入链路转移到适当输出链路接口的路由器本地动作</strong>。而路由选择是指确定分组从源到目的地所定位的路径的选择。我们后面会经常提到转发和路由选择这两个名词。</p>
+<blockquote>
+<p>那么此处就有一个问题，路由器怎么知道有哪些路径可以选择呢？</p>
+</blockquote>
+<p>每台路由器都有一个关键的概念就是 <code>转发表(forwarding table)</code>。路由器通过检查数据包标头中字段的值，来定位转发表中的项来实现转发。标头中的值即对应着转发表中的值，这个值指出了分组将被转发的路由器输出链路。如下图所示</p>
+<p><img src="https://s3.ax1x.com/2020/12/22/rBOTHS.png" class="lazyload placeholder" data-srcset="https://s3.ax1x.com/2020/12/22/rBOTHS.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>上图中有一个 1001 分组到达路由器后，首先会在转发表中进行索引，然后由路由选择算法决定分组要走的路径。每台路由器都有两种功能：<strong>转发和路由选择</strong>。下	面我们就来聊一聊路由器的工作原理。</p>
+<h2 id="路由器工作原理"><a href="#路由器工作原理" class="headerlink" title="路由器工作原理"></a>路由器工作原理</h2><p>下面是一个路由器体系结构图，路由器主要是由 4 个组件构成的</p>
+<p><img src="https://s3.ax1x.com/2020/12/22/rBOoB8.png" class="lazyload placeholder" data-srcset="https://s3.ax1x.com/2020/12/22/rBOoB8.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<ul>
+<li>输入端口：<code>输入端口(input port)</code>有很多功能。<code>线路终端功能</code>和<code>数据链路处理</code>功能，这两个功能实现了路由器的单个输入链路相关联的物理层和数据链路层。<code>输入端口查找/转发功能</code>对路由器的交换功能来说至关重要，由路由器的交换结构来决定输出端口，具体来讲应该是查询转发表来确定的。</li>
+<li>交换结构：<code>交换结构(Switching fabric)</code>就是将路由器的输入端口连接到它的输出端口。这种交换结构相当于是路由器内部的网络。</li>
+<li>输出端口：<code>输出端口(Output ports)</code> 通过交换结构转发分组，并通过物理层和数据链路层的功能传输分组，因此，输出端口作为输入端口执行反向数据链接和物理层功能。</li>
+<li>路由选择处理器：<code>路由选择处理器(Routing processor)</code> 在路由器内执行路由协议，维护路由表并执行网络管理功能。</li>
+</ul>
+<p>上面只是这几个组件的简单介绍，其实这几个组件的组成并不像描述的那样简单，下面我们就来深入聊一聊这几个组件。</p>
+<h3 id="输入端口"><a href="#输入端口" class="headerlink" title="输入端口"></a>输入端口</h3><p>上面介绍了输入端口有很多功能，包括线路终端、数据处理、查找转发，其实这些功能在输入端口的内部有相应的模块，输入端口的内部实现如下图所示</p>
+<p><img src="https://s3.ax1x.com/2020/12/22/rBOhct.png" class="lazyload placeholder" data-srcset="https://s3.ax1x.com/2020/12/22/rBOhct.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>每个输入端口中都有一个路由处理器维护的<strong>路由表的副本</strong>，根据路由处理器进行更新。这个路由表的副本能		够使每个输入端口进行切换，而无需经过路由处理器统一处理。这是一种<code>分散式</code>的切换，这种方式避免了路		由选择器统一处理造成转发瓶颈。</p>
+<p>在输入端口处理能力有限的路由器中，输入端口不会进行交换功能，而是由路由处理器统一处理，然后根据		路由表查找并将数据包转发到相应的输出端口。</p>
+<blockquote>
+<p>一般这种路由器不是单独的路由器，而是工作站或者服务器充当的路由，这种路由器内部中，路由处理器其实就是 <code>CPU</code>，而输入端口其实只是<code>网卡</code>。</p>
+</blockquote>
+<p>输入端口会根据转发表定位输出端口，然后再会进行分组转发，那么现在就有一个问题，是不是每一个分组都有自己的一条链路呢？如果分组数量非常大，到达亿级的话，也会有亿个输出端口路径吗？</p>
+<p>我们的潜意识中显然不是的，来看下面一个例子。</p>
+<p>下面是三个输入端口对应了转发表中的三个输出链路的示例</p>
+<p><img src="https://s3.ax1x.com/2020/12/22/rBOHAg.png" class="lazyload placeholder" data-srcset="https://s3.ax1x.com/2020/12/22/rBOHAg.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>可以看到，对于这个例子来说，路由器转发表中不需要那么多条链路，只需要四条就够，即对应输出链路 0 1 2 3 。也就是说，能够使用 4 个转发表就可以实现亿级链路。</p>
+<blockquote>
+<p>如何实现呢？</p>
+</blockquote>
+<p>使用这种风格的转发表，路由器分组的地址 <code>前缀(prefix)</code> 会与该表中的表项进行匹配。</p>
+<p><img src="https://s3.ax1x.com/2020/12/22/rBObNQ.png" class="lazyload placeholder" data-srcset="https://s3.ax1x.com/2020/12/22/rBObNQ.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>如果存在一个匹配项，那么就会转发到对应的链路上，可能不好理解，我举个例子来说吧。</p>
+<p>比如这时有一个分组是 11000011 10010101 00010000 0001100 到达，因为这个分组与 11000011 10010101 00010000 相匹配，所以路由器会转发到 0 链路接口上。如果一个前缀不匹配上面三个输出链路中的一种，那么路由器将向链路接口 3 进行转发。</p>
+<p>路由匹配遵循 <code>最长前缀原则(longest prefix matching rule)</code>，最长匹配原则故名思义就是如果有两个匹配项一个长一个短的话，就匹配最长的。</p>
+<p>一旦通过查找功能确定了分组的输出端口后，那么该分组就会进入交换结构。在进入交换结构时，如果交换结构正在被使用，就会阻塞新到的分组，等到交换结构调度新的分组。</p>
+<h3 id="交换结构"><a href="#交换结构" class="headerlink" title="交换结构"></a>交换结构</h3><p>交换结构是路由器的核心功能，通过交换功能把分组从输入端口转发至输出端口，这就是交换结构的主要功能。交换结构有多种形式，主要分为 <strong>通过内存交换、通过总线交换、通过互联网络进行交换</strong>，下面我们分开来探讨一下。</p>
+<ul>
+<li>经过内存交换：最开始的传统计算机就是使用<code>内存交换</code>的，在输入端口和输出端口之间是通过 CPU 进行的。输入端口和输出端口的功能就好像传统操作系统中的 I&#x2F;O 设备一样。当一个分组到达输入端口时，这个端口会首先以<code>中断</code> 的方式向路由选择器发出信号，将分组从输入端口拷贝到内存中。然后，路由选择处理器从分组首部中提取目标地址，在转发表中找出适当的输出端口进行转发，同时将分组复制到输出端口的缓存中。</li>
+</ul>
+<blockquote>
+<p>这里需要注意一点，如果内存带宽以每秒读取或者写入 B 个数据包，那么总的交换机吞吐量(数据包从输入端口到输出端口的总速率) 必须小于 B&#x2F;2。</p>
+</blockquote>
+<p><img src="https://s3.ax1x.com/2020/12/22/rBOqhj.png" class="lazyload placeholder" data-srcset="https://s3.ax1x.com/2020/12/22/rBOqhj.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<ul>
+<li>经过总线交换：在这种处理方式中，总线经由输入端口直接将分组传送到输出端口，中间不需要路由选择器的干预。总线的工作流程如下：输入端口给分组分配一个<code>标签</code>，然后分组经由总线发送给所有的输出端口，每个输出端口都会判断标签中的端口和自己的是否匹配，如果匹配的话，那么这个输出端口就会把标签拆掉，这个标签只用于交换机内部跨越总线。如果同时有 <code>多个</code> 分组到达路由器的话，那么只有一个分组能够被处理，其他分组需要再进入交换结构前等待。</li>
+</ul>
+<p><img src="https://s3.ax1x.com/2020/12/22/rBOO9s.png" class="lazyload placeholder" data-srcset="https://s3.ax1x.com/2020/12/22/rBOO9s.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<ul>
+<li>经过互联网络交换：克服单一、共享式总线带宽限制的一种方法是使用一个更复杂的互联网络。如下图所示</li>
+</ul>
+<p><img src="https://s3.ax1x.com/2020/12/22/rBOX3n.png" class="lazyload placeholder" data-srcset="https://s3.ax1x.com/2020/12/22/rBOX3n.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>每条垂直的的总线在交叉点与每条水平的总线交叉，交叉点通过交换结构控制器能够在任何时候开启和闭合。当分组到达输入端口 A 时，如果需要转发到端口 X，交换机控制器会闭合 A 到 X 交叉部分的交叉点，然后端口 A 在总线上进行分组转发。这种网络互联式的交换结构是 <code>非阻塞的(non-blocking)</code>的，也就是说 A -&gt; X 的交叉点闭合不会影响 B -&gt; Y 的链路。如果来自两个不同输入端口的两个分组其目的地为相同的输出端口的话，这种情况下只能有一个分组被交换，另外一个分组必须进行等待。</p>
+<h3 id="输出端口处理"><a href="#输出端口处理" class="headerlink" title="输出端口处理"></a>输出端口处理</h3><p>如下图所示，输出端口处理取出已经存放在输出端口内存中的分组并将其发送到输出链路上。包括选择和去除排队的分组进行传输，执行所需的链路层和物理层的功能。</p>
+<p><img src="https://s3.ax1x.com/2020/12/22/rBOjcq.png" class="lazyload placeholder" data-srcset="https://s3.ax1x.com/2020/12/22/rBOjcq.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>在输入端口中有等待进入交换的排队队列，而在输出端口中有等待转发的排队队列，排队的位置和程度取决于<strong>流量负载、交换结构</strong>的相对频率和线路速率。</p>
+<p>随着队列的不断增加，会导致路由器的缓存空间被耗尽，进而使没有内存可以存储溢出的队列，致使分组出现<code>丢包(packet loss)</code>，这就是我们说的在网络中丢包或者被路由器丢弃。</p>
+<h2 id="何时出现排队"><a href="#何时出现排队" class="headerlink" title="何时出现排队"></a>何时出现排队</h2><p>下面我们通过输入端口的排队队列和输出端口的排队队列来介绍一下可能出现的排队情况。</p>
+<h3 id="输入队列"><a href="#输入队列" class="headerlink" title="输入队列"></a>输入队列</h3><p>如果交换结构的处理速度没有输入队列到达的速度快，在这种情况下，输入端口将会出现排队情况，到达交换结构前的分组会加入输入端口队列中，以等待通过交换结构传送到输出端口。</p>
+<p>为了描述清楚输入队列，我们假设以下情况：</p>
+<ul>
+<li>使用网络互联的交换方式；</li>
+<li>假定所有链路的速度相同；</li>
+<li>在链路中一个分组由输入端口交换到输出端口所花的时间相同，从任意一个输入端口传送到给定的输出端口；</li>
+<li>分组按照 FCFS 的方式，只要输出端口不同，就可以进行并行传送。但是如果位于任意两个输入端口中的分组是发往同一个目的地的，那么其中的一个分组将被阻塞，而且必须在输入队列中等待，因为交换结构一次只能传输一个到指定端口。</li>
+</ul>
+<p>如下图所示</p>
+<p><img src="https://s3.ax1x.com/2020/12/22/rBOvj0.png" class="lazyload placeholder" data-srcset="https://s3.ax1x.com/2020/12/22/rBOvj0.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>在 A 队列中，输入队列中的两个分组会发送至同一个目的地 X，假设在交换结构正要发送 A 中的分组，在这个时候，C 队列中也有一个分组发送至 X，在这种情况下，C 中发送至 X 的分组将会等待，不仅如此，C 队列中发送至 Y 输出端口的分组也会等待，即使 Y 中没有出现竞争的情况。这种现象叫做 <code>线路前部阻塞(Head-Of-The-Line, HOL)</code> 。</p>
+<h3 id="输出队列"><a href="#输出队列" class="headerlink" title="输出队列"></a>输出队列</h3><p>我们下面讨论输出队列中出现等待的情况。假设交换速率要比输入&#x2F;输出的传输速率快很多，而且有 N 个输入分组的目的地是转发至相同的输出端口。在这种情况下，在向输出链路发送分组的过程中，将会有 N 个新分组到达传输端口。因为输出端口在一个单位时间内只能传输一个分组，那么这 N 个分组将会等待。然而在等待 N 个分组被处理的过程中，同时又有 N 个分组到达，所以 ，分组队列能够在输出端口形成。这种情况下最终会因为分组数量变的足够大，从而<code>耗尽</code> 输出端口的可用内存。</p>
+<p>如果没有足够的内存来缓存分组的话，就必须考虑其他的方式，主要有两种：一种是丢失分组，采用 <code>弃尾(drop-tail)</code> 的方法；一种是删除一个或多个已经排队的分组，从而来为新的分组腾出空间。</p>
+<blockquote>
+<p>网络层的策略对 TCP 拥塞控制影响很大的就是路由器的分组丢弃策略。在最简单的情况下，路由器的队列通常都是按照 FCFS 的规则处理到来的分组。由于队列长度总是有限的，因此当队列已经满了的时候，以后再到达的所有分组（如果能够继续排队，这些分组都将排在队列的尾部）将都被丢弃。这就叫做尾部丢弃策略。</p>
+</blockquote>
+<p>通常情况下，在缓冲填满之前将其丢弃是更好的策略。</p>
+<p><img src="https://s3.ax1x.com/2020/12/22/rBOzuV.png" class="lazyload placeholder" data-srcset="https://s3.ax1x.com/2020/12/22/rBOzuV.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>如上图所示，A B C 每个输入端口都到达了一个分组，而且这个分组都是发往 X 的，同一时间只能处理一个分组，然后这时，又有两个分组分别由 A B 发往 X，所以此时有 4 个分组在 X 中进行等待。</p>
+<p><img src="https://s3.ax1x.com/2020/12/22/rBXpHU.png" class="lazyload placeholder" data-srcset="https://s3.ax1x.com/2020/12/22/rBXpHU.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>等上一个分组被转发完成后，输出端口就会选择在剩下的分组中根据 <code>分组调度(packet scheduleer)</code> 选择一个分组来进行传输，我们下面就会聊到分组传输。</p>
+<h2 id="分组调度"><a href="#分组调度" class="headerlink" title="分组调度"></a>分组调度</h2><p>现在我们来讨论一下分组调度次序的问题，即排队的分组如何经输出链路传输的问题。我们生活中有无数排队的例子，但是我们生活中一般的排队算法都是 <code>先来先服务(FCFS)</code>，也是<code>先进先出(FIFO)</code>。</p>
+<h3 id="先进先出"><a href="#先进先出" class="headerlink" title="先进先出"></a>先进先出</h3><p>先进先出就映射为数据结构中的<code>队列</code>，只不过它现在是链路调度规则的排队模型。</p>
+<p><img src="https://s3.ax1x.com/2020/12/22/rBXSBT.png" class="lazyload placeholder" data-srcset="https://s3.ax1x.com/2020/12/22/rBXSBT.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>FIFO 调度规则按照分组到达输出链路队列的相同次序来选择分组，先到达队列的分组将先会被转发。在这种抽象模型中，如果队列已满，那么弃尾的分组将是队列末尾的后面一个。</p>
+<h3 id="优先级排队"><a href="#优先级排队" class="headerlink" title="优先级排队"></a>优先级排队</h3><p>优先级排队是先进先出排队的改良版本，到达输出链路的分组被分类放入输出队列中的优先权类，如下图所示</p>
+<p><img src="https://s3.ax1x.com/2020/12/22/rBXCEF.png" class="lazyload placeholder" data-srcset="https://s3.ax1x.com/2020/12/22/rBXCEF.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>通常情况下，每个优先级不同的分组有自己的优先级类，每个优先级类有自己的队列，分组传输会首先从优先级高的队列中进行，在同一类优先级的分组之间的选择通常是以 FIFO 的方式完成。</p>
+<h3 id="循环加权公平排队"><a href="#循环加权公平排队" class="headerlink" title="循环加权公平排队"></a>循环加权公平排队</h3><p>在<code>循环加权公平规则(round robin queuing discipline)</code> 下，分组像使用优先级那样被分类。然而，在类之间却不存在严格的服务优先权。循环调度器在这些类之间循环轮流提供服务。如下图所示</p>
+<p><img src="https://s3.ax1x.com/2020/12/22/rBXPN4.png" class="lazyload placeholder" data-srcset="https://s3.ax1x.com/2020/12/22/rBXPN4.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>在循环加权公平排队中，类 1 的分组被传输，接着是类 2 的分组，最后是类 3 的分组，这算是一个循环，然后接下来又重新开始，又从 1 -&gt; 2 -&gt; 3 这个顺序进行轮询。每个队列也是一个先入先出的队列。</p>
+<p>这是一种所谓的<code>保持工作排队(work-conserving queuing)</code> 的规则，就是说如果轮询的过程中发现有空队列，输出端口不会等待分组，而是继续轮询下面的队列。</p>
+<h2 id="IP-协议"><a href="#IP-协议" class="headerlink" title="IP 协议"></a>IP 协议</h2><p>路由器对分组进行转发后，就会把数据包传到网络上，数据包最终是要传递到客户端或者服务器上的，那么数据包怎么知道要发往哪里呢？起到关键作用的就是 IP 协议。</p>
+<p>IP 主要分为三个部分，分别是 <strong>IP 寻址、路由和分包组包</strong>。下面我们主要围绕这三点进行阐述。</p>
+<h3 id="IP-地址"><a href="#IP-地址" class="headerlink" title="IP 地址"></a>IP 地址</h3><p>既然一个数据包要在网络上传输，那么肯定需要知道这个数据包到底发往哪里，也就是说需要一个目标地址信息，<strong>IP 地址就是连接网络中的所有主机进行通信的目标地址</strong>，因此，在网络上的每个主机都需要有自己的 IP 地址。</p>
+<p><img src="https://s3.ax1x.com/2020/12/22/rBXi4J.png" class="lazyload placeholder" data-srcset="https://s3.ax1x.com/2020/12/22/rBXi4J.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>在 IP 数据报发送的链路中，有可能链路非常长，比如说由中国发往美国的一个数据报，由于网络抖动等一些意外因素可能会导致数据报丢失，这时我们在这条链路中会放入一些 <code>中转站</code>，一方面能够确保数据报是否丢失，另一方面能够控制数据报的转发，这个中转站就是我们前面聊过的路由器，这个转发过程就是 <code>路由控制</code>。</p>
+<p><code>路由控制(Routing)</code> 是指将分组数据发送到最终目标地址的功能，即使网络复杂多变，也能够通过路由控制到达目标地址。因此，一个数据报能否到达目标主机，关键就在于路由器的控制。</p>
+<p>这里有一个名词，就是 <code>跳</code>，因为在一条链路中可能会布满很多路由器，路由器和路由器之间的数据报传送就是跳，比如你和隔壁老王通信，中间就可能会经过路由器 A-&gt; 路由器 B -&gt; 路由器 C 。</p>
+<blockquote>
+<p>那么一跳的范围有多大呢？</p>
+</blockquote>
+<p><strong>一跳是指从源 MAC 地址到目标 MAC 地址之间传输帧的区间</strong>，这里引出一个新的名词，MAC 地址是啥？</p>
+<p>MAC 地址指的就是计算机的<code>物理地址(Physical Address)</code>，它是用来确认网络设备位置的地址。在 OSI 网络模型中，网络层负责 IP 地址的定位，而数据链路层负责 MAC 地址的定位。MAC 地址用于在网络中唯一标示一个网卡，一台设备若有一或多个网卡，则每个网卡都需要并会有一个唯一的 MAC 地址，也就是说 MAC 地址和网卡是紧密联系在一起的。</p>
+<p>路由器的每一跳都需要询问当前中转的路由器，下一跳应该跳到哪里，从而跳转到目标地址。而不是数据报刚开始发送后，网络中所有的通路都会显示出来，这种多次跳转也叫做<code>多跳路由</code>。</p>
+<h4 id="IP-地址定义"><a href="#IP-地址定义" class="headerlink" title="IP 地址定义"></a>IP 地址定义</h4><p>现如今有两个版本的 IP 地址，IPv4 和 IPv6，我们首先探讨一下现如今还在广泛使用的 IPv4 地址，后面再考虑 IPv6 。</p>
+<p>IPv4 由 32 位正整数来表示，在计算机内部会转化为二进制来处理，但是二进制不符合人类阅读的习惯，所以我们根据<code>易读性</code>的原则把 32 位的 IP 地址以 8 位为一组，分成四组，每组之间以 <code>.</code> 进行分割，再将每组转换为十进制数。如下图所示</p>
+<p><img src="https://s3.ax1x.com/2020/12/22/rBXkC9.png" class="lazyload placeholder" data-srcset="https://s3.ax1x.com/2020/12/22/rBXkC9.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>那么上面这个 32 位的 IP 地址就会被转换为十进制的 156.197.1.1。</p>
+<p>除此之外，从图中我们还可以得到如下信息</p>
+<p>每个这样 8 位位一组的数字，自然是非负数，其取值范围是 [0,255]。</p>
+<p>IP 地址的总个数有 2^32 次幂个，这个数值算下来是 <code>4294967296</code> ，大概能允许 43 亿台设备连接到网络。实际上真的如此吗？</p>
+<p>实际上 IP 不会以主机的个数来配置的，而是根据设备上的 <code>网卡(NIC)</code> 进行配置，每一块网卡都会设置一个或者多个 IP 地址，而且通常一台路由器会有至少两块网卡，所以可以设置两个以上的 IP 地址，所以主机的数量远远达不到 43 亿。</p>
+<p><img src="https://s3.ax1x.com/2020/12/22/rBXA3R.png" class="lazyload placeholder" data-srcset="https://s3.ax1x.com/2020/12/22/rBXA3R.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<h4 id="IP-地址构造和分类"><a href="#IP-地址构造和分类" class="headerlink" title="IP 地址构造和分类"></a>IP 地址构造和分类</h4><p>IP 地址由 <code>网络标识</code> 和 <code>主机标识</code> 两部分组成，网络标识代表着网络地址，主机标识代表着主机地址。网络标识在数据链路的每个段配置不同的值。网络标识必须保证相互连接的每个段的地址都不重复。而相同段内相连的主机必须有相同的网络地址。IP 地址的 <code>主机标识</code> 则不允许在同一网段内重复出现。</p>
+<p>举个例子来说：比如说我在石家庄(好像不用比如昂)，我所在的小区的某一栋楼就相当于是网络标识，某一栋楼的第几户就相当于是我的主机标识，当然如果你有整栋楼的话，那就当我没说。你可以通过xx省xx市xx区xx路xx小区xx栋来定位我的网络标识，这一栋的第几户就相当于是我的网络标识。</p>
+<p>IP 地址分为四类，分别是 <strong>A类、B类、C类、D类、E类</strong>，它会根据 IP 地址中的第 1 位到第 4 位的比特对网络标识和主机标识进行分类。</p>
+<ul>
+<li><p><code>A 类</code>：(1.0.0.0 - 126.0.0.0)（默认子网掩码：255.0.0.0 或 0xFF000000）第一个字节为网络号，后三个字节为主机号。该类 IP 地址的最前面为 0 ，所以地址的网络号取值于 1~126 之间。一般用于大型网络。</p>
+</li>
+<li><p><code>B 类</code>：(128.0.0.0 - 191.255.0.0)（默认子网掩码：255.255.0.0 或 0xFFFF0000）前两个字节为网络号，后两个字节为主机号。该类 IP 地址的最前面为 10 ，所以地址的网络号取值于 128~191 之间。一般用于中等规模网络。</p>
+</li>
+<li><p><code>C 类</code>：(192.0.0.0 - 223.255.255.0)（子网掩码：255.255.255.0 或 0xFFFFFF00）前三个字节为网络号，最后一个字节为主机号。该类 IP 地址的最前面为 110 ，所以地址的网络号取值于 192~223 之间。一般用于小型网络。</p>
+</li>
+<li><p><code>D 类</code>：是多播地址。该类 IP 地址的最前面为 1110 ，所以地址的网络号取值于 224~239 之间。一般用于多路广播用户。</p>
+</li>
+<li><p><code>E 类</code>：是保留地址。该类 IP 地址的最前面为 1111 ，所以地址的网络号取值于 240~255 之间。</p>
+</li>
+</ul>
+<p>为了方便理解，我画了一张 IP 地址分类图，如下所示</p>
+<p><img src="https://s3.ax1x.com/2020/12/22/rBXEg1.png" class="lazyload placeholder" data-srcset="https://s3.ax1x.com/2020/12/22/rBXEg1.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>根据不同的 IP 范围，有下面不同的地总空间分类</p>
+<p><img src="https://s3.ax1x.com/2020/12/22/rBXVjx.png" class="lazyload placeholder" data-srcset="https://s3.ax1x.com/2020/12/22/rBXVjx.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<h4 id="子网掩码"><a href="#子网掩码" class="headerlink" title="子网掩码"></a>子网掩码</h4><p><code>子网掩码(subnet mask)</code> 又叫做网络掩码，它是一种用来指明一个 IP 地址的哪些位标识的是主机所在的网络。子网掩码是一个 32位 地址，用于屏蔽 IP 地址的一部分以区别网络标识和主机标识。</p>
+<p>一个 IP 地址只要确定了其分类，也就确定了它的网络标识和主机标识，由此，各个分类所表示的网络标识范围如下</p>
+<p><img src="https://s3.ax1x.com/2020/12/22/rBXmDK.png" class="lazyload placeholder" data-srcset="https://s3.ax1x.com/2020/12/22/rBXmDK.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>用 <code>1</code> 表示 IP 网络地址的比特范围，<code>0</code> 表示 IP 主机地址的范围。将他们用十进制表示，那么这三类的表示如下</p>
+<p><img src="https://s3.ax1x.com/2020/12/22/rBXeu6.png" class="lazyload placeholder" data-srcset="https://s3.ax1x.com/2020/12/22/rBXeu6.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<h4 id="保留地址"><a href="#保留地址" class="headerlink" title="保留地址"></a>保留地址</h4><p>在IPv4 的几类地址中，有几个保留的地址空间不能在互联网上使用。这些地址用于特殊目的，不能在局域网外部路由。</p>
+<p><img src="https://s3.ax1x.com/2020/12/22/rBXnHO.png" class="lazyload placeholder" data-srcset="https://s3.ax1x.com/2020/12/22/rBXnHO.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<h3 id="IP-协议版本"><a href="#IP-协议版本" class="headerlink" title="IP 协议版本"></a>IP 协议版本</h3><p>目前，全球 Internet 中共存有两个IP版本：<code>IP 版本 4（IPv4）</code>和 <code>IP 版本6（IPv6）</code>。 IP 地址由二进制值组成，可驱动 Internet 上所有数据的路由。 IPv4 地址的长度为 32 位，而 IPv6 地址的长度为 128 位。</p>
+<p>Internet IP 资源由 <code>Internet 分配号码机构（IANA）</code>分配给区域 Internet 注册表（RIR），例如 APNIC，该机构负责根 DNS ，IP 寻址和其他 Internet 协议资源。</p>
+<p>下面我们就一起认识一下 IP 协议中非常重要的两个版本 IPv4 和 IPv6。</p>
+<h3 id="IPv4"><a href="#IPv4" class="headerlink" title="IPv4"></a>IPv4</h3><p>IPv4 的全称是 <code>Internet Protocol version 4</code>，是 Internet 协议的第四版。IPv4 是一种无连接的协议，这个协议会尽最大努力交付数据包，也就是说它不能保证任何数据包能到达目的地，也不能保证所有的数据包都会按照正确的顺序到达目标主机，这些都是由上层比如传输控制协议控制的。也就是说，单从 IP 看来，这是一个不可靠的协议。</p>
+<blockquote>
+<p>前面我们讲过网络层分组被称为 <code>数据报</code>，所以我们接下来的叙述也会围绕着数据报展开。</p>
+</blockquote>
+<p>IPv4 的数据报格式如下</p>
+<p><img src="https://s3.ax1x.com/2020/12/22/rBXKED.png" class="lazyload placeholder" data-srcset="https://s3.ax1x.com/2020/12/22/rBXKED.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>IPv4 数据报中的关键字及其解释</p>
+<ul>
+<li><code>版本字段(Version)</code>占用 4 bit，通信双方使用的版本必须一致，对于 IPv4 版本来说，字段值是 4。</li>
+<li><code>首部长度(Internet Header Length)</code> 占用 4 bit，首部长度说明首部有多少 32 位(4 字节)。由于 IPv4 首部可能包含不确定的选项，因此这个字段被用来确定数据的偏移量。大多数 IP 不包含这个选项，所以一般首部长度设置为 5， 数据报为 20 字节 。</li>
+<li><code>服务类型(Differential Services Codepoint，DSCP)</code> 占用 6 bit，以便使用不同的 IP 数据报，比如一些低时延、高吞吐量和可靠性的数据报。服务类型如下表所示</li>
+</ul>
+<img src="https://s3.ax1x.com/2020/12/22/rBXMUe.png" class="lazyload placeholder" data-srcset="https://s3.ax1x.com/2020/12/22/rBXMUe.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" style="zoom:50%;" />
+
+<ul>
+<li><p><code>拥塞通告(Explicit Congestion Notification，ECN)</code> 占用 2 bit，它允许在不丢弃报文的同时通知对方网络拥塞的发生。ECN 是一种可选的功能，仅当两端都支持并希望使用，且底层网络支持时才被使用。		最开始 DSCP 和 ECN 统称为 TOS，也就是区分服务，但是后来被细化为了 DSCP 和 ECN。</p>
+</li>
+<li><p><code>数据报长度(Total Length)</code> 占用 16 bit，这 16 位是包括在数据在内的总长度，理论上数据报的总长度为 2 的 16 次幂 - 1，最大长度是 65535 字节，但是实际上数据报很少有超过 1500 字节的。IP 规定所有主机都必须支持最小 576 字节的报文，但大多数现代主机支持更大的报文。当下层的数据链路协议的<code>最大传输单元（MTU）</code>字段的值小于 IP 报文长度时，报文就必须被分片。</p>
+</li>
+<li><p><code>标识符(Identification)</code> 占用 16 bit，这个字段用来标识所有的分片，因为分片不一定会按序到达，所以到达目标主机的所有分片会进行重组，每产生一个数据报，计数器加1，并赋值给此字段。</p>
+</li>
+<li><p><code>标志(Flags)</code> 占用 3 bit，标志用于控制和识别分片，这 3 位分别是</p>
+<ul>
+<li>0 位：保留，必须为0；</li>
+<li>1 位：<code>禁止分片（Don’t Fragment，DF）</code>，当 DF &#x3D; 0 时才允许分片；</li>
+<li>2 位：<code>更多分片（More Fragment，MF）</code>，MF &#x3D; 1 代表后面还有分片，MF &#x3D; 0 代表已经是最后一个分片。</li>
+</ul>
+<p>如果 DF 标志被设置为 1 ，但是路由要求必须进行分片，那么这条数据报回丢弃</p>
+</li>
+<li><p><code>分片偏移(Fragment Offset)</code> 占用 13 位，它指明了每个分片相对于原始报文开头的偏移量，以 8 字节作单位。</p>
+</li>
+<li><p><code>存活时间(Time To Live，TTL)</code> 占用 8 位，存活时间避免报文在互联网中<code>迷失</code>，比如陷入路由环路。存活时间以秒为单位，但小于一秒的时间均向上取整到一秒。在现实中，这实际上成了一个跳数计数器：报文经过的每个路由器都将此字段减 1，当此字段等于 0 时，报文不再向下一跳传送并被丢弃，这个字段最大值是 255。</p>
+</li>
+<li><p><code>协议(Protocol)</code> 占用 8 位，这个字段定义了报文数据区使用的协议。协议内容可以在 <a target="_blank" rel="noopener" href="https://www.iana.org/assignments/protocol-numbers/protocol-numbers.xhtml">https://www.iana.org/assignments/protocol-numbers/protocol-numbers.xhtml</a> 官网上获取。</p>
+</li>
+<li><p><code>首部校验和(Header Checksum)</code> 占用 16 位，首部校验和会对字段进行纠错检查，在每一跳中，路由器都要重新计算出的首部检验和并与此字段进行比对，如果不一致，此报文将会被丢弃。</p>
+</li>
+<li><p><code>源地址(Source address)</code> 占用 32 位，它是 IPv4 地址的构成条件，源地址指的是数据报的发送方</p>
+</li>
+<li><p><code>目的地址(Destination address)</code>占用 32 位，它是 IPv4 地址的构成条件，目标地址指的是数据报的接收方</p>
+</li>
+<li><p><code>选项(Options)</code> 是附加字段，选项字段占用 1 - 40 个字节不等，一般会跟在目的地址之后。如果首部长度 &gt; 5，就应该考虑选项字段。</p>
+</li>
+<li><p><code>数据</code> 不是首部的一部分，因此并不被包含在首部检验和中。</p>
+</li>
+</ul>
+<p>在 IP 发送的过程中，每个数据报的大小是不同的，每个链路层协议能承载的网络层分组也不一样，有的协议能够承载大数据报，有的却只能承载很小的数据报，不同的链路层能够承载的数据报大小如下。</p>
+<p><img src="https://s3.ax1x.com/2020/12/22/rBXQ4H.png" class="lazyload placeholder" data-srcset="https://s3.ax1x.com/2020/12/22/rBXQ4H.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<h4 id="IPv4-分片"><a href="#IPv4-分片" class="headerlink" title="IPv4 分片"></a>IPv4 分片</h4><p>一个链路层帧能承载的最大数据量叫做<code>最大传输单元(Maximum Transmission Unit, MTU)</code>，每个 IP 数据报封装在链路层帧中从一台路由器传到下一台路由器。因为每个链路层所支持的最大 MTU 不一样，当数据报的大小超过 MTU 后，会在链路层进行分片，每个数据报会在链路层单独封装，每个较小的片都被称为 <code>片(fragement)</code>。</p>
+<p><img src="https://s3.ax1x.com/2020/12/22/rBX38A.png" class="lazyload placeholder" data-srcset="https://s3.ax1x.com/2020/12/22/rBX38A.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>每个片在到达目的地后会进行重组，准确的来说是在运输层之前会进行重组，TCP 和 UDP 都会希望发送完整的、未分片的报文，出于性能的原因，分片重组不会在路由器中进行，而是会在目标主机中进行重组。</p>
+<p>当目标主机收到从发送端发送过来的数据报后，它需要确定这些数据报中的分片是否是由源数据报分片传递过来的，如果是的话，还需要确定何时收到了分片中的<code>最后一片</code>，并且这些片会如何拼接一起成为数据报。</p>
+<p>针对这些潜在的问题，IPv4 设计者将 <strong>标识、标志和片偏移</strong>放在 IP 数据报首部中。当生成一个数据报时，发送主机会为该数据报设置源和目的地址的同时贴上<code>标识号</code>。发送主机通常将它发送的每个数据报的标识 + 1。当某路由器需要对一个数据报分片时，形成的每个数据报具有初始数据报的<strong>源地址、目标地址和标识号</strong>。当目的地从同一发送主机收到一系列数据报时，它能够检查数据报的标识号以确定哪些数据是由源数据报发送过来的。由于 IP 是一种不可靠的服务，分片可能会在网路中丢失，鉴于这种情况，通常会把分片的最后一个比特设置为 0 ，其他分片设置为 1，同时使用偏移字段指定分片应该在数据报的哪个位置。</p>
+<h4 id="IPv4-寻址"><a href="#IPv4-寻址" class="headerlink" title="IPv4 寻址"></a>IPv4 寻址</h4><p>IPv4 支持三种不同类型的寻址模式，分别是</p>
+<ul>
+<li>单播寻址模式：在这种模式下，数据只发送到一个目的地的主机。</li>
+</ul>
+<p><img src="https://s3.ax1x.com/2020/12/22/rBX1Cd.png" class="lazyload placeholder" data-srcset="https://s3.ax1x.com/2020/12/22/rBX1Cd.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<ul>
+<li>广播寻址模式：在此模式下，数据包将被寻址到网段中的所有主机。这里客户端发送一个数据包，由所有服务器接收：</li>
+</ul>
+<p><img src="https://s3.ax1x.com/2020/12/22/rBO4jP.png" class="lazyload placeholder" data-srcset="https://s3.ax1x.com/2020/12/22/rBO4jP.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<ul>
+<li>组播寻址模式：此模式是前两种模式的混合，即发送的数据包既不指向单个主机也不指定段上的所有主机</li>
+</ul>
+<p><img src="https://s3.ax1x.com/2020/12/22/rBxVvn.png" class="lazyload placeholder" data-srcset="https://s3.ax1x.com/2020/12/22/rBxVvn.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<h3 id="IPv6"><a href="#IPv6" class="headerlink" title="IPv6"></a>IPv6</h3><p>随着端系统接入的越来越多，IPv4 已经无法满足分配了，所以，IPv6 应运而生，IPv6 就是为了解决 IPv4 的地址耗尽问题而被标准化的网际协议。IPv4 的地址长度为 4 个 8 字节，即 32 比特， 而 IPv6 的地址长度是原来的四倍，也就是 128 比特，一般写成 8 个 16 位字节。</p>
+<p>从 IPv4 切换到 IPv6 及其耗时，需要将网络中所有的主机和路由器的 IP 地址进行设置，在互联网不断普及的今天，替换所有的 IP 是一个工作量及其庞大的任务。我们后面会说。</p>
+<p>我们先来看一下 IPv6 的地址是怎样的</p>
+<p><img src="https://s3.ax1x.com/2020/12/22/rBxmD0.png" class="lazyload placeholder" data-srcset="https://s3.ax1x.com/2020/12/22/rBxmD0.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<ul>
+<li><code>版本</code>与 IPv4 一样，版本号由 4 bit 构成，IPv6 版本号的值为 6。</li>
+<li><code>流量类型(Traffic Class)</code> 占用 8 bit，它就相当于 IPv4 中的服务类型(Type Of Service)。</li>
+<li><code>流标签(Flow Label)</code> 占用 20 bit，这 20 比特用于标识一条数据报的流，能够对一条流中的某些数据报给出优先权，或者它能够用来对来自某些应用的数据报给出更高的优先权，只有流标签、源地址和目标地址一致时，才会被认为是一个流。</li>
+<li><code>有效载荷长度(Payload Length)</code> 占用 16 bit，这 16 比特值作为一个无符号整数，它给出了在 IPv6 数据报中跟在鼎昌 40 字节数据报首部后面的字节数量。</li>
+<li><code>下一个首部(Next Header)</code> 占用 8 bit，它用于标识数据报中的内容需要交付给哪个协议，是 TCP 协议还是 UDP 协议。</li>
+<li><code>跳限制(Hop Limit)</code> 占用 8 bit，这个字段与 IPv4 的 TTL 意思相同。数据每经过一次路由就会减 1，减到 0 则会丢弃数据。</li>
+<li><code>源地址(Source Address)</code> 占用 128 bit (8 个 16 位 )，表示发送端的 IP 地址。</li>
+<li><code>目标地址(Destination Address)</code> 占用 128 bit (8 个 16 位 )，表示接收端 IP 地址。</li>
+</ul>
+<p>可以看到，相较于 IPv4 ，IPv6 取消了下面几个字段</p>
+<ul>
+<li><strong>标识符、标志和比特偏移</strong>：IPv6 不允许在中间路由器上进行分片和重新组装。这种操作只能在端系统上进行，IPv6 将这个功能放在端系统中，加快了网络中的转发速度。</li>
+<li><strong>首部校验和</strong>：因为在运输层和数据链路执行了报文段完整性校验工作，IP 设计者大概觉得在网络层中有首部校验和比较多余，所以去掉了。<strong>IP 更多专注的是快速处理分组数据</strong>。</li>
+<li><strong>选项字段</strong>：选项字段不再是标准 IP 首部的一部分了，但是它并没有消失，而是可能出现在 IPv6 的扩展首部，也就是下一个首部中。</li>
+</ul>
+<h4 id="IPv6-扩展首部"><a href="#IPv6-扩展首部" class="headerlink" title="IPv6 扩展首部"></a>IPv6 扩展首部</h4><p>IPv6 首部长度固定，无法将选项字段加入其中，取而代之的是 IPv6 使用了<code>扩展首部</code></p>
+<p>扩展首部通常介于 IPv6 首部与 TCP&#x2F;UDP 首部之间，在 IPv4 中可选长度固定为 40 字节，在 IPv6 中没有这样的限制。IPv6 的扩展首部可以是任意长度。扩展首部中还可以包含扩展首部协议和下一个扩展字段。</p>
+<p>IPv6 首部中没有标识和标志字段，<strong>对 IP 进行分片时，需要使用到扩展首部</strong>。</p>
+<p><img src="https://s3.ax1x.com/2020/12/22/rBxEgs.png" class="lazyload placeholder" data-srcset="https://s3.ax1x.com/2020/12/22/rBxEgs.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>具体的扩展首部表如下所示</p>
+<p><img src="https://s3.ax1x.com/2020/12/22/rBxnbV.png" class="lazyload placeholder" data-srcset="https://s3.ax1x.com/2020/12/22/rBxnbV.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>下面我们来看一下 IPv6 都有哪些特点</p>
+<h4 id="IPv6-特点"><a href="#IPv6-特点" class="headerlink" title="IPv6 特点"></a>IPv6 特点</h4><p>IPv6 的特点在 IPv4 中得以实现，但是即便实现了 IPv4 的操作系统，也未必实现了 IPv4 的所有功能。而 IPv6 却将这些功能大众化了，也就表明这些功能在 IPv6 已经进行了实现，这些功能主要有</p>
+<ul>
+<li><p><strong>地址空间变得更大</strong>：这是 IPv6 最主要的一个特点，即支持更大的地址空间。</p>
+</li>
+<li><p><strong>精简报文结构</strong>: IPv6 要比 IPv4 精简很多，IPv4 的报文长度不固定，而且有一个不断变化的选项字段；IPv6 报文段固定，并且将选项字段，分片的字段移到了  IPv6 扩展头中，这就极大的精简了 IPv6 的报文结构。</p>
+</li>
+<li><p><strong>实现了自动配置</strong>：IPv6 支持其主机设备的<strong>状态和无状态</strong>自动配置模式。这样，没有 <code>DHCP 服务器</code>不会停止跨段通信。</p>
+</li>
+<li><p><strong>层次化的网络结构</strong>： IPv6 不再像 IPv4 一样按照 A、B、C等分类来划分地址，而是通过 IANA -&gt; RIR -&gt; ISP 这样的顺序来分配的。IANA 是国际互联网号码分配机构，RIR 是区域互联网注册管理机构，ISP 是一些运营商（例如电信、移动、联通）。</p>
+</li>
+<li><p><strong>IPSec</strong>：IPv6 的扩展报头中有一个认证报头、封装安全净载报头，这两个报头是 IPsec 定义的。通过这两个报头网络层自己就可以实现端到端的安全，而无需像 IPv4 协议一样需要其他协议的帮助。</p>
+</li>
+<li><p><strong>支持任播</strong>：IPv6 引入了一种新的寻址方式，称为任播寻址。</p>
+</li>
+</ul>
+<h4 id="IPv6-地址"><a href="#IPv6-地址" class="headerlink" title="IPv6 地址"></a>IPv6 地址</h4><p>我们知道，IPv6 地址长度为 128 位，他所能表示的范围是 2 ^ 128 次幂，这个数字非常庞大，几乎涵盖了你能想到的所有主机和路由器，那么 IPv6 该如何表示呢？</p>
+<p>一般我们将 128 比特的 IP 地址以每 16 比特为一组，并用 <code>:</code> 号进行分隔，如果出现连续的 0 时还可以将 0 省略，并用 <code>::</code> 两个冒号隔开，记住，一个 IP 地址只允许出现一次两个连续的冒号。</p>
+<p>下面是一些 IPv6 地址的示例</p>
+<ul>
+<li>二进制数表示</li>
+</ul>
+<p><img src="https://s3.ax1x.com/2020/12/22/rBxA3j.png" class="lazyload placeholder" data-srcset="https://s3.ax1x.com/2020/12/22/rBxA3j.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<ul>
+<li>用十六进制数表示</li>
+</ul>
+<p><img src="https://s3.ax1x.com/2020/12/22/rBxeuq.png" class="lazyload placeholder" data-srcset="https://s3.ax1x.com/2020/12/22/rBxeuq.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<ul>
+<li>出现两个冒号的情况</li>
+</ul>
+<p><img src="https://s3.ax1x.com/2020/12/22/rBxKET.png" class="lazyload placeholder" data-srcset="https://s3.ax1x.com/2020/12/22/rBxKET.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>如上图所示，A120 和 4CD 中间的 0 被 :: 所取代了。</p>
+<h2 id="如何从-IPv4-迁移到-IPv6"><a href="#如何从-IPv4-迁移到-IPv6" class="headerlink" title="如何从 IPv4 迁移到 IPv6"></a>如何从 IPv4 迁移到 IPv6</h2><p>我们上面聊了聊 IPv4 和 IPv6 的报文格式、报文含义是什么、以及 IPv4 和 IPv6 的特征分别是什么，看完上面的内容，你已经知道了 IPv4 现在马上就变的不够用了，而且随着 IPv6 的不断发展和引用，虽然新型的 IPv6 可以做到<code>向后兼容</code>，即 IPv6 可以收发 IPv4 的数据报，但是<strong>已经部署的具有 IPv4 能力的系统却不能够处理 IPv6 数据报</strong>。所以 IPv4 噬需迁移到 IPv6，迁移并不意味着将 IPv4 替换为 IPv6。这仅意味着同时启用 IPv6 和 IPv4。</p>
+<blockquote>
+<p>那么现在就有一个问题了，IPv4 如何迁移到 IPv6 呢？这就是我们接下来讨论的重点。</p>
+</blockquote>
+<h3 id="标志"><a href="#标志" class="headerlink" title="标志"></a>标志</h3><p>最简单的方式就是设置一个标志日，指定某个时间点和日期，此时全球的因特网机器都会在这时关机从 IPv4 迁移到 IPv6 。上一次重大的技术迁移是在 35 年前，但是很显然，不用我过多解释，这种情况肯定是 <code>不行的</code>。影响不可估量不说，如何保证全球人类都能知道如何设置自己的 IPv6 地址？一个设计数十亿台机器的标志日现在是想都不敢想的。</p>
+<h3 id="隧道技术"><a href="#隧道技术" class="headerlink" title="隧道技术"></a>隧道技术</h3><p>现在已经在实践中使用的从 IPv4 迁移到 IPv6 的方法是 <code>隧道技术(tunneling)</code>。</p>
+<blockquote>
+<p>什么是隧道技术呢？</p>
+</blockquote>
+<p>隧道技术是一种使用互联网络的基础设施在网络之间的传输数据的方式，使用隧道传递的数据可以是不同协议的数据帧或包。使用隧道技术所遵从的协议叫做<code>隧道协议(tunneling protocol)</code>。隧道协议会将这些协议的数据帧或包封装在新的包头中发送。新的包头提供了路由信息，从而使封装的负载数据能够通过互联网络进行传递。</p>
+<p>使用隧道技术一般都会建一个<code>隧道</code>，建隧道的依据如下：</p>
+<p>比如两个 IPv6 节点(下方 B、E)要使用 IPv6 数据报进行交互，但是它们是经由两个 IPv4 的路由器进行互联的。那么我们就需要将 IPv6 节点和 IPv4 路由器组成一个隧道，如下图所示</p>
+<p><img src="https://s3.ax1x.com/2021/01/03/spq8cn.png" class="lazyload placeholder" data-srcset="https://s3.ax1x.com/2021/01/03/spq8cn.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>借助于隧道，在隧道发送端的 IPv6 节点可将整个 IPv6 数据报放到一个 IPv4 数据报的<code>数据(有效载荷)</code> 字段中，于是，IPv4 数据报的地址被设置为指向隧道接收端的 IPv6 的节点，比如上面的 E 节点。然后再发送给隧道中的第一个节点 C，如下所示</p>
+<p><img src="https://s3.ax1x.com/2021/01/03/spqGXq.png" class="lazyload placeholder" data-srcset="https://s3.ax1x.com/2021/01/03/spqGXq.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp"></p>
+<p>隧道中间的 IPv4 提供路由，路由器不知道这个 IPv4 内部包含一个指向 IPv6 的地址。隧道接收端的 IPv6 节点收到 IPv4 数据报，会确定这个 IPv4 数据报含有一个 IPv6 数据报，通过观察数据报长度和数据得知。然后取出 IPv6 数据报，再为 IPv6 提供路由，就好像两个节点直接相连传输数据报一样。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>这篇文章是计算机网络系列的连载文章，这篇我们主要探讨了网络层的相关知识、路由器的内部构造、路由器如何实现转发的，IP 协议相关内容：包括 IP 地址、IPv4 和 IPv6 的相关内容，最后我们探讨了如何使 IPv4 迁移到 IPv6 。</p>
+
+      </div>
+      <div class="post-tags-categories">
+        
+        <div class="tags">
+          
+            <a href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" class="">
+              计算机网络
+            </a>
+          
+        </div>
+        
+      </div>
+      
+        <div class="copyright">
+  <ul class="post-copyright">
+    <li class="post-copyright-author">
+    <strong>author:  </strong>John Doe</a>
+    </li>
+    <li class="post-copyright-link">
+    <strong>link:  </strong>
+    <a href="/2022/05/03/计算机网络的网络层/" target="_blank" title="计算机网络的网络层">http://example.com/2022/05/03/计算机网络的网络层/</a>
+    </li>
+    <li class="post-copyright-license">
+      <strong>Copyright notice:   </strong>
+      All articles on this website, unless otherwise stated, adopt <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">CC BY-NC-ND 4.0</a>
+      reprint policy. If reproduced, please indicate source!
+    </li>
+  </ul>
+<div>
+      
+    </article>
+    <!-- 上一篇文章和下一篇文章 -->
+    
+      <!-- 文章详情页的上一页和下一页 -->
+<div class="post-nav">
+
+
+
+  
+  <div class="post-nav-prev post-nav-item">
+    <div class="post-nav-img" style="background-size: cover; 
+      background-position: center center;">
+      <img class="lazyload lazyload placeholder" src="/medias/6.jpg" class="lazyload placeholder" data-srcset="/medias/6.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="">
+    </div>
+    <a href="/2022/05/03/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86/" class="post-nav-link">
+      <div class="title">
+        <i class="fas fa-angle-left"></i> Prev:
+        <div class="title-text">计算机网络基础知识</div>
+      </div>
+      
+      <!-- <div class="content">
+        计算机网络基础知识
+
+如果说计算机把我们从工业时代带到了信息时代，那么计算机网络就可以说把我们带到了网络时代。随着使用计
+      </div> -->
+    </a>
+  </div>
+
+
+
+  
+  <div class="post-nav-next post-nav-item">
+    <div class="post-nav-img" style="background-size: cover; 
+      background-position: center center;">
+      <img class="lazyload lazyload placeholder" src="/medias/5.jpg" class="lazyload placeholder" data-srcset="/medias/5.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" src="" alt="">
+    </div>
+    <a href="/2022/05/03/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E8%87%AA%E5%AD%A6%E6%8C%87%E5%8D%97/" class="post-nav-link">
+      <div class="title">
+        Next: <i class="fas fa-angle-right"></i>
+        <div class="title-text">计算机网络自学指南</div>
+      </div>
+      <!-- <div class="content">
+        计算机网络自学指南关于计算机网络如何学习，我就拿自己亲身实践的来举例吧，因为我也自学学起的。
+我觉得最重要的就是看书(博
+      </div> -->
+    </a>
+  </div>
+
+</div>
+
+    
+    
+
+    <!-- 打赏 -->
+    
+      <div id="appDonate" class="post-donate">
+  <div id="donate_board" class="donate_bar center" ref="donate">
+    <a id="btn_donate" class="btn_donate" href="javascript:;" title="打赏" @click="showDialogDrawer()"></a>
+  </div>
+  <transition name="fade">
+    <div 
+      class="donate-box-mask"
+      v-cloak 
+      v-show="visible"
+      @click="cancelDialogDrawer()"
+    >
+    </div>
+  </transition>
+  <transition name="bounce">
+    <div class="donate-box" v-cloak v-show="visible">
+      <div class="donate-box_close">
+        <i class="fas fa-times" aria-hidden="true" @click="cancelDialogDrawer" pointer></i>
+      </div>
+      <div class="donate-box_title">
+        <h4>
+          你的赏识是我前进的动力
+        </h4>
+      </div>
+      <div class="donate-box_tab">
+        <div class="Alipay" pointer :class="{'active': tabActive === 'Alipay'}" @click="changeTabActive('Alipay')">
+          支付宝
+        </div>
+        <div class="WeChatpay" pointer :class="{'active': tabActive === 'WeChatpay'}" @click="changeTabActive('WeChatpay')">
+          微信
+        </div>
+      </div>
+      <div class="donate-box_img">
+        <div class="AlipayImg" v-show="tabActive === 'Alipay'">
+          <img src="/medias/1.jpg" class="lazyload placeholder" data-srcset="/medias/1.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="支付宝打赏" />
+        </div> 
+        <div class="WeChatpayImg" v-show="tabActive === 'WeChatpay'">
+          <img src="/medias/2.jpg" class="lazyload placeholder" data-srcset="/medias/2.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="微信打赏" />
+        </div>
+      </div>
+    </div>
+  </transition>
+</div>
+
+<script>
+  var body = document.body || document.documentElement || window;
+  var vm = new Vue({
+    el: '#appDonate',
+    data: {
+      visible: false,
+      tabActive: 'Alipay',
+      top: 0,
+    },
+    computed: {
+    },
+    mounted() {
+    },
+    methods: {
+      showDialogDrawer() {
+        this.visible = true;
+        // 防止页面滚动，只能让弹框滚动
+        // function getScroll() {
+        //   return {
+        //     left: window.pageXOffset || document.documentElement.scrollLeft || document.body.scrollLeft || 0,
+        //     top: window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0
+        //   };
+        // }
+        this.top = $(document).scrollTop() // or getScroll().top
+        // console.log('aa', $('.main-content'));
+        body.style.cssText = 'overflow: hidden;';
+      },
+      cancelDialogDrawer() {
+        this.visible = false;
+        body.removeAttribute('style');
+        $(document).scrollTop(this.top)
+      },
+      changeTabActive(name) {
+        this.tabActive = name;
+      }
+    },
+    created() {}
+  })
+</script>
+    
+
+    <!-- 分享 -->
+    
+      <!-- https://github.com/overtrue/share.js -->
+<!-- 文章详情页的分享 -->
+<div class="social-share" data-sites="twitter,facebook,google,qq,qzone,wechat,weibo,douban,linkedin" data-wechat-qrcode-helper="<p>微信扫一扫即可分享！</p>"></div>
+
+<script src="/js/shareJs/social-share.min.js"></script>
+</script>
+
+<style>
+  .social-share {
+    margin: 20px 0;
+  }
+</style>
+
+
+    
+    
+    <!-- 评论 -->
+    <!-- 评论 -->
+
+  <div id="myComment">
+    
+      <div id="gitment-container"></div>
+
+    
+  </div>
+
+<!-- comment script in themes\hexo-theme-bamboo\layout\_partial\scripts\index.ejs -->
+
+
+  </div>
+
+  <!-- 目录 -->
+  <!-- 文章详情页右侧目录 -->
+
+  <div class="toc-aside">
+    <div class="toc-main">
+      <div class="toc-aside-title">
+        <i class="fas fa-list-ul" aria-hidden="true"></i><span>catalog</span>
+        
+          <div class="toc-open-close">catalog</div>
+        
+      </div>
+      <div class="toc-content">
+        <div class="toc"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 手机端目录按钮 -->
+  <div id="toc-mobile-btn">
+    <i class="fas fa-list-ul" aria-hidden="true"></i>
+  </div>
+
+
+<script>
+  function closeToc(init) {
+    $(".toc-aside").css({'width': 0, 'padding': 0, 'transition': init ?  'noe' : 'width 0.3s' });
+    $(".toc-content").css({'width': 0});
+    $(".toc-aside-title span, .toc-aside-title i").css({'display': 'none'});
+    $(".main-content").css({'width': '75%', 'margin-left': 'auto', 'margin-right': 'auto',});
+  };
+  function openToc() {
+    $(".main-content").css({'width': '65%', 'margin-right': '10px', 'margin-left': 'calc(35% - 350px)'});
+    $(".toc-aside").css({'width': '300px', 'padding': '0 10px', 'transition': 'width 0.3s'});
+    $(".toc-content").css({'width': '300px'});
+    $(".toc-aside-title span, .toc-aside-title i").css({'display': 'inline-block'});
+  }
+  function openBtnClickFn () {
+    let openOrCloseBtn = $('.toc-aside .toc-aside-title .toc-open-close');
+    let open = eval('' || 'true');
+    openOrCloseBtn.click(function() {
+      if (open) {
+        closeToc();
+        open = false;
+      } else {
+        openToc();
+        open = true;
+      }
+    });
+  };
+  openBtnClickFn();
+  initCloseTocWidth(true);
+
+  function initCloseTocWidth(init) {
+    if (window.innerWidth >= 992) {
+      let isClose = false;
+      isClose && closeToc(init)
+    }
+  }
+
+  document.addEventListener('pjax:complete', function () {
+    $(".toc-aside").css({'transition': 'no'});
+  })
+  document.addEventListener('pjax:complete', function () {
+    openBtnClickFn();
+  })
+  
+</script>
+
+  <!-- 图片放大 Wrap images with fancybox support -->
+  <script src="/js/wrapImage.js"></script>
+</div>
+
+<!-- 文章详情页背景图 -->
+<div id="appBgSwiper" style="position: fixed;left: 0;top: 0;width: 100%;height: 100%;z-index: -2;"
+	:style="{'background-color': bgColor ? bgColor : 'transparent'}">
+	<transition-group tag="ul" :name="names">
+		<li v-for='(image,index) in img' :key='index' v-show="index === mark" class="bg-swiper-box">
+			<img :src="image" class="bg-swiper-img no-lazy">
+		</li>
+	</transition-group>
+</div>
+<script>
+	var vm = new Vue({
+		el: '#appBgSwiper',
+		data: {
+			names: '' || 'fade' || 'fade', // translate-fade fade
+			mark: 0,
+			img: [],
+			bgColor: '',
+			time: null
+		},
+		methods: {   //添加方法
+			change(i, m) {
+				if (i > m) {
+					// this.names = 'fade';
+				} else if (i < m) {
+					// this.names = 'fade';
+				} else {
+					return;
+				}
+				this.mark = i;
+			},
+			prev() {
+				// this.names = 'fade';
+				this.mark--;
+				if (this.mark === -1) {
+					this.mark = 3;
+					return
+				}
+			},
+			next() {
+				// this.names = 'fade';
+				this.mark++;
+				if (this.mark === this.img.length) {
+					this.mark = 0;
+					return
+				}
+			},
+			autoPlay() {
+				// this.names = 'fade';
+				this.mark++;
+				if (this.mark === this.img.length) {
+					this.mark = 0;
+					return
+				}
+			},
+			play() {
+				let bgImgDelay = '' || '180000'
+				let delay = parseInt(bgImgDelay) || 180000;
+				this.time = setInterval(this.autoPlay, delay);
+			},
+			enter() {
+				clearInterval(this.time);
+			},
+			leave() {
+				this.play();
+			}
+		},
+		created() {
+			this.play()
+		},
+		beforeDestroy() {
+			clearInterval(this.time);
+		},
+		mounted() {
+			let prop = '' || '';
+			let isImg = prop.includes('.bmp') || prop.includes('.jpg') || prop.includes('.png') || prop.includes('.tif') || prop.includes('.gif') || prop.includes('.pcx') || prop.includes('.tga') || prop.includes('.exif') || prop.includes('.fpx') || prop.includes('.psd') || prop.includes('.cdr') || prop.includes('.pcd') || prop.includes('.dxf') || prop.includes('.ufo') || prop.includes('.eps') || prop.includes('.ai') || prop.includes('.raw') || prop.includes('.WMF') || prop.includes('.webp') || prop.includes('.jpeg') || prop.includes('http://') || prop.includes('https://')
+			if (isImg) {
+				let img = prop.split(',');
+				let configRoot = '/'
+				let arrImg = [];
+				img.forEach(el => {
+					var Expression = /http(s)?:\/\/([\w-]+\.)+[\w-]+(\/[\w- .\/?%&=]*)?/;
+					var objExp = new RegExp(Expression);
+
+					if (objExp.test(el)) {
+						// http or https
+						arrImg.push(el);
+					} else {
+						// 非http or https开头
+						// 本地文件
+						let firstStr = el.charAt(0);
+						if (firstStr == '/') {
+							el = el.substr(1); // 删除第一个字符 '/',因为 configRoot最后一个字符为 /
+						}
+						el = configRoot + el;
+						arrImg.push(el);
+					}
+				})
+				this.img = arrImg;
+			} else {
+				this.bgColor = prop;
+			}
+		}
+	})
+</script>
+
+<style>
+	.bg-swiper-box {
+		position: absolute;
+		display: block;
+		width: 100%;
+		height: 100%;
+	}
+
+	.bg-swiper-img {
+		object-fit: cover;
+		width: 100%;
+		height: 100%;
+	}
+</style>
+
+
+
+
+  <script>
+  function loadMermaid() {
+    if (document.getElementsByClassName('mermaid').length) {
+      if (window.mermaidJsLoad) mermaid.init()
+      else {
+        loadScript('https://unpkg.com/mermaid/dist/mermaid.min.js').then(() => {
+          window.mermaidJsLoad = true
+          mermaid.initialize({
+            theme: 'default',
+          })
+          if ('true') {
+            mermaid.init();
+          }
+        })
+      }
+    }
+  };
+  document.addEventListener("DOMContentLoaded", function () {
+    loadMermaid();
+  })
+
+  document.addEventListener('pjax:complete', function () {
+    loadMermaid();
+  })
+  
+</script>
+
+
+      </main>
+    </div>
+
+    <!-- 页脚 -->
+    
+  
+  
+    <!-- 底部鱼儿跳动效果，依赖于jquery-->
+<div id="j-fish-skip" style=" position: relative;height: 153px;width: auto;"></div>
+<script>
+  var RENDERER = {
+    POINT_INTERVAL: 5,
+    FISH_COUNT: 3,
+    MAX_INTERVAL_COUNT: 50,
+    INIT_HEIGHT_RATE: .5,
+    THRESHOLD: 50,
+    FISH_COLOR: '',
+    init: function () {
+      this.setFishColor(); this.setParameters(), this.reconstructMethods(), this.setup(), this.bindEvent(), this.render()
+    },
+    setFishColor: function () {
+      let isDark = JSON.parse(localStorage.getItem('dark')) || JSON.parse('false');
+      if (isDark) {
+        this.FISH_COLOR = '#222'; // 暗黑色，有时间把这整成一个变量
+      } else {
+        this.FISH_COLOR = '' || '#42b983';
+      }
+    },
+    setParameters: function () {
+      this.$window = $(window), this.$container = $("#j-fish-skip"), this.$canvas = $("<canvas />"), this.context = this.$canvas.appendTo(this.$container).get(0).getContext("2d"), this.points = [], this.fishes = [], this.watchIds = []
+    },
+    createSurfacePoints: function () {
+      var t = Math.round(this.width / this.POINT_INTERVAL);
+      this.pointInterval = this.width / (t - 1), this.points.push(new SURFACE_POINT(this, 0));
+      for (var i = 1; i < t; i++) {
+        var e = new SURFACE_POINT(this, i * this.pointInterval),
+          h = this.points[i - 1];
+        e.setPreviousPoint(h), h.setNextPoint(e), this.points.push(e)
+      }
+    },
+    reconstructMethods: function () {
+      this.watchWindowSize = this.watchWindowSize.bind(this), this.jdugeToStopResize = this.jdugeToStopResize.bind(this), this.startEpicenter = this.startEpicenter.bind(this), this.moveEpicenter = this.moveEpicenter.bind(this), this.reverseVertical = this.reverseVertical.bind(this), this.render = this.render.bind(this)
+    },
+    setup: function () {
+      this.points.length = 0, this.fishes.length = 0, this.watchIds.length = 0, this.intervalCount = this.MAX_INTERVAL_COUNT, this.width = this.$container.width(), this.height = this.$container.height(), this.fishCount = this.FISH_COUNT * this.width / 500 * this.height / 500, this.$canvas.attr({
+        width: this.width,
+        height: this.height
+      }), this.reverse = !1, this.fishes.push(new FISH(this)), this.createSurfacePoints()
+    },
+    watchWindowSize: function () {
+      this.clearTimer(), this.tmpWidth = this.$window.width(), this.tmpHeight = this.$window.height(), this.watchIds.push(setTimeout(this.jdugeToStopResize, this.WATCH_INTERVAL))
+    },
+    clearTimer: function () {
+      for (; this.watchIds.length > 0;) clearTimeout(this.watchIds.pop())
+    },
+    jdugeToStopResize: function () {
+      var t = this.$window.width(),
+        i = this.$window.height(),
+        e = t == this.tmpWidth && i == this.tmpHeight;
+      this.tmpWidth = t, this.tmpHeight = i, e && this.setup()
+    },
+    bindEvent: function () {
+      this.$window.on("resize", this.watchWindowSize), this.$container.on("mouseenter", this.startEpicenter), this.$container.on("mousemove", this.moveEpicenter)
+    },
+    getAxis: function (t) {
+      var i = this.$container.offset();
+      return {
+        x: t.clientX - i.left + this.$window.scrollLeft(),
+        y: t.clientY - i.top + this.$window.scrollTop()
+      }
+    },
+    startEpicenter: function (t) {
+      this.axis = this.getAxis(t)
+    },
+    moveEpicenter: function (t) {
+      var i = this.getAxis(t);
+      this.axis || (this.axis = i), this.generateEpicenter(i.x, i.y, i.y - this.axis.y), this.axis = i
+    },
+    generateEpicenter: function (t, i, e) {
+      if (!(i < this.height / 2 - this.THRESHOLD || i > this.height / 2 + this.THRESHOLD)) {
+        var h = Math.round(t / this.pointInterval);
+        h < 0 || h >= this.points.length || this.points[h].interfere(i, e)
+      }
+    },
+    reverseVertical: function () {
+      this.reverse = !this.reverse;
+      for (var t = 0, i = this.fishes.length; t < i; t++) this.fishes[t].reverseVertical()
+    },
+    controlStatus: function () {
+      for (var t = 0, i = this.points.length; t < i; t++) this.points[t].updateSelf();
+      for (t = 0, i = this.points.length; t < i; t++) this.points[t].updateNeighbors();
+      this.fishes.length < this.fishCount && 0 == --this.intervalCount && (this.intervalCount = this.MAX_INTERVAL_COUNT, this.fishes.push(new FISH(this)))
+    },
+    render: function () {
+      requestAnimationFrame(this.render), this.controlStatus(), this.context.clearRect(0, 0, this.width, this.height), this.context.fillStyle = this.FISH_COLOR;
+      for (var t = 0, i = this.fishes.length; t < i; t++) this.fishes[t].render(this.context);
+      this.context.save(), this.context.globalCompositeOperation = "xor", this.context.beginPath(), this.context.moveTo(0, this.reverse ? 0 : this.height);
+      for (t = 0, i = this.points.length; t < i; t++) this.points[t].render(this.context);
+      this.context.lineTo(this.width, this.reverse ? 0 : this.height), this.context.closePath(), this.context.fill(), this.context.restore()
+    }
+  },
+  SURFACE_POINT = function (t, i) {
+    this.renderer = t, this.x = i, this.init()
+  };
+  SURFACE_POINT.prototype = {
+    SPRING_CONSTANT: .03,
+    SPRING_FRICTION: .9,
+    WAVE_SPREAD: .3,
+    ACCELARATION_RATE: .01,
+    init: function () {
+      this.initHeight = this.renderer.height * this.renderer.INIT_HEIGHT_RATE, this.height = this.initHeight, this.fy = 0, this.force = {
+        previous: 0,
+        next: 0
+      }
+    },
+    setPreviousPoint: function (t) {
+      this.previous = t
+    },
+    setNextPoint: function (t) {
+      this.next = t
+    },
+    interfere: function (t, i) {
+      this.fy = this.renderer.height * this.ACCELARATION_RATE * (this.renderer.height - this.height - t >= 0 ? -1 : 1) * Math.abs(i)
+    },
+    updateSelf: function () {
+      this.fy += this.SPRING_CONSTANT * (this.initHeight - this.height), this.fy *= this.SPRING_FRICTION, this.height += this.fy
+    },
+    updateNeighbors: function () {
+      this.previous && (this.force.previous = this.WAVE_SPREAD * (this.height - this.previous.height)), this.next && (this.force.next = this.WAVE_SPREAD * (this.height - this.next.height))
+    },
+    render: function (t) {
+      this.previous && (this.previous.height += this.force.previous, this.previous.fy += this.force.previous), this.next && (this.next.height += this.force.next, this.next.fy += this.force.next), t.lineTo(this.x, this.renderer.height - this.height)
+    }
+  };
+  var FISH = function (t) {
+    this.renderer = t, this.init()
+  };
+  FISH.prototype = {
+    GRAVITY: .4,
+    init: function () {
+      this.direction = Math.random() < .5, this.x = this.direction ? this.renderer.width + this.renderer.THRESHOLD : -this.renderer.THRESHOLD, this.previousY = this.y, this.vx = this.getRandomValue(4, 10) * (this.direction ? -1 : 1), this.renderer.reverse ? (this.y = this.getRandomValue(1 * this.renderer.height / 10, 4 * this.renderer.height / 10), this.vy = this.getRandomValue(2, 5), this.ay = this.getRandomValue(.05, .2)) : (this.y = this.getRandomValue(6 * this.renderer.height / 10, 9 * this.renderer.height / 10), this.vy = this.getRandomValue(-5, -2), this.ay = this.getRandomValue(-.2, -.05)), this.isOut = !1, this.theta = 0, this.phi = 0
+    },
+    getRandomValue: function (t, i) {
+      return t + (i - t) * Math.random()
+    },
+    reverseVertical: function () {
+      this.isOut = !this.isOut, this.ay *= -1
+    },
+    controlStatus: function (t) {
+      this.previousY = this.y, this.x += this.vx, this.y += this.vy, this.vy += this.ay, this.renderer.reverse ? this.y > this.renderer.height * this.renderer.INIT_HEIGHT_RATE ? (this.vy -= this.GRAVITY, this.isOut = !0) : (this.isOut && (this.ay = this.getRandomValue(.05, .2)), this.isOut = !1) : this.y < this.renderer.height * this.renderer.INIT_HEIGHT_RATE ? (this.vy += this.GRAVITY, this.isOut = !0) : (this.isOut && (this.ay = this.getRandomValue(-.2, -.05)), this.isOut = !1), this.isOut || (this.theta += Math.PI / 20, this.theta %= 2 * Math.PI, this.phi += Math.PI / 30, this.phi %= 2 * Math.PI), this.renderer.generateEpicenter(this.x + (this.direction ? -1 : 1) * this.renderer.THRESHOLD, this.y, this.y - this.previousY), (this.vx > 0 && this.x > this.renderer.width + this.renderer.THRESHOLD || this.vx < 0 && this.x < -this.renderer.THRESHOLD) && this.init()
+    },
+    render: function (t) {
+      t.save(), t.translate(this.x, this.y), t.rotate(Math.PI + Math.atan2(this.vy, this.vx)), t.scale(1, this.direction ? 1 : -1), t.beginPath(), t.moveTo(-30, 0), t.bezierCurveTo(-20, 15, 15, 10, 40, 0), t.bezierCurveTo(15, -10, -20, -15, -30, 0), t.fill(), t.save(), t.translate(40, 0), t.scale(.9 + .2 * Math.sin(this.theta), 1), t.beginPath(), t.moveTo(0, 0), t.quadraticCurveTo(5, 10, 20, 8), t.quadraticCurveTo(12, 5, 10, 0), t.quadraticCurveTo(12, -5, 20, -8), t.quadraticCurveTo(5, -10, 0, 0), t.fill(), t.restore(), t.save(), t.translate(-3, 0), t.rotate((Math.PI / 3 + Math.PI / 10 * Math.sin(this.phi)) * (this.renderer.reverse ? -1 : 1)), t.beginPath(), this.renderer.reverse ? (t.moveTo(5, 0), t.bezierCurveTo(10, 10, 10, 30, 0, 40), t.bezierCurveTo(-12, 25, -8, 10, 0, 0)) : (t.moveTo(-5, 0), t.bezierCurveTo(-10, -10, -10, -30, 0, -40), t.bezierCurveTo(12, -25, 8, -10, 0, 0)), t.closePath(), t.fill(), t.restore(), t.restore(), this.controlStatus(t)
+    }
+  }, $(function () {
+    RENDERER.init()
+    $('.dark').click(function () {
+      setTimeout(() => {
+        RENDERER.setFishColor();
+        RENDERER.context.fill();
+      });
+    })
+  });
+</script>
+  
+  <div class="footer bg-color">
+    <div class="footer-main">
+      
+        
+          <div class="link">
+            
+          </div>
+        
+      
+        
+          <div class="footer-copyright">
+            <p>Copyright © 2019 - 2020 <a target="_blank" rel="noopener" href="https://github.com/yuang01">yuang01</a> | Powered by <a target="_blank" rel="noopener" href="https://hexo.io/zh-cn/docs/">Hexo</a> | Theme <a target="_blank" rel="noopener" href="https://github.com/yuang01/theme">Bamboo</a> </p>
+
+          </div>
+        
+      
+        
+          
+            <!-- 不蒜子统计 -->
+            <!-- 不蒜子统计 -->
+<span id="busuanzi_container_site_pv">
+      <i class="fas fa-eye" aria-hidden="true"></i>Total visits：<span id="busuanzi_value_site_pv"></span> times
+</span>
+<span class="post-meta-divider">|</span>
+<span id="busuanzi_container_site_uv" style='display:none'>
+      <i class="fas fa-users" aria-hidden="true"></i>Number of visitors：<span id="busuanzi_value_site_uv"></span> people
+</span>
+
+          
+        
+      
+        
+          <div class="footer-custom">
+            
+          </div>
+        
+      
+    </div>
+  </div>
+
+
+
+    <!-- 渲染暗黑按钮 -->
+    
+      <div class="dark">
+  <div class="dark-content">
+    <i class="fas fa-moon" aria-hidden="true"></i>
+    <!-- <span>关灯</span> -->
+  </div>
+  
+</div>
+
+<script>
+  $(function() {
+    let isDark = JSON.parse(localStorage.getItem('dark'))  || JSON.parse('false');
+    if (isDark) {
+      $(".dark-content").replaceWith(
+          `
+          <div class='dark-content'>
+            <i class="fas fa-lightbulb" aria-hidden="true"></i>
+          </div>
+          `
+        );
+    }
+    $('.dark').click(function() {
+      if ($(document.body).is('.darkModel')) {
+        $(document.body).removeClass('darkModel');
+        localStorage.setItem('dark', false);
+        $(".dark-content").replaceWith(
+          `
+          <div class='dark-content'>
+            <i class="fas fa-moon" aria-hidden="true"></i>
+          </div>
+          `
+        );
+      } else {
+        $(document.body).addClass('darkModel');
+        localStorage.setItem('dark', true);
+        $(".dark-content").replaceWith(
+          `
+          <div class='dark-content'>
+            <i class="fas fa-lightbulb" aria-hidden="true"></i>
+          </div>
+          `
+        );
+      }
+    })
+  })
+</script>
+    
+    <!-- 渲染回到顶部按钮 -->
+    
+      <div class="goTop top-btn-color" pointer>
+  <i class="fas fa-arrow-up" aria-hidden="true"></i>
+</div>
+<script src="/js/goTop.js"></script>
+
+    
+    <!-- 渲染左下角音乐播放器 -->
+    
+      <link rel="stylesheet" href="/js/aplayer/APlayer@1.10.1.min.css">
+<style>
+.aplayer .aplayer-lrc p {
+  
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 16px !important;
+}
+
+.aplayer .aplayer-lrc p.aplayer-lrc-current {
+  
+  font-size: 15px;
+  color: #42b983;
+}
+
+
+.aplayer.aplayer-fixed.aplayer-narrow .aplayer-body {
+  left: -66px !important;
+}
+
+.aplayer.aplayer-fixed.aplayer-narrow .aplayer-body:hover {
+  left: 0px !important;
+}
+
+
+</style>
+<meting-js  
+  class=""
+  server="tencent"
+  type="playlist"
+  id="8062553743"
+  fixed='true'
+  autoplay='false'
+  theme='#42b983'
+  loop='all'
+  order='random'
+  preload='auto'
+  volume='0.7'
+  list-folded='true'
+>
+</meting-js>
+
+<!-- <style>
+  #aplayer {
+    position: fixed;
+    left: 0;
+    bottom: 300px;
+  }
+</style> -->
+<script src="https://unpkg.com/aplayer@1.10.1/dist/APlayer.min.js"></script>
+<script src="https://unpkg.com/meting@2/dist/Meting.min.js"></script>
+    
+
+    <!-- 图片放大 -->
+    
+      <script src="/js/fancybox/jquery.fancybox.min.js"></script>
+    
+
+    <!-- 百度解析 -->
+    <!-- Baidu Analytics -->
+
+    <!-- Baidu Push -->
+
+<script>
+    (function () {
+        var bp = document.createElement('script');
+        var curProtocol = window.location.protocol.split(':')[0];
+        if (curProtocol === 'https') {
+            bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+        } else {
+            bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+        }
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(bp, s);
+    })();
+</script>
+
+    
+    <!-- 背景彩带 -->
+    
+      <script type="text/javascript" size="100" alpha='0.4' zIndex="-1" src="/js/ribbon.min.js"></script>
+    
+
+    <script src="/js/utils/index.js"></script>
+    <script src="/js/app.js"></script>
+    
+    <!-- 文章目录所需js -->
+<link href="/js/tocbot/tocbot.css" rel="stylesheet">
+<script src="/js/tocbot/tocbot.min.js"></script>
+
+<script>
+  var headerEl = 'h2, h3, h4',  //headers 
+    content = '.post-detail',//文章容器
+    idArr = {};  //标题数组以确定是否增加索引id
+  //add #id
+  var option = {
+    // Where to render the table of contents.
+    tocSelector: '.toc',
+    // Where to grab the headings to build the table of contents.
+    contentSelector: content,
+    // Which headings to grab inside of the contentSelector element.
+    headingSelector: headerEl,
+    scrollSmooth: true,
+    scrollSmoothOffset: -80,
+    headingsOffset: -($(window).height() * 0.4 - 45),
+    positionFixedSelector: '.toc-main',
+    positionFixedClass: 'is-position-fixed',
+    fixedSidebarOffset: 'auto',
+    activeLinkClass: 'is-active-link',
+    // onClick: function (e) {},
+  }
+  if ($('.toc').length > 0) {
+
+    $(content).children(headerEl).each(function () {
+      //去除空格以及多余标点
+      var headerId = $(this).text().replace(/[\s|\~|`|\!|\@|\#|\$|\%|\^|\&|\*|\(|\)|\_|\+|\=|\||\|\[|\]|\{|\}|\;|\:|\"|\'|\,|\<|\.|\>|\/|\?|\：|\，|\。]/g, '');
+
+      headerId = headerId.toLowerCase();
+      if (idArr[headerId]) {
+        //id已经存在
+        $(this).attr('id', headerId + '-' + idArr[headerId]);
+        idArr[headerId]++;
+      }
+      else {
+        //id未存在
+        idArr[headerId] = 1;
+        $(this).attr('id', headerId);
+      }
+    });
+
+    document.addEventListener("DOMContentLoaded", function () {
+      tocbot.init(option);
+      mobileTocClick();
+    });
+
+  }
+
+  window.tocScrollFn = function () {
+    return bamboo.throttle(function () {
+      findHeadPosition();
+    }, 100)()
+  }
+  window.addEventListener('scroll', tocScrollFn);
+
+  const findHeadPosition = function (top) {
+    if ($('.toc-list').length <= 0) {
+      return false;
+    }
+    setTimeout(() => {  // or DOMContentLoaded 
+      autoScrollToc();
+    }, 0);
+  }
+
+  const autoScrollToc = function () {
+    const $activeItem = document.querySelector('.is-active-link');
+    const $cardToc = document.querySelector('.toc-content');
+    const activePosition = $activeItem.getBoundingClientRect().top
+    const sidebarScrollTop = $cardToc.scrollTop
+    if (activePosition > (document.documentElement.clientHeight - 100)) {
+      $cardToc.scrollTop = sidebarScrollTop + 150
+    }
+    if (activePosition < 100) {
+      $cardToc.scrollTop = sidebarScrollTop - 150
+    }
+  }
+
+  document.addEventListener('pjax:send', function () {
+    if ($('.toc').length) {
+      tocbot.destroy();
+    }
+  });
+
+  document.addEventListener('pjax:complete', function () {
+    if ($('.toc').length) {
+      tocbot.init(option);
+      mobileTocClick();
+    }
+  });
+  
+  // 手机端toc按钮点击出现目录
+  const mobileTocClick = function () {
+    const $cardTocLayout = document.getElementsByClassName('toc-aside')[0];
+    const $cardToc = $cardTocLayout.getElementsByClassName('toc-content')[0];
+    let right = '45px';
+    if (window.innerWidth >= 551 && window.innerWidth <= 992) {
+      right = '100px'
+    }
+    const mobileToc = {
+      open: () => {
+        $cardTocLayout.style.cssText = 'animation: toc-open .3s; opacity: 1; right: ' + right
+      },
+
+      close: () => {
+        $cardTocLayout.style.animation = 'toc-close .2s'
+        setTimeout(() => {
+          $cardTocLayout.style.cssText = "opacity:''; animation: ''; right: ''"
+        }, 100)
+      }
+    }
+    document.getElementById('toc-mobile-btn').addEventListener('click', () => {
+      if (window.getComputedStyle($cardTocLayout).getPropertyValue('opacity') === '0') mobileToc.open()
+      else mobileToc.close()
+    })
+
+    $cardToc.addEventListener('click', (e) => {
+      if (window.innerWidth < 992) { // 小于992px的时候
+        mobileToc.close()
+      }
+    })
+  }
+</script>
+
+<style>
+  .is-position-fixed {
+    position: sticky !important;
+    top: 74px;
+  }
+
+  .toc-main ul {
+    counter-reset: show-list;
+  }
+
+  .toc-main ul li::before {
+    content: counter(item)".";
+    display: block;
+    position: absolute;
+    left: 12px;
+    top: 0;
+  }
+</style> 
+
+<!-- 设置导航背景 -->
+<script>
+  let setHeaderClass = () => {
+    const headerMenuTransparent = true;
+    if (!headerMenuTransparent) { return; }
+    const nav = $('#navHeader');
+    const navTop = nav.outerHeight();
+    const winTop = $(window).scrollTop();
+    if(winTop > navTop) {
+      nav.addClass('header-bg-color');
+    }
+    else {
+      nav.removeClass('header-bg-color');
+    }
+  };
+
+  let scrollCollect = () => {
+    return bamboo.throttle(function (e) {
+      setHeaderClass();
+    }, 200)()
+  }
+
+  let initHeaderBg = () => {
+    setHeaderClass();
+  }
+
+  setHeaderClass();
+  window.addEventListener('scroll', scrollCollect);
+
+  document.addEventListener('pjax:send', function () {
+    window.removeEventListener('scroll', scrollCollect)
+  })
+  document.addEventListener('pjax:complete', function () {
+    window.addEventListener('scroll', scrollCollect);
+    setHeaderClass();
+  })
+</script> 
+
+<!-- 渲染issues标签里的内容 -->
+<script>
+  function loadIssuesJS() {
+    if ($(".post-detail").find(".issues-api").length == 0) {
+      return;
+    } 
+    loadScript('/js/issues/index.js');
+  };
+  $(function () {
+    loadIssuesJS();
+  });
+  document.addEventListener('pjax:complete', function () {
+    if (typeof IssuesAPI == "undefined") {
+      loadIssuesJS();
+    }
+  })
+</script>
+
+<!-- 输入框打字特效 -->
+<!-- 输入框打字特效 -->
+
+  <script src="/js/activate-power-mode.js"></script>
+  <script>
+    POWERMODE.colorful = true;  // 打开随机颜色特效
+    POWERMODE.shake = false;    // 关闭输入框抖动
+    document.body.addEventListener('input', POWERMODE);//监听打字事件
+  </script>
+
+
+<!-- markdown代码一键复制功能 -->
+
+  <link rel="stylesheet" href="https://unpkg.com/v-plugs-ayu/lib/ayu.css">
+  <script src="https://unpkg.com/v-plugs-ayu/lib/ayu.umd.min.js"></script>
+  <script src="/js/clipboard/clipboard.min.js"></script>
+  <div id="appCopy">
+  </div>
+  <script data-pjax>
+    var vm = new Vue({
+      el: '#appCopy',
+      data: {
+      },
+      computed: {
+      },
+      mounted() {
+        const that = this;
+        var copy = 'copy';
+        /* code */
+        var initCopyCode = function () {
+          var copyHtml = '';
+          copyHtml += '<button class="btn-copy" data-clipboard-snippet="" style="position:absolute;top:0;right:0;z-index:1;">';
+          copyHtml += '<i class="fas fa-copy"></i><span>' + copy + '</span>';
+          copyHtml += '</button>';
+          $(".post-detail pre").not('.gutter pre').wrap("<div class='codeBox' style='position:relative;width:100%;'></div>")
+          $(".post-detail pre").not('.gutter pre').before(copyHtml);
+          new ClipboardJS('.btn-copy', {
+            target: function (trigger) {
+              return trigger.nextElementSibling;
+            }
+          });
+        }
+        initCopyCode();
+        $('.btn-copy').unbind('click').bind('click', function () {
+          doSomething();
+        })
+        $(document).unbind('keypress').bind('keypress', function (e) {
+          if (e.ctrlKey && e.keyCode == 67) {
+            doSomething();
+          }
+        })
+
+        function doSomething() {
+          that.$notify({
+            title: "成功",
+            content: "代码已复制，请遵守相关授权协议。",
+            type: 'success'
+          })
+        }
+      },
+      methods: {
+      },
+      created() { }
+    })
+  </script>
+  
+
+<!-- 图片懒加载 -->
+<script defer src="https://unpkg.com/vanilla-lazyload@17.1.0/dist/lazyload.min.js"></script>
+<script>
+  // https://www.npmjs.com/package/vanilla-lazyload
+  // Set the options globally
+  // to make LazyLoad self-initialize
+  window.lazyLoadOptions = {
+    elements_selector: ".lazyload",
+    threshold: 0
+  };
+  // Listen to the initialization event
+  // and get the instance of LazyLoad
+  window.addEventListener(
+    "LazyLoad::Initialized",
+    function (event) {
+      window.lazyLoadInstance = event.detail.instance;
+    },
+    false
+  );
+  document.addEventListener('DOMContentLoaded', function () {
+    lazyLoadInstance.update();
+  });
+  document.addEventListener('pjax:complete', function () {
+    lazyLoadInstance.update();
+  });
+</script>
+
+
+<!-- 卡片滚动动画 -->
+   
+
+<!-- 评论所需js -->
+
+  
+    <script type="text/javascript">
+  var utteranceCommon = {};
+
+  function check_utterance() {
+    let isDark = JSON.parse(localStorage.getItem('dark')) || JSON.parse('false');
+    if (isDark) {
+      utteranceCommon.Theme = 'github-dark';
+    } else {
+      utteranceCommon.Theme = 'github-light';
+    }
+
+    return document.getElementById("gitment-container");
+  }
+  comment_el = '#gitment-container';
+  load_utterance = function () {
+    if ($(comment_el).length) {
+      // 匿名函数，防止污染全局变量
+      const HEAD = check_utterance();
+
+      var utterances = document.createElement('script');
+      utterances.type = 'text/javascript';
+      utterances.async = true;
+      utterances.setAttribute('issue-term', 'pathname')
+      utterances.setAttribute('theme', utteranceCommon.Theme)
+      utterances.setAttribute('repo', '')
+      utterances.crossorigin = 'anonymous';
+      utterances.src = 'https://utteranc.es/client.js';
+      // content 是要插入评论的地方
+      document.getElementById('gitment-container').appendChild(utterances);
+
+    }
+  }
+
+  function dark_utterance() {
+    const HEAD = check_utterance();
+    if (!HEAD) return;
+    const message = {
+      type: 'set-theme',
+      theme: utteranceCommon.Theme
+    };
+    const utteranceIframe = document.querySelector('iframe');
+    utteranceIframe.contentWindow.postMessage(message, 'https://utteranc.es');
+  }
+
+  $(document).ready(load_utterance);
+  document.addEventListener('pjax:complete', function () {
+    load_utterance();
+  });
+
+  $('.dark').click(function () {
+    setTimeout(() => {
+      dark_utterance();
+    });
+  })
+
+</script>
+
+<style>
+  .utterances {
+    max-width: inherit !important;
+  }
+</style>
+  
+
+
+<!-- 鼠标点击特效 -->
+<!-- 爱心点击 -->
+
+  
+    <canvas class="fireworks" style="position: fixed;left: 0;top: 0;z-index: 999; pointer-events: none;" ></canvas>
+    <script src="//cdn.bootcss.com/animejs/2.2.0/anime.min.js"></script>
+    <script src="/js/cursor/explosion.min.js"></script>
+  
+
+
+
+
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" data-pjax></script>
+
+
+    <!-- pjax -->
+    
+
+<!-- pjax -->
+
+
+  <script src="/js/pjax@0.2.8/index.js"></script>
+  
+    <!-- 样式位于：source/css/_third-party/pjaxanimate.styl -->
+
+<div class="pjax-animate">
+  
+    <div class="loading-circle"><div id="loader-circle"></div></div>
+    <script>
+      window.ShowLoading = function() {
+        $(".loading-circle").css("display", "block");
+      };
+      window.HideLoading = function() {
+        $(".loading-circle").css("display", "none");
+      }
+    </script>
+  
+	<script>
+    document.addEventListener('pjax:complete', function () {
+      window.HideLoading();
+    })
+    document.addEventListener('pjax:send', function () {
+      window.ShowLoading();
+    })
+    document.addEventListener('pjax:error', function () {
+      window.HideLoading();
+    })
+	</script>
+</div>
+
+  
+
+  <script>
+    var pjax = new Pjax({
+      elements: 'a[href]:not([href^="#"]):not([href="javascript:void(0)"]):not([no-pjax])',   // 拦截正常带链接的 a 标签
+      selectors: ["#pjax-container","title"],                                   // 根据实际需要确认重载区域
+      cacheBust: false,   // url 地址追加时间戳，用以避免浏览器缓存
+      timeout: 5000
+    });
+
+    document.addEventListener('pjax:send', function (e) {
+
+      try {
+        var currentUrl = window.location.pathname;
+        var targetUrl = e.triggerElement.href;
+        var banUrl = [""];
+        if (banUrl[0] != "") {
+          banUrl.forEach(item => {
+            if(currentUrl.indexOf(item) != -1 || targetUrl.indexOf(item) != -1) {
+              window.location.href = targetUrl;
+            }
+          });
+        }
+      } catch (error) {}
+
+      $(window).unbind('resize');
+      $(window).unbind('scroll');
+      $(document).unbind('scroll');
+      $(document).unbind('click');
+      $('body').unbind('click');
+
+    })
+    
+    document.addEventListener('pjax:complete', function () {
+      $('script[data-pjax], .pjax-reload script').each(function () {
+        $(this).parent().append($(this).remove());
+      });
+    });
+
+    document.addEventListener('pjax:error', function (e) {
+      window.location.href = e.triggerElement.href;
+    })
+    
+    // 刷新不从顶部开始
+    document.addEventListener("DOMContentLoaded", function () {
+      history.scrollRestoration = 'auto';
+    })
+  </script>
+
+
+
+  </body>
+</html>

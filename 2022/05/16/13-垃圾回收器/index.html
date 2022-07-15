@@ -1,0 +1,2308 @@
+<!DOCTYPE html>
+<html>
+  <!-- meta/link... -->
+  
+
+
+
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport">
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+
+
+  <title>13-垃圾回收器 | Hexo</title>
+
+  <link rel="icon" type="image/x-icon, image/vnd.microsoft.icon" href="/favicon.ico">
+  <link rel="stylesheet" href="https://at.alicdn.com/t/font_1911880_c1nvbyezg17.css">
+  <link href="https://unpkg.com/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet">
+  <link href="/js/swiper/swiper@5.4.1.min.css" rel="stylesheet">
+  
+  
+  
+  
+<link rel="stylesheet" href="/css/animate.min.css">
+
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+  
+    
+<link rel="stylesheet" href="/js/fancybox/jquery.fancybox.min.css">
+
+  
+  
+    
+<link rel="stylesheet" href="/js/shareJs/share.min.css">
+
+  
+  <style>
+        @media (max-width: 992px) {
+            #waifu {
+                display: none;
+            }
+        }
+    </style>
+    <script src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
+    <link href="//cdn.bootcss.com/pace/1.0.2/themes/pink/pace-theme-flash.css" rel="stylesheet">
+
+    
+
+    <!-- import link -->
+    
+        
+            
+        
+            
+        
+    
+    <!-- import script -->
+    
+        
+            
+        
+            
+        
+    
+
+<meta name="generator" content="Hexo 6.2.0"></head>
+
+  
+  <!-- 依赖于jquery和vue -->
+  
+    
+<script src="https://unpkg.com/jquery@3.5.1/dist/jquery.min.js"></script>
+
+  
+
+  
+    
+<script src="https://unpkg.com/vue@2.6.11/dist/vue.min.js"></script>
+
+  
+  
+  <body>
+    <!-- 预加载动画 -->
+    <!-- 页面预加载动画 -->
+
+<div id='loader'>
+  <link rel="stylesheet" href="/js/loaded/index.css" >
+  <div class="loading-left-bg"></div>
+  <div class="loading-right-bg"></div>
+  <div class="spinner-box">
+    <div class="configure-border-1">
+      <div class="configure-core"></div>
+    </div>
+    <div class="configure-border-2">
+      <div class="configure-core"></div>
+    </div>
+    <div class="loading-word">loading...</div>
+  </div>
+</div>
+
+<script>
+  var endLoading = function () {
+    document.body.style.overflow = 'auto';
+    document.getElementById('loader').classList.add("loading");
+  }
+  window.addEventListener('DOMContentLoaded',endLoading);
+  
+</script>
+
+    
+    <!-- 判断是否为暗黑风格 -->
+    <!-- 判断是否为黑夜模式 -->
+<script>
+  let isDark = JSON.parse(localStorage.getItem('dark')) || JSON.parse('false');
+
+  if (isDark) {
+    $(document.body).addClass('darkModel');
+  }
+</script>
+
+    <!-- 需要在上面加载的js -->
+    <script>
+  function loadScript(src, cb) {
+    return new Promise(resolve => {
+      setTimeout(function () {
+        var HEAD = document.getElementsByTagName("head")[0] || document.documentElement;
+        var script = document.createElement("script");
+        script.setAttribute("type", "text/javascript");
+        if (cb) {
+          if (JSON.stringify(cb)) {
+            for (let p in cb) {
+              if (p == "onload") {
+                script[p] = () => {
+                  cb[p]()
+                  resolve()
+                }
+              } else {
+                script[p] = cb[p]
+                script.onload = resolve
+              }
+            }
+          } else {
+            script.onload = () => {
+              cb()
+              resolve()
+            };
+          }
+        } else {
+          script.onload = resolve
+        }
+        script.setAttribute("src", src);
+        HEAD.appendChild(script);
+      });
+    });
+  }
+
+  //https://github.com/filamentgroup/loadCSS
+  var loadCSS = function (href, before, media, attributes) {
+    return new Promise(resolve => {
+      setTimeout(function () {
+        var link = document.createElement('link');
+        link.rel = "stylesheet";
+        link.href = src;
+        link.onload = resolve;
+        document.getElementsByTagName("head")[0].appendChild(link);
+      });
+    });
+  };
+
+</script> 
+
+<!-- 轮播图所需要的js -->
+<script src="/js/swiper/swiper.min.js"></script>
+<script src="/js/swiper/vue-awesome-swiper.js"></script>
+<script src="/js/swiper/swiper.animate1.0.3.min.js"></script>
+
+<script type="text/javascript">
+  Vue.use(window.VueAwesomeSwiper)
+</script>
+
+
+  <script src="/js/vue-typed-js/index.js"></script>
+
+
+<!-- 首页的公告滚动插件的js需要重新加载 -->
+<script src="/js/vue-seamless-scroll/index.js"></script>
+
+<!-- 打字机效果js -->
+<script src="https://unpkg.com/typed.js@2.0.11"></script>
+
+
+    <div id="safearea">
+      <main class="main" id="pjax-container">
+        <!-- 头部导航 -->
+        
+<header class="header   " 
+  id="navHeader"
+  style="position: fixed;
+  left: 0; top: 0; z-index: 10;width: 100%;"
+>
+  <div class="header-content">
+    <div class="bars">
+      <div id="appDrawer" class="sidebar-image">
+  <div class="drawer-box-icon">
+    <i class="fas fa-bars" aria-hidden="true" @click="showDialogDrawer"></i>
+  </div>
+  
+  <transition name="fade">
+    <div class="drawer-box_mask" v-cloak style="display: none;" v-show="visible" @click.self="cancelDialogDrawer">
+    </div>
+  </transition>
+  <div class="drawer-box" :class="{'active': visible}">
+    <div class="drawer-box-head bg-color">
+      <img class="drawer-box-head_logo lazyload placeholder" src="/medias/logo.png" class="lazyload placeholder" data-srcset="/medias/logo.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="logo">
+      <h3 class="drawer-box-head_title">Hexo</h3>
+      <h5 class="drawer-box-head_desc"></h5>
+    </div>
+    
+    <div class="drawer-box-content">
+      <ul class="drawer-box-content_menu">
+        
+        
+          <li class="drawer-box-content_item">
+            <a target="_blank" rel="noopener" href="https://github.com/yuang01/hexo-theme-bamboo">
+              <i class="fas fa-github" aria-hidden="true"></i>
+              <span>Github</span>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</div>
+
+<script>
+  var body = document.body || document.documentElement || window;
+  var vm = new Vue({
+    el: '#appDrawer',
+    data: {
+      visible: false,
+      top: 0,
+      openArr: [],
+    },
+    computed: {
+    },
+    mounted() {
+    },
+    methods: {
+      isOpen(index) {
+        if (this.openArr.includes(index)) {
+          return true;
+        } else {
+          return false;
+        }
+      },
+      openOrCloseMenu(curIndex) {
+        const index = this.openArr.indexOf(curIndex);
+        if (index !== -1) {
+          this.openArr.splice(index, 1);
+        } else {
+          this.openArr.push(curIndex);
+        }
+      },
+      showDialogDrawer() {
+        this.visible = true;
+        // 防止页面滚动，只能让弹框滚动
+        this.top = $(document).scrollTop()
+        body.style.cssText = 'width: 100%; height: 100%;overflow: hidden;';
+      },
+      cancelDialogDrawer() {
+        this.visible = false;
+        body.removeAttribute('style');
+        $(document).scrollTop(this.top)
+      }
+    },
+    created() {}
+  })
+</script>
+
+    </div>
+    <div class="blog-title" id="author-avatar">
+      
+        <div class="avatar">
+          <img src="/medias/logo.png" class="lazyload placeholder" data-srcset="/medias/logo.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="logo">
+        </div>
+      
+      <a href="/" class="logo">Hexo</a>
+    </div>
+    <nav class="navbar">
+      <ul class="menu">
+        
+      </ul>
+      
+      
+        <div id="appSearch">
+  <div class="search"  @click="showDialog()"><i class="fas fa-search" aria-hidden="true"></i></div>
+  <transition name="fade">
+    <div class="message-box_wrapper" style="display: none;" v-cloak v-show="dialogVisible" @click.self="cancelDialogVisible()">
+      <div class="message-box animated bounceInDown">
+        <h2>
+          <span>
+            <i class="fas fa-search" aria-hidden="true"></i>
+            <span class="title">Search</span>
+          </span>
+          <i class="fas fa-times close" pointer style="float:right;" aria-hidden="true" @click.self="cancelDialogVisible()"></i>
+        </h2>
+        <form class="site-search-form">
+          <input type="text"
+            placeholder="Please enter keywords"
+            id="local-search-input" 
+            @click="getSearchFile()"
+            class="st-search-input"
+            v-model="searchInput"
+          />
+        </form>
+        <div class="result-wrapper">
+          <div id="local-search-result" class="local-search-result-cls"></div>
+        </div>
+      </div>
+    </div>
+  </transition>
+</div>
+<script src="/js/local_search.js"></script>
+<script>
+  var body = document.body || document.documentElement || window;
+  var vm = new Vue({
+    el: '#appSearch',
+    data: {
+      dialogVisible: false,
+      searchInput: '',
+      top: 0,
+    },
+    computed: {
+    },
+    mounted() {
+      window.addEventListener('pjax:complete', () => {
+        this.cancelDialogVisible();
+      })
+    },
+    methods: {
+      showDialog() {
+        this.dialogVisible = true;
+        // 防止页面滚动，只能让弹框滚动
+        this.top = $(document).scrollTop()
+        body.style.cssText = 'overflow: hidden;';
+      },
+      getSearchFile() {
+        if (!this.searchInput) {
+          getSearchFile("/search.xml");
+        }
+      },
+      cancelDialogVisible() {
+        this.dialogVisible = false;
+        body.removeAttribute('style');
+        $(document).scrollTop(this.top)
+      },
+    },
+    created() {}
+  })
+</script>
+<!-- 解决刷新页面闪烁问题，可以在元素上添加display: none, 或者用vue.extend方法，详情：https://blog.csdn.net/qq_31393401/article/details/81017912 -->
+<!-- 下面是搜索基本写法 -->
+<!-- <script type="text/javascript" id="local.search.active">
+  var inputArea = document.querySelector("#local-search-input");
+  inputArea.onclick   = function(){ getSearchFile(); this.onclick = null }
+  inputArea.onkeydown = function(){ if(event.keyCode == 13) return false }
+</script> -->
+
+      
+
+    </nav>
+  </div>
+  
+    <a target="_blank" rel="noopener" href="https://github.com/yuang01/hexo-theme-bamboo" class="github-corner color-primary" aria-label="View source on GitHub"><svg width="60" height="60" viewBox="0 0 250 250" style="fill:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+  
+  
+</header>
+        <!-- 内容区域 -->
+        
+ <!-- prismjs 代码高亮 -->
+ 
+
+
+<div class="bg-dark-floor" style="position: fixed;left: 0;top: 0;width: 100%;height: 100%;z-index: -1;"></div>
+
+
+  <!-- 文章详情页顶部图片和标题 -->
+
+
+
+
+<div class="post-detail-header" id="thumbnail_canvas" style="background-repeat: no-repeat; background-size: cover; 
+  background-position: center center;position: relative;background-image:url('/medias/6.jpg')">
+  <div class="post-detail-header-mask"></div>
+  <canvas id="header_canvas"style="position:absolute;bottom:0;pointer-events:none;"></canvas>
+  
+  <div class="post-detail-header_info-box">
+    <div class="title-box">
+      <span class="title">
+        13-垃圾回收器
+      </span>
+    </div>
+    
+    
+      
+        <span class="post-detail-header_date">
+          <i class="fas fa-calendar"></i> Published in：2022-05-16 |
+        </span>
+      
+
+      
+        <span class="post-detail-header_categories">
+          <i class="iconfont iconbookmark1"></i> category：
+          
+            <a href="/categories/JVM%E4%B8%8A%E7%AF%87/" class="post-detail-header_category">
+              JVM上篇
+            </a>
+          
+        </span>
+      
+
+      
+    
+  </div>
+  
+  
+    <script src="/js/bubble/bubble.js"></script>
+  
+</div>
+
+
+
+
+
+<div class="post-detail-content row justify-position" 
+  style="padding-top: 0px;">
+  <div class="main-content">
+    <article class="post post-detail">
+      <div class="post-content">
+        <h1 id="13-垃圾回收器"><a href="#13-垃圾回收器" class="headerlink" title="13-垃圾回收器"></a>13-垃圾回收器</h1><blockquote>
+<p>笔记来源：<a target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV1PJ411n7xZ">尚硅谷 JVM 全套教程，百万播放，全网巅峰（宋红康详解 java 虚拟机）</a></p>
+</blockquote>
+<h2 id="13-垃圾回收器-1"><a href="#13-垃圾回收器-1" class="headerlink" title="13. 垃圾回收器"></a>13. 垃圾回收器</h2><h3 id="13-1-GC-分类与性能指标"><a href="#13-1-GC-分类与性能指标" class="headerlink" title="13.1. GC 分类与性能指标"></a>13.1. GC 分类与性能指标</h3><h4 id="13-1-1-垃圾回收器概述"><a href="#13-1-1-垃圾回收器概述" class="headerlink" title="13.1.1. 垃圾回收器概述"></a>13.1.1. 垃圾回收器概述</h4><p>垃圾收集器没有在规范中进行过多的规定，可以由不同的厂商、不同版本的 JVM 来实现。</p>
+<p>由于 JDK 的版本处于高速迭代过程中，因此 Java 发展至今已经衍生了众多的 GC 版本。</p>
+<p>从不同角度分析垃圾收集器，可以将 GC 分为不同的类型。</p>
+<h4 id="13-1-2-垃圾收集器分类"><a href="#13-1-2-垃圾收集器分类" class="headerlink" title="13.1.2. 垃圾收集器分类"></a>13.1.2. 垃圾收集器分类</h4><p>按线程数分，可以分为串行垃圾回收器和并行垃圾回收器。</p>
+<p><img src="https://img-blog.csdnimg.cn/img_convert/ab10d1899d353ea14797f9ce1778503c.png" class="lazyload placeholder" data-srcset="https://img-blog.csdnimg.cn/img_convert/ab10d1899d353ea14797f9ce1778503c.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20210512144253383"></p>
+<p>串行回收指的是在同一时间段内只允许有一个 CPU 用于执行垃圾回收操作，此时工作线程被暂停，直至垃圾收集工作结束。</p>
+<ul>
+<li>在诸如单 CPU 处理器或者较小的应用内存等硬件平台不是特别优越的场合，串行回收器的性能表现可以超过并行回收器和并发回收器。所以，串行回收默认被应用在客户端的 Client 模式下的 JVM 中</li>
+<li>在并发能力比较强的 CPU 上，并行回收器产生的停顿时间要短于串行回收器。</li>
+</ul>
+<p>和串行回收相反，并行收集可以运用多个 CPU 同时执行垃圾回收，因此提升了应用的吞吐量，不过并行回收仍然与串行回收一样，采用独占式，使用了“Stop-the-World”机制。</p>
+<p>按照工作模式分，可以分为并发式垃圾回收器和独占式垃圾回收器。</p>
+<ul>
+<li>并发式垃圾回收器与应用程序线程交替工作，以尽可能减少应用程序的停顿时间。</li>
+<li>独占式垃圾回收器（Stop the world）一旦运行，就停止应用程序中的所有用户线程，直到垃圾回收过程完全结束。</li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/img_convert/6e2c2869a4450dc405bda0ea8a8e7c31.png" class="lazyload placeholder" data-srcset="https://img-blog.csdnimg.cn/img_convert/6e2c2869a4450dc405bda0ea8a8e7c31.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20200713083443486"></p>
+<p>按碎片处理方式分，可分为压缩式垃圾回收器和非压缩式垃圾回收器。</p>
+<ul>
+<li>压缩式垃圾回收器会在回收完成后，对存活对象进行压缩整理，消除回收后的碎片。</li>
+<li>非压缩式的垃圾回收器不进行这步操作。</li>
+</ul>
+<p>按工作的内存区间分，又可分为年轻代垃圾回收器和老年代垃圾回收器。</p>
+<h4 id="13-1-3-评估-GC-的性能指标"><a href="#13-1-3-评估-GC-的性能指标" class="headerlink" title="13.1.3. 评估 GC 的性能指标"></a>13.1.3. 评估 GC 的性能指标</h4><ul>
+<li>吞吐量：运行用户代码的时间占总运行时间的比例（总运行时间 &#x3D; 程序的运行时间 + 内存回收的时间）</li>
+<li>垃圾收集开销：吞吐量的补数，垃圾收集所用时间与总运行时间的比例。</li>
+<li>暂停时间：执行垃圾收集时，程序的工作线程被暂停的时间。</li>
+<li>收集频率：相对于应用程序的执行，收集操作发生的频率。</li>
+<li>内存占用：Java 堆区所占的内存大小。</li>
+<li>快速：一个对象从诞生到被回收所经历的时间。</li>
+</ul>
+<p>吞吐量、暂停时间、内存占用 这三者共同构成一个“不可能三角”。三者总体的表现会随着技术进步而越来越好。一款优秀的收集器通常最多同时满足其中的两项。</p>
+<p>这三项里，暂停时间的重要性日益凸显。因为随着硬件发展，内存占用多些越来越能容忍，硬件性能的提升也有助于降低收集器运行时对应用程序的影响，即提高了吞吐量。而内存的扩大，对延迟反而带来负面效果。</p>
+<p>简单来说，主要抓住两点：吞吐量、暂停时间</p>
+<h4 id="吞吐量"><a href="#吞吐量" class="headerlink" title="吞吐量"></a>吞吐量</h4><p>吞吐量就是 CPU 用于运行用户代码的时间与 CPU 总消耗时间的比值，即吞吐量 &#x3D; 运行用户代码时间 &#x2F;（运行用户代码时间+垃圾收集时间）。比如：虚拟机总共运行了 100 分钟，其中垃圾收集花掉 1 分钟，那吞吐量就是 99%。</p>
+<p>这种情况下，应用程序能容忍较高的暂停时间，因此，高吞吐量的应用程序有更长的时间基准，快速响应是不必考虑的</p>
+<p>吞吐量优先，意味着在单位时间内，STW 的时间最短：0.2 + 0.2 &#x3D; 0.4</p>
+<p><img src="https://img-blog.csdnimg.cn/img_convert/a05d48c1926a03c3acdebf74d10bf522.png" class="lazyload placeholder" data-srcset="https://img-blog.csdnimg.cn/img_convert/a05d48c1926a03c3acdebf74d10bf522.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20200713084726176"></p>
+<h4 id="暂停时间"><a href="#暂停时间" class="headerlink" title="暂停时间"></a>暂停时间</h4><p>“暂停时间”是指一个时间段内应用程序线程暂停，让 GC 线程执行的状态。</p>
+<p>例如，GC 期间 100 毫秒的暂停时间意味着在这 100 毫秒期间内没有应用程序线程是活动的。</p>
+<p>暂停时间优先，意味着尽可能让单次 STW 的时间最短：0.1 + 0.1 + 0.1 + 0.1 + 0.1 &#x3D; 0.5</p>
+<p><img src="https://img-blog.csdnimg.cn/img_convert/de90092e21cbff31926f7cc7dceebf25.png" class="lazyload placeholder" data-srcset="https://img-blog.csdnimg.cn/img_convert/de90092e21cbff31926f7cc7dceebf25.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20200713085306400"></p>
+<h4 id="吞吐量-vs-暂停时间"><a href="#吞吐量-vs-暂停时间" class="headerlink" title="吞吐量 vs 暂停时间"></a>吞吐量 vs 暂停时间</h4><p>高吞吐量较好因为这会让应用程序的最终用户感觉只有应用程序线程在做“生产性”工作。直觉上，吞吐量越高程序运行越快。</p>
+<p>低暂停时间（低延迟）较好因为从最终用户的角度来看不管是 GC 还是其他原因导致一个应用被挂起始终是不好的。这取决于应用程序的类型，有时候甚至短暂的 200 毫秒暂停都可能打断终端用户体验。因此，具有低的较大暂停时间是非常重要的，特别是对于一个交互式应用程序。</p>
+<p>不幸的是”高吞吐量”和”低暂停时间”是一对相互竞争的目标（矛盾）。</p>
+<ul>
+<li>因为如果选择以吞吐量优先，那么必然需要降低内存回收的执行频率，但是这样会导致 GC 需要更长的暂停时间来执行内存回收。</li>
+<li>相反的，如果选择以低延迟优先为原则，那么为了降低每次执行内存回收时的暂停时间，也只能频繁地执行内存回收，但这又引起了年轻代内存的缩减和导致程序吞吐量的下降。</li>
+</ul>
+<p>在设计（或使用）GC 算法时，我们必须确定我们的目标：一个 GC 算法只可能针对两个目标之一（即只专注于较大吞吐量或最小暂停时间），或尝试找到一个二者的折衷。</p>
+<p>现在标准：在最大吞吐量优先的情况下，降低停顿时间</p>
+<h4 id="13-2-不同的垃圾回收器概述"><a href="#13-2-不同的垃圾回收器概述" class="headerlink" title="13.2. 不同的垃圾回收器概述"></a>13.2. 不同的垃圾回收器概述</h4><p>垃圾收集机制是 Java 的招牌能力，极大地提高了开发效率。这当然也是面试的热点。</p>
+<h3 id="13-2-1-垃圾回收器发展史"><a href="#13-2-1-垃圾回收器发展史" class="headerlink" title="13.2.1. 垃圾回收器发展史"></a>13.2.1. 垃圾回收器发展史</h3><p>有了虚拟机，就一定需要收集垃圾的机制，这就是 Garbage Collection，对应的产品我们称为 Garbage Collector。</p>
+<ul>
+<li>1999 年随 JDK1.3.1 一起来的是串行方式的 serialGc，它是第一款 GC。ParNew 垃圾收集器是 Serial 收集器的多线程版本</li>
+<li>2002 年 2 月 26 日，Parallel GC 和 Concurrent Mark Sweep GC 跟随 JDK1.4.2 一起发布·</li>
+<li>Parallel GC 在 JDK6 之后成为 HotSpot 默认 GC。</li>
+<li>2012 年，在 JDK1.7u4 版本中，G1 可用。</li>
+<li>2017 年，JDK9 中 G1 变成默认的垃圾收集器，以替代 CMS。</li>
+<li>2018 年 3 月，JDK10 中 G1 垃圾回收器的并行完整垃圾回收，实现并行性来改善最坏情况下的延迟。</li>
+<li>2018 年 9 月，JDK11 发布。引入 Epsilon 垃圾回收器，又被称为 “No-Op(无操作)“ 回收器。同时，引入 ZGC：可伸缩的低延迟垃圾回收器（Experimental）</li>
+<li>2019 年 3 月，JDK12 发布。增强 G1，自动返回未用堆内存给操作系统。同时，引入 Shenandoah GC：低停顿时间的 GC（Experimental）。·</li>
+<li>2019 年 9 月，JDK13 发布。增强 ZGC，自动返回未用堆内存给操作系统。</li>
+<li>2020 年 3 月，JDK14 发布。删除 CMS 垃圾回收器。扩展 ZGC 在 macos 和 Windows 上的应用</li>
+</ul>
+<h4 id="13-2-2-7-种经典的垃圾收集器"><a href="#13-2-2-7-种经典的垃圾收集器" class="headerlink" title="13.2.2. 7 种经典的垃圾收集器"></a>13.2.2. 7 种经典的垃圾收集器</h4><ul>
+<li>串行回收器：Serial、Serial Old</li>
+<li>并行回收器：ParNew、Parallel Scavenge、Parallel old</li>
+<li>并发回收器：CMS、G1</li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/img_convert/90c3bcdc22cd0b49e10d702c608c4fc6.png" class="lazyload placeholder" data-srcset="https://img-blog.csdnimg.cn/img_convert/90c3bcdc22cd0b49e10d702c608c4fc6.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20200713093551365"></p>
+<p>官方手册：<a target="_blank" rel="noopener" href="https://www.oracle.com/technetwork/java/javase/tech/memorymanagement-whitepaper-1-150020.pdf">https://www.oracle.com/technetwork/java/javase/tech/memorymanagement-whitepaper-1-150020.pdf</a></p>
+<p><img src="https://img-blog.csdnimg.cn/img_convert/c529d76b22212c44275b94675cc56760.png" class="lazyload placeholder" data-srcset="https://img-blog.csdnimg.cn/img_convert/c529d76b22212c44275b94675cc56760.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20210512145950897"></p>
+<h4 id="13-2-3-7-款经典收集器与垃圾分代之间的关系"><a href="#13-2-3-7-款经典收集器与垃圾分代之间的关系" class="headerlink" title="13.2.3. 7 款经典收集器与垃圾分代之间的关系"></a>13.2.3. 7 款经典收集器与垃圾分代之间的关系</h4><p><img src="https://img-blog.csdnimg.cn/img_convert/fd16701d3e150d5e58d52b7306473a42.png" class="lazyload placeholder" data-srcset="https://img-blog.csdnimg.cn/img_convert/fd16701d3e150d5e58d52b7306473a42.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20200713093757644"></p>
+<ul>
+<li>新生代收集器：Serial、ParNew、Parallel Scavenge；</li>
+<li>老年代收集器：Serial Old、Parallel Old、CMS；</li>
+<li>整堆收集器：G1；</li>
+</ul>
+<h4 id="13-2-4-垃圾收集器的组合关系"><a href="#13-2-4-垃圾收集器的组合关系" class="headerlink" title="13.2.4. 垃圾收集器的组合关系"></a>13.2.4. 垃圾收集器的组合关系</h4><p><img src="https://img-blog.csdnimg.cn/img_convert/b92c2212bea2907cb75ff9ef26f346fe.png" class="lazyload placeholder" data-srcset="https://img-blog.csdnimg.cn/img_convert/b92c2212bea2907cb75ff9ef26f346fe.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20200713094745366"></p>
+<ol>
+<li>两个收集器间有连线，表明它们可以搭配使用：Serial&#x2F;Serial Old、Serial&#x2F;CMS、ParNew&#x2F;Serial Old、ParNew&#x2F;CMS、Parallel Scavenge&#x2F;Serial Old、Parallel Scavenge&#x2F;Parallel Old、G1；</li>
+<li>其中 Serial Old 作为 CMS 出现”<code>Concurrent Mode Failure</code>“失败的后备预案。</li>
+<li>（红色虚线）由于维护和兼容性测试的成本，在 JDK 8 时将 Serial+CMS、ParNew+Serial Old 这两个组合声明为废弃（JEP173），并在 JDK9 中完全取消了这些组合的支持（JEP214），即：移除。</li>
+<li>（绿色虚线）JDK14 中：弃用 Parallel Scavenge 和 Serialold GC 组合（JEP366）</li>
+<li>（绿色虚框）JDK14 中：删除 CMS 垃圾回收器（JEP363）</li>
+</ol>
+<h4 id="13-2-5-不同的垃圾收集器概述"><a href="#13-2-5-不同的垃圾收集器概述" class="headerlink" title="13.2.5. 不同的垃圾收集器概述"></a>13.2.5. 不同的垃圾收集器概述</h4><p>为什么要有很多收集器，一个不够吗？因为 Java 的使用场景很多，移动端，服务器等。所以就需要针对不同的场景，提供不同的垃圾收集器，提高垃圾收集的性能。</p>
+<p>虽然我们会对各个收集器进行比较，但并非为了挑选一个最好的收集器出来。没有一种放之四海皆准、任何场景下都适用的完美收集器存在，更加没有万能的收集器。所以我们选择的只是对具体应用最合适的收集器。</p>
+<h4 id="13-2-6-如何查看默认垃圾收集器"><a href="#13-2-6-如何查看默认垃圾收集器" class="headerlink" title="13.2.6. 如何查看默认垃圾收集器"></a>13.2.6. 如何查看默认垃圾收集器</h4><p><code>-XX:+PrintCommandLineFlags</code>：查看命令行相关参数（包含使用的垃圾收集器）</p>
+<p>使用命令行指令：<code>jinfo -flag 相关垃圾回收器参数 进程ID</code></p>
+<h3 id="13-3-Serial-回收器：串行回收"><a href="#13-3-Serial-回收器：串行回收" class="headerlink" title="13.3. Serial 回收器：串行回收"></a>13.3. Serial 回收器：串行回收</h3><p>Serial 收集器是最基本、历史最悠久的垃圾收集器了。JDK1.3 之前回收新生代唯一的选择。</p>
+<p>Serial 收集器作为 HotSpot 中 client 模式下的默认新生代垃圾收集器。</p>
+<p>Serial 收集器采用复制算法、串行回收和”stop-the-World”机制的方式执行内存回收。</p>
+<p>除了年轻代之外，Serial 收集器还提供用于执行老年代垃圾收集的 Serial Old 收集器。Serial Old 收集器同样也采用了串行回收和”Stop the World”机制，只不过内存回收算法使用的是标记-压缩算法。</p>
+<ul>
+<li>Serial old 是运行在 Client 模式下默认的老年代的垃圾回收器</li>
+<li>Serial 0ld 在 Server 模式下主要有两个用途：① 与新生代的 Parallel scavenge 配合使用 ② 作为老年代 CMS 收集器的后备垃圾收集方案</li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/img_convert/d66b612e68381df2101c3e829a18b4f0.png" class="lazyload placeholder" data-srcset="https://img-blog.csdnimg.cn/img_convert/d66b612e68381df2101c3e829a18b4f0.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20200713100703799"></p>
+<p>这个收集器是一个单线程的收集器，但它的“单线程”的意义并不仅仅说明它只会使用一个 CPU 或一条收集线程去完成垃圾收集工作，更重要的是在它进行垃圾收集时，必须暂停其他所有的工作线程，直到它收集结束（Stop The World）</p>
+<p>优势：简单而高效（与其他收集器的单线程比），对于限定单个 CPU 的环境来说，Serial 收集器由于没有线程交互的开销，专心做垃圾收集自然可以获得最高的单线程收集效率。运行在 Client 模式下的虚拟机是个不错的选择。</p>
+<p>在用户的桌面应用场景中，可用内存一般不大（几十 MB 至一两百 MB），可以在较短时间内完成垃圾收集（几十 ms 至一百多 ms），只要不频繁发生，使用串行回收器是可以接受的。</p>
+<p>在 HotSpot 虚拟机中，使用<code>-XX:+UseSerialGC</code>参数可以指定年轻代和老年代都使用串行收集器。等价于新生代用 Serial GC，且老年代用 Serial Old GC</p>
+<p><strong>总结</strong></p>
+<p>这种垃圾收集器大家了解，现在已经不用串行的了。而且在限定单核 cpu 才可以用。现在都不是单核的了。</p>
+<p>对于交互较强的应用而言，这种垃圾收集器是不能接受的。一般在 Java web 应用程序中是不会采用串行垃圾收集器的。</p>
+<h3 id="13-4-ParNew-回收器：并行回收"><a href="#13-4-ParNew-回收器：并行回收" class="headerlink" title="13.4. ParNew 回收器：并行回收"></a>13.4. ParNew 回收器：并行回收</h3><p>如果说 Serial GC 是年轻代中的单线程垃圾收集器，那么 ParNew 收集器则是 Serial 收集器的多线程版本。Par 是 Parallel 的缩写，New：只能处理的是新生代</p>
+<p>ParNew 收集器除了采用并行回收的方式执行内存回收外，两款垃圾收集器之间几乎没有任何区别。ParNew 收集器在年轻代中同样也是采用复制算法、”Stop-the-World”机制。</p>
+<p>ParNew 是很多 JVM 运行在 Server 模式下新生代的默认垃圾收集器。</p>
+<p><img src="https://img-blog.csdnimg.cn/img_convert/187fdcd46a1cb35be6d88a01a433c0f3.png" class="lazyload placeholder" data-srcset="https://img-blog.csdnimg.cn/img_convert/187fdcd46a1cb35be6d88a01a433c0f3.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20200713102030127"></p>
+<ul>
+<li>对于新生代，回收次数频繁，使用并行方式高效。</li>
+<li>对于老年代，回收次数少，使用串行方式节省资源。（CPU 并行需要切换线程，串行可以省去切换线程的资源）</li>
+</ul>
+<p>由于 ParNew 收集器是基于并行回收，那么是否可以断定 ParNew 收集器的回收效率在任何场景下都会比 serial 收集器更高效？</p>
+<ul>
+<li>ParNew 收集器运行在多 CPU 的环境下，由于可以充分利用多 CPU、多核心等物理硬件资源优势，可以更快速地完成垃圾收集，提升程序的吞吐量。</li>
+<li>但是在单个 CPU 的环境下，ParNew 收集器不比 Serial 收集器更高效。虽然 Serial 收集器是基于串行回收，但是由于 CPU 不需要频繁地做任务切换，因此可以有效避免多线程交互过程中产生的一些额外开销。</li>
+</ul>
+<p>因为除 Serial 外，目前只有 ParNew GC 能与 CMS 收集器配合工作</p>
+<p>在程序中，开发人员可以通过选项”<code>-XX:+UseParNewGC</code>“手动指定使用 ParNew 收集器执行内存回收任务。它表示年轻代使用并行收集器，不影响老年代。</p>
+<p><code>-XX:ParallelGCThreads</code>限制线程数量，默认开启和 CPU 数据相同的线程数。</p>
+<h3 id="13-5-Parallel-回收器：吞吐量优先"><a href="#13-5-Parallel-回收器：吞吐量优先" class="headerlink" title="13.5. Parallel 回收器：吞吐量优先"></a>13.5. Parallel 回收器：吞吐量优先</h3><p>HotSpot 的年轻代中除了拥有 ParNew 收集器是基于并行回收的以外，Parallel Scavenge 收集器同样也采用了复制算法、并行回收和”Stop the World”机制。</p>
+<p>那么 Parallel 收集器的出现是否多此一举？</p>
+<ul>
+<li>和 ParNew 收集器不同，ParallelScavenge 收集器的目标则是达到一个可控制的吞吐量（Throughput），它也被称为吞吐量优先的垃圾收集器。</li>
+<li>自适应调节策略也是 Parallel Scavenge 与 ParNew 一个重要区别。</li>
+</ul>
+<p>高吞吐量则可以高效率地利用 CPU 时间，尽快完成程序的运算任务，主要适合在后台运算而不需要太多交互的任务。因此，常见在服务器环境中使用。例如，那些执行批量处理、订单处理、工资支付、科学计算的应用程序。</p>
+<p>Parallel 收集器在 JDK1.6 时提供了用于执行老年代垃圾收集的 Parallel Old 收集器，用来代替老年代的 Serial Old 收集器。</p>
+<p>Parallel Old 收集器采用了标记-压缩算法，但同样也是基于并行回收和”Stop-the-World”机制。</p>
+<p><img src="https://img-blog.csdnimg.cn/img_convert/8a4b655ee277aaf0f9a46754248ce05a.png" class="lazyload placeholder" data-srcset="https://img-blog.csdnimg.cn/img_convert/8a4b655ee277aaf0f9a46754248ce05a.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20200713110359441"></p>
+<p>在程序吞吐量优先的应用场景中，Parallel 收集器和 Parallel Old 收集器的组合，在 Server 模式下的内存回收性能很不错。在 Java8 中，默认是此垃圾收集器。</p>
+<p><strong>参数配置</strong></p>
+<ul>
+<li><p><code>-XX:+UseParallelGC</code> 手动指定年轻代使用 Parallel 并行收集器执行内存回收任务。</p>
+</li>
+<li><p><code>-XX:+UseParallelOldGC</code> 手动指定老年代都是使用并行回收收集器。</p>
+<ul>
+<li>分别适用于新生代和老年代。默认 jdk8 是开启的。</li>
+<li>上面两个参数，默认开启一个，另一个也会被开启。（互相激活）</li>
+</ul>
+</li>
+<li><p><code>-XX:ParallelGCThreads</code> 设置年轻代并行收集器的线程数。一般地，最好与 CPU 数量相等，以避免过多的线程数影响垃圾收集性能。</p>
+<p>ParallelGCThreads&#x3D;{CPUCount3+(5*CPU＿Count&#x2F;8)(CPUCount&lt;&#x3D;8)(CPUCount&gt;8)ParallelGCThreads&#x3D;{CPUCount(CPUCount&lt;&#x3D;8)3+(5*CPU＿Count&#x2F;8)(CPUCount&gt;8)</p>
+</li>
+<li><p><code>-XX:MaxGCPauseMillis</code> 设置垃圾收集器最大停顿时间（即 STw 的时间）。单位是毫秒。</p>
+<ul>
+<li>为了尽可能地把停顿时间控制在 MaxGCPauseMills 以内，收集器在工作时会调整 Java 堆大小或者其他一些参数。</li>
+<li>对于用户来讲，停顿时间越短体验越好。但是在服务器端，我们注重高并发，整体的吞吐量。所以服务器端适合 Parallel，进行控制。</li>
+<li>该参数使用需谨慎。</li>
+</ul>
+</li>
+<li><p><code>-XX:GCTimeRatio</code> 垃圾收集时间占总时间的比例（&#x3D;1&#x2F;（N+1））。用于衡量吞吐量的大小。</p>
+<ul>
+<li>取值范围（0, 100）。默认值 99，也就是垃圾回收时间不超过 1%。</li>
+<li>与前一个<code>-XX:MaxGCPauseMillis </code>参数有一定矛盾性。暂停时间越长，Radio 参数就容易超过设定的比例。</li>
+</ul>
+</li>
+<li><p><code>-XX:+UseAdaptivesizePolicy</code> 设置 Parallel Scavenge 收集器具有自适应调节策略</p>
+<ul>
+<li>在这种模式下，年轻代的大小、Eden 和 Survivor 的比例、晋升老年代的对象年龄等参数会被自动调整，已达到在堆大小、吞吐量和停顿时间之间的平衡点。</li>
+<li>在手动调优比较困难的场合，可以直接使用这种自适应的方式，仅指定虚拟机的最大堆、目标的吞吐量（<code>GCTimeRatio</code>）和停顿时间（<code>MaxGCPauseMills</code>），让虚拟机自己完成调优工作。</li>
+</ul>
+</li>
+</ul>
+<h3 id="13-6-CMS-回收器：低延迟"><a href="#13-6-CMS-回收器：低延迟" class="headerlink" title="13.6. CMS 回收器：低延迟"></a>13.6. CMS 回收器：低延迟</h3><p>在 JDK1.5 时期，Hotspot 推出了一款在强交互应用中几乎可认为有划时代意义的垃圾收集器：CMS（Concurrent-Mark-Sweep）收集器，这款收集器是 HotSpot 虚拟机中第一款真正意义上的并发收集器，它第一次实现了让垃圾收集线程与用户线程同时工作。</p>
+<p>CMS 收集器的关注点是尽可能缩短垃圾收集时用户线程的停顿时间。停顿时间越短（低延迟）就越适合与用户交互的程序，良好的响应速度能提升用户体验。</p>
+<ul>
+<li>目前很大一部分的 Java 应用集中在互联网站或者 B&#x2F;S 系统的服务端上，这类应用尤其重视服务的响应速度，希望系统停顿时间最短，以给用户带来较好的体验。CMS 收集器就非常符合这类应用的需求。</li>
+</ul>
+<p>CMS 的垃圾收集算法采用标记-清除算法，并且也会”Stop-the-World”</p>
+<p>不幸的是，CMS 作为老年代的收集器，却无法与 JDK1.4.0 中已经存在的新生代收集器 Parallel Scavenge 配合工作，所以在 JDK1.5 中使用 CMS 来收集老年代的时候，新生代只能选择 ParNew 或者 Serial 收集器中的一个。</p>
+<p>在 G1 出现之前，CMS 使用还是非常广泛的。一直到今天，仍然有很多系统使用 CMS GC。</p>
+<p><img src="https://img-blog.csdnimg.cn/img_convert/f84a132db8c56a488e14f51e2c4d7fa7.png" class="lazyload placeholder" data-srcset="https://img-blog.csdnimg.cn/img_convert/f84a132db8c56a488e14f51e2c4d7fa7.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20200713205154007"></p>
+<p>CMS 整个过程比之前的收集器要复杂，整个过程分为 4 个主要阶段，即初始标记阶段、并发标记阶段、重新标记阶段和并发清除阶段</p>
+<ul>
+<li><strong>初始标记</strong>（Initial-Mark）阶段：在这个阶段中，程序中所有的工作线程都将会因为“Stop-the-World”机制而出现短暂的暂停，这个阶段的主要任务仅仅只是标记出 GCRoots 能直接关联到的对象。一旦标记完成之后就会恢复之前被暂停的所有应用线程。由于直接关联对象比较小，所以这里的速度非常快。</li>
+<li><strong>并发标记</strong>（Concurrent-Mark）阶段：从 GC Roots 的直接关联对象开始遍历整个对象图的过程，这个过程耗时较长但是不需要停顿用户线程，可以与垃圾收集线程一起并发运行。</li>
+<li><strong>重新标记</strong>（Remark）阶段：由于在并发标记阶段中，程序的工作线程会和垃圾收集线程同时运行或者交叉运行，因此为了修正并发标记期间，因用户程序继续运作而导致标记产生变动的那一部分对象的标记记录，这个阶段的停顿时间通常会比初始标记阶段稍长一些，但也远比并发标记阶段的时间短。</li>
+<li><strong>并发清除</strong>（Concurrent-Sweep）阶段：此阶段清理删除掉标记阶段判断的已经死亡的对象，释放内存空间。由于不需要移动存活对象，所以这个阶段也是可以与用户线程同时并发的</li>
+</ul>
+<p>尽管 CMS 收集器采用的是并发回收（非独占式），但是在其初始化标记和再次标记这两个阶段中仍然需要执行“Stop-the-World”机制暂停程序中的工作线程，不过暂停时间并不会太长，因此可以说明目前所有的垃圾收集器都做不到完全不需要“stop-the-World”，只是尽可能地缩短暂停时间。</p>
+<p>由于最耗费时间的并发标记与并发清除阶段都不需要暂停工作，所以整体的回收是低停顿的。</p>
+<p>另外，由于在垃圾收集阶段用户线程没有中断，所以在 CMS 回收过程中，还应该确保应用程序用户线程有足够的内存可用。因此，CMS 收集器不能像其他收集器那样等到老年代几乎完全被填满了再进行收集，而是当堆内存使用率达到某一阈值时，便开始进行回收，以确保应用程序在 CMS 工作过程中依然有足够的空间支持应用程序运行。要是 CMS 运行期间预留的内存无法满足程序需要，就会出现一次“<code>Concurrent Mode Failure</code>” 失败，这时虚拟机将启动后备预案：临时启用 Serial Old 收集器来重新进行老年代的垃圾收集，这样停顿时间就很长了。</p>
+<p>CMS 收集器的垃圾收集算法采用的是标记清除算法，这意味着每次执行完内存回收后，由于被执行内存回收的无用对象所占用的内存空间极有可能是不连续的一些内存块，不可避免地将会产生一些内存碎片。那么 CMS 在为新对象分配内存空间时，将无法使用指针碰撞（Bump the Pointer）技术，而只能够选择空闲列表（Free List）执行内存分配。</p>
+<p><img src="https://img-blog.csdnimg.cn/img_convert/052d6ef7655e46e040729082ac36da30.png" class="lazyload placeholder" data-srcset="https://img-blog.csdnimg.cn/img_convert/052d6ef7655e46e040729082ac36da30.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20200713212230352"></p>
+<p><strong>有人会觉得既然 Mark Sweep 会造成内存碎片，那么为什么不把算法换成 Mark Compact？</strong></p>
+<p>答案其实很简单，因为当并发清除的时候，用 Compact 整理内存的话，原来的用户线程使用的内存还怎么用呢？要保证用户线程能继续执行，前提的它运行的资源不受影响嘛。Mark Compact 更适合“Stop the World” 这种场景下使用</p>
+<h3 id="13-6-1-CMS-的优点"><a href="#13-6-1-CMS-的优点" class="headerlink" title="13.6.1. CMS 的优点"></a>13.6.1. CMS 的优点</h3><ul>
+<li>并发收集</li>
+<li>低延迟</li>
+</ul>
+<h3 id="13-6-2-CMS-的弊端"><a href="#13-6-2-CMS-的弊端" class="headerlink" title="13.6.2. CMS 的弊端"></a>13.6.2. CMS 的弊端</h3><ul>
+<li>会产生内存碎片，导致并发清除后，用户线程可用的空间不足。在无法分配大对象的情况下，不得不提前触发 FullGC。</li>
+<li>CMS 收集器对 CPU 资源非常敏感。在并发阶段，它虽然不会导致用户停顿，但是会因为占用了一部分线程而导致应用程序变慢，总吞吐量会降低。</li>
+<li>CMS 收集器无法处理浮动垃圾。可能出现“<code>Concurrent Mode Failure</code>“失败而导致另一次 Full GC 的产生。在并发标记阶段由于程序的工作线程和垃圾收集线程是同时运行或者交叉运行的，那么在并发标记阶段如果产生新的垃圾对象，CMS 将无法对这些垃圾对象进行标记，最终会导致这些新产生的垃圾对象没有被及时回收，从而只能在下一次执行 GC 时释放这些之前未被回收的内存空间。</li>
+</ul>
+<h3 id="13-6-3-设置的参数"><a href="#13-6-3-设置的参数" class="headerlink" title="13.6.3. 设置的参数"></a>13.6.3. 设置的参数</h3><ul>
+<li><p><code>-XX:+UseConcMarkSweepGC </code>手动指定使用 CMS 收集器执行内存回收任务。</p>
+<p>开启该参数后会自动将<code>-xx:+UseParNewGC</code>打开。即：ParNew（Young 区用）+CMS（Old 区用）+ Serial Old 的组合。</p>
+</li>
+<li><p><code>-XX:CMSInitiatingOccupanyFraction</code> 设置堆内存使用率的阈值，一旦达到该阈值，便开始进行回收。</p>
+<ul>
+<li>JDK5 及以前版本的默认值为 68，即当老年代的空间使用率达到 68%时，会执行一次 CMS 回收。JDK6 及以上版本默认值为 92%</li>
+<li>如果内存增长缓慢，则可以设置一个稍大的值，大的阀值可以有效降低 CMS 的触发频率，减少老年代回收的次数可以较为明显地改善应用程序性能。反之，如果应用程序内存使用率增长很快，则应该降低这个阈值，以避免频繁触发老年代串行收集器。因此通过该选项便可以有效降低 Ful1Gc 的执行次数。</li>
+</ul>
+</li>
+<li><p><code>-XX:+UseCMSCompactAtFullCollection</code> 用于指定在执行完 Full GC 后对内存空间进行压缩整理，以此避免内存碎片的产生。不过由于内存压缩整理过程无法并发执行，所带来的问题就是停顿时间变得更长了。</p>
+</li>
+<li><p><code>-XX:CMSFullGCsBeforeCompaction</code> 设置在执行多少次 Full GC 后对内存空间进行压缩整理。</p>
+</li>
+<li><p><code>-XX:ParallelcMSThreads</code> 设置 CMS 的线程数量。</p>
+<ul>
+<li>CMS 默认启动的线程数是（ParallelGCThreads+3）&#x2F;4，ParallelGCThreads 是年轻代并行收集器的线程数。当 CPU 资源比较紧张时，受到 CMS 收集器线程的影响，应用程序的性能在垃圾回收阶段可能会非常糟糕。</li>
+</ul>
+</li>
+</ul>
+<h3 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h3><p>HotSpot 有这么多的垃圾回收器，那么如果有人问，Serial GC、Parallel GC、Concurrent Mark Sweep GC 这三个 Gc 有什么不同呢？</p>
+<p>请记住以下口令：</p>
+<ul>
+<li>如果你想要最小化地使用内存和并行开销，请选 Serial GC；</li>
+<li>如果你想要最大化应用程序的吞吐量，请选 Parallel GC；</li>
+<li>如果你想要最小化 GC 的中断或停顿时间，请选 CMS GC。</li>
+</ul>
+<h3 id="13-6-4-JDK-后续版本中-CMS-的变化"><a href="#13-6-4-JDK-后续版本中-CMS-的变化" class="headerlink" title="13.6.4. JDK 后续版本中 CMS 的变化"></a>13.6.4. JDK 后续版本中 CMS 的变化</h3><p>JDK9 新特性：CMS 被标记为 Deprecate 了（JEP291）</p>
+<ul>
+<li>如果对 JDK9 及以上版本的 HotSpot 虚拟机使用参数<code>-XX: +UseConcMarkSweepGC</code>来开启 CMS 收集器的话，用户会收到一个警告信息，提示 CMS 未来将会被废弃。</li>
+</ul>
+<p>JDK14 新特性：删除 CMS 垃圾回收器（JEP363）</p>
+<ul>
+<li>移除了 CMS 垃圾收集器，如果在 JDK14 中使用 <code>-XX:+UseConcMarkSweepGC</code>的话，JVM 不会报错，只是给出一个 warning 信息，但是不会 exit。JVM 会自动回退以默认 GC 方式启动 JVM</li>
+</ul>
+<h3 id="13-7-G1-回收器：区域化分代式"><a href="#13-7-G1-回收器：区域化分代式" class="headerlink" title="13.7. G1 回收器：区域化分代式"></a>13.7. G1 回收器：区域化分代式</h3><p><strong>既然我们已经有了前面几个强大的 GC，为什么还要发布 Garbage First（G1）？</strong></p>
+<p>原因就在于应用程序所应对的业务越来越庞大、复杂，用户越来越多，没有 GC 就不能保证应用程序正常进行，而经常造成 STW 的 GC 又跟不上实际的需求，所以才会不断地尝试对 GC 进行优化。G1（Garbage-First）垃圾回收器是在 Java7 update4 之后引入的一个新的垃圾回收器，是当今收集器技术发展的最前沿成果之一。</p>
+<p>与此同时，为了适应现在不断扩大的内存和不断增加的处理器数量，进一步降低暂停时间（pause time），同时兼顾良好的吞吐量。</p>
+<p>官方给 G1 设定的目标是在延迟可控的情况下获得尽可能高的吞吐量，所以才担当起“全功能收集器”的重任与期望。</p>
+<p><strong>为什么名字叫 Garbage First(G1)呢？</strong></p>
+<p>因为 G1 是一个并行回收器，它把堆内存分割为很多不相关的区域（Region）（物理上不连续的）。使用不同的 Region 来表示 Eden、幸存者 0 区，幸存者 1 区，老年代等。</p>
+<p>G1 GC 有计划地避免在整个 Java 堆中进行全区域的垃圾收集。G1 跟踪各个 Region 里面的垃圾堆积的价值大小（回收所获得的空间大小以及回收所需时间的经验值），在后台维护一个优先列表，每次根据允许的收集时间，优先回收价值最大的 Region。</p>
+<p>由于这种方式的侧重点在于回收垃圾最大量的区间（Region），所以我们给 G1 一个名字：垃圾优先（Garbage First）。</p>
+<p>G1（Garbage-First）是一款面向服务端应用的垃圾收集器，主要针对配备多核 CPU 及大容量内存的机器，以极高概率满足 GC 停顿时间的同时，还兼具高吞吐量的性能特征。</p>
+<p>在 JDK1.7 版本正式启用，移除了 Experimenta1 的标识，是JDK9 以后的默认垃圾回收器，取代了 CMS 回收器以及 Parallel+Parallel Old 组合。被 Oracle 官方称为“全功能的垃圾收集器”。</p>
+<p>与此同时，CMS 已经在 JDK9 中被标记为废弃（deprecated）。在 jdk8 中还不是默认的垃圾回收器，需要使用<code>-XX:+UseG1GC</code>来启用。</p>
+<h4 id="13-7-1-G1-回收器的特点（优势）"><a href="#13-7-1-G1-回收器的特点（优势）" class="headerlink" title="13.7.1. G1 回收器的特点（优势）"></a>13.7.1. G1 回收器的特点（优势）</h4><p>与其他 GC 收集器相比，G1 使用了全新的分区算法，其特点如下所示：</p>
+<h4 id="并行与并发"><a href="#并行与并发" class="headerlink" title="并行与并发"></a>并行与并发</h4><ul>
+<li>并行性：G1 在回收期间，可以有多个 GC 线程同时工作，有效利用多核计算能力。此时用户线程 STW</li>
+<li>并发性：G1 拥有与应用程序交替执行的能力，部分工作可以和应用程序同时执行，因此，一般来说，不会在整个回收阶段发生完全阻塞应用程序的情况</li>
+</ul>
+<h4 id="分代收集"><a href="#分代收集" class="headerlink" title="分代收集"></a>分代收集</h4><ul>
+<li>从分代上看，G1 依然属于分代型垃圾回收器，它会区分年轻代和老年代，年轻代依然有 Eden 区和 Survivor 区。但从堆的结构上看，它不要求整个 Eden 区、年轻代或者老年代都是连续的，也不再坚持固定大小和固定数量。</li>
+<li>将堆空间分为若干个区域（Region），这些区域中包含了逻辑上的年轻代和老年代。</li>
+<li>和之前的各类回收器不同，它同时兼顾年轻代和老年代。对比其他回收器，或者工作在年轻代，或者工作在老年代；</li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/img_convert/9a71df3a4013da274aa3b28cd95e7d37.png" class="lazyload placeholder" data-srcset="https://img-blog.csdnimg.cn/img_convert/9a71df3a4013da274aa3b28cd95e7d37.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20200713215105293"></p>
+<p><img src="https://img-blog.csdnimg.cn/img_convert/8bcd36541731eb308043eba968b7a828.png" class="lazyload placeholder" data-srcset="https://img-blog.csdnimg.cn/img_convert/8bcd36541731eb308043eba968b7a828.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20200713215133839"></p>
+<h4 id="空间整合"><a href="#空间整合" class="headerlink" title="空间整合"></a>空间整合</h4><ul>
+<li>CMS：“标记-清除”算法、内存碎片、若干次 Gc 后进行一次碎片整理</li>
+<li>G1 将内存划分为一个个的 region。内存的回收是以 region 作为基本单位的。Region 之间是复制算法，但整体上实际可看作是标记-压缩（Mark-Compact）算法，两种算法都可以避免内存碎片。这种特性有利于程序长时间运行，分配大对象时不会因为无法找到连续内存空间而提前触发下一次 GC。尤其是当 Java 堆非常大的时候，G1 的优势更加明显。</li>
+</ul>
+<h4 id="可预测的停顿时间模型（即：软实时-soft-real-time）"><a href="#可预测的停顿时间模型（即：软实时-soft-real-time）" class="headerlink" title="可预测的停顿时间模型（即：软实时 soft real-time）"></a>可预测的停顿时间模型（即：软实时 soft real-time）</h4><p>这是 G1 相对于 CMS 的另一大优势，G1 除了追求低停顿外，还能建立可预测的停顿时间模型，能让使用者明确指定在一个长度为 M 毫秒的时间片段内，消耗在垃圾收集上的时间不得超过 N 毫秒。</p>
+<ul>
+<li>由于分区的原因，G1 可以只选取部分区域进行内存回收，这样缩小了回收的范围，因此对于全局停顿情况的发生也能得到较好的控制。</li>
+<li>G1 跟踪各个 Region 里面的垃圾堆积的价值大小（回收所获得的空间大小以及回收所需时间的经验值），在后台维护一个优先列表，每次根据允许的收集时间，优先回收价值最大的 Region。保证了 G1 收集器在有限的时间内可以获取尽可能高的收集效率。</li>
+<li>相比于 CMSGC，G1 未必能做到 CMS 在最好情况下的延时停顿，但是最差情况要好很多。</li>
+</ul>
+<h4 id="13-7-2-G1-垃圾收集器的缺点"><a href="#13-7-2-G1-垃圾收集器的缺点" class="headerlink" title="13.7.2. G1 垃圾收集器的缺点"></a>13.7.2. G1 垃圾收集器的缺点</h4><p>相较于 CMS，G1 还不具备全方位、压倒性优势。比如在用户程序运行过程中，G1 无论是为了垃圾收集产生的内存占用（Footprint）还是程序运行时的额外执行负载（Overload）都要比 CMS 要高。</p>
+<p>从经验上来说，在小内存应用上 CMS 的表现大概率会优于 G1，而 G1 在大内存应用上则发挥其优势。平衡点在 6-8GB 之间。</p>
+<h4 id="13-7-3-G1-回收器的参数设置"><a href="#13-7-3-G1-回收器的参数设置" class="headerlink" title="13.7.3. G1 回收器的参数设置"></a>13.7.3. G1 回收器的参数设置</h4><ul>
+<li><code>-XX:+UseG1GC</code>：手动指定使用 G1 垃圾收集器执行内存回收任务</li>
+<li><code>-XX:G1HeapRegionSize</code> 设置每个 Region 的大小。值是 2 的幂，范围是 1MB 到 32MB 之间，目标是根据最小的 Java 堆大小划分出约 2048 个区域。默认是堆内存的 1&#x2F;2000。</li>
+<li><code>-XX:MaxGCPauseMillis</code> 设置期望达到的最大 GC 停顿时间指标（JVM 会尽力实现，但不保证达到）。默认值是 200ms（人的平均反应速度）</li>
+<li><code>-XX:+ParallelGCThread</code> 设置 STW 工作线程数的值。最多设置为 8（上面说过 Parallel 回收器的线程计算公式，当 CPU_Count &gt; 8 时，ParallelGCThreads 也会大于 8）</li>
+<li><code>-XX:ConcGCThreads</code> 设置并发标记的线程数。将 n 设置为并行垃圾回收线程数（ParallelGCThreads）的 1&#x2F;4 左右。</li>
+<li><code>-XX:InitiatingHeapOccupancyPercent</code> 设置触发并发 GC 周期的 Java 堆占用率阈值。超过此值，就触发 GC。默认值是 45。</li>
+</ul>
+<h4 id="13-7-4-G1-收集器的常见操作步骤"><a href="#13-7-4-G1-收集器的常见操作步骤" class="headerlink" title="13.7.4. G1 收集器的常见操作步骤"></a>13.7.4. G1 收集器的常见操作步骤</h4><p>G1 的设计原则就是简化 JVM 性能调优，开发人员只需要简单的三步即可完成调优：</p>
+<ul>
+<li>第一步：开启 G1 垃圾收集器</li>
+<li>第二步：设置堆的最大内存</li>
+<li>第三步：设置最大的停顿时间</li>
+</ul>
+<p>G1 中提供了三种垃圾回收模式：Young GC、Mixed GC 和 Full GC，在不同的条件下被触发。</p>
+<h4 id="13-7-5-G1-收集器的适用场景"><a href="#13-7-5-G1-收集器的适用场景" class="headerlink" title="13.7.5. G1 收集器的适用场景"></a>13.7.5. G1 收集器的适用场景</h4><p>面向服务端应用，针对具有大内存、多处理器的机器。（在普通大小的堆里表现并不惊喜）</p>
+<p>最主要的应用是需要低 GC 延迟，并具有大堆的应用程序提供解决方案；如：在堆大小约 6GB 或更大时，可预测的暂停时间可以低于 0.5 秒；（G1 通过每次只清理一部分而不是全部的 Region 的增量式清理来保证每次 GC 停顿时间不会过长）。</p>
+<p>用来替换掉 JDK1.5 中的 CMS 收集器；在下面的情况时，使用 G1 可能比 CMS 好：</p>
+<ul>
+<li>超过 50%的 Java 堆被活动数据占用；</li>
+<li>对象分配频率或年代提升频率变化很大；</li>
+<li>GC 停顿时间过长（长于 0.5 至 1 秒）</li>
+</ul>
+<p>HotSpot 垃圾收集器里，除了 G1 以外，其他的垃圾收集器使用内置的 JVM 线程执行 GC 的多线程操作，而 G1 GC 可以采用应用线程承担后台运行的 GC 工作，即当 JVM 的 GC 线程处理速度慢时，系统会调用应用程序线程帮助加速垃圾回收过程。</p>
+<h4 id="13-7-6-分区-Region：化整为零"><a href="#13-7-6-分区-Region：化整为零" class="headerlink" title="13.7.6. 分区 Region：化整为零"></a>13.7.6. 分区 Region：化整为零</h4><p>使用 G1 收集器时，它将整个 Java 堆划分成约 2048 个大小相同的独立 Region 块，每个 Region 块大小根据堆空间的实际大小而定，整体被控制在 1MB 到 32MB 之间，且为 2 的 N 次幂，即 1MB，2MB，4MB，8MB，16MB，32MB。可以通过<code>-XX:G1HeapRegionSize</code>设定。所有的 Region 大小相同，且在 JVM 生命周期内不会被改变。</p>
+<p>虽然还保留有新生代和老年代的概念，但新生代和老年代不再是物理隔离的了，它们都是一部分 Region（不需要连续）的集合。通过 Region 的动态分配方式实现逻辑上的连续。</p>
+<p><img src="https://img-blog.csdnimg.cn/img_convert/74c611464ae6cdae3cbfffaef213cfd5.png" class="lazyload placeholder" data-srcset="https://img-blog.csdnimg.cn/img_convert/74c611464ae6cdae3cbfffaef213cfd5.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20200713223244886"></p>
+<p>一个 region 有可能属于 Eden，Survivor 或者 Old&#x2F;Tenured 内存区域。但是一个 region 只可能属于一个角色。图中的 E 表示该 region 属于 Eden 内存区域，S 表示属于 survivor 内存区域，O 表示属于 Old 内存区域。图中空白的表示未使用的内存空间。</p>
+<p>G1 垃圾收集器还增加了一种新的内存区域，叫做 Humongous 内存区域，如图中的 H 块。主要用于存储大对象，如果超过 1.5 个 region，就放到 H。</p>
+<p>设置 H 的原因：对于堆中的对象，默认直接会被分配到老年代，但是如果它是一个短期存在的大对象就会对垃圾收集器造成负面影响。为了解决这个问题，G1 划分了一个 Humongous 区，它用来专门存放大对象。如果一个 H 区装不下一个大对象，那么 G1 会寻找连续的 H 区来存储。为了能找到连续的 H 区，有时候不得不启动 Full GC。G1 的大多数行为都把 H 区作为老年代的一部分来看待。</p>
+<p>每个 Region 都是通过指针碰撞来分配空间</p>
+<p><img src="https://img-blog.csdnimg.cn/img_convert/049520c5a004b63f750e04d5362a2992.png" class="lazyload placeholder" data-srcset="https://img-blog.csdnimg.cn/img_convert/049520c5a004b63f750e04d5362a2992.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20200713223509993"></p>
+<h4 id="13-7-7-G1-垃圾回收器的回收过程"><a href="#13-7-7-G1-垃圾回收器的回收过程" class="headerlink" title="13.7.7. G1 垃圾回收器的回收过程"></a>13.7.7. G1 垃圾回收器的回收过程</h4><p>G1GC 的垃圾回收过程主要包括如下三个环节：</p>
+<ul>
+<li><p>年轻代 GC（Young GC）</p>
+</li>
+<li><p>老年代并发标记过程（Concurrent Marking）</p>
+</li>
+<li><p>混合回收（Mixed GC）</p>
+<p>（如果需要，单线程、独占式、高强度的 Full GC 还是继续存在的。它针对 GC 的评估失败提供了一种失败保护机制，即强力回收。）</p>
+</li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/img_convert/e8f79c3cdeb0969981703f7a026cf581.png" class="lazyload placeholder" data-srcset="https://img-blog.csdnimg.cn/img_convert/e8f79c3cdeb0969981703f7a026cf581.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20200713224113996"></p>
+<p>顺时针，Young gc -&gt; Young gc + Concurrent mark-&gt;Mixed GC 顺序，进行垃圾回收。</p>
+<p>应用程序分配内存，当年轻代的 Eden 区用尽时开始年轻代回收过程；G1 的年轻代收集阶段是一个并行的独占式收集器。在年轻代回收期，G1GC 暂停所有应用程序线程，启动多线程执行年轻代回收。然后从年轻代区间移动存活对象到 Survivor 区间或者老年区间，也有可能是两个区间都会涉及。</p>
+<p>当堆内存使用达到一定值（默认 45%）时，开始老年代并发标记过程。</p>
+<p>标记完成马上开始混合回收过程。对于一个混合回收期，G1 GC 从老年区间移动存活对象到空闲区间，这些空闲区间也就成为了老年代的一部分。和年轻代不同，老年代的 G1 回收器和其他 GC 不同，G1 的老年代回收器不需要整个老年代被回收，一次只需要扫描&#x2F;回收一小部分老年代的 Region 就可以了。同时，这个老年代 Region 是和年轻代一起被回收的。</p>
+<p>举个例子：一个 Web 服务器，Java 进程最大堆内存为 4G，每分钟响应 1500 个请求，每 45 秒钟会新分配大约 2G 的内存。G1 会每 45 秒钟进行一次年轻代回收，每 31 个小时整个堆的使用率会达到 45%，会开始老年代并发标记过程，标记完成后开始四到五次的混合回收。</p>
+<h4 id="13-7-8-Remembered-Set"><a href="#13-7-8-Remembered-Set" class="headerlink" title="13.7.8. Remembered Set"></a>13.7.8. Remembered Set</h4><ul>
+<li>一个对象被不同区域引用的问题</li>
+<li>一个 Region 不可能是孤立的，一个 Region 中的对象可能被其他任意 Region 中对象引用，判断对象存活时，是否需要扫描整个 Java 堆才能保证准确？</li>
+<li>在其他的分代收集器，也存在这样的问题（而 G1 更突出）回收新生代也不得不同时扫描老年代？</li>
+<li>这样的话会降低 MinorGC 的效率；</li>
+</ul>
+<p><strong>解决方法：</strong></p>
+<p>无论 G1 还是其他分代收集器，JVM 都是使用 Remembered Set 来避免全局扫描：</p>
+<p>每个 Region 都有一个对应的 Remembered Set；</p>
+<p>每次 Reference 类型数据写操作时，都会产生一个 Write Barrier 暂时中断操作；</p>
+<p>然后检查将要写入的引用指向的对象是否和该 Reference 类型数据在不同的 Region（其他收集器：检查老年代对象是否引用了新生代对象）；</p>
+<p>如果不同，通过 CardTable 把相关引用信息记录到引用指向对象的所在 Region 对应的 Remembered Set 中；</p>
+<p>当进行垃圾收集时，在 GC 根节点的枚举范围加入 Remembered Set；就可以保证不进行全局扫描，也不会有遗漏。</p>
+<p><img src="https://img-blog.csdnimg.cn/img_convert/c97de4bdada1da5a9fdd344692ed0957.png" class="lazyload placeholder" data-srcset="https://img-blog.csdnimg.cn/img_convert/c97de4bdada1da5a9fdd344692ed0957.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20200713224716715"></p>
+<h4 id="13-7-9-G1-回收过程一：年轻代-GC"><a href="#13-7-9-G1-回收过程一：年轻代-GC" class="headerlink" title="13.7.9. G1 回收过程一：年轻代 GC"></a>13.7.9. G1 回收过程一：年轻代 GC</h4><p>JVM 启动时，G1 先准备好 Eden 区，程序在运行过程中不断创建对象到 Eden 区，当 Eden 空间耗尽时，G1 会启动一次年轻代垃圾回收过程。</p>
+<p>年轻代垃圾回收只会回收 Eden 区和 Survivor 区。</p>
+<p>首先 G1 停止应用程序的执行（Stop-The-World），G1 创建回收集（Collection Set），回收集是指需要被回收的内存分段的集合，年轻代回收过程的回收集包含年轻代 Eden 区和 Survivor 区所有的内存分段。</p>
+<p><img src="https://img-blog.csdnimg.cn/img_convert/f29fa4dfe3abf4a77be06fdf3378aecf.png" class="lazyload placeholder" data-srcset="https://img-blog.csdnimg.cn/img_convert/f29fa4dfe3abf4a77be06fdf3378aecf.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20200713225100632"></p>
+<p>然后开始如下回收过程：</p>
+<ol>
+<li>第一阶段，扫描根。根是指 static 变量指向的对象，正在执行的方法调用链条上的局部变量等。根引用连同 RSet 记录的外部引用作为扫描存活对象的入口。</li>
+<li>第二阶段，更新 RSet。处理 dirty card queue（见备注）中的 card，更新 RSet。此阶段完成后，RSet 可以准确的反映老年代对所在的内存分段中对象的引用。</li>
+<li>第三阶段，处理 RSet。识别被老年代对象指向的 Eden 中的对象，这些被指向的 Eden 中的对象被认为是存活的对象。</li>
+<li>第四阶段，复制对象。此阶段，对象树被遍历，Eden 区内存段中存活的对象会被复制到 Survivor 区中空的内存分段，Survivor 区内存段中存活的对象如果年龄未达阈值，年龄会加 1，达到阀值会被会被复制到 Old 区中空的内存分段。如果 Survivor 空间不够，Eden 空间的部分数据会直接晋升到老年代空间。</li>
+<li>第五阶段，处理引用。处理 Soft，Weak，Phantom，Final，JNI Weak 等引用。最终 Eden 空间的数据为空，GC 停止工作，而目标内存中的对象都是连续存储的，没有碎片，所以复制过程可以达到内存整理的效果，减少碎片。</li>
+</ol>
+<h4 id="13-7-10-G1-回收过程二：并发标记过程"><a href="#13-7-10-G1-回收过程二：并发标记过程" class="headerlink" title="13.7.10. G1 回收过程二：并发标记过程"></a>13.7.10. G1 回收过程二：并发标记过程</h4><ol>
+<li>初始标记阶段：标记从根节点直接可达的对象。这个阶段是 STW 的，并且会触发一次年轻代 GC。</li>
+<li>根区域扫描（Root Region Scanning）：G1 GC 扫描 Survivor 区直接可达的老年代区域对象，并标记被引用的对象。这一过程必须在 YoungGC 之前完成。</li>
+<li>并发标记（Concurrent Marking）：在整个堆中进行并发标记（和应用程序并发执行），此过程可能被 YoungGC 中断。在并发标记阶段，若发现区域对象中的所有对象都是垃圾，那这个区域会被立即回收。同时，并发标记过程中，会计算每个区域的对象活性（区域中存活对象的比例）。</li>
+<li>再次标记（Remark）：由于应用程序持续进行，需要修正上一次的标记结果。是 STW 的。G1 中采用了比 CMS 更快的初始快照算法：snapshot-at-the-beginning（SATB）。</li>
+<li>独占清理（cleanup，STW）：计算各个区域的存活对象和 GC 回收比例，并进行排序，识别可以混合回收的区域。为下阶段做铺垫。是 STW 的。这个阶段并不会实际上去做垃圾的收集</li>
+<li>并发清理阶段：识别并清理完全空闲的区域。</li>
+</ol>
+<h4 id="13-7-11-G1-回收过程三：混合回收"><a href="#13-7-11-G1-回收过程三：混合回收" class="headerlink" title="13.7.11. G1 回收过程三：混合回收"></a>13.7.11. G1 回收过程三：混合回收</h4><p>当越来越多的对象晋升到老年代 o1d region 时，为了避免堆内存被耗尽，虚拟机会触发一个混合的垃圾收集器，即 Mixed GC，该算法并不是一个 Old GC，除了回收整个 Young Region，还会回收一部分的 Old Region。这里需要注意：是一部分老年代，而不是全部老年代。可以选择哪些 Old Region 进行收集，从而可以对垃圾回收的耗时时间进行控制。也要注意的是 Mixed GC 并不是 Full GC。</p>
+<p><img src="https://img-blog.csdnimg.cn/img_convert/766b882cba7e709202005a3baeb596d0.png" class="lazyload placeholder" data-srcset="https://img-blog.csdnimg.cn/img_convert/766b882cba7e709202005a3baeb596d0.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20200713225810871"></p>
+<p>并发标记结束以后，老年代中百分百为垃圾的内存分段被回收了，部分为垃圾的内存分段被计算了出来。默认情况下，这些老年代的内存分段会分 8 次（可以通过<code>-XX:G1MixedGCCountTarget</code>设置）被回收</p>
+<p>混合回收的回收集（Collection Set）包括八分之一的老年代内存分段，Eden 区内存分段，Survivor 区内存分段。混合回收的算法和年轻代回收的算法完全一样，只是回收集多了老年代的内存分段。具体过程请参考上面的年轻代回收过程。</p>
+<p>由于老年代中的内存分段默认分 8 次回收，G1 会优先回收垃圾多的内存分段。垃圾占内存分段比例越高的，越会被先回收。并且有一个阈值会决定内存分段是否被回收，<code>-XX:G1MixedGCLiveThresholdPercent</code>，默认为 65%，意思是垃圾占内存分段比例要达到 65%才会被回收。如果垃圾占比太低，意味着存活的对象占比高，在复制的时候会花费更多的时间。</p>
+<p>混合回收并不一定要进行 8 次。有一个阈值<code>-XX:G1HeapWastePercent</code>，默认值为 10%，意思是允许整个堆内存中有 10%的空间被浪费，意味着如果发现可以回收的垃圾占堆内存的比例低于 10%，则不再进行混合回收。因为 GC 会花费很多的时间但是回收到的内存却很少。</p>
+<h4 id="13-7-12-G1-回收可选的过程四：Full-GC"><a href="#13-7-12-G1-回收可选的过程四：Full-GC" class="headerlink" title="13.7.12. G1 回收可选的过程四：Full GC"></a>13.7.12. G1 回收可选的过程四：Full GC</h4><p>G1 的初衷就是要避免 Full GC 的出现。但是如果上述方式不能正常工作，G1 会停止应用程序的执行（Stop-The-World），使用单线程的内存回收算法进行垃圾回收，性能会非常差，应用程序停顿时间会很长。</p>
+<p>要避免 Full GC 的发生，一旦发生需要进行调整。什么时候会发生 Full GC 呢？比如堆内存太小，当 G1 在复制存活对象的时候没有空的内存分段可用，则会回退到 Full GC，这种情况可以通过增大内存解决。</p>
+<p>导致 G1 Full GC 的原因可能有两个：</p>
+<ul>
+<li>Evacuation 的时候没有足够的 to-space 来存放晋升的对象；</li>
+<li>并发处理过程完成之前空间耗尽。</li>
+</ul>
+<h4 id="13-7-13-补充"><a href="#13-7-13-补充" class="headerlink" title="13.7.13. 补充"></a>13.7.13. 补充</h4><p>从 Oracle 官方透露出来的信息可获知，回收阶段（Evacuation）其实本也有想过设计成与用户程序一起并发执行，但这件事情做起来比较复杂，考虑到 G1 只是回一部分 Region，停顿时间是用户可控制的，所以并不迫切去实现，而选择把这个特性放到了 G1 之后出现的低延迟垃圾收集器（即 ZGC）中。另外，还考虑到 G1 不是仅仅面向低延迟，停顿用户线程能够最大幅度提高垃圾收集效率，为了保证吞吐量所以才选择了完全暂停用户线程的实现方案。</p>
+<h4 id="13-7-14-G1-回收器优化建议"><a href="#13-7-14-G1-回收器优化建议" class="headerlink" title="13.7.14. G1 回收器优化建议"></a>13.7.14. G1 回收器优化建议</h4><p>年轻代大小</p>
+<ul>
+<li>避免使用<code>-Xmn</code>或<code>-XX:NewRatio</code>等相关选项显式设置年轻代大小</li>
+<li>固定年轻代的大小会覆盖暂停时间目标</li>
+</ul>
+<p>暂停时间目标不要太过严苛</p>
+<ul>
+<li>G1 GC 的吞吐量目标是 90%的应用程序时间和 10%的垃圾回收时间</li>
+<li>评估 G1 GC 的吞吐量时，暂停时间目标不要太严苛。目标太过严苛表示你愿意承受更多的垃圾回收开销，而这些会直接影响到吞吐量。</li>
+</ul>
+<h3 id="13-8-垃圾回收器总结"><a href="#13-8-垃圾回收器总结" class="headerlink" title="13.8. 垃圾回收器总结"></a>13.8. 垃圾回收器总结</h3><h4 id="13-8-1-7-种经典垃圾回收器总结"><a href="#13-8-1-7-种经典垃圾回收器总结" class="headerlink" title="13.8.1. 7 种经典垃圾回收器总结"></a>13.8.1. 7 种经典垃圾回收器总结</h4><p>截止 JDK1.8，一共有 7 款不同的垃圾收集器。每一款的垃圾收集器都有不同的特点，在具体使用的时候，需要根据具体的情况选用不同的垃圾收集器。</p>
+<table>
+<thead>
+<tr>
+<th align="left">垃圾收集器</th>
+<th align="left">分类</th>
+<th align="left">作用位置</th>
+<th align="left">使用算法</th>
+<th align="left">特点</th>
+<th align="left">适用场景</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">Serial</td>
+<td align="left">串行运行</td>
+<td align="left">作用于新生代</td>
+<td align="left">复制算法</td>
+<td align="left">响应速度优先</td>
+<td align="left">适用于单 CPU 环境下的 client 模式</td>
+</tr>
+<tr>
+<td align="left">ParNew</td>
+<td align="left">并行运行</td>
+<td align="left">作用于新生代</td>
+<td align="left">复制算法</td>
+<td align="left">响应速度优先</td>
+<td align="left">多 CPU 环境 Server 模式下与 CMS 配合使用</td>
+</tr>
+<tr>
+<td align="left">Parallel</td>
+<td align="left">并行运行</td>
+<td align="left">作用于新生代</td>
+<td align="left">复制算法</td>
+<td align="left">吞吐量优先</td>
+<td align="left">适用于后台运算而不需要太多交互的场景</td>
+</tr>
+<tr>
+<td align="left">Serial Old</td>
+<td align="left">串行运行</td>
+<td align="left">作用于老年代</td>
+<td align="left">标记-压缩算法</td>
+<td align="left">响应速度优先</td>
+<td align="left">适用于单 CPU 环境下的 Client 模式</td>
+</tr>
+<tr>
+<td align="left">Parallel Old</td>
+<td align="left">并行运行</td>
+<td align="left">作用于老年代</td>
+<td align="left">标记-压缩算法</td>
+<td align="left">吞吐量优先</td>
+<td align="left">适用于后台运算而不需要太多交互的场景</td>
+</tr>
+<tr>
+<td align="left">CMS</td>
+<td align="left">并发运行</td>
+<td align="left">作用于老年代</td>
+<td align="left">标记-清除算法</td>
+<td align="left">响应速度优先</td>
+<td align="left">适用于互联网或 B／S 业务</td>
+</tr>
+<tr>
+<td align="left">G1</td>
+<td align="left">并发、并行运行</td>
+<td align="left">作用于新生代、老年代</td>
+<td align="left">标记-压缩算法、复制算法</td>
+<td align="left">响应速度优先</td>
+<td align="left">面向服务端应用</td>
+</tr>
+</tbody></table>
+<p>GC 发展阶段：Serial &#x3D;&gt; Parallel（并行）&#x3D;&gt; CMS（并发）&#x3D;&gt; G1 &#x3D;&gt; ZGC</p>
+<h4 id="13-8-2-垃圾回收器组合"><a href="#13-8-2-垃圾回收器组合" class="headerlink" title="13.8.2. 垃圾回收器组合"></a>13.8.2. 垃圾回收器组合</h4><p>不同厂商、不同版本的虚拟机实现差距比较大。HotSpot 虚拟机在 JDK7&#x2F;8 后所有收集器及组合如下图</p>
+<p><img src="https://img-blog.csdnimg.cn/img_convert/5e57edaa3ec7295424480c67daee499e.png" class="lazyload placeholder" data-srcset="https://img-blog.csdnimg.cn/img_convert/5e57edaa3ec7295424480c67daee499e.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20200714080151020"></p>
+<ol>
+<li>两个收集器间有连线，表明它们可以搭配使用：Serial&#x2F;Serial Old、Serial&#x2F;CMS、ParNew&#x2F;Serial Old、ParNew&#x2F;CMS、Parallel Scavenge&#x2F;Serial Old、Parallel Scavenge&#x2F;Parallel Old、G1;</li>
+<li>其中 Serial Old 作为 CMS 出现＂<code>Concurrent Mode Failure</code>＂失败的后备预案。</li>
+<li>（红色虚线）由于维护和兼容性测试的成本，在 JDK 8 时将 Serial ＋ CMS、ParNew ＋ Serial old 这两个组合声明为 Deprecated（JEP 173），并在 JDK 9 中</li>
+</ol>
+<p>完全取消了这些组合的支持（JEP214），即：移除。</p>
+<ol>
+<li>（绿色虚线）JDK 14 中：弃用 ParallelScavenge 和 SeriaOold GC 组合(JEP 366)</li>
+<li>（绿色虚框）JDK 14 中：删除 CMS 垃圾回收器（JEP 363）</li>
+</ol>
+<h4 id="13-8-3-怎么选择垃圾回收器"><a href="#13-8-3-怎么选择垃圾回收器" class="headerlink" title="13.8.3. 怎么选择垃圾回收器"></a>13.8.3. 怎么选择垃圾回收器</h4><p>Java 垃圾收集器的配置对于 JVM 优化来说是一个很重要的选择，选择合适的垃圾收集器可以让 JVM 的性能有一个很大的提升。</p>
+<p>怎么选择垃圾收集器？</p>
+<ol>
+<li><p>优先调整堆的大小让 JVM 自适应完成。</p>
+</li>
+<li><p>如果内存小于 100M，使用串行收集器</p>
+</li>
+<li><p>如果是单核、单机程序，并且没有停顿时间的要求，串行收集器</p>
+</li>
+<li><p>如果是多 CPU、需要高吞吐量、允许停顿时间超过 1 秒，选择并行或者 JVM 自己选择</p>
+</li>
+<li><p>如果是多 CPU、追求低停顿时间，需快速响应（比如延迟不能超过 1 秒，如互联网应用），使用并发收集器</p>
+<p>官方推荐 G1，性能高。现在互联网的项目，基本都是使用 G1。</p>
+</li>
+</ol>
+<p>最后需要明确一个观点：</p>
+<ol>
+<li>没有最好的收集器，更没有万能的收集</li>
+<li>调优永远是针对特定场景、特定需求，不存在一劳永逸的收集器</li>
+</ol>
+<p><strong>面试</strong></p>
+<p>对于垃圾收集，面试官可以循序渐进从理论、实践各种角度深入，也未必是要求面试者什么都懂。但如果你懂得原理，一定会成为面试中的加分项。 这里较通用、基础性的部分如下：</p>
+<ul>
+<li>垃圾收集的算法有哪些？如何判断一个对象是否可以回收？</li>
+<li>垃圾收集器工作的基本流程。</li>
+</ul>
+<p>另外，大家需要多关注垃圾回收器这一章的各种常用的参数</p>
+<h3 id="13-9-GC-日志分析"><a href="#13-9-GC-日志分析" class="headerlink" title="13.9. GC 日志分析"></a>13.9. GC 日志分析</h3><p>通过阅读 Gc 日志，我们可以了解 Java 虚拟机内存分配与回收策略。 内存分配与垃圾回收的参数列表</p>
+<ul>
+<li><code>-XX:+PrintGC</code> 输出 GC 日志。类似：<code>-verbose:gc</code></li>
+<li><code>-XX:+PrintGCDetails</code> 输出 GC 的详细日志</li>
+<li><code>-XX:+PrintGCTimestamps</code> 输出 GC 的时间戳（以基准时间的形式）</li>
+<li><code>-XX:+PrintGCDatestamps</code> 输出 GcC 的时间戳（以日期的形式，如 2013-05-04T21：53：59.234+0800）</li>
+<li><code>-XX:+PrintHeapAtGC</code> 在进行 GC 的前后打印出堆的信息</li>
+<li><code>-Xloggc:../logs/gc.log</code> 日志文件的输出路径</li>
+</ul>
+<p>打开 GC 日志</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">复制代码</span><br><span class="line">1</span><br><span class="line">SHELL-verbose:gc</span><br></pre></td></tr></table></figure>
+
+<p>这个只会显示总的 GC 堆的变化，如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">复制代码123JAVA[GC (Allocation Failure) 80832K-&gt;19298K(227840K),<span class="number">0.0084018</span> secs]</span><br><span class="line">[GC (Metadata GC Threshold) 109499K-&gt;21465K(228352K),<span class="number">0.0184066</span> secs]</span><br><span class="line">[Full <span class="title function_">GC</span> <span class="params">(Metadata GC Threshold)</span> 21465K-&gt;16716K(201728K),<span class="number">0.0619261</span> secs]</span><br></pre></td></tr></table></figure>
+
+<p>参数解析</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">复制代码12345JAVAGC、Full GC：GC的类型，GC只在新生代上进行，Full GC包括永生代，新生代，老年代。</span><br><span class="line">Allocation Failure：GC发生的原因。</span><br><span class="line">80832K-&gt;19298K：堆在GC前的大小和GC后的大小。</span><br><span class="line">228840k：现在的堆大小。</span><br><span class="line"><span class="number">0.0084018</span> secs：GC持续的时间。</span><br></pre></td></tr></table></figure>
+
+<p>打开 GC 日志</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">复制代码</span><br><span class="line">1</span><br><span class="line">SHELL-verbose:gc -XX:+PrintGCDetails</span><br></pre></td></tr></table></figure>
+
+<p>输入信息如下</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">复制代码12345JAVA[GC (Allocation Failure) [PSYoungGen:70640K-&gt;10116K(141312K)] 80541K-&gt;20017K(227328K),<span class="number">0.0172573</span> secs] [Times:user=<span class="number">0.03</span> sys=<span class="number">0.00</span>,real=<span class="number">0.02</span> secs]</span><br><span class="line">[GC (Metadata GC Threshold) [PSYoungGen:98859K-&gt;8154K(142336K)] 108760K-&gt;21261K(228352K),<span class="number">0.0151573</span> secs] [Times:user=<span class="number">0.00</span> sys=<span class="number">0.01</span>,real=<span class="number">0.02</span> secs]</span><br><span class="line">[Full <span class="title function_">GC</span> <span class="params">(Metadata GC Threshold)</span>[PSYoungGen:8154K-&gt;0K(142336K)]</span><br><span class="line">[ParOldGen:13107K-&gt;16809K(62464K)] 21261K-&gt;16809K(204800K),[Metaspace:20599K-&gt;20599K(1067008K)],<span class="number">0.0639732</span> secs]</span><br><span class="line">[Times:user=<span class="number">0.14</span> sys=<span class="number">0.00</span>,real=<span class="number">0.06</span> secs]</span><br></pre></td></tr></table></figure>
+
+<p>参数解析</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">复制代码1234567JAVAGC，Full FC：同样是GC的类型</span><br><span class="line">Allocation Failure：GC原因</span><br><span class="line">PSYoungGen：使用了Parallel Scavenge并行垃圾收集器的新生代GC前后大小的变化</span><br><span class="line">ParOldGen：使用了Parallel Old并行垃圾收集器的老年代GC前后大小的变化</span><br><span class="line">Metaspace： 元数据区GC前后大小的变化，JDK1<span class="number">.8</span>中引入了元数据区以替代永久代</span><br><span class="line">xxx secs：指GC花费的时间</span><br><span class="line">Times：user：指的是垃圾收集器花费的所有CPU时间，sys：花费在等待系统调用或系统事件的时间，real：GC从开始到结束的时间，包括其他进程占用时间片的实际时间。</span><br></pre></td></tr></table></figure>
+
+<p>打开 GC 日志</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">复制代码</span><br><span class="line">1</span><br><span class="line">SHELL-verbose:gc -XX:+PrintGCDetails -XX:+PrintGCTimestamps -XX:+PrintGCDatestamps</span><br></pre></td></tr></table></figure>
+
+<p>输入信息如下</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">复制代码12345JAVA2019-09-24T22:<span class="number">15</span>:<span class="number">24.518</span>+0800: <span class="number">3.287</span>: [GC (Allocation Failure) [PSYoungGen:136162K-&gt;5113K(136192K)] 141425K-&gt;17632K(222208K),<span class="number">0.0248249</span> secs] [Times:user=<span class="number">0.05</span> sys=<span class="number">0.00</span>,real=<span class="number">0.03</span> secs]</span><br><span class="line"></span><br><span class="line"><span class="number">2019</span>-09-24T22:<span class="number">15</span>:<span class="number">25.559</span>+0800: <span class="number">4.329</span>: [GC (Metadata GC Threshold) [PSYoungGen:97578K-&gt;10068K(274944K)] 110096K-&gt;22658K(360960K),<span class="number">0.0094071</span> secs] [Times: user=<span class="number">0.00</span> sys=<span class="number">0.00</span>,real=<span class="number">0.01</span> secs]</span><br><span class="line"></span><br><span class="line"><span class="number">2019</span>-09-24T22:<span class="number">15</span>:<span class="number">25.569</span>+0800: <span class="number">4.338</span>: [Full <span class="title function_">GC</span> <span class="params">(Metadata GC Threshold)</span> [PSYoungGen:10068K-&gt;0K(274944K)][ParoldGen:12590K-&gt;13564K(56320K)] 22658K-&gt;13564K(331264K),[Metaspace:20590K-&gt;20590K(1067008K)],<span class="number">0.0494875</span> secs] [Times: user=<span class="number">0.17</span> sys=<span class="number">0.02</span>,real=<span class="number">0.05</span> secs]</span><br></pre></td></tr></table></figure>
+
+<p>说明：带上了日期和实践</p>
+<p>如果想把 GC 日志存到文件的话，是下面的参数：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">复制代码</span><br><span class="line">1</span><br><span class="line">SHELL-Xloggc:/path/to/gc.log</span><br></pre></td></tr></table></figure>
+
+<p><strong>日志补充说明</strong></p>
+<ul>
+<li><p>“<code>[GC</code>“和”<code>[Full GC</code>“说明了这次垃圾收集的停顿类型，如果有”Full”则说明 GC 发生了”Stop The World”</p>
+</li>
+<li><p>使用 Serial 收集器在新生代的名字是 Default New Generation，因此显示的是”<code>[DefNew</code>“</p>
+</li>
+<li><p>使用 ParNew 收集器在新生代的名字会变成”<code>[ParNew</code>“，意思是”Parallel New Generation”</p>
+</li>
+<li><p>使用 Parallel scavenge 收集器在新生代的名字是”<code>[PSYoungGen</code>“</p>
+</li>
+<li><p>老年代的收集和新生代道理一样，名字也是收集器决定的</p>
+</li>
+<li><p>使用 G1 收集器的话，会显示为”garbage-first heap”</p>
+</li>
+<li><p>Allocation Failure</p>
+<p>表明本次引起 GC 的原因是因为在年轻代中没有足够的空间能够存储新的数据了。</p>
+</li>
+<li><p>[PSYoungGen：5986K-&gt;696K(8704K) ] 5986K-&gt;704K(9216K)</p>
+<p>中括号内：GC 回收前年轻代大小，回收后大小，（年轻代总大小）</p>
+<p>括号外：GC 回收前年轻代和老年代大小，回收后大小，（年轻代和老年代总大小）</p>
+</li>
+<li><p>user 代表用户态回收耗时，sys 内核态回收耗时，rea 实际耗时。由于多核的原因，时间总和可能会超过 real 时间</p>
+</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">复制代码1234567891011JAVAHeap（堆）</span><br><span class="line">PSYoungGen（Parallel Scavenge收集器新生代）total 9216K，used 6234K [<span class="number">0x00000000ff600000</span>,<span class="number">0x0000000100000000</span>,<span class="number">0x0000000100000000</span>)</span><br><span class="line">eden space（堆中的Eden区默认占比是<span class="number">8</span>）8192K，<span class="number">768</span> used [<span class="number">0x00000000ff600000</span>,<span class="number">0x00000000ffc16b08</span>,<span class="number">0x00000000ffe00000</span>)</span><br><span class="line">from space（堆中的Survivor，这里是From Survivor区默认占比是<span class="number">1</span>）1024K， <span class="number">0</span>% used [<span class="number">0x00000000fff00000</span>,<span class="number">0x00000000fff00000</span>,<span class="number">0x0000000100000000</span>)</span><br><span class="line">to space（堆中的Survivor，这里是to Survivor区默认占比是<span class="number">1</span>，需要先了解一下堆的分配策略）1024K, <span class="number">0</span>% used [<span class="number">0x00000000ffe00000</span>,<span class="number">0x00000000ffe00000</span>,<span class="number">0x00000000fff00000</span>)</span><br><span class="line"></span><br><span class="line">ParOldGen（老年代总大小和使用大小）total 10240K， used 7001K ［<span class="number">0x00000000fec00000</span>,<span class="number">0x00000000ff600000</span>,<span class="number">0x00000000ff600000</span>)</span><br><span class="line">object space（显示个使用百分比）10240K，<span class="number">688</span> used [<span class="number">0x00000000fec00000</span>,<span class="number">0x00000000ff2d6630</span>,<span class="number">0x00000000ff600000</span>)</span><br><span class="line"></span><br><span class="line">PSPermGen（永久代总大小和使用大小）total 21504K， used 4949K [<span class="number">0x00000000f9a00000</span>,<span class="number">0x00000000faf00000</span>,<span class="number">0x00000000fec00000</span>)</span><br><span class="line">object space（显示个使用百分比，自己能算出来）21504K， <span class="number">238</span> used [<span class="number">0x00000000f9a00000</span>,<span class="number">0x00000000f9ed55e0</span>,<span class="number">0x00000000faf00000</span>)</span><br></pre></td></tr></table></figure>
+
+<h3 id="Minor-GC-日志"><a href="#Minor-GC-日志" class="headerlink" title="Minor GC 日志"></a>Minor GC 日志</h3><p><img src="https://img-blog.csdnimg.cn/img_convert/9364561fbb81a0e2f9aedc45a383972f.png" class="lazyload placeholder" data-srcset="https://img-blog.csdnimg.cn/img_convert/9364561fbb81a0e2f9aedc45a383972f.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20200714082555688"></p>
+<h3 id="Full-GC-日志"><a href="#Full-GC-日志" class="headerlink" title="Full GC 日志"></a>Full GC 日志</h3><p><img src="https://img-blog.csdnimg.cn/img_convert/502793e725122b958f2861932e5ef9c1.png" class="lazyload placeholder" data-srcset="https://img-blog.csdnimg.cn/img_convert/502793e725122b958f2861932e5ef9c1.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20210512194815354"></p>
+<p><strong>举例</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">复制代码</span><br><span class="line"><span class="number">1</span></span><br><span class="line">JAVAprivate <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">int</span> <span class="variable">_1MB</span> <span class="operator">=</span> <span class="number">1024</span> * <span class="number">1024</span>;<span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">testAllocation</span><span class="params">()</span> &#123;    <span class="type">byte</span> [] allocation1, allocation2, allocation3, allocation4;    allocation1 = <span class="keyword">new</span> <span class="title class_">byte</span>[<span class="number">2</span> *_1MB];    allocation2 = <span class="keyword">new</span> <span class="title class_">byte</span>[<span class="number">2</span> *_1MB];    allocation3 = <span class="keyword">new</span> <span class="title class_">byte</span>[<span class="number">2</span> *_1MB];    allocation4 = <span class="keyword">new</span> <span class="title class_">byte</span>[<span class="number">4</span> *_1MB];&#125;<span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;    testAllocation();&#125;</span><br></pre></td></tr></table></figure>
+
+<p>设置 JVM 参数</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">复制代码</span><br><span class="line">1</span><br><span class="line">SHELL-Xms10m -Xmx10m -XX:+PrintGCDetails</span><br></pre></td></tr></table></figure>
+
+<p><strong>图示</strong></p>
+<p><img src="https://img-blog.csdnimg.cn/img_convert/8dada6b73786eb693975593db10ce825.png" class="lazyload placeholder" data-srcset="https://img-blog.csdnimg.cn/img_convert/8dada6b73786eb693975593db10ce825.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20200714083332238"></p>
+<p><img src="https://img-blog.csdnimg.cn/img_convert/78f6489bd1a3b74e14ee4a95392df8c2.png" class="lazyload placeholder" data-srcset="https://img-blog.csdnimg.cn/img_convert/78f6489bd1a3b74e14ee4a95392df8c2.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20200714083526790"></p>
+<p>可以用一些工具去分析这些 GC 日志</p>
+<p>常用的日志分析工具有：GCViewer、GCEasy、GCHisto、GCLogViewer、Hpjmeter、garbagecat 等</p>
+<h3 id="13-X-垃圾回收器的新发展"><a href="#13-X-垃圾回收器的新发展" class="headerlink" title="13.X. 垃圾回收器的新发展"></a>13.X. 垃圾回收器的新发展</h3><p>GC 仍然处于飞速发展之中，目前的默认选项G1 GC 在不断的进行改进，很多我们原来认为的缺点，例如串行的 Fu11GC、Card Table 扫描的低效等，都已经被大幅改进，例如，JDK10 以后，Fu11GC 已经是并行运行，在很多场景下，其表现还略优于 ParallelGC 的并行 Ful1GC 实现。</p>
+<p>即使是 Serial GC，虽然比较古老，但是简单的设计和实现未必就是过时的，它本身的开销，不管是 GC 相关数据结构的开销，还是线程的开销，都是非常小的，所以随着云计算的兴起，在 Serverless 等新的应用场景下，Serial GC 找到了新的舞台。</p>
+<p>比较不幸的是 CMSGC，因为其算法的理论缺陷等原因，虽然现在还有非常大的用户群体，但在 JDK9 中已经被标记为废弃，并在 JDK14 版本中移除</p>
+<h4 id="13-X-1-JDK11-新特性"><a href="#13-X-1-JDK11-新特性" class="headerlink" title="13.X.1. JDK11 新特性"></a>13.X.1. JDK11 新特性</h4><p>Epsilon:A No-Op GarbageCollector（Epsilon 垃圾回收器，”No-Op（无操作）”回收器）<a target="_blank" rel="noopener" href="http://openidk.iava.net/jeps/318">http://openidk.iava.net/jeps/318</a></p>
+<p>ZGC:A Scalable Low-Latency Garbage Collector（Experimental）（ZGC：可伸缩的低延迟垃圾回收器，处于实验性阶段）<a target="_blank" rel="noopener" href="http://openidk.iava.net/jeps/318">http://openidk.iava.net/jeps/333</a></p>
+<p><img src="https://img-blog.csdnimg.cn/img_convert/4aaef244379d75ba838e10d4178b2960.png" class="lazyload placeholder" data-srcset="https://img-blog.csdnimg.cn/img_convert/4aaef244379d75ba838e10d4178b2960.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20210512195426194"></p>
+<p>现在 G1 回收器已成为默认回收器好几年了。</p>
+<p>我们还看到了引入了两个新的收集器：ZGC（JDK11 出现）和 Shenandoah（Open JDK12）。主打特点：低停顿时间</p>
+<p><img src="https://img-blog.csdnimg.cn/img_convert/00920e4ae2b2c80a8016e6d8f4632545.png" class="lazyload placeholder" data-srcset="https://img-blog.csdnimg.cn/img_convert/00920e4ae2b2c80a8016e6d8f4632545.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20210512195528695"></p>
+<h4 id="13-X-2-Open-JDK12-的-Shenandoash-GC"><a href="#13-X-2-Open-JDK12-的-Shenandoash-GC" class="headerlink" title="13.X.2. Open JDK12 的 Shenandoash GC"></a>13.X.2. Open JDK12 的 Shenandoash GC</h4><p>Open JDK12 的 Shenandoash GC：低停顿时间的 GC（实验性）</p>
+<p>Shenandoah，无疑是众多 GC 中最孤独的一个。是第一款不由 oracle 公司团队领导开发的 Hotspot 垃圾收集器。不可避免的受到官方的排挤。比如号称 OpenJDK 和 OracleJDK 没有区别的 Oracle 公司仍拒绝在 OracleJDK12 中支持 Shenandoah。</p>
+<p>Shenandoah 垃圾回收器最初由 RedHat 进行的一项垃圾收集器研究项目 Pauseless GC 的实现，旨在针对 JVM 上的内存回收实现低停顿的需求.。在 2014 年贡献给 OpenJDK。</p>
+<p>Red Hat 研发 Shenandoah 团队对外宣称，Shenandoah 垃圾回收器的暂停时间与堆大小无关，这意味着无论将堆设置为 200MB 还是 200GB，99.9%的目标都可以把垃圾收集的停顿时间限制在十毫秒以内。不过实际使用性能将取决于实际工作堆的大小和工作负载。</p>
+<p><img src="https://img-blog.csdnimg.cn/img_convert/01f566c0db04f0e475db05addd94259f.png" class="lazyload placeholder" data-srcset="https://img-blog.csdnimg.cn/img_convert/01f566c0db04f0e475db05addd94259f.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20200714090608807"></p>
+<p>这是 RedHat 在 2016 年发表的论文数据，测试内容是使用 Es 对 200GB 的维基百科数据进行索引。从结果看：</p>
+<ul>
+<li>停顿时间比其他几款收集器确实有了质的飞跃，但也未实现最大停顿时间控制在十毫秒以内的目标。</li>
+<li>而吞吐量方面出现了明显的下降，总运行时间是所有测试收集器里最长的。</li>
+</ul>
+<p>总结</p>
+<ul>
+<li>Shenandoah GC 的弱项：高运行负担下的吞吐量下降。</li>
+<li>Shenandoah GC 的强项：低延迟时间。</li>
+<li>Shenandoah GC 的工作过程大致分为九个阶段，这里就不再赘述。在之前 Java12 新特性视频里有过介绍。</li>
+</ul>
+<p>【Java12 新特性地址】</p>
+<p><a target="_blank" rel="noopener" href="http://www.atguigu.com/download_detail.shtml?v=222">http://www.atguigu.com/download_detail.shtml?v=222</a></p>
+<p>或</p>
+<p><a target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV1jJ411M7kQ?from=search&amp;seid=12339069673726242866">https://www.bilibili.com/video/BV1jJ411M7kQ?from=search&amp;seid=12339069673726242866</a></p>
+<h4 id="13-X-3-令人震惊、革命性的-ZGC"><a href="#13-X-3-令人震惊、革命性的-ZGC" class="headerlink" title="13.X.3. 令人震惊、革命性的 ZGC"></a>13.X.3. 令人震惊、革命性的 ZGC</h4><p>官方地址：<a target="_blank" rel="noopener" href="https://docs.oracle.com/en/java/javase/12/gctuning/">https://docs.oracle.com/en/java/javase/12/gctuning/</a></p>
+<p><img src="https://img-blog.csdnimg.cn/img_convert/f78eebadbabf7450ded984f0f1e3a405.png" class="lazyload placeholder" data-srcset="https://img-blog.csdnimg.cn/img_convert/f78eebadbabf7450ded984f0f1e3a405.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20210512200236647"></p>
+<p>ZGC 与 Shenandoah 目标高度相似，在尽可能对吞吐量影响不大的前提下，实现在任意堆内存大小下都可以把垃圾收集的停颇时间限制在十毫秒以内的低延迟。</p>
+<p>《深入理解 Java 虚拟机》一书中这样定义 ZGC：ZGC 收集器是一款基于 Region 内存布局的，（暂时）不设分代的，使用了读屏障、染色指针和内存多重映射等技术来实现可并发的标记-压缩算法的，以低延迟为首要目标的一款垃圾收集器。</p>
+<p>ZGC 的工作过程可以分为 4 个阶段：并发标记 - 并发预备重分配 - 并发重分配 - 并发重映射 等。</p>
+<p>ZGC 几乎在所有地方并发执行的，除了初始标记的是 STw 的。所以停顿时间几乎就耗费在初始标记上，这部分的实际时间是非常少的。</p>
+<p>测试数据：</p>
+<p><img src="https://img-blog.csdnimg.cn/img_convert/b08828b548a255493e934c6fe3308e50.png" class="lazyload placeholder" data-srcset="https://img-blog.csdnimg.cn/img_convert/b08828b548a255493e934c6fe3308e50.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20200714091201073"></p>
+<p><img src="https://img-blog.csdnimg.cn/img_convert/4e648c4e37d84f5d83d965b55f6bc5f9.png" class="lazyload placeholder" data-srcset="https://img-blog.csdnimg.cn/img_convert/4e648c4e37d84f5d83d965b55f6bc5f9.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20200714091401511"></p>
+<p>在 ZGC 的强项停顿时间测试上，它毫不留情的将 Parallel、G1 拉开了两个数量级的差距。无论平均停顿、95％停顿、99％停顿、99.9％停顿，还是最大停顿时间，ZGC 都能毫不费劲控制在 10 毫秒以内。</p>
+<p>虽然 ZGC 还在试验状态，没有完成所有特性，但此时性能已经相当亮眼，用“令人震惊、革命性”来形容，不为过。 未来将在服务端、大内存、低延迟应用的首选垃圾收集器。</p>
+<p><img src="https://img-blog.csdnimg.cn/img_convert/59b014ca2eeda5332fd40a4a2356f883.png" class="lazyload placeholder" data-srcset="https://img-blog.csdnimg.cn/img_convert/59b014ca2eeda5332fd40a4a2356f883.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20200714093243028"></p>
+<p>JEP 364：ZGC 应用在 macos 上</p>
+<p>JEP 365：ZGC 应用在 Windows 上</p>
+<p>JDK14 之前，ZGC 仅 Linux 才支持。</p>
+<p>尽管许多使用 zGc 的用户都使用类 Linux 的环境，但在 Windows 和 macos 上，人们也需要 ZGC 进行开发部署和测试。许多桌面应用也可以从 ZGC 中受益。因此，ZGC 特性被移植到了 Windows 和 macos 上。</p>
+<p>现在 mac 或 Windows 上也能使用 zGC 了，示例如下：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">复制代码</span><br><span class="line">1</span><br><span class="line">SHELL-XX:+UnlockExperimentalVMOptions -XX:+UseZGC</span><br></pre></td></tr></table></figure>
+
+<h4 id="13-X-4-其他垃圾回收器：AliGC"><a href="#13-X-4-其他垃圾回收器：AliGC" class="headerlink" title="13.X.4. 其他垃圾回收器：AliGC"></a>13.X.4. 其他垃圾回收器：AliGC</h4><p>AliGC 是阿里巴巴 JVM 团队基于 G1 算法，面向大堆（LargeHeap）应用场景。指定场景下的对比：</p>
+<p><img src="https://img-blog.csdnimg.cn/img_convert/835fff5c3a7884de2a1d564b7f332900.png" class="lazyload placeholder" data-srcset="https://img-blog.csdnimg.cn/img_convert/835fff5c3a7884de2a1d564b7f332900.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20200714093604012"></p>
+<p>当然，其它厂商也提供了各种别具一格的 GC 实现，例如比较有名的低延迟 GC：Zing，有兴趣可以参考提供的链接 <a target="_blank" rel="noopener" href="https://www.infoq.com/articles/azul_gc_in_detail">https://www.infoq.com/articles/azul_gc_in_detail</a></p>
+
+      </div>
+      <div class="post-tags-categories">
+        
+        <div class="tags">
+          
+            <a href="/tags/JVM/" class="">
+              JVM
+            </a>
+          
+            <a href="/tags/%E7%AC%94%E8%AE%B0/" class="">
+              笔记
+            </a>
+          
+        </div>
+        
+      </div>
+      
+        <div class="copyright">
+  <ul class="post-copyright">
+    <li class="post-copyright-author">
+    <strong>author:  </strong>John Doe</a>
+    </li>
+    <li class="post-copyright-link">
+    <strong>link:  </strong>
+    <a href="/2022/05/16/13-垃圾回收器/" target="_blank" title="13-垃圾回收器">http://example.com/2022/05/16/13-垃圾回收器/</a>
+    </li>
+    <li class="post-copyright-license">
+      <strong>Copyright notice:   </strong>
+      All articles on this website, unless otherwise stated, adopt <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">CC BY-NC-ND 4.0</a>
+      reprint policy. If reproduced, please indicate source!
+    </li>
+  </ul>
+<div>
+      
+    </article>
+    <!-- 上一篇文章和下一篇文章 -->
+    
+      <!-- 文章详情页的上一页和下一页 -->
+<div class="post-nav">
+
+
+
+  
+  <div class="post-nav-prev post-nav-item">
+    <div class="post-nav-img" style="background-size: cover; 
+      background-position: center center;">
+      <img class="lazyload lazyload placeholder" src="/medias/1.jpg" class="lazyload placeholder" data-srcset="/medias/1.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="">
+    </div>
+    <a href="/2022/05/16/%EF%BC%9CJVM%E4%B8%AD%E7%AF%87%EF%BC%9A%E5%AD%97%E8%8A%82%E7%A0%81%E4%B8%8E%E7%B1%BB%E7%9A%84%E5%8A%A0%E8%BD%BD%E7%AF%87%EF%BC%9E01-Class%E5%AD%97%E8%8A%82%E7%A0%81%E6%96%87%E4%BB%B6%E7%BB%93%E6%9E%84/" class="post-nav-link">
+      <div class="title">
+        <i class="fas fa-angle-left"></i> Prev:
+        <div class="title-text">＜JVM中篇：字节码与类的加载篇＞01-Class字节码文件结构</div>
+      </div>
+      
+      <!-- <div class="content">
+        ＜JVM中篇：字节码与类的加载篇＞01-Class字节码文件结构
+笔记来源：尚硅谷JVM全套教程，百万播放，全网巅峰（宋
+      </div> -->
+    </a>
+  </div>
+
+
+
+  
+  <div class="post-nav-next post-nav-item">
+    <div class="post-nav-img" style="background-size: cover; 
+      background-position: center center;">
+      <img class="lazyload lazyload placeholder" src="/medias/1.jpg" class="lazyload placeholder" data-srcset="/medias/1.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" src="" alt="">
+    </div>
+    <a href="/2022/05/16/12-%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E7%9B%B8%E5%85%B3%E6%A6%82%E5%BF%B5/" class="post-nav-link">
+      <div class="title">
+        Next: <i class="fas fa-angle-right"></i>
+        <div class="title-text">12-垃圾回收相关概念</div>
+      </div>
+      <!-- <div class="content">
+        12-垃圾回收相关概念
+笔记来源：尚硅谷 JVM 全套教程，百万播放，全网巅峰（宋红康详解 java 虚拟机）
+
+12.
+      </div> -->
+    </a>
+  </div>
+
+</div>
+
+    
+    
+
+    <!-- 打赏 -->
+    
+      <div id="appDonate" class="post-donate">
+  <div id="donate_board" class="donate_bar center" ref="donate">
+    <a id="btn_donate" class="btn_donate" href="javascript:;" title="打赏" @click="showDialogDrawer()"></a>
+  </div>
+  <transition name="fade">
+    <div 
+      class="donate-box-mask"
+      v-cloak 
+      v-show="visible"
+      @click="cancelDialogDrawer()"
+    >
+    </div>
+  </transition>
+  <transition name="bounce">
+    <div class="donate-box" v-cloak v-show="visible">
+      <div class="donate-box_close">
+        <i class="fas fa-times" aria-hidden="true" @click="cancelDialogDrawer" pointer></i>
+      </div>
+      <div class="donate-box_title">
+        <h4>
+          你的赏识是我前进的动力
+        </h4>
+      </div>
+      <div class="donate-box_tab">
+        <div class="Alipay" pointer :class="{'active': tabActive === 'Alipay'}" @click="changeTabActive('Alipay')">
+          支付宝
+        </div>
+        <div class="WeChatpay" pointer :class="{'active': tabActive === 'WeChatpay'}" @click="changeTabActive('WeChatpay')">
+          微信
+        </div>
+      </div>
+      <div class="donate-box_img">
+        <div class="AlipayImg" v-show="tabActive === 'Alipay'">
+          <img src="/medias/1.jpg" class="lazyload placeholder" data-srcset="/medias/1.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="支付宝打赏" />
+        </div> 
+        <div class="WeChatpayImg" v-show="tabActive === 'WeChatpay'">
+          <img src="/medias/2.jpg" class="lazyload placeholder" data-srcset="/medias/2.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="微信打赏" />
+        </div>
+      </div>
+    </div>
+  </transition>
+</div>
+
+<script>
+  var body = document.body || document.documentElement || window;
+  var vm = new Vue({
+    el: '#appDonate',
+    data: {
+      visible: false,
+      tabActive: 'Alipay',
+      top: 0,
+    },
+    computed: {
+    },
+    mounted() {
+    },
+    methods: {
+      showDialogDrawer() {
+        this.visible = true;
+        // 防止页面滚动，只能让弹框滚动
+        // function getScroll() {
+        //   return {
+        //     left: window.pageXOffset || document.documentElement.scrollLeft || document.body.scrollLeft || 0,
+        //     top: window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0
+        //   };
+        // }
+        this.top = $(document).scrollTop() // or getScroll().top
+        // console.log('aa', $('.main-content'));
+        body.style.cssText = 'overflow: hidden;';
+      },
+      cancelDialogDrawer() {
+        this.visible = false;
+        body.removeAttribute('style');
+        $(document).scrollTop(this.top)
+      },
+      changeTabActive(name) {
+        this.tabActive = name;
+      }
+    },
+    created() {}
+  })
+</script>
+    
+
+    <!-- 分享 -->
+    
+      <!-- https://github.com/overtrue/share.js -->
+<!-- 文章详情页的分享 -->
+<div class="social-share" data-sites="twitter,facebook,google,qq,qzone,wechat,weibo,douban,linkedin" data-wechat-qrcode-helper="<p>微信扫一扫即可分享！</p>"></div>
+
+<script src="/js/shareJs/social-share.min.js"></script>
+</script>
+
+<style>
+  .social-share {
+    margin: 20px 0;
+  }
+</style>
+
+
+    
+    
+    <!-- 评论 -->
+    <!-- 评论 -->
+
+  <div id="myComment">
+    
+      <div id="gitment-container"></div>
+
+    
+  </div>
+
+<!-- comment script in themes\hexo-theme-bamboo\layout\_partial\scripts\index.ejs -->
+
+
+  </div>
+
+  <!-- 目录 -->
+  <!-- 文章详情页右侧目录 -->
+
+  <div class="toc-aside">
+    <div class="toc-main">
+      <div class="toc-aside-title">
+        <i class="fas fa-list-ul" aria-hidden="true"></i><span>catalog</span>
+        
+          <div class="toc-open-close">catalog</div>
+        
+      </div>
+      <div class="toc-content">
+        <div class="toc"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 手机端目录按钮 -->
+  <div id="toc-mobile-btn">
+    <i class="fas fa-list-ul" aria-hidden="true"></i>
+  </div>
+
+
+<script>
+  function closeToc(init) {
+    $(".toc-aside").css({'width': 0, 'padding': 0, 'transition': init ?  'noe' : 'width 0.3s' });
+    $(".toc-content").css({'width': 0});
+    $(".toc-aside-title span, .toc-aside-title i").css({'display': 'none'});
+    $(".main-content").css({'width': '75%', 'margin-left': 'auto', 'margin-right': 'auto',});
+  };
+  function openToc() {
+    $(".main-content").css({'width': '65%', 'margin-right': '10px', 'margin-left': 'calc(35% - 350px)'});
+    $(".toc-aside").css({'width': '300px', 'padding': '0 10px', 'transition': 'width 0.3s'});
+    $(".toc-content").css({'width': '300px'});
+    $(".toc-aside-title span, .toc-aside-title i").css({'display': 'inline-block'});
+  }
+  function openBtnClickFn () {
+    let openOrCloseBtn = $('.toc-aside .toc-aside-title .toc-open-close');
+    let open = eval('' || 'true');
+    openOrCloseBtn.click(function() {
+      if (open) {
+        closeToc();
+        open = false;
+      } else {
+        openToc();
+        open = true;
+      }
+    });
+  };
+  openBtnClickFn();
+  initCloseTocWidth(true);
+
+  function initCloseTocWidth(init) {
+    if (window.innerWidth >= 992) {
+      let isClose = false;
+      isClose && closeToc(init)
+    }
+  }
+
+  document.addEventListener('pjax:complete', function () {
+    $(".toc-aside").css({'transition': 'no'});
+  })
+  document.addEventListener('pjax:complete', function () {
+    openBtnClickFn();
+  })
+  
+</script>
+
+  <!-- 图片放大 Wrap images with fancybox support -->
+  <script src="/js/wrapImage.js"></script>
+</div>
+
+<!-- 文章详情页背景图 -->
+<div id="appBgSwiper" style="position: fixed;left: 0;top: 0;width: 100%;height: 100%;z-index: -2;"
+	:style="{'background-color': bgColor ? bgColor : 'transparent'}">
+	<transition-group tag="ul" :name="names">
+		<li v-for='(image,index) in img' :key='index' v-show="index === mark" class="bg-swiper-box">
+			<img :src="image" class="bg-swiper-img no-lazy">
+		</li>
+	</transition-group>
+</div>
+<script>
+	var vm = new Vue({
+		el: '#appBgSwiper',
+		data: {
+			names: '' || 'fade' || 'fade', // translate-fade fade
+			mark: 0,
+			img: [],
+			bgColor: '',
+			time: null
+		},
+		methods: {   //添加方法
+			change(i, m) {
+				if (i > m) {
+					// this.names = 'fade';
+				} else if (i < m) {
+					// this.names = 'fade';
+				} else {
+					return;
+				}
+				this.mark = i;
+			},
+			prev() {
+				// this.names = 'fade';
+				this.mark--;
+				if (this.mark === -1) {
+					this.mark = 3;
+					return
+				}
+			},
+			next() {
+				// this.names = 'fade';
+				this.mark++;
+				if (this.mark === this.img.length) {
+					this.mark = 0;
+					return
+				}
+			},
+			autoPlay() {
+				// this.names = 'fade';
+				this.mark++;
+				if (this.mark === this.img.length) {
+					this.mark = 0;
+					return
+				}
+			},
+			play() {
+				let bgImgDelay = '' || '180000'
+				let delay = parseInt(bgImgDelay) || 180000;
+				this.time = setInterval(this.autoPlay, delay);
+			},
+			enter() {
+				clearInterval(this.time);
+			},
+			leave() {
+				this.play();
+			}
+		},
+		created() {
+			this.play()
+		},
+		beforeDestroy() {
+			clearInterval(this.time);
+		},
+		mounted() {
+			let prop = '' || '';
+			let isImg = prop.includes('.bmp') || prop.includes('.jpg') || prop.includes('.png') || prop.includes('.tif') || prop.includes('.gif') || prop.includes('.pcx') || prop.includes('.tga') || prop.includes('.exif') || prop.includes('.fpx') || prop.includes('.psd') || prop.includes('.cdr') || prop.includes('.pcd') || prop.includes('.dxf') || prop.includes('.ufo') || prop.includes('.eps') || prop.includes('.ai') || prop.includes('.raw') || prop.includes('.WMF') || prop.includes('.webp') || prop.includes('.jpeg') || prop.includes('http://') || prop.includes('https://')
+			if (isImg) {
+				let img = prop.split(',');
+				let configRoot = '/'
+				let arrImg = [];
+				img.forEach(el => {
+					var Expression = /http(s)?:\/\/([\w-]+\.)+[\w-]+(\/[\w- .\/?%&=]*)?/;
+					var objExp = new RegExp(Expression);
+
+					if (objExp.test(el)) {
+						// http or https
+						arrImg.push(el);
+					} else {
+						// 非http or https开头
+						// 本地文件
+						let firstStr = el.charAt(0);
+						if (firstStr == '/') {
+							el = el.substr(1); // 删除第一个字符 '/',因为 configRoot最后一个字符为 /
+						}
+						el = configRoot + el;
+						arrImg.push(el);
+					}
+				})
+				this.img = arrImg;
+			} else {
+				this.bgColor = prop;
+			}
+		}
+	})
+</script>
+
+<style>
+	.bg-swiper-box {
+		position: absolute;
+		display: block;
+		width: 100%;
+		height: 100%;
+	}
+
+	.bg-swiper-img {
+		object-fit: cover;
+		width: 100%;
+		height: 100%;
+	}
+</style>
+
+
+
+
+  <script>
+  function loadMermaid() {
+    if (document.getElementsByClassName('mermaid').length) {
+      if (window.mermaidJsLoad) mermaid.init()
+      else {
+        loadScript('https://unpkg.com/mermaid/dist/mermaid.min.js').then(() => {
+          window.mermaidJsLoad = true
+          mermaid.initialize({
+            theme: 'default',
+          })
+          if ('true') {
+            mermaid.init();
+          }
+        })
+      }
+    }
+  };
+  document.addEventListener("DOMContentLoaded", function () {
+    loadMermaid();
+  })
+
+  document.addEventListener('pjax:complete', function () {
+    loadMermaid();
+  })
+  
+</script>
+
+
+      </main>
+    </div>
+
+    <!-- 页脚 -->
+    
+  
+  
+    <!-- 底部鱼儿跳动效果，依赖于jquery-->
+<div id="j-fish-skip" style=" position: relative;height: 153px;width: auto;"></div>
+<script>
+  var RENDERER = {
+    POINT_INTERVAL: 5,
+    FISH_COUNT: 3,
+    MAX_INTERVAL_COUNT: 50,
+    INIT_HEIGHT_RATE: .5,
+    THRESHOLD: 50,
+    FISH_COLOR: '',
+    init: function () {
+      this.setFishColor(); this.setParameters(), this.reconstructMethods(), this.setup(), this.bindEvent(), this.render()
+    },
+    setFishColor: function () {
+      let isDark = JSON.parse(localStorage.getItem('dark')) || JSON.parse('false');
+      if (isDark) {
+        this.FISH_COLOR = '#222'; // 暗黑色，有时间把这整成一个变量
+      } else {
+        this.FISH_COLOR = '' || '#42b983';
+      }
+    },
+    setParameters: function () {
+      this.$window = $(window), this.$container = $("#j-fish-skip"), this.$canvas = $("<canvas />"), this.context = this.$canvas.appendTo(this.$container).get(0).getContext("2d"), this.points = [], this.fishes = [], this.watchIds = []
+    },
+    createSurfacePoints: function () {
+      var t = Math.round(this.width / this.POINT_INTERVAL);
+      this.pointInterval = this.width / (t - 1), this.points.push(new SURFACE_POINT(this, 0));
+      for (var i = 1; i < t; i++) {
+        var e = new SURFACE_POINT(this, i * this.pointInterval),
+          h = this.points[i - 1];
+        e.setPreviousPoint(h), h.setNextPoint(e), this.points.push(e)
+      }
+    },
+    reconstructMethods: function () {
+      this.watchWindowSize = this.watchWindowSize.bind(this), this.jdugeToStopResize = this.jdugeToStopResize.bind(this), this.startEpicenter = this.startEpicenter.bind(this), this.moveEpicenter = this.moveEpicenter.bind(this), this.reverseVertical = this.reverseVertical.bind(this), this.render = this.render.bind(this)
+    },
+    setup: function () {
+      this.points.length = 0, this.fishes.length = 0, this.watchIds.length = 0, this.intervalCount = this.MAX_INTERVAL_COUNT, this.width = this.$container.width(), this.height = this.$container.height(), this.fishCount = this.FISH_COUNT * this.width / 500 * this.height / 500, this.$canvas.attr({
+        width: this.width,
+        height: this.height
+      }), this.reverse = !1, this.fishes.push(new FISH(this)), this.createSurfacePoints()
+    },
+    watchWindowSize: function () {
+      this.clearTimer(), this.tmpWidth = this.$window.width(), this.tmpHeight = this.$window.height(), this.watchIds.push(setTimeout(this.jdugeToStopResize, this.WATCH_INTERVAL))
+    },
+    clearTimer: function () {
+      for (; this.watchIds.length > 0;) clearTimeout(this.watchIds.pop())
+    },
+    jdugeToStopResize: function () {
+      var t = this.$window.width(),
+        i = this.$window.height(),
+        e = t == this.tmpWidth && i == this.tmpHeight;
+      this.tmpWidth = t, this.tmpHeight = i, e && this.setup()
+    },
+    bindEvent: function () {
+      this.$window.on("resize", this.watchWindowSize), this.$container.on("mouseenter", this.startEpicenter), this.$container.on("mousemove", this.moveEpicenter)
+    },
+    getAxis: function (t) {
+      var i = this.$container.offset();
+      return {
+        x: t.clientX - i.left + this.$window.scrollLeft(),
+        y: t.clientY - i.top + this.$window.scrollTop()
+      }
+    },
+    startEpicenter: function (t) {
+      this.axis = this.getAxis(t)
+    },
+    moveEpicenter: function (t) {
+      var i = this.getAxis(t);
+      this.axis || (this.axis = i), this.generateEpicenter(i.x, i.y, i.y - this.axis.y), this.axis = i
+    },
+    generateEpicenter: function (t, i, e) {
+      if (!(i < this.height / 2 - this.THRESHOLD || i > this.height / 2 + this.THRESHOLD)) {
+        var h = Math.round(t / this.pointInterval);
+        h < 0 || h >= this.points.length || this.points[h].interfere(i, e)
+      }
+    },
+    reverseVertical: function () {
+      this.reverse = !this.reverse;
+      for (var t = 0, i = this.fishes.length; t < i; t++) this.fishes[t].reverseVertical()
+    },
+    controlStatus: function () {
+      for (var t = 0, i = this.points.length; t < i; t++) this.points[t].updateSelf();
+      for (t = 0, i = this.points.length; t < i; t++) this.points[t].updateNeighbors();
+      this.fishes.length < this.fishCount && 0 == --this.intervalCount && (this.intervalCount = this.MAX_INTERVAL_COUNT, this.fishes.push(new FISH(this)))
+    },
+    render: function () {
+      requestAnimationFrame(this.render), this.controlStatus(), this.context.clearRect(0, 0, this.width, this.height), this.context.fillStyle = this.FISH_COLOR;
+      for (var t = 0, i = this.fishes.length; t < i; t++) this.fishes[t].render(this.context);
+      this.context.save(), this.context.globalCompositeOperation = "xor", this.context.beginPath(), this.context.moveTo(0, this.reverse ? 0 : this.height);
+      for (t = 0, i = this.points.length; t < i; t++) this.points[t].render(this.context);
+      this.context.lineTo(this.width, this.reverse ? 0 : this.height), this.context.closePath(), this.context.fill(), this.context.restore()
+    }
+  },
+  SURFACE_POINT = function (t, i) {
+    this.renderer = t, this.x = i, this.init()
+  };
+  SURFACE_POINT.prototype = {
+    SPRING_CONSTANT: .03,
+    SPRING_FRICTION: .9,
+    WAVE_SPREAD: .3,
+    ACCELARATION_RATE: .01,
+    init: function () {
+      this.initHeight = this.renderer.height * this.renderer.INIT_HEIGHT_RATE, this.height = this.initHeight, this.fy = 0, this.force = {
+        previous: 0,
+        next: 0
+      }
+    },
+    setPreviousPoint: function (t) {
+      this.previous = t
+    },
+    setNextPoint: function (t) {
+      this.next = t
+    },
+    interfere: function (t, i) {
+      this.fy = this.renderer.height * this.ACCELARATION_RATE * (this.renderer.height - this.height - t >= 0 ? -1 : 1) * Math.abs(i)
+    },
+    updateSelf: function () {
+      this.fy += this.SPRING_CONSTANT * (this.initHeight - this.height), this.fy *= this.SPRING_FRICTION, this.height += this.fy
+    },
+    updateNeighbors: function () {
+      this.previous && (this.force.previous = this.WAVE_SPREAD * (this.height - this.previous.height)), this.next && (this.force.next = this.WAVE_SPREAD * (this.height - this.next.height))
+    },
+    render: function (t) {
+      this.previous && (this.previous.height += this.force.previous, this.previous.fy += this.force.previous), this.next && (this.next.height += this.force.next, this.next.fy += this.force.next), t.lineTo(this.x, this.renderer.height - this.height)
+    }
+  };
+  var FISH = function (t) {
+    this.renderer = t, this.init()
+  };
+  FISH.prototype = {
+    GRAVITY: .4,
+    init: function () {
+      this.direction = Math.random() < .5, this.x = this.direction ? this.renderer.width + this.renderer.THRESHOLD : -this.renderer.THRESHOLD, this.previousY = this.y, this.vx = this.getRandomValue(4, 10) * (this.direction ? -1 : 1), this.renderer.reverse ? (this.y = this.getRandomValue(1 * this.renderer.height / 10, 4 * this.renderer.height / 10), this.vy = this.getRandomValue(2, 5), this.ay = this.getRandomValue(.05, .2)) : (this.y = this.getRandomValue(6 * this.renderer.height / 10, 9 * this.renderer.height / 10), this.vy = this.getRandomValue(-5, -2), this.ay = this.getRandomValue(-.2, -.05)), this.isOut = !1, this.theta = 0, this.phi = 0
+    },
+    getRandomValue: function (t, i) {
+      return t + (i - t) * Math.random()
+    },
+    reverseVertical: function () {
+      this.isOut = !this.isOut, this.ay *= -1
+    },
+    controlStatus: function (t) {
+      this.previousY = this.y, this.x += this.vx, this.y += this.vy, this.vy += this.ay, this.renderer.reverse ? this.y > this.renderer.height * this.renderer.INIT_HEIGHT_RATE ? (this.vy -= this.GRAVITY, this.isOut = !0) : (this.isOut && (this.ay = this.getRandomValue(.05, .2)), this.isOut = !1) : this.y < this.renderer.height * this.renderer.INIT_HEIGHT_RATE ? (this.vy += this.GRAVITY, this.isOut = !0) : (this.isOut && (this.ay = this.getRandomValue(-.2, -.05)), this.isOut = !1), this.isOut || (this.theta += Math.PI / 20, this.theta %= 2 * Math.PI, this.phi += Math.PI / 30, this.phi %= 2 * Math.PI), this.renderer.generateEpicenter(this.x + (this.direction ? -1 : 1) * this.renderer.THRESHOLD, this.y, this.y - this.previousY), (this.vx > 0 && this.x > this.renderer.width + this.renderer.THRESHOLD || this.vx < 0 && this.x < -this.renderer.THRESHOLD) && this.init()
+    },
+    render: function (t) {
+      t.save(), t.translate(this.x, this.y), t.rotate(Math.PI + Math.atan2(this.vy, this.vx)), t.scale(1, this.direction ? 1 : -1), t.beginPath(), t.moveTo(-30, 0), t.bezierCurveTo(-20, 15, 15, 10, 40, 0), t.bezierCurveTo(15, -10, -20, -15, -30, 0), t.fill(), t.save(), t.translate(40, 0), t.scale(.9 + .2 * Math.sin(this.theta), 1), t.beginPath(), t.moveTo(0, 0), t.quadraticCurveTo(5, 10, 20, 8), t.quadraticCurveTo(12, 5, 10, 0), t.quadraticCurveTo(12, -5, 20, -8), t.quadraticCurveTo(5, -10, 0, 0), t.fill(), t.restore(), t.save(), t.translate(-3, 0), t.rotate((Math.PI / 3 + Math.PI / 10 * Math.sin(this.phi)) * (this.renderer.reverse ? -1 : 1)), t.beginPath(), this.renderer.reverse ? (t.moveTo(5, 0), t.bezierCurveTo(10, 10, 10, 30, 0, 40), t.bezierCurveTo(-12, 25, -8, 10, 0, 0)) : (t.moveTo(-5, 0), t.bezierCurveTo(-10, -10, -10, -30, 0, -40), t.bezierCurveTo(12, -25, 8, -10, 0, 0)), t.closePath(), t.fill(), t.restore(), t.restore(), this.controlStatus(t)
+    }
+  }, $(function () {
+    RENDERER.init()
+    $('.dark').click(function () {
+      setTimeout(() => {
+        RENDERER.setFishColor();
+        RENDERER.context.fill();
+      });
+    })
+  });
+</script>
+  
+  <div class="footer bg-color">
+    <div class="footer-main">
+      
+        
+          <div class="link">
+            
+          </div>
+        
+      
+        
+          <div class="footer-copyright">
+            <p>Copyright © 2019 - 2020 <a target="_blank" rel="noopener" href="https://github.com/yuang01">yuang01</a> | Powered by <a target="_blank" rel="noopener" href="https://hexo.io/zh-cn/docs/">Hexo</a> | Theme <a target="_blank" rel="noopener" href="https://github.com/yuang01/theme">Bamboo</a> </p>
+
+          </div>
+        
+      
+        
+          
+            <!-- 不蒜子统计 -->
+            <!-- 不蒜子统计 -->
+<span id="busuanzi_container_site_pv">
+      <i class="fas fa-eye" aria-hidden="true"></i>Total visits：<span id="busuanzi_value_site_pv"></span> times
+</span>
+<span class="post-meta-divider">|</span>
+<span id="busuanzi_container_site_uv" style='display:none'>
+      <i class="fas fa-users" aria-hidden="true"></i>Number of visitors：<span id="busuanzi_value_site_uv"></span> people
+</span>
+
+          
+        
+      
+        
+          <div class="footer-custom">
+            
+          </div>
+        
+      
+    </div>
+  </div>
+
+
+
+    <!-- 渲染暗黑按钮 -->
+    
+      <div class="dark">
+  <div class="dark-content">
+    <i class="fas fa-moon" aria-hidden="true"></i>
+    <!-- <span>关灯</span> -->
+  </div>
+  
+</div>
+
+<script>
+  $(function() {
+    let isDark = JSON.parse(localStorage.getItem('dark'))  || JSON.parse('false');
+    if (isDark) {
+      $(".dark-content").replaceWith(
+          `
+          <div class='dark-content'>
+            <i class="fas fa-lightbulb" aria-hidden="true"></i>
+          </div>
+          `
+        );
+    }
+    $('.dark').click(function() {
+      if ($(document.body).is('.darkModel')) {
+        $(document.body).removeClass('darkModel');
+        localStorage.setItem('dark', false);
+        $(".dark-content").replaceWith(
+          `
+          <div class='dark-content'>
+            <i class="fas fa-moon" aria-hidden="true"></i>
+          </div>
+          `
+        );
+      } else {
+        $(document.body).addClass('darkModel');
+        localStorage.setItem('dark', true);
+        $(".dark-content").replaceWith(
+          `
+          <div class='dark-content'>
+            <i class="fas fa-lightbulb" aria-hidden="true"></i>
+          </div>
+          `
+        );
+      }
+    })
+  })
+</script>
+    
+    <!-- 渲染回到顶部按钮 -->
+    
+      <div class="goTop top-btn-color" pointer>
+  <i class="fas fa-arrow-up" aria-hidden="true"></i>
+</div>
+<script src="/js/goTop.js"></script>
+
+    
+    <!-- 渲染左下角音乐播放器 -->
+    
+      <link rel="stylesheet" href="/js/aplayer/APlayer@1.10.1.min.css">
+<style>
+.aplayer .aplayer-lrc p {
+  
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 16px !important;
+}
+
+.aplayer .aplayer-lrc p.aplayer-lrc-current {
+  
+  font-size: 15px;
+  color: #42b983;
+}
+
+
+.aplayer.aplayer-fixed.aplayer-narrow .aplayer-body {
+  left: -66px !important;
+}
+
+.aplayer.aplayer-fixed.aplayer-narrow .aplayer-body:hover {
+  left: 0px !important;
+}
+
+
+</style>
+<meting-js  
+  class=""
+  server="tencent"
+  type="playlist"
+  id="8062553743"
+  fixed='true'
+  autoplay='false'
+  theme='#42b983'
+  loop='all'
+  order='random'
+  preload='auto'
+  volume='0.7'
+  list-folded='true'
+>
+</meting-js>
+
+<!-- <style>
+  #aplayer {
+    position: fixed;
+    left: 0;
+    bottom: 300px;
+  }
+</style> -->
+<script src="https://unpkg.com/aplayer@1.10.1/dist/APlayer.min.js"></script>
+<script src="https://unpkg.com/meting@2/dist/Meting.min.js"></script>
+    
+
+    <!-- 图片放大 -->
+    
+      <script src="/js/fancybox/jquery.fancybox.min.js"></script>
+    
+
+    <!-- 百度解析 -->
+    <!-- Baidu Analytics -->
+
+    <!-- Baidu Push -->
+
+<script>
+    (function () {
+        var bp = document.createElement('script');
+        var curProtocol = window.location.protocol.split(':')[0];
+        if (curProtocol === 'https') {
+            bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+        } else {
+            bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+        }
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(bp, s);
+    })();
+</script>
+
+    
+    <!-- 背景彩带 -->
+    
+      <script type="text/javascript" size="100" alpha='0.4' zIndex="-1" src="/js/ribbon.min.js"></script>
+    
+
+    <script src="/js/utils/index.js"></script>
+    <script src="/js/app.js"></script>
+    
+    <!-- 文章目录所需js -->
+<link href="/js/tocbot/tocbot.css" rel="stylesheet">
+<script src="/js/tocbot/tocbot.min.js"></script>
+
+<script>
+  var headerEl = 'h2, h3, h4',  //headers 
+    content = '.post-detail',//文章容器
+    idArr = {};  //标题数组以确定是否增加索引id
+  //add #id
+  var option = {
+    // Where to render the table of contents.
+    tocSelector: '.toc',
+    // Where to grab the headings to build the table of contents.
+    contentSelector: content,
+    // Which headings to grab inside of the contentSelector element.
+    headingSelector: headerEl,
+    scrollSmooth: true,
+    scrollSmoothOffset: -80,
+    headingsOffset: -($(window).height() * 0.4 - 45),
+    positionFixedSelector: '.toc-main',
+    positionFixedClass: 'is-position-fixed',
+    fixedSidebarOffset: 'auto',
+    activeLinkClass: 'is-active-link',
+    // onClick: function (e) {},
+  }
+  if ($('.toc').length > 0) {
+
+    $(content).children(headerEl).each(function () {
+      //去除空格以及多余标点
+      var headerId = $(this).text().replace(/[\s|\~|`|\!|\@|\#|\$|\%|\^|\&|\*|\(|\)|\_|\+|\=|\||\|\[|\]|\{|\}|\;|\:|\"|\'|\,|\<|\.|\>|\/|\?|\：|\，|\。]/g, '');
+
+      headerId = headerId.toLowerCase();
+      if (idArr[headerId]) {
+        //id已经存在
+        $(this).attr('id', headerId + '-' + idArr[headerId]);
+        idArr[headerId]++;
+      }
+      else {
+        //id未存在
+        idArr[headerId] = 1;
+        $(this).attr('id', headerId);
+      }
+    });
+
+    document.addEventListener("DOMContentLoaded", function () {
+      tocbot.init(option);
+      mobileTocClick();
+    });
+
+  }
+
+  window.tocScrollFn = function () {
+    return bamboo.throttle(function () {
+      findHeadPosition();
+    }, 100)()
+  }
+  window.addEventListener('scroll', tocScrollFn);
+
+  const findHeadPosition = function (top) {
+    if ($('.toc-list').length <= 0) {
+      return false;
+    }
+    setTimeout(() => {  // or DOMContentLoaded 
+      autoScrollToc();
+    }, 0);
+  }
+
+  const autoScrollToc = function () {
+    const $activeItem = document.querySelector('.is-active-link');
+    const $cardToc = document.querySelector('.toc-content');
+    const activePosition = $activeItem.getBoundingClientRect().top
+    const sidebarScrollTop = $cardToc.scrollTop
+    if (activePosition > (document.documentElement.clientHeight - 100)) {
+      $cardToc.scrollTop = sidebarScrollTop + 150
+    }
+    if (activePosition < 100) {
+      $cardToc.scrollTop = sidebarScrollTop - 150
+    }
+  }
+
+  document.addEventListener('pjax:send', function () {
+    if ($('.toc').length) {
+      tocbot.destroy();
+    }
+  });
+
+  document.addEventListener('pjax:complete', function () {
+    if ($('.toc').length) {
+      tocbot.init(option);
+      mobileTocClick();
+    }
+  });
+  
+  // 手机端toc按钮点击出现目录
+  const mobileTocClick = function () {
+    const $cardTocLayout = document.getElementsByClassName('toc-aside')[0];
+    const $cardToc = $cardTocLayout.getElementsByClassName('toc-content')[0];
+    let right = '45px';
+    if (window.innerWidth >= 551 && window.innerWidth <= 992) {
+      right = '100px'
+    }
+    const mobileToc = {
+      open: () => {
+        $cardTocLayout.style.cssText = 'animation: toc-open .3s; opacity: 1; right: ' + right
+      },
+
+      close: () => {
+        $cardTocLayout.style.animation = 'toc-close .2s'
+        setTimeout(() => {
+          $cardTocLayout.style.cssText = "opacity:''; animation: ''; right: ''"
+        }, 100)
+      }
+    }
+    document.getElementById('toc-mobile-btn').addEventListener('click', () => {
+      if (window.getComputedStyle($cardTocLayout).getPropertyValue('opacity') === '0') mobileToc.open()
+      else mobileToc.close()
+    })
+
+    $cardToc.addEventListener('click', (e) => {
+      if (window.innerWidth < 992) { // 小于992px的时候
+        mobileToc.close()
+      }
+    })
+  }
+</script>
+
+<style>
+  .is-position-fixed {
+    position: sticky !important;
+    top: 74px;
+  }
+
+  .toc-main ul {
+    counter-reset: show-list;
+  }
+
+  .toc-main ul li::before {
+    content: counter(item)".";
+    display: block;
+    position: absolute;
+    left: 12px;
+    top: 0;
+  }
+</style> 
+
+<!-- 设置导航背景 -->
+<script>
+  let setHeaderClass = () => {
+    const headerMenuTransparent = true;
+    if (!headerMenuTransparent) { return; }
+    const nav = $('#navHeader');
+    const navTop = nav.outerHeight();
+    const winTop = $(window).scrollTop();
+    if(winTop > navTop) {
+      nav.addClass('header-bg-color');
+    }
+    else {
+      nav.removeClass('header-bg-color');
+    }
+  };
+
+  let scrollCollect = () => {
+    return bamboo.throttle(function (e) {
+      setHeaderClass();
+    }, 200)()
+  }
+
+  let initHeaderBg = () => {
+    setHeaderClass();
+  }
+
+  setHeaderClass();
+  window.addEventListener('scroll', scrollCollect);
+
+  document.addEventListener('pjax:send', function () {
+    window.removeEventListener('scroll', scrollCollect)
+  })
+  document.addEventListener('pjax:complete', function () {
+    window.addEventListener('scroll', scrollCollect);
+    setHeaderClass();
+  })
+</script> 
+
+<!-- 渲染issues标签里的内容 -->
+<script>
+  function loadIssuesJS() {
+    if ($(".post-detail").find(".issues-api").length == 0) {
+      return;
+    } 
+    loadScript('/js/issues/index.js');
+  };
+  $(function () {
+    loadIssuesJS();
+  });
+  document.addEventListener('pjax:complete', function () {
+    if (typeof IssuesAPI == "undefined") {
+      loadIssuesJS();
+    }
+  })
+</script>
+
+<!-- 输入框打字特效 -->
+<!-- 输入框打字特效 -->
+
+  <script src="/js/activate-power-mode.js"></script>
+  <script>
+    POWERMODE.colorful = true;  // 打开随机颜色特效
+    POWERMODE.shake = false;    // 关闭输入框抖动
+    document.body.addEventListener('input', POWERMODE);//监听打字事件
+  </script>
+
+
+<!-- markdown代码一键复制功能 -->
+
+  <link rel="stylesheet" href="https://unpkg.com/v-plugs-ayu/lib/ayu.css">
+  <script src="https://unpkg.com/v-plugs-ayu/lib/ayu.umd.min.js"></script>
+  <script src="/js/clipboard/clipboard.min.js"></script>
+  <div id="appCopy">
+  </div>
+  <script data-pjax>
+    var vm = new Vue({
+      el: '#appCopy',
+      data: {
+      },
+      computed: {
+      },
+      mounted() {
+        const that = this;
+        var copy = 'copy';
+        /* code */
+        var initCopyCode = function () {
+          var copyHtml = '';
+          copyHtml += '<button class="btn-copy" data-clipboard-snippet="" style="position:absolute;top:0;right:0;z-index:1;">';
+          copyHtml += '<i class="fas fa-copy"></i><span>' + copy + '</span>';
+          copyHtml += '</button>';
+          $(".post-detail pre").not('.gutter pre').wrap("<div class='codeBox' style='position:relative;width:100%;'></div>")
+          $(".post-detail pre").not('.gutter pre').before(copyHtml);
+          new ClipboardJS('.btn-copy', {
+            target: function (trigger) {
+              return trigger.nextElementSibling;
+            }
+          });
+        }
+        initCopyCode();
+        $('.btn-copy').unbind('click').bind('click', function () {
+          doSomething();
+        })
+        $(document).unbind('keypress').bind('keypress', function (e) {
+          if (e.ctrlKey && e.keyCode == 67) {
+            doSomething();
+          }
+        })
+
+        function doSomething() {
+          that.$notify({
+            title: "成功",
+            content: "代码已复制，请遵守相关授权协议。",
+            type: 'success'
+          })
+        }
+      },
+      methods: {
+      },
+      created() { }
+    })
+  </script>
+  
+
+<!-- 图片懒加载 -->
+<script defer src="https://unpkg.com/vanilla-lazyload@17.1.0/dist/lazyload.min.js"></script>
+<script>
+  // https://www.npmjs.com/package/vanilla-lazyload
+  // Set the options globally
+  // to make LazyLoad self-initialize
+  window.lazyLoadOptions = {
+    elements_selector: ".lazyload",
+    threshold: 0
+  };
+  // Listen to the initialization event
+  // and get the instance of LazyLoad
+  window.addEventListener(
+    "LazyLoad::Initialized",
+    function (event) {
+      window.lazyLoadInstance = event.detail.instance;
+    },
+    false
+  );
+  document.addEventListener('DOMContentLoaded', function () {
+    lazyLoadInstance.update();
+  });
+  document.addEventListener('pjax:complete', function () {
+    lazyLoadInstance.update();
+  });
+</script>
+
+
+<!-- 卡片滚动动画 -->
+   
+
+<!-- 评论所需js -->
+
+  
+    <script type="text/javascript">
+  var utteranceCommon = {};
+
+  function check_utterance() {
+    let isDark = JSON.parse(localStorage.getItem('dark')) || JSON.parse('false');
+    if (isDark) {
+      utteranceCommon.Theme = 'github-dark';
+    } else {
+      utteranceCommon.Theme = 'github-light';
+    }
+
+    return document.getElementById("gitment-container");
+  }
+  comment_el = '#gitment-container';
+  load_utterance = function () {
+    if ($(comment_el).length) {
+      // 匿名函数，防止污染全局变量
+      const HEAD = check_utterance();
+
+      var utterances = document.createElement('script');
+      utterances.type = 'text/javascript';
+      utterances.async = true;
+      utterances.setAttribute('issue-term', 'pathname')
+      utterances.setAttribute('theme', utteranceCommon.Theme)
+      utterances.setAttribute('repo', '')
+      utterances.crossorigin = 'anonymous';
+      utterances.src = 'https://utteranc.es/client.js';
+      // content 是要插入评论的地方
+      document.getElementById('gitment-container').appendChild(utterances);
+
+    }
+  }
+
+  function dark_utterance() {
+    const HEAD = check_utterance();
+    if (!HEAD) return;
+    const message = {
+      type: 'set-theme',
+      theme: utteranceCommon.Theme
+    };
+    const utteranceIframe = document.querySelector('iframe');
+    utteranceIframe.contentWindow.postMessage(message, 'https://utteranc.es');
+  }
+
+  $(document).ready(load_utterance);
+  document.addEventListener('pjax:complete', function () {
+    load_utterance();
+  });
+
+  $('.dark').click(function () {
+    setTimeout(() => {
+      dark_utterance();
+    });
+  })
+
+</script>
+
+<style>
+  .utterances {
+    max-width: inherit !important;
+  }
+</style>
+  
+
+
+<!-- 鼠标点击特效 -->
+<!-- 爱心点击 -->
+
+  
+    <canvas class="fireworks" style="position: fixed;left: 0;top: 0;z-index: 999; pointer-events: none;" ></canvas>
+    <script src="//cdn.bootcss.com/animejs/2.2.0/anime.min.js"></script>
+    <script src="/js/cursor/explosion.min.js"></script>
+  
+
+
+
+
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" data-pjax></script>
+
+
+    <!-- pjax -->
+    
+
+<!-- pjax -->
+
+
+  <script src="/js/pjax@0.2.8/index.js"></script>
+  
+    <!-- 样式位于：source/css/_third-party/pjaxanimate.styl -->
+
+<div class="pjax-animate">
+  
+    <div class="loading-circle"><div id="loader-circle"></div></div>
+    <script>
+      window.ShowLoading = function() {
+        $(".loading-circle").css("display", "block");
+      };
+      window.HideLoading = function() {
+        $(".loading-circle").css("display", "none");
+      }
+    </script>
+  
+	<script>
+    document.addEventListener('pjax:complete', function () {
+      window.HideLoading();
+    })
+    document.addEventListener('pjax:send', function () {
+      window.ShowLoading();
+    })
+    document.addEventListener('pjax:error', function () {
+      window.HideLoading();
+    })
+	</script>
+</div>
+
+  
+
+  <script>
+    var pjax = new Pjax({
+      elements: 'a[href]:not([href^="#"]):not([href="javascript:void(0)"]):not([no-pjax])',   // 拦截正常带链接的 a 标签
+      selectors: ["#pjax-container","title"],                                   // 根据实际需要确认重载区域
+      cacheBust: false,   // url 地址追加时间戳，用以避免浏览器缓存
+      timeout: 5000
+    });
+
+    document.addEventListener('pjax:send', function (e) {
+
+      try {
+        var currentUrl = window.location.pathname;
+        var targetUrl = e.triggerElement.href;
+        var banUrl = [""];
+        if (banUrl[0] != "") {
+          banUrl.forEach(item => {
+            if(currentUrl.indexOf(item) != -1 || targetUrl.indexOf(item) != -1) {
+              window.location.href = targetUrl;
+            }
+          });
+        }
+      } catch (error) {}
+
+      $(window).unbind('resize');
+      $(window).unbind('scroll');
+      $(document).unbind('scroll');
+      $(document).unbind('click');
+      $('body').unbind('click');
+
+    })
+    
+    document.addEventListener('pjax:complete', function () {
+      $('script[data-pjax], .pjax-reload script').each(function () {
+        $(this).parent().append($(this).remove());
+      });
+    });
+
+    document.addEventListener('pjax:error', function (e) {
+      window.location.href = e.triggerElement.href;
+    })
+    
+    // 刷新不从顶部开始
+    document.addEventListener("DOMContentLoaded", function () {
+      history.scrollRestoration = 'auto';
+    })
+  </script>
+
+
+
+  </body>
+</html>

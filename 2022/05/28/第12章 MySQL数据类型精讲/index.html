@@ -1,0 +1,2502 @@
+<!DOCTYPE html>
+<html>
+  <!-- meta/link... -->
+  
+
+
+
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport">
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+
+
+  <title>第12章 MySQL数据类型精讲 | Hexo</title>
+
+  <link rel="icon" type="image/x-icon, image/vnd.microsoft.icon" href="/favicon.ico">
+  <link rel="stylesheet" href="https://at.alicdn.com/t/font_1911880_c1nvbyezg17.css">
+  <link href="https://unpkg.com/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet">
+  <link href="/js/swiper/swiper@5.4.1.min.css" rel="stylesheet">
+  
+  
+  
+  
+<link rel="stylesheet" href="/css/animate.min.css">
+
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+  
+    
+<link rel="stylesheet" href="/js/fancybox/jquery.fancybox.min.css">
+
+  
+  
+    
+<link rel="stylesheet" href="/js/shareJs/share.min.css">
+
+  
+  <style>
+        @media (max-width: 992px) {
+            #waifu {
+                display: none;
+            }
+        }
+    </style>
+    <script src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
+    <link href="//cdn.bootcss.com/pace/1.0.2/themes/pink/pace-theme-flash.css" rel="stylesheet">
+
+    
+
+    <!-- import link -->
+    
+        
+            
+        
+            
+        
+    
+    <!-- import script -->
+    
+        
+            
+        
+            
+        
+    
+
+<meta name="generator" content="Hexo 6.2.0"></head>
+
+  
+  <!-- 依赖于jquery和vue -->
+  
+    
+<script src="https://unpkg.com/jquery@3.5.1/dist/jquery.min.js"></script>
+
+  
+
+  
+    
+<script src="https://unpkg.com/vue@2.6.11/dist/vue.min.js"></script>
+
+  
+  
+  <body>
+    <!-- 预加载动画 -->
+    <!-- 页面预加载动画 -->
+
+<div id='loader'>
+  <link rel="stylesheet" href="/js/loaded/index.css" >
+  <div class="loading-left-bg"></div>
+  <div class="loading-right-bg"></div>
+  <div class="spinner-box">
+    <div class="configure-border-1">
+      <div class="configure-core"></div>
+    </div>
+    <div class="configure-border-2">
+      <div class="configure-core"></div>
+    </div>
+    <div class="loading-word">loading...</div>
+  </div>
+</div>
+
+<script>
+  var endLoading = function () {
+    document.body.style.overflow = 'auto';
+    document.getElementById('loader').classList.add("loading");
+  }
+  window.addEventListener('DOMContentLoaded',endLoading);
+  
+</script>
+
+    
+    <!-- 判断是否为暗黑风格 -->
+    <!-- 判断是否为黑夜模式 -->
+<script>
+  let isDark = JSON.parse(localStorage.getItem('dark')) || JSON.parse('false');
+
+  if (isDark) {
+    $(document.body).addClass('darkModel');
+  }
+</script>
+
+    <!-- 需要在上面加载的js -->
+    <script>
+  function loadScript(src, cb) {
+    return new Promise(resolve => {
+      setTimeout(function () {
+        var HEAD = document.getElementsByTagName("head")[0] || document.documentElement;
+        var script = document.createElement("script");
+        script.setAttribute("type", "text/javascript");
+        if (cb) {
+          if (JSON.stringify(cb)) {
+            for (let p in cb) {
+              if (p == "onload") {
+                script[p] = () => {
+                  cb[p]()
+                  resolve()
+                }
+              } else {
+                script[p] = cb[p]
+                script.onload = resolve
+              }
+            }
+          } else {
+            script.onload = () => {
+              cb()
+              resolve()
+            };
+          }
+        } else {
+          script.onload = resolve
+        }
+        script.setAttribute("src", src);
+        HEAD.appendChild(script);
+      });
+    });
+  }
+
+  //https://github.com/filamentgroup/loadCSS
+  var loadCSS = function (href, before, media, attributes) {
+    return new Promise(resolve => {
+      setTimeout(function () {
+        var link = document.createElement('link');
+        link.rel = "stylesheet";
+        link.href = src;
+        link.onload = resolve;
+        document.getElementsByTagName("head")[0].appendChild(link);
+      });
+    });
+  };
+
+</script> 
+
+<!-- 轮播图所需要的js -->
+<script src="/js/swiper/swiper.min.js"></script>
+<script src="/js/swiper/vue-awesome-swiper.js"></script>
+<script src="/js/swiper/swiper.animate1.0.3.min.js"></script>
+
+<script type="text/javascript">
+  Vue.use(window.VueAwesomeSwiper)
+</script>
+
+
+  <script src="/js/vue-typed-js/index.js"></script>
+
+
+<!-- 首页的公告滚动插件的js需要重新加载 -->
+<script src="/js/vue-seamless-scroll/index.js"></script>
+
+<!-- 打字机效果js -->
+<script src="https://unpkg.com/typed.js@2.0.11"></script>
+
+
+    <div id="safearea">
+      <main class="main" id="pjax-container">
+        <!-- 头部导航 -->
+        
+<header class="header   " 
+  id="navHeader"
+  style="position: fixed;
+  left: 0; top: 0; z-index: 10;width: 100%;"
+>
+  <div class="header-content">
+    <div class="bars">
+      <div id="appDrawer" class="sidebar-image">
+  <div class="drawer-box-icon">
+    <i class="fas fa-bars" aria-hidden="true" @click="showDialogDrawer"></i>
+  </div>
+  
+  <transition name="fade">
+    <div class="drawer-box_mask" v-cloak style="display: none;" v-show="visible" @click.self="cancelDialogDrawer">
+    </div>
+  </transition>
+  <div class="drawer-box" :class="{'active': visible}">
+    <div class="drawer-box-head bg-color">
+      <img class="drawer-box-head_logo lazyload placeholder" src="/medias/logo.png" class="lazyload placeholder" data-srcset="/medias/logo.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="logo">
+      <h3 class="drawer-box-head_title">Hexo</h3>
+      <h5 class="drawer-box-head_desc"></h5>
+    </div>
+    
+    <div class="drawer-box-content">
+      <ul class="drawer-box-content_menu">
+        
+        
+          <li class="drawer-box-content_item">
+            <a target="_blank" rel="noopener" href="https://github.com/yuang01/hexo-theme-bamboo">
+              <i class="fas fa-github" aria-hidden="true"></i>
+              <span>Github</span>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</div>
+
+<script>
+  var body = document.body || document.documentElement || window;
+  var vm = new Vue({
+    el: '#appDrawer',
+    data: {
+      visible: false,
+      top: 0,
+      openArr: [],
+    },
+    computed: {
+    },
+    mounted() {
+    },
+    methods: {
+      isOpen(index) {
+        if (this.openArr.includes(index)) {
+          return true;
+        } else {
+          return false;
+        }
+      },
+      openOrCloseMenu(curIndex) {
+        const index = this.openArr.indexOf(curIndex);
+        if (index !== -1) {
+          this.openArr.splice(index, 1);
+        } else {
+          this.openArr.push(curIndex);
+        }
+      },
+      showDialogDrawer() {
+        this.visible = true;
+        // 防止页面滚动，只能让弹框滚动
+        this.top = $(document).scrollTop()
+        body.style.cssText = 'width: 100%; height: 100%;overflow: hidden;';
+      },
+      cancelDialogDrawer() {
+        this.visible = false;
+        body.removeAttribute('style');
+        $(document).scrollTop(this.top)
+      }
+    },
+    created() {}
+  })
+</script>
+
+    </div>
+    <div class="blog-title" id="author-avatar">
+      
+        <div class="avatar">
+          <img src="/medias/logo.png" class="lazyload placeholder" data-srcset="/medias/logo.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="logo">
+        </div>
+      
+      <a href="/" class="logo">Hexo</a>
+    </div>
+    <nav class="navbar">
+      <ul class="menu">
+        
+      </ul>
+      
+      
+        <div id="appSearch">
+  <div class="search"  @click="showDialog()"><i class="fas fa-search" aria-hidden="true"></i></div>
+  <transition name="fade">
+    <div class="message-box_wrapper" style="display: none;" v-cloak v-show="dialogVisible" @click.self="cancelDialogVisible()">
+      <div class="message-box animated bounceInDown">
+        <h2>
+          <span>
+            <i class="fas fa-search" aria-hidden="true"></i>
+            <span class="title">Search</span>
+          </span>
+          <i class="fas fa-times close" pointer style="float:right;" aria-hidden="true" @click.self="cancelDialogVisible()"></i>
+        </h2>
+        <form class="site-search-form">
+          <input type="text"
+            placeholder="Please enter keywords"
+            id="local-search-input" 
+            @click="getSearchFile()"
+            class="st-search-input"
+            v-model="searchInput"
+          />
+        </form>
+        <div class="result-wrapper">
+          <div id="local-search-result" class="local-search-result-cls"></div>
+        </div>
+      </div>
+    </div>
+  </transition>
+</div>
+<script src="/js/local_search.js"></script>
+<script>
+  var body = document.body || document.documentElement || window;
+  var vm = new Vue({
+    el: '#appSearch',
+    data: {
+      dialogVisible: false,
+      searchInput: '',
+      top: 0,
+    },
+    computed: {
+    },
+    mounted() {
+      window.addEventListener('pjax:complete', () => {
+        this.cancelDialogVisible();
+      })
+    },
+    methods: {
+      showDialog() {
+        this.dialogVisible = true;
+        // 防止页面滚动，只能让弹框滚动
+        this.top = $(document).scrollTop()
+        body.style.cssText = 'overflow: hidden;';
+      },
+      getSearchFile() {
+        if (!this.searchInput) {
+          getSearchFile("/search.xml");
+        }
+      },
+      cancelDialogVisible() {
+        this.dialogVisible = false;
+        body.removeAttribute('style');
+        $(document).scrollTop(this.top)
+      },
+    },
+    created() {}
+  })
+</script>
+<!-- 解决刷新页面闪烁问题，可以在元素上添加display: none, 或者用vue.extend方法，详情：https://blog.csdn.net/qq_31393401/article/details/81017912 -->
+<!-- 下面是搜索基本写法 -->
+<!-- <script type="text/javascript" id="local.search.active">
+  var inputArea = document.querySelector("#local-search-input");
+  inputArea.onclick   = function(){ getSearchFile(); this.onclick = null }
+  inputArea.onkeydown = function(){ if(event.keyCode == 13) return false }
+</script> -->
+
+      
+
+    </nav>
+  </div>
+  
+    <a target="_blank" rel="noopener" href="https://github.com/yuang01/hexo-theme-bamboo" class="github-corner color-primary" aria-label="View source on GitHub"><svg width="60" height="60" viewBox="0 0 250 250" style="fill:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+  
+  
+</header>
+        <!-- 内容区域 -->
+        
+ <!-- prismjs 代码高亮 -->
+ 
+
+
+<div class="bg-dark-floor" style="position: fixed;left: 0;top: 0;width: 100%;height: 100%;z-index: -1;"></div>
+
+
+  <!-- 文章详情页顶部图片和标题 -->
+
+
+
+
+<div class="post-detail-header" id="thumbnail_canvas" style="background-repeat: no-repeat; background-size: cover; 
+  background-position: center center;position: relative;background-image:url('/medias/8.jpg')">
+  <div class="post-detail-header-mask"></div>
+  <canvas id="header_canvas"style="position:absolute;bottom:0;pointer-events:none;"></canvas>
+  
+  <div class="post-detail-header_info-box">
+    <div class="title-box">
+      <span class="title">
+        第12章 MySQL数据类型精讲
+      </span>
+    </div>
+    
+    
+      
+        <span class="post-detail-header_date">
+          <i class="fas fa-calendar"></i> Published in：2022-05-28 |
+        </span>
+      
+
+      
+        <span class="post-detail-header_categories">
+          <i class="iconfont iconbookmark1"></i> category：
+          
+            <a href="/categories/MySQL-shk/" class="post-detail-header_category">
+              MySQL-shk
+            </a>
+          
+        </span>
+      
+
+      
+    
+  </div>
+  
+  
+    <script src="/js/bubble/bubble.js"></script>
+  
+</div>
+
+
+
+
+
+<div class="post-detail-content row justify-position" 
+  style="padding-top: 0px;">
+  <div class="main-content">
+    <article class="post post-detail">
+      <div class="post-content">
+        <h1 id="第12章-MySQL数据类型精讲"><a href="#第12章-MySQL数据类型精讲" class="headerlink" title="第12章 MySQL数据类型精讲"></a>第12章 MySQL数据类型精讲</h1><hr>
+<h2 id="1-MySQL中的数据类型"><a href="#1-MySQL中的数据类型" class="headerlink" title="1. MySQL中的数据类型"></a>1. MySQL中的数据类型</h2><table>
+<thead>
+<tr>
+<th>类型</th>
+<th>类型举例</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>整数类型</td>
+<td><strong>TINYINT</strong>、<strong>SMALLINT</strong>、MEDIUMINT、<code>INT(或INTEGER)</code>、<strong>BIGINT</strong></td>
+</tr>
+<tr>
+<td>浮点类型</td>
+<td>FLOAT、DOUBLE</td>
+</tr>
+<tr>
+<td>定点数类型</td>
+<td><code>DECIMAL</code></td>
+</tr>
+<tr>
+<td>位类型</td>
+<td>BIT</td>
+</tr>
+<tr>
+<td>日期时间类型</td>
+<td>YEAR、TIME、DATE、DATETIME、<code>TIMESTAMP</code></td>
+</tr>
+<tr>
+<td>文本字符串类型</td>
+<td>CHAR、<code>VARCHAR</code>、TINYTEXT、<strong>TEXT</strong>、MEDIUMTEXT、LONGTEXT</td>
+</tr>
+<tr>
+<td>枚举类型</td>
+<td>ENUM</td>
+</tr>
+<tr>
+<td>集合类型</td>
+<td>SET</td>
+</tr>
+<tr>
+<td>二进制字符串类型</td>
+<td>BINARY、VARBINARY、TINYBLOB、BLOB、MEDIUMBLOB、LONGBLOB</td>
+</tr>
+<tr>
+<td>JSON类型</td>
+<td>JSON对象、JSON数组</td>
+</tr>
+<tr>
+<td>空间数据类型(了解)</td>
+<td>单值类型：GEOMETRY、POINT、LINESTRING、POLYGON； 集合类型：MULTIPOINT、MULTILINESTRING、MULTIPOLYGON、GEOMETRYCOLLECTION</td>
+</tr>
+</tbody></table>
+<p>常见数据类型的属性，如下：</p>
+<table>
+<thead>
+<tr>
+<th>MySQL关键字</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>NULL</td>
+<td>数据列可包含NULL值</td>
+</tr>
+<tr>
+<td>NOT NULL</td>
+<td>数据列不允许包含NULL值</td>
+</tr>
+<tr>
+<td>DEFAULT</td>
+<td>默认值</td>
+</tr>
+<tr>
+<td>PRIMARY KEY</td>
+<td>主键</td>
+</tr>
+<tr>
+<td>AUTO_INCREMENT</td>
+<td>自动递增，适用于整数类型</td>
+</tr>
+<tr>
+<td>UNSIGNED (主要针对整数类型)</td>
+<td>无符号</td>
+</tr>
+<tr>
+<td>CHARACTER SET name</td>
+<td>指定一个字符集</td>
+</tr>
+</tbody></table>
+<h2 id="2-整数类型"><a href="#2-整数类型" class="headerlink" title="2. 整数类型"></a>2. 整数类型</h2><h3 id="2-1-类型介绍"><a href="#2-1-类型介绍" class="headerlink" title="2.1 类型介绍"></a>2.1 类型介绍</h3><p>整数类型一共有 5 种，包括 TINYINT、SMALLINT、MEDIUMINT、INT（INTEGER）和 BIGINT。</p>
+<p>它们的区别如下表所示：</p>
+<table>
+<thead>
+<tr>
+<th><strong><code>整数类型</code></strong></th>
+<th><strong><code>字节</code></strong></th>
+<th>有符号数取值范围</th>
+<th>无符号数取值范围 (UNSIGNED)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>TINYINT</strong></td>
+<td>1</td>
+<td>-128~127</td>
+<td>0~255</td>
+</tr>
+<tr>
+<td>SMALLINT</td>
+<td>2</td>
+<td>-32768~32767</td>
+<td>0~65535</td>
+</tr>
+<tr>
+<td>MEDIUMINT</td>
+<td>3</td>
+<td>-8388608~8388607</td>
+<td>0~16777215</td>
+</tr>
+<tr>
+<td><strong>INT、INTEGER</strong></td>
+<td>4</td>
+<td>-2147483648~2147483647</td>
+<td>0~4294967295</td>
+</tr>
+<tr>
+<td><strong>BIGINT</strong></td>
+<td>8</td>
+<td>-9223372036854775808~9223372036854775807</td>
+<td>0~18446744073709551615</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p>如果超出设置类型的范围, 就会报错: Out of range value for column ‘字段名’ at row 1</p>
+</blockquote>
+<h3 id="2-2-可选属性"><a href="#2-2-可选属性" class="headerlink" title="2.2 可选属性"></a>2.2 可选属性</h3><p><strong><code>整数类型的可选属性有三个：</code></strong></p>
+<h4 id="2-2-1-M-了解"><a href="#2-2-1-M-了解" class="headerlink" title="2.2.1 M (了解)"></a>2.2.1 M (了解)</h4><p><code>M</code>: 表示显示宽度，M的取值范围是(0, 255)。例如，int(5)：当数据宽度小于5位的时候在数字前面需要用字符填满宽度。该项功能需要配合“<code>ZEROFILL</code>”使用，表示用“0”填满宽度，否则指定显示宽度无效。</p>
+<p>如果设置了显示宽度，那么插入的数据宽度超过显示宽度限制，会不会截断或插入失败？</p>
+<p>答案：不会对插入的数据有任何影响，还是按照类型的实际宽度进行保存，即<code>显示宽度与类型可以存储的值范围无关</code>。<strong>从MySQL 8.0.17开始，整数数据类型不推荐使用显示宽度属性。</strong></p>
+<p>整型数据类型可以在定义表结构时指定所需要的显示宽度，如果不指定，则系统为每一种类型指定默认的宽度值。</p>
+<p>举例：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> test_int1 ( x TINYINT,　y <span class="type">SMALLINT</span>,　z MEDIUMINT,　m <span class="type">INT</span>,　n <span class="type">BIGINT</span> );</span><br><span class="line"><span class="number">1</span></span><br></pre></td></tr></table></figure>
+
+<p>查看表结构 （MySQL5.7中显式如下，MySQL8中不再显式范围）</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">mysql<span class="operator">&gt;</span> <span class="keyword">desc</span> test_int1;</span><br><span class="line"><span class="operator">+</span><span class="comment">-------+--------------+------+-----+---------+-------+</span></span><br><span class="line"><span class="operator">|</span> Field <span class="operator">|</span> Type         <span class="operator">|</span> <span class="keyword">Null</span> <span class="operator">|</span> Key <span class="operator">|</span> <span class="keyword">Default</span> <span class="operator">|</span> Extra <span class="operator">|</span></span><br><span class="line"><span class="operator">+</span><span class="comment">-------+--------------+------+-----+---------+-------+</span></span><br><span class="line"><span class="operator">|</span>   x   <span class="operator">|</span> tinyint(<span class="number">4</span>)   <span class="operator">|</span> YES  <span class="operator">|</span>     <span class="operator">|</span> <span class="keyword">NULL</span>    <span class="operator">|</span>       <span class="operator">|</span></span><br><span class="line"><span class="operator">|</span> 　y   <span class="operator">|</span> <span class="type">smallint</span>(<span class="number">6</span>)  <span class="operator">|</span> YES  <span class="operator">|</span>     <span class="operator">|</span> <span class="keyword">NULL</span>    <span class="operator">|</span>       <span class="operator">|</span></span><br><span class="line"><span class="operator">|</span> 　z   <span class="operator">|</span> mediumint(<span class="number">9</span>) <span class="operator">|</span> YES  <span class="operator">|</span>     <span class="operator">|</span> <span class="keyword">NULL</span>    <span class="operator">|</span>       <span class="operator">|</span></span><br><span class="line"><span class="operator">|</span> 　m   <span class="operator">|</span> <span class="type">int</span>(<span class="number">11</span>)      <span class="operator">|</span> YES  <span class="operator">|</span>     <span class="operator">|</span> <span class="keyword">NULL</span>    <span class="operator">|</span>       <span class="operator">|</span></span><br><span class="line"><span class="operator">|</span> 　n   <span class="operator">|</span> <span class="type">bigint</span>(<span class="number">20</span>)   <span class="operator">|</span> YES  <span class="operator">|</span>     <span class="operator">|</span> <span class="keyword">NULL</span>    <span class="operator">|</span>       <span class="operator">|</span></span><br><span class="line"><span class="operator">+</span><span class="comment">-------+--------------+------+-----+---------+-------+</span></span><br><span class="line"><span class="number">5</span> <span class="keyword">rows</span> <span class="keyword">in</span> <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br><span class="line"><span class="number">1234567891011</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>TINYINT有符号数和无符号数的取值范围分别为-128-127和0-255，由于负号占了一个数字位，因此TINYINT默认的显示宽度为4。同理，其他整数类型的默认显示宽度与其有符号数的最小值的宽度相同。</strong></p>
+<p>举例：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> test_int2(</span><br><span class="line">f1 <span class="type">INT</span>,</span><br><span class="line">f2 <span class="type">INT</span>(<span class="number">5</span>),</span><br><span class="line">f3 <span class="type">INT</span>(<span class="number">5</span>) ZEROFILL</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">DESC</span> test_int2;</span><br><span class="line"></span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> test_int2(f1,f2,f3)</span><br><span class="line"><span class="keyword">VALUES</span>(<span class="number">1</span>,<span class="number">123</span>,<span class="number">123</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> test_int2(f1,f2)</span><br><span class="line"><span class="keyword">VALUES</span>(<span class="number">123456</span>,<span class="number">123456</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> test_int2(f1,f2,f3)</span><br><span class="line"><span class="keyword">VALUES</span>(<span class="number">123456</span>,<span class="number">123456</span>,<span class="number">123456</span>);</span><br><span class="line"><span class="number">12345678910111213141516</span></span><br><span class="line">mysql<span class="operator">&gt;</span> <span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> test_int2;</span><br><span class="line"><span class="operator">+</span><span class="comment">--------+--------+--------+</span></span><br><span class="line"><span class="operator">|</span> f1     <span class="operator">|</span> f2     <span class="operator">|</span> f3     <span class="operator">|</span></span><br><span class="line"><span class="operator">+</span><span class="comment">--------+--------+--------+</span></span><br><span class="line"><span class="operator">|</span>      <span class="number">1</span> <span class="operator">|</span>    <span class="number">123</span> <span class="operator">|</span>  <span class="number">00123</span> <span class="operator">|</span></span><br><span class="line"><span class="operator">|</span> <span class="number">123456</span> <span class="operator">|</span> <span class="number">123456</span> <span class="operator">|</span>   <span class="keyword">NULL</span> <span class="operator">|</span></span><br><span class="line"><span class="operator">|</span> <span class="number">123456</span> <span class="operator">|</span> <span class="number">123456</span> <span class="operator">|</span> <span class="number">123456</span> <span class="operator">|</span></span><br><span class="line"><span class="operator">+</span><span class="comment">--------+--------+--------+</span></span><br><span class="line"><span class="number">3</span> <span class="keyword">rows</span> <span class="keyword">in</span> <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br><span class="line"><span class="number">123456789</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="2-2-2-UNSIGNED"><a href="#2-2-2-UNSIGNED" class="headerlink" title="2.2.2 UNSIGNED"></a>2.2.2 <code>UNSIGNED</code></h4><p><code>UNSIGNED</code>: <strong>无符号类型（非负），所有的整数类型都有一个可选的属性UNSIGNED（无符号属性），无符号整数类型的最小取值为0。所以，如果需要在MySQL数据库中保存非负整数值时，可以将整数类型设置为无符号类型。</strong></p>
+<p>int类型默认显示宽度为int(11)，无符号int类型默认显示宽度为int(10)。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> test_int3(</span><br><span class="line">f1 <span class="type">INT</span> UNSIGNED</span><br><span class="line">);</span><br><span class="line"></span><br><span class="line">mysql<span class="operator">&gt;</span> <span class="keyword">desc</span> test_int3;</span><br><span class="line"><span class="operator">+</span><span class="comment">-------+------------------+------+-----+---------+-------+</span></span><br><span class="line"><span class="operator">|</span> Field <span class="operator">|</span> Type             <span class="operator">|</span> <span class="keyword">Null</span> <span class="operator">|</span> Key <span class="operator">|</span> <span class="keyword">Default</span> <span class="operator">|</span> Extra <span class="operator">|</span></span><br><span class="line"><span class="operator">+</span><span class="comment">-------+------------------+------+-----+---------+-------+</span></span><br><span class="line"><span class="operator">|</span> f1    <span class="operator">|</span> <span class="type">int</span>(<span class="number">10</span>) unsigned <span class="operator">|</span> YES  <span class="operator">|</span>     <span class="operator">|</span> <span class="keyword">NULL</span>    <span class="operator">|</span>       <span class="operator">|</span></span><br><span class="line"><span class="operator">+</span><span class="comment">-------+------------------+------+-----+---------+-------+</span></span><br><span class="line"><span class="number">1</span> <span class="type">row</span> <span class="keyword">in</span> <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br><span class="line"><span class="number">1234567891011</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="2-2-3-ZEROFILL-了解"><a href="#2-2-3-ZEROFILL-了解" class="headerlink" title="2.2.3 ZEROFILL (了解)"></a>2.2.3 ZEROFILL (了解)</h4><p><code>ZEROFILL</code>: 0填充,（如果某列是ZEROFILL，那么MySQL会自动为当前列添加UNSIGNED属性），如果指定了ZEROFILL只是表示不够M位时，用0在左边填充，如果超过M位，只要不超过数据存储范围即可。</p>
+<p>原来，在 int(M) 中，M 的值跟 int(M) 所占多少存储空间并无任何关系。 int(3)、int(4)、int(8) 在磁盘上都是占用 4 bytes 的存储空间。也就是说，<strong>int(M)，必须和UNSIGNED ZEROFILL一起使用才有意义。</strong> 如果整数值超过M位，就按照实际位数存储。只是无须再用字符 0 进行填充。</p>
+<h3 id="2-3-适用场景-整型的场景"><a href="#2-3-适用场景-整型的场景" class="headerlink" title="2.3 适用场景 (整型的场景)"></a>2.3 适用场景 (整型的场景)</h3><p><code>TINYINT</code>：一般用于枚举数据，比如系统设定<strong>取值范围很小且固定的场景</strong>。</p>
+<p><code>SMALLINT</code>：可以用于较小范围的统计数据，比如统计工厂的固定资产库存数量等。</p>
+<p><code>MEDIUMINT</code>：用于较大整数的计算，比如车站每日的客流量等。</p>
+<p><code>INT、INTEGER</code>：取值范围足够大，一般情况下不用考虑超限问题，用得最多。比如商品编号。(一般使用 <strong><code>INT / INTEGER</code></strong>) 即可</p>
+<p><code>BIGINT</code>：只有当你处理特别巨大的整数时才会用到。比如双十一的交易量、大型门户网站点击量、证券公司衍生产品持仓等。</p>
+<h3 id="2-4-如何选择？"><a href="#2-4-如何选择？" class="headerlink" title="2.4 如何选择？"></a>2.4 如何选择？</h3><p>在评估用哪种整数类型的时候，你需要考虑<code>存储空间</code>和<code>可靠性</code>的平衡问题：</p>
+<ul>
+<li>一方面，用占用字节数少的整数类型可以节省存储空间；</li>
+<li>另一方面，要是为了节省存储空间， 使用的整数类型取值范围太小，一旦遇到超出取值范围的情况，就可能引起<code>系统错误</code>，影响可靠性。</li>
+</ul>
+<p>举个例子，商品编号采用的数据类型是 INT。原因就在于，客户门店中流通的商品种类较多，而且，每天都有旧商品下架，新商品上架，这样不断迭代，日积月累。</p>
+<p>如果使用 SMALLINT 类型，虽然占用字节数比 INT 类型的整数少，但是却不能保证数据不会超出范围 65535。相反，使用 INT，就能确保有足够大的取值范围，不用担心数据超出范围影响可靠性的问题。</p>
+<p>你要注意的是，在实际工作中，<strong>系统故障产生的成本远远超过增加几个字段存储空间所产生的成本</strong>。</p>
+<blockquote>
+<p><strong><code>因此，建议首先确保数据不会超过取值范围，在这个前提之下，再去考虑如何节省存储空间。</code></strong></p>
+</blockquote>
+<h2 id="3-浮点类型"><a href="#3-浮点类型" class="headerlink" title="3. 浮点类型"></a>3. <a target="_blank" rel="noopener" href="https://so.csdn.net/so/search?q=%E6%B5%AE%E7%82%B9&spm=1001.2101.3001.7020">浮点</a>类型</h2><h3 id="3-1-类型介绍"><a href="#3-1-类型介绍" class="headerlink" title="3.1 类型介绍"></a>3.1 类型介绍</h3><p>浮点数和定点数类型的特点是可以<code>处理小数</code>，你可以把整数看成小数的一个特例。因此，浮点数和定点数的使用场景，比整数大多了。</p>
+<p>MySQL支持的浮点数类型，分别是 FLOAT、DOUBLE、REAL。</p>
+<ul>
+<li>FLOAT 表示单精度浮点数；</li>
+<li>DOUBLE 表示双精度浮点数；</li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/050e4f53f0104299bd91c4df817a5274.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAd2hpdGUgY2FtZWw=,size_19,color_FFFFFF,t_70,g_se,x_16" class="lazyload placeholder" data-srcset="https://img-blog.csdnimg.cn/050e4f53f0104299bd91c4df817a5274.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAd2hpdGUgY2FtZWw=,size_19,color_FFFFFF,t_70,g_se,x_16" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="[外链图片转存失败,源站可能有防盗链机制,建议将图片保存下来直接上传(img-crh66E7w-1650184445011)(images/image-20211007173312237.png)]"></p>
+<ul>
+<li><p>REAL默认就是 DOUBLE。如果你把 SQL 模式设定为启用“<code>REAL_AS_FLOAT</code>”，那 么，MySQL 就认为 REAL 是 FLOAT。如果要启用“REAL_AS_FLOAT”，可以通过以下 SQL 语句实现：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SET</span> sql_mode <span class="operator">=</span> “REAL_AS_FLOAT”;</span><br><span class="line"><span class="number">1</span></span><br></pre></td></tr></table></figure></li>
+</ul>
+<p><strong>问题1：</strong> FLOAT 和 DOUBLE 这两种数据类型的区别是啥呢？</p>
+<ul>
+<li>FLOAT 占用字节数少，取值范围小；DOUBLE 占用字节数多，取值范围也大。</li>
+</ul>
+<p><strong>问题2：</strong> 为什么浮点数类型的无符号数取值范围，只相当于有符号数取值范围的一半，也就是只相当于有符号数取值范围大于等于零的部分呢？</p>
+<blockquote>
+<p>MySQL 存储浮点数的格式为：<code>符号(S)</code>、<code>尾数(M)</code>和 <code>阶码(E)</code>。因此，无论有没有符号，MySQL 的浮点数都会存储表示符号的部分。因此， 所谓的无符号数取值范围，其实就是有符号数取值范围大于等于零的部分。</p>
+</blockquote>
+<h3 id="3-2-数据精度说明-了解"><a href="#3-2-数据精度说明-了解" class="headerlink" title="3.2 数据精度说明 (了解)"></a>3.2 数据精度说明 (了解)</h3><p>对于浮点类型，在MySQL中单精度值使用<code>4</code>个字节，双精度值使用<code>8</code>个字节。</p>
+<ul>
+<li><p>MySQL允许使用<code>非标准语法</code>（其他数据库未必支持，因此如果涉及到数据迁移，则最好不要这么用）：<code>FLOAT(M,D)</code>或<code>DOUBLE(M,D)</code>。这里，M称为<code>精度</code>，D称为<code>标度</code>。</p>
+</li>
+<li><p><strong>(M,D)中 M&#x3D;整数位+小数位，D&#x3D;小数位。 D&lt;&#x3D;M&lt;&#x3D;255，0&lt;&#x3D;D&lt;&#x3D;30。</strong></p>
+<p>例如，定义为FLOAT(5,2)的一个列可以显示为-999.99-999.99。如果超过这个范围会报错。</p>
+</li>
+<li><p>FLOAT和DOUBLE类型在不指定(M,D)时，默认会按照实际的精度（由实际的硬件和操作系统决定）来显示。</p>
+</li>
+<li><p>说明：浮点类型，也可以加<code>UNSIGNED</code>，但是不会改变数据范围，例如：FLOAT(3,2) UNSIGNED仍然只能表示0-9.99的范围。</p>
+</li>
+<li><p>不管是否显式设置了精度(M,D)，这里MySQL的处理方案如下：</p>
+<ul>
+<li>如果存储时，整数部分超出了范围，MySQL就会报错，不允许存这样的值</li>
+<li>如果存储时，小数点部分若超出范围，就分以下情况：<ul>
+<li>若四舍五入后，整数部分没有超出范围，则只警告，但能成功操作并四舍五入删除多余的小数位后保存。例如在FLOAT(5,2)列内插入999.009，近似结果是999.01。</li>
+<li>若四舍五入后，整数部分超出范围，则MySQL报错，并拒绝处理。如FLOAT(5,2)列内插入999.995和-999.995都会报错。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>**<code>从MySQL 8.0.17开始，FLOAT(M,D) 和DOUBLE(M,D)用法在官方文档中已经明确不推荐使用</code>**，将来可能被移除。另外，关于浮点型FLOAT和DOUBLE的UNSIGNED也不推荐使用了，将来也可能被移除。</p>
+</li>
+<li><p>举例</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> test_double1(</span><br><span class="line">    f1 <span class="type">FLOAT</span>,</span><br><span class="line">    f2 <span class="type">FLOAT</span>(<span class="number">5</span>,<span class="number">2</span>),</span><br><span class="line">    f3 <span class="keyword">DOUBLE</span>,</span><br><span class="line">    f4 <span class="keyword">DOUBLE</span>(<span class="number">5</span>,<span class="number">2</span>)</span><br><span class="line">);</span><br><span class="line"></span><br><span class="line"><span class="keyword">DESC</span> test_double1;</span><br><span class="line"></span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> test_double1</span><br><span class="line"><span class="keyword">VALUES</span>(<span class="number">123.456</span>,<span class="number">123.456</span>,<span class="number">123.4567</span>,<span class="number">123.45</span>);</span><br><span class="line"></span><br><span class="line">#<span class="keyword">Out</span> <span class="keyword">of</span> <span class="keyword">range</span> <span class="keyword">value</span> <span class="keyword">for</span> <span class="keyword">column</span> <span class="string">&#x27;f2&#x27;</span> <span class="keyword">at</span> <span class="type">row</span> <span class="number">1</span></span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> test_double1</span><br><span class="line"><span class="keyword">VALUES</span>(<span class="number">123.456</span>,<span class="number">1234.456</span>,<span class="number">123.4567</span>,<span class="number">123.45</span>); </span><br><span class="line"></span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> test_double1;</span><br><span class="line"><span class="number">1234567891011121314151617</span></span><br></pre></td></tr></table></figure></li>
+</ul>
+<h3 id="3-3-精度误差说明"><a href="#3-3-精度误差说明" class="headerlink" title="3.3 精度误差说明"></a>3.3 精度误差说明</h3><p>**<code>浮点数类型有个缺陷，就是不精准</code>**。下面我来重点解释一下为什么 MySQL 的浮点数不够精准。</p>
+<p>比如，我们设计一个表，有f1这个字段，插入值分别为0.47,0.44,0.19，我们期待的运行结果是：0.47 + 0.44 + 0.19 &#x3D; 1.1。而使用sum之后查询：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> test_double2(</span><br><span class="line">f1 <span class="keyword">DOUBLE</span></span><br><span class="line">);</span><br><span class="line"></span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> test_double2</span><br><span class="line"><span class="keyword">VALUES</span>(<span class="number">0.47</span>),(<span class="number">0.44</span>),(<span class="number">0.19</span>);</span><br><span class="line"><span class="number">123456</span></span><br><span class="line">mysql<span class="operator">&gt;</span> <span class="keyword">SELECT</span> <span class="built_in">SUM</span>(f1)</span><br><span class="line">    <span class="operator">-</span><span class="operator">&gt;</span> <span class="keyword">FROM</span> test_double2;</span><br><span class="line"><span class="operator">+</span><span class="comment">--------------------+</span></span><br><span class="line"><span class="operator">|</span> <span class="built_in">SUM</span>(f1)            <span class="operator">|</span></span><br><span class="line"><span class="operator">+</span><span class="comment">--------------------+</span></span><br><span class="line"><span class="operator">|</span> <span class="number">1.0999999999999999</span> <span class="operator">|</span></span><br><span class="line"><span class="operator">+</span><span class="comment">--------------------+</span></span><br><span class="line"><span class="number">1</span> <span class="type">row</span> <span class="keyword">in</span> <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br><span class="line"><span class="number">12345678</span></span><br><span class="line">mysql<span class="operator">&gt;</span> <span class="keyword">SELECT</span> <span class="built_in">SUM</span>(f1) <span class="operator">=</span> <span class="number">1.1</span>,<span class="number">1.1</span> <span class="operator">=</span> <span class="number">1.1</span></span><br><span class="line">    <span class="operator">-</span><span class="operator">&gt;</span> <span class="keyword">FROM</span> test_double2;</span><br><span class="line"><span class="operator">+</span><span class="comment">---------------+-----------+</span></span><br><span class="line"><span class="operator">|</span> <span class="built_in">SUM</span>(f1) <span class="operator">=</span> <span class="number">1.1</span> <span class="operator">|</span> <span class="number">1.1</span> <span class="operator">=</span> <span class="number">1.1</span> <span class="operator">|</span></span><br><span class="line"><span class="operator">+</span><span class="comment">---------------+-----------+</span></span><br><span class="line"><span class="operator">|</span>             <span class="number">0</span> <span class="operator">|</span>         <span class="number">1</span> <span class="operator">|</span></span><br><span class="line"><span class="operator">+</span><span class="comment">---------------+-----------+</span></span><br><span class="line"><span class="number">1</span> <span class="type">row</span> <span class="keyword">in</span> <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br><span class="line"><span class="number">12345678</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>查询结果是 1.0999999999999999。看到了吗？虽然误差很小，但确实有误差。 你也可以尝试把数据类型改成 FLOAT，然后运行求和查询，得到的是， 1.0999999940395355。显然，误差更大了。</strong></p>
+<p>那么，为什么会存在这样的误差呢？问题还是出在 MySQL 对浮点类型数据的存储方式上。</p>
+<blockquote>
+<p>了解: MySQL 用 4 个字节存储 FLOAT 类型数据，用 8 个字节来存储 DOUBLE 类型数据。无论哪个，都是采用二进制的方式来进行存储的。比如 9.625，用二进制来表达，就是 1001.101，或者表达成 1.001101×2^3。如果尾数不是 0 或 5（比如 9.624），你就无法用一个二进制数来精确表达。进而，就只好在取值允许的范围内进行四舍五入。</p>
+</blockquote>
+<p>在编程中，如果用到浮点数，要特别注意误差问题，<strong>因为浮点数是不准确的，所以我们要避免使用“&#x3D;”来判断两个数是否相等。</strong> 同时，在一些对精确度要求较高的项目中，千万不要使用浮点数，不然会导致结果错误，甚至是造成不可挽回的损失。那么，MySQL 有没有精准的数据类型呢？当然有，这就是定点数类型：**<code>DECIMAL</code>**。</p>
+<h2 id="4-定点数类型"><a href="#4-定点数类型" class="headerlink" title="4. 定点数类型"></a>4. 定点数类型</h2><h3 id="4-1-类型介绍"><a href="#4-1-类型介绍" class="headerlink" title="4.1 类型介绍"></a>4.1 类型介绍</h3><ul>
+<li><p><strong>MySQL中的定点数类型只有 DECIMAL 一种类型。</strong></p>
+<table>
+<thead>
+<tr>
+<th>数据类型</th>
+<th>字节数</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>DECIMAL(M,D), DEC, NUMERIC</td>
+<td>M+2字节</td>
+<td>有效范围由M和D决定</td>
+</tr>
+</tbody></table>
+<p>使用 DECIMAL(M,D) 的方式表示高精度小数。其中，M被称为精度，D被称为标度。0&lt;&#x3D;M&lt;&#x3D;65，0&lt;&#x3D;D&lt;&#x3D;30，D&lt;M。例如，定义DECIMAL（5,2）的类型，表示该列取值范围是-999.99~999.99。</p>
+</li>
+<li><p>**<code>DECIMAL(M,D)的最大取值范围与DOUBLE类型一样</code>**，但是有效的数据范围是由M和D决定的。DECIMAL 的存储空间并不是固定的，由精度值M决定，总共占用的存储空间为M+2个字节。也就是说，在一些对精度要求不高的场景下，比起占用同样字节长度的定点数，浮点数表达的数值范围可以更大一些。</p>
+</li>
+<li><p><strong>定点数在MySQL内部是以<code>字符串</code>的形式进行存储，这就决定了它一定是精准的。</strong></p>
+</li>
+<li><p>当DECIMAL类型不指定精度和标度时，<code>其默认为DECIMAL(10,0)</code>。当数据的精度超出了定点数类型的精度范围时，则MySQL同样会进行四舍五入处理。</p>
+</li>
+<li><p><strong><code>浮点数 vs 定点数</code></strong></p>
+<ul>
+<li>浮点数相对于定点数的优点是在长度一定的情况下，浮点类型取值范围大，但是不精准，适用于需要取值范围大，又可以容忍微小误差的科学计算场景（比如计算化学、分子建模、流体动力学等）</li>
+<li>定点数类型取值范围相对小，但是精准，没有误差，适合于对精度要求极高的场景 （比如涉及金额计算的场景）</li>
+</ul>
+</li>
+<li><p>举例</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> test_decimal1(</span><br><span class="line">f1 <span class="type">DECIMAL</span>,</span><br><span class="line">f2 <span class="type">DECIMAL</span>(<span class="number">5</span>,<span class="number">2</span>)</span><br><span class="line">);</span><br><span class="line"></span><br><span class="line"><span class="keyword">DESC</span> test_decimal1;</span><br><span class="line"></span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> test_decimal1(f1,f2)</span><br><span class="line"><span class="keyword">VALUES</span>(<span class="number">123.123</span>,<span class="number">123.456</span>);</span><br><span class="line"></span><br><span class="line">#<span class="keyword">Out</span> <span class="keyword">of</span> <span class="keyword">range</span> <span class="keyword">value</span> <span class="keyword">for</span> <span class="keyword">column</span> <span class="string">&#x27;f2&#x27;</span> <span class="keyword">at</span> <span class="type">row</span> <span class="number">1</span>  # M部分为整数部分<span class="operator">+</span>小数部分,所以整数部分为<span class="number">3</span></span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> test_decimal1(f2)</span><br><span class="line"><span class="keyword">VALUES</span>(<span class="number">1234.34</span>);</span><br><span class="line"><span class="number">12345678910111213</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">mysql<span class="operator">&gt;</span> <span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> test_decimal1;</span><br><span class="line"><span class="operator">+</span><span class="comment">------+--------+</span></span><br><span class="line"><span class="operator">|</span> f1   <span class="operator">|</span> f2     <span class="operator">|</span></span><br><span class="line"><span class="operator">+</span><span class="comment">------+--------+</span></span><br><span class="line"><span class="operator">|</span>  <span class="number">123</span> <span class="operator">|</span> <span class="number">123.46</span> <span class="operator">|</span></span><br><span class="line"><span class="operator">+</span><span class="comment">------+--------+</span></span><br><span class="line"><span class="number">1</span> <span class="type">row</span> <span class="keyword">in</span> <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br><span class="line"><span class="number">1234567</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>举例</p>
+<p>我们运行下面的语句，把test_double2表中字段“f1”的数据类型修改为 DECIMAL(5,2)：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">ALTER</span> <span class="keyword">TABLE</span> test_double2</span><br><span class="line">MODIFY f1 <span class="type">DECIMAL</span>(<span class="number">5</span>,<span class="number">2</span>);</span><br><span class="line"><span class="number">12</span></span><br></pre></td></tr></table></figure>
+
+<p>然后，我们再一次运行求和语句：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">mysql<span class="operator">&gt;</span> <span class="keyword">SELECT</span> <span class="built_in">SUM</span>(f1)</span><br><span class="line">    <span class="operator">-</span><span class="operator">&gt;</span> <span class="keyword">FROM</span> test_double2;</span><br><span class="line"><span class="operator">+</span><span class="comment">---------+</span></span><br><span class="line"><span class="operator">|</span> <span class="built_in">SUM</span>(f1) <span class="operator">|</span></span><br><span class="line"><span class="operator">+</span><span class="comment">---------+</span></span><br><span class="line"><span class="operator">|</span>    <span class="number">1.10</span> <span class="operator">|</span></span><br><span class="line"><span class="operator">+</span><span class="comment">---------+</span></span><br><span class="line"><span class="number">1</span> <span class="type">row</span> <span class="keyword">in</span> <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br><span class="line"><span class="number">12345678</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">mysql<span class="operator">&gt;</span> <span class="keyword">SELECT</span> <span class="built_in">SUM</span>(f1) <span class="operator">=</span> <span class="number">1.1</span></span><br><span class="line">    <span class="operator">-</span><span class="operator">&gt;</span> <span class="keyword">FROM</span> test_double2;</span><br><span class="line"><span class="operator">+</span><span class="comment">---------------+</span></span><br><span class="line"><span class="operator">|</span> <span class="built_in">SUM</span>(f1) <span class="operator">=</span> <span class="number">1.1</span> <span class="operator">|</span></span><br><span class="line"><span class="operator">+</span><span class="comment">---------------+</span></span><br><span class="line"><span class="operator">|</span>             <span class="number">1</span> <span class="operator">|</span></span><br><span class="line"><span class="operator">+</span><span class="comment">---------------+</span></span><br><span class="line"><span class="number">1</span> <span class="type">row</span> <span class="keyword">in</span> <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br><span class="line"><span class="number">12345678</span></span><br></pre></td></tr></table></figure></li>
+</ul>
+<h3 id="4-2-开发中经验"><a href="#4-2-开发中经验" class="headerlink" title="4.2 开发中经验"></a>4.2 开发中经验</h3><blockquote>
+<p>“由于 DECIMAL 数据类型的精准性，在我们的项目中，除了极少数（比如商品编号）用到整数类型外，其他的数值都用的是 DECIMAL，原因就是这个项目所处的零售行业，要求精准，一分钱也不能差。 ” ——来自某项目经理</p>
+</blockquote>
+<h2 id="5-位类型：BIT-了解"><a href="#5-位类型：BIT-了解" class="headerlink" title="5. 位类型：BIT (了解)"></a>5. 位类型：BIT (了解)</h2><p>BIT类型中存储的是二进制值，类似010110。</p>
+<table>
+<thead>
+<tr>
+<th>二进制字符串类型</th>
+<th>长度</th>
+<th>长度范围</th>
+<th>占用空间</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>BIT(M)</td>
+<td>M</td>
+<td>1 &lt;&#x3D; M &lt;&#x3D; 64</td>
+<td>约为(M + 7)&#x2F;8个字节</td>
+</tr>
+</tbody></table>
+<p>BIT类型，如果没有指定(M)，默认是1位。这个1位，表示只能存1位的二进制值。这里(M)是表示二进制的位数，位数最小值为1，最大值为64。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> test_bit1(</span><br><span class="line">	f1 BIT,</span><br><span class="line">	f2 BIT(<span class="number">5</span>),</span><br><span class="line">	f3 BIT(<span class="number">64</span>)</span><br><span class="line">);</span><br><span class="line"></span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> test_bit1(f1)</span><br><span class="line"><span class="keyword">VALUES</span>(<span class="number">1</span>);</span><br><span class="line"></span><br><span class="line">#Data too long <span class="keyword">for</span> <span class="keyword">column</span> <span class="string">&#x27;f1&#x27;</span> <span class="keyword">at</span> <span class="type">row</span> <span class="number">1</span></span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> test_bit1(f1)</span><br><span class="line"><span class="keyword">VALUES</span>(<span class="number">2</span>); # 这样写<span class="number">2</span>表示十进制</span><br><span class="line"></span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> test_bit1(f2)</span><br><span class="line"><span class="keyword">VALUES</span>(<span class="number">23</span>);</span><br><span class="line"><span class="number">123456789101112131415</span></span><br></pre></td></tr></table></figure>
+
+<p>注意：在向BIT类型的字段中插入数据时，一定要确保插入的数据在BIT类型支持的范围内。</p>
+<p>使用SELECT命令查询位字段时，可以用<code>BIN()</code>或<code>HEX()</code>函数进行读取。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">mysql<span class="operator">&gt;</span> <span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> test_bit1;</span><br><span class="line"><span class="operator">+</span><span class="comment">------------+------------+------------+</span></span><br><span class="line"><span class="operator">|</span> f1         <span class="operator">|</span> f2         <span class="operator">|</span> f3         <span class="operator">|</span></span><br><span class="line"><span class="operator">+</span><span class="comment">------------+------------+------------+</span></span><br><span class="line"><span class="operator">|</span> <span class="number">0x01</span>       <span class="operator">|</span> <span class="keyword">NULL</span>       <span class="operator">|</span> <span class="keyword">NULL</span>       <span class="operator">|</span></span><br><span class="line"><span class="operator">|</span> <span class="keyword">NULL</span>       <span class="operator">|</span> <span class="number">0x17</span>       <span class="operator">|</span> <span class="keyword">NULL</span>       <span class="operator">|</span></span><br><span class="line"><span class="operator">+</span><span class="comment">------------+------------+------------+</span></span><br><span class="line"><span class="number">2</span> <span class="keyword">rows</span> <span class="keyword">in</span> <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br><span class="line"><span class="number">12345678</span></span><br><span class="line">mysql<span class="operator">&gt;</span> <span class="keyword">SELECT</span> BIN(f2),HEX(f2)</span><br><span class="line">    <span class="operator">-</span><span class="operator">&gt;</span> <span class="keyword">FROM</span> test_bit1;</span><br><span class="line"><span class="operator">+</span><span class="comment">---------+---------+</span></span><br><span class="line"><span class="operator">|</span> BIN(f2) <span class="operator">|</span> HEX(f2) <span class="operator">|</span></span><br><span class="line"><span class="operator">+</span><span class="comment">---------+---------+</span></span><br><span class="line"><span class="operator">|</span> <span class="keyword">NULL</span>    <span class="operator">|</span> <span class="keyword">NULL</span>    <span class="operator">|</span></span><br><span class="line"><span class="operator">|</span> <span class="number">10111</span>   <span class="operator">|</span> <span class="number">17</span>      <span class="operator">|</span></span><br><span class="line"><span class="operator">+</span><span class="comment">---------+---------+</span></span><br><span class="line"><span class="number">2</span> <span class="keyword">rows</span> <span class="keyword">in</span> <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br><span class="line"><span class="number">123456789</span></span><br><span class="line">mysql<span class="operator">&gt;</span> <span class="keyword">SELECT</span> f2 <span class="operator">+</span> <span class="number">0</span></span><br><span class="line">    <span class="operator">-</span><span class="operator">&gt;</span> <span class="keyword">FROM</span> test_bit1;</span><br><span class="line"><span class="operator">+</span><span class="comment">--------+</span></span><br><span class="line"><span class="operator">|</span> f2 <span class="operator">+</span> <span class="number">0</span> <span class="operator">|</span></span><br><span class="line"><span class="operator">+</span><span class="comment">--------+</span></span><br><span class="line"><span class="operator">|</span>   <span class="keyword">NULL</span> <span class="operator">|</span></span><br><span class="line"><span class="operator">|</span>     <span class="number">23</span> <span class="operator">|</span></span><br><span class="line"><span class="operator">+</span><span class="comment">--------+</span></span><br><span class="line"><span class="number">2</span> <span class="keyword">rows</span> <span class="keyword">in</span> <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br><span class="line"><span class="number">123456789</span></span><br></pre></td></tr></table></figure>
+
+<p>可以看到，使用b+0查询数据时，可以直接查询出存储的十进制数据的值。</p>
+<h2 id="6-日期与时间类型"><a href="#6-日期与时间类型" class="headerlink" title="6. 日期与时间类型"></a>6. 日期与时间类型</h2><p>日期与时间是重要的信息，在我们的系统中，几乎所有的数据表都用得到。原因是客户需要知道数据的时间标签，从而进行数据查询、统计和处理。</p>
+<p>MySQL有多种表示日期和时间的数据类型，不同的版本可能有所差异，MySQL8.0版本支持的日期和时间类型主要有：<strong>YEAR类型、TIME类型、DATE类型、DATETIME类型和TIMESTAMP类型</strong>。</p>
+<ul>
+<li><code>YEAR</code>类型通常用来表示年</li>
+<li><code>DATE</code>类型通常用来表示年、月、日</li>
+<li><code>TIME</code>类型通常用来表示时、分、秒</li>
+<li><code>DATETIME</code>类型通常用来表示年、月、日、时、分、秒</li>
+<li><code>TIMESTAMP</code>类型通常用来表示带时区的年、月、日、时、分、秒</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>类型</th>
+<th>名称</th>
+<th>字节</th>
+<th>日期格式</th>
+<th>最小值</th>
+<th>最大值</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>YEAR</td>
+<td>年</td>
+<td>1</td>
+<td>YYYY或YY</td>
+<td>1901</td>
+<td>2155</td>
+</tr>
+<tr>
+<td>TIME</td>
+<td>时间</td>
+<td>3</td>
+<td>HH:MM:SS</td>
+<td>-838:59:59</td>
+<td>838:59:59</td>
+</tr>
+<tr>
+<td>DATE</td>
+<td>日期</td>
+<td>3</td>
+<td>YYYY-MM-DD</td>
+<td>1000-01-01</td>
+<td>9999-12-03</td>
+</tr>
+<tr>
+<td>DATETIME</td>
+<td>日期时间</td>
+<td>8</td>
+<td>YYYY-MM-DD HH:MM:SS</td>
+<td>1000-01-01 00:00:00</td>
+<td>9999-12-31 23:59:59</td>
+</tr>
+<tr>
+<td>TIMESTAMP</td>
+<td>日期时间</td>
+<td>4</td>
+<td>YYYY-MM-DD HH:MM:SS</td>
+<td>1970-01-01 00:00:00 UTC</td>
+<td>2038-01-19 03:14:07UTC</td>
+</tr>
+</tbody></table>
+<p>可以看到，不同数据类型表示的时间内容不同、取值范围不同，而且占用的字节数也不一样，你要根据实际需要灵活选取。</p>
+<p>为什么时间类型 TIME 的取值范围不是 -23:59:59～23:59:59 呢？原因是 MySQL 设计的 TIME 类型，不光表示一天之内的时间，而且可以用来表示一个时间间隔，这个时间间隔可以超过 24 小时。</p>
+<h3 id="6-1-YEAR类型"><a href="#6-1-YEAR类型" class="headerlink" title="6.1 YEAR类型"></a>6.1 YEAR类型</h3><p>YEAR类型用来表示年份，在所有的日期时间类型中所占用的存储空间最小，只需要<code>1个字节</code>的存储空间。</p>
+<p>在MySQL中，YEAR有以下几种存储格式：</p>
+<ul>
+<li><p>以4位字符串或数字格式表示YEAR类型，其格式为YYYY，最小值为1901，最大值为2155。</p>
+</li>
+<li><p>以2位字符串格式表示YEAR类型，最小值为00，最大值为99。</p>
+<p>(推荐不用)</p>
+<ul>
+<li>当取值为01到69时，表示2001到2069；</li>
+<li>当取值为70到99时，表示1970到1999；</li>
+<li>当取值整数的0或00添加的话，那么是0000年；</li>
+<li>当取值是日期&#x2F;字符串的’0’添加的话，是2000年。</li>
+</ul>
+</li>
+</ul>
+<p>**<code>从MySQL5.5.27开始，2位格式的YEAR已经不推荐使用</code>**。YEAR默认格式就是“YYYY”，没必要写成YEAR(4)，从MySQL 8.0.19开始，不推荐使用指定显示宽度的YEAR(4)数据类型。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> test_year(</span><br><span class="line">	f1 <span class="keyword">YEAR</span>,</span><br><span class="line">	f2 <span class="keyword">YEAR</span>(<span class="number">4</span>)</span><br><span class="line">);</span><br><span class="line"><span class="number">1234</span></span><br><span class="line">mysql<span class="operator">&gt;</span> <span class="keyword">DESC</span> test_year;</span><br><span class="line"><span class="operator">+</span><span class="comment">-------+---------+------+-----+---------+-------+</span></span><br><span class="line"><span class="operator">|</span> Field <span class="operator">|</span> Type    <span class="operator">|</span> <span class="keyword">Null</span> <span class="operator">|</span> Key <span class="operator">|</span> <span class="keyword">Default</span> <span class="operator">|</span> Extra <span class="operator">|</span></span><br><span class="line"><span class="operator">+</span><span class="comment">-------+---------+------+-----+---------+-------+</span></span><br><span class="line"><span class="operator">|</span> f1    <span class="operator">|</span> <span class="keyword">year</span>(<span class="number">4</span>) <span class="operator">|</span> YES  <span class="operator">|</span>     <span class="operator">|</span> <span class="keyword">NULL</span>    <span class="operator">|</span>       <span class="operator">|</span></span><br><span class="line"><span class="operator">|</span> f2    <span class="operator">|</span> <span class="keyword">year</span>(<span class="number">4</span>) <span class="operator">|</span> YES  <span class="operator">|</span>     <span class="operator">|</span> <span class="keyword">NULL</span>    <span class="operator">|</span>       <span class="operator">|</span></span><br><span class="line"><span class="operator">+</span><span class="comment">-------+---------+------+-----+---------+-------+</span></span><br><span class="line"><span class="number">2</span> <span class="keyword">rows</span> <span class="keyword">in</span> <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br><span class="line"><span class="number">12345678</span></span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> test_year</span><br><span class="line"><span class="keyword">VALUES</span>(<span class="string">&#x27;2020&#x27;</span>,<span class="string">&#x27;2021&#x27;</span>);</span><br><span class="line"></span><br><span class="line">mysql<span class="operator">&gt;</span> <span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> test_year;</span><br><span class="line"><span class="operator">+</span><span class="comment">------+------+</span></span><br><span class="line"><span class="operator">|</span> f1   <span class="operator">|</span> f2   <span class="operator">|</span></span><br><span class="line"><span class="operator">+</span><span class="comment">------+------+</span></span><br><span class="line"><span class="operator">|</span> <span class="number">2020</span> <span class="operator">|</span> <span class="number">2021</span> <span class="operator">|</span></span><br><span class="line"><span class="operator">+</span><span class="comment">------+------+</span></span><br><span class="line"><span class="number">1</span> <span class="keyword">rows</span> <span class="keyword">in</span> <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br><span class="line"><span class="number">12345678910</span></span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> test_year</span><br><span class="line"><span class="keyword">VALUES</span>(<span class="string">&#x27;45&#x27;</span>,<span class="string">&#x27;71&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> test_year</span><br><span class="line"><span class="keyword">VALUES</span>(<span class="number">0</span>,<span class="string">&#x27;0&#x27;</span>);</span><br><span class="line"></span><br><span class="line">mysql<span class="operator">&gt;</span> <span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> test_year;</span><br><span class="line"><span class="operator">+</span><span class="comment">------+------+</span></span><br><span class="line"><span class="operator">|</span> f1   <span class="operator">|</span> f2   <span class="operator">|</span></span><br><span class="line"><span class="operator">+</span><span class="comment">------+------+</span></span><br><span class="line"><span class="operator">|</span> <span class="number">2020</span> <span class="operator">|</span> <span class="number">2021</span> <span class="operator">|</span></span><br><span class="line"><span class="operator">|</span> <span class="number">2045</span> <span class="operator">|</span> <span class="number">1971</span> <span class="operator">|</span></span><br><span class="line"><span class="operator">|</span> <span class="number">0000</span> <span class="operator">|</span> <span class="number">2000</span> <span class="operator">|</span></span><br><span class="line"><span class="operator">+</span><span class="comment">------+------+</span></span><br><span class="line"><span class="number">3</span> <span class="keyword">rows</span> <span class="keyword">in</span> <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br><span class="line"><span class="number">123456789101112131415</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="6-2-DATE类型"><a href="#6-2-DATE类型" class="headerlink" title="6.2 DATE类型"></a>6.2 DATE类型</h3><p>DATE类型表示日期，没有时间部分，格式为<code>YYYY-MM-DD</code>，其中，YYYY表示年份，MM表示月份，DD表示日期。需要<code>3个字节</code>的存储空间。在向DATE类型的字段插入数据时，同样需要满足一定的格式条件。</p>
+<ul>
+<li>以<code>YYYY-MM-DD</code>格式或者<code>YYYYMMDD</code>格式表示的字符串日期，其最小取值为1000-01-01，最大取值为9999-12-03。**<code>YYYYMMDD格式会被转化为YYYY-MM-DD格式</code>**。</li>
+<li>以<code>YY-MM-DD</code>格式或者<code>YYMMDD</code>格式表示的字符串日期，此格式中，年份为两位数值或字符串满足YEAR类型的格式条件为：当年份取值为00到69时，会被转化为2000到2069；当年份取值为70到99时，会被转化为1970到1999。</li>
+<li><strong>使用<code>CURRENT_DATE()</code>或者<code>NOW()</code>函数，会插入当前系统的日期。</strong></li>
+</ul>
+<p><strong>举例：</strong></p>
+<p>创建数据表，表中只包含一个DATE类型的字段f1。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> test_date1(</span><br><span class="line">	f1 <span class="type">DATE</span></span><br><span class="line">);</span><br><span class="line">Query OK, <span class="number">0</span> <span class="keyword">rows</span> affected (<span class="number">0.13</span> sec)</span><br><span class="line"><span class="number">1234</span></span><br></pre></td></tr></table></figure>
+
+<p>插入数据：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> test_date1</span><br><span class="line"><span class="keyword">VALUES</span> (<span class="string">&#x27;2020-10-01&#x27;</span>), (<span class="string">&#x27;20201001&#x27;</span>),(<span class="number">20201001</span>); # 都输出 <span class="number">2022</span><span class="number">-10</span><span class="number">-01</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> test_date1 # (了解, 不推荐这样写)</span><br><span class="line"><span class="keyword">VALUES</span> (<span class="string">&#x27;00-01-01&#x27;</span>), (<span class="string">&#x27;000101&#x27;</span>), (<span class="string">&#x27;69-10-01&#x27;</span>), (<span class="string">&#x27;691001&#x27;</span>), (<span class="string">&#x27;70-01-01&#x27;</span>), (<span class="string">&#x27;700101&#x27;</span>), (<span class="string">&#x27;99-01-01&#x27;</span>), (<span class="string">&#x27;990101&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> test_date1</span><br><span class="line"><span class="keyword">VALUES</span> (<span class="number">000301</span>), (<span class="number">690301</span>), (<span class="number">700301</span>), (<span class="number">990301</span>); </span><br><span class="line"></span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> test_date1</span><br><span class="line"><span class="keyword">VALUES</span> (<span class="built_in">CURRENT_DATE</span>()), (NOW());</span><br><span class="line"></span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span></span><br><span class="line"><span class="keyword">FROM</span> test_date1;</span><br><span class="line"><span class="number">1234567891011121314</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="6-3-TIME类型"><a href="#6-3-TIME类型" class="headerlink" title="6.3 TIME类型"></a>6.3 TIME类型</h3><p><strong>TIME类型用来表示时间，不包含日期部分。</strong></p>
+<p>在MySQL中，需要<code>3个字节</code>的存储空间来存储TIME类型的数据，可以使用“HH:MM:SS”格式来表示TIME类型，其中，<strong>HH表示小时，MM表示分钟，SS表示秒</strong>。</p>
+<p>在MySQL中，向TIME类型的字段插入数据时，也可以使用几种不同的格式。</p>
+<p>（1）可以使用带有冒号的<a target="_blank" rel="noopener" href="https://so.csdn.net/so/search?q=%E5%AD%97%E7%AC%A6%E4%B8%B2&spm=1001.2101.3001.7020">字符串</a>，比如’<code>D HH:MM:SS&#39;</code>、‘<code>HH:MM:SS</code>’、‘<code>HH:MM</code>’、‘<code>D HH:MM</code>’、’<code>D HH</code>’或’<code>SS</code>’格式，都能被正确地插入TIME类型的字段中。</p>
+<ul>
+<li>其中D表示天，其最小值为0，最大值为34。如果使用带有D格式的字符串插入TIME类型的字段时，D会被转化为小时，计算格式为D*24+HH。</li>
+<li>当使用带有冒号并且不带D的字符串表示时间时，表示当天的时间，比如12:10表示12:10:00，而不是00:12:10。</li>
+</ul>
+<p>（2）可以使用不带有冒号的字符串或者数字，格式为’<code>HHMMSS</code>’或者<code>HHMMSS</code>。如果插入一个不合法的字符串或者数字，MySQL在存储数据时，会将其自动转化为00:00:00进行存储。比如1210，MySQL会将最右边的两位解析成秒，表示00:12:10，而不是12:10:00。</p>
+<p>（3）<strong>使用<code>CURRENT_TIME()</code>或者<code>NOW()</code>，会插入当前系统的时间。</strong></p>
+<p><strong>举例：</strong></p>
+<p>创建数据表，表中包含一个TIME类型的字段f1。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> test_time1(</span><br><span class="line">	f1 <span class="type">TIME</span></span><br><span class="line">);</span><br><span class="line">Query OK, <span class="number">0</span> <span class="keyword">rows</span> affected (<span class="number">0.02</span> sec)</span><br><span class="line"><span class="number">1234</span></span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> test_time1</span><br><span class="line"><span class="keyword">VALUES</span>(<span class="string">&#x27;2 12:30:29&#x27;</span>), (<span class="string">&#x27;12:35:29&#x27;</span>), (<span class="string">&#x27;12:40&#x27;</span>), (<span class="string">&#x27;2 12:40&#x27;</span>),(<span class="string">&#x27;1 05&#x27;</span>), (<span class="string">&#x27;45&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> test_time1</span><br><span class="line"><span class="keyword">VALUES</span> (<span class="string">&#x27;123520&#x27;</span>), (<span class="number">124011</span>),(<span class="number">1210</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> test_time1</span><br><span class="line"><span class="keyword">VALUES</span> (NOW()), (<span class="built_in">CURRENT_TIME</span>());</span><br><span class="line"></span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> test_time1;</span><br><span class="line"><span class="number">12345678910</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="6-4-DATETIME类型"><a href="#6-4-DATETIME类型" class="headerlink" title="6.4 DATETIME类型"></a>6.4 <a target="_blank" rel="noopener" href="https://so.csdn.net/so/search?q=DATETIME&spm=1001.2101.3001.7020">DATETIME</a>类型</h3><blockquote>
+<p>DATETIME类型在所有的日期时间类型中占用的存储空间最大，总共需要<code>8</code>个字节的存储空间。在格式上为DATE类型和TIME类型的组合，可以表示为<code>YYYY-MM-DD HH:MM:SS</code>，其中YYYY表示年份，MM表示月份，DD表示日期，HH表示小时，MM表示分钟，SS表示秒。</p>
+</blockquote>
+<p>在向DATETIME类型的字段插入数据时，同样需要满足一定的格式条件。</p>
+<ul>
+<li><p>以</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">YYYY-MM-DD HH:MM:SS</span><br></pre></td></tr></table></figure>
+
+<p>格式或者</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">YYYYMMDDHHMMSS</span><br></pre></td></tr></table></figure>
+
+<p>格式的字符串插入DATETIME类型的字段时，最小值为1000-01-01 00:00:00，最大值为9999-12-03 23:59:59。</p>
+<ul>
+<li>以YYYYMMDDHHMMSS格式的数字插入DATETIME类型的字段时，会被转化为YYYY-MM-DD HH:MM:SS格式。</li>
+</ul>
+</li>
+<li><p>以<code>YY-MM-DD HH:MM:SS</code>格式或者<code>YYMMDDHHMMSS</code>格式的字符串插入DATETIME类型的字段时，两位数的年份规则符合YEAR类型的规则，00到69表示2000到2069；70到99表示1970到1999。</p>
+</li>
+<li><p><strong>使用函数<code>CURRENT_TIMESTAMP()</code>和<code>NOW()</code>，可以向DATETIME类型的字段插入系统的当前日期和时间</strong>。</p>
+</li>
+</ul>
+<p><strong>举例：</strong></p>
+<p>创建数据表，表中包含一个DATETIME类型的字段dt。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> test_datetime1(</span><br><span class="line">	dt DATETIME</span><br><span class="line">);</span><br><span class="line">Query OK, <span class="number">0</span> <span class="keyword">rows</span> affected (<span class="number">0.02</span> sec)</span><br><span class="line"><span class="number">1234</span></span><br></pre></td></tr></table></figure>
+
+<p>插入数据：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> test_datetime1</span><br><span class="line"><span class="keyword">VALUES</span> (<span class="string">&#x27;2021-01-01 06:50:30&#x27;</span>), (<span class="string">&#x27;20210101065030&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> test_datetime1</span><br><span class="line"><span class="keyword">VALUES</span> (<span class="string">&#x27;99-01-01 00:00:00&#x27;</span>), (<span class="string">&#x27;990101000000&#x27;</span>), (<span class="string">&#x27;20-01-01 00:00:00&#x27;</span>), (<span class="string">&#x27;200101000000&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> test_datetime1</span><br><span class="line"><span class="keyword">VALUES</span> (<span class="number">20200101000000</span>), (<span class="number">200101000000</span>), (<span class="number">19990101000000</span>), (<span class="number">990101000000</span>);</span><br><span class="line"> </span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> test_datetime1</span><br><span class="line"><span class="keyword">VALUES</span> (<span class="built_in">CURRENT_TIMESTAMP</span>()), (NOW());</span><br><span class="line"><span class="number">1234567891011</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="6-5-TIMESTAMP类型"><a href="#6-5-TIMESTAMP类型" class="headerlink" title="6.5 TIMESTAMP类型"></a>6.5 <a target="_blank" rel="noopener" href="https://so.csdn.net/so/search?q=TIMESTAMP&spm=1001.2101.3001.7020">TIMESTAMP</a>类型</h3><blockquote>
+<p>TIMESTAMP类型也可以表示日期时间，其显示格式与DATETIME类型相同，都是<code>YYYY-MM-DD HH:MM:SS</code>，需要4个字节的存储空间。但是TIMESTAMP存储的时间范围比DATETIME要小很多，<code>只能存储“1970-01-01 00:00:01 UTC”到“2038-01-19 03:14:07 UTC”</code>之间的时间。其中，UTC表示世界统一时间，也叫作世界标准时间。</p>
+</blockquote>
+<ul>
+<li><strong>存储数据的时候需要对当前时间所在的时区进行转换，查询数据的时候再将时间转换回当前的时区。因此，使用TIMESTAMP存储的同一个时间值，在不同的时区查询时会显示不同的时间。</strong></li>
+</ul>
+<p>向TIMESTAMP类型的字段插入数据时，当插入的数据格式满足YY-MM-DD HH:MM:SS和YYMMDDHHMMSS时，两位数值的年份同样符合YEAR类型的规则条件，只不过表示的时间范围要小很多。</p>
+<p>如果向TIMESTAMP类型的字段插入的时间超出了TIMESTAMP类型的范围，则MySQL会抛出错误信息。</p>
+<p><strong>举例：</strong></p>
+<p>创建数据表，表中包含一个TIMESTAMP类型的字段ts。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> test_timestamp1(</span><br><span class="line">ts <span class="type">TIMESTAMP</span></span><br><span class="line">);</span><br><span class="line"><span class="number">123</span></span><br></pre></td></tr></table></figure>
+
+<p>插入数据：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> test_timestamp1</span><br><span class="line"><span class="keyword">VALUES</span> (<span class="string">&#x27;1999-01-01 03:04:50&#x27;</span>), (<span class="string">&#x27;19990101030405&#x27;</span>), (<span class="string">&#x27;99-01-01 03:04:05&#x27;</span>), (<span class="string">&#x27;990101030405&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> test_timestamp1</span><br><span class="line"><span class="keyword">VALUES</span> (<span class="string">&#x27;2020@01@01@00@00@00&#x27;</span>), (<span class="string">&#x27;20@01@01@00@00@00&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> test_timestamp1</span><br><span class="line"><span class="keyword">VALUES</span> (<span class="built_in">CURRENT_TIMESTAMP</span>()), (NOW());</span><br><span class="line"></span><br><span class="line">#Incorrect datetime <span class="keyword">value</span></span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> test_timestamp1</span><br><span class="line"><span class="keyword">VALUES</span> (<span class="string">&#x27;2038-01-20 03:14:07&#x27;</span>);</span><br><span class="line"><span class="number">123456789101112</span></span><br></pre></td></tr></table></figure>
+
+<p><strong><code>TIMESTAMP和DATETIME的区别：</code></strong></p>
+<ul>
+<li><p>TIMESTAMP存储空间比较小，表示的日期时间范围也比较小</p>
+</li>
+<li><p>底层存储方式不同，TIMESTAMP底层存储的是毫秒值，距离1970-1-1 0:0:0 0毫秒的毫秒值。</p>
+</li>
+<li><p>两个日期比较大小或日期计算时，TIMESTAMP更方便、更快。</p>
+</li>
+<li><p>TIMESTAMP和时区有关。TIMESTAMP会根据用户的时区不同，显示不同的结果。而DATETIME则只能反映出插入时当地的时区，其他时区的人查看数据必然会有误差的。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> temp_time(</span><br><span class="line">    d1 DATETIME,</span><br><span class="line">    d2 <span class="type">TIMESTAMP</span></span><br><span class="line">);</span><br><span class="line"><span class="number">1234</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> temp_time <span class="keyword">VALUES</span>(<span class="string">&#x27;2021-9-2 14:45:52&#x27;</span>,<span class="string">&#x27;2021-9-2 14:45:52&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> temp_time <span class="keyword">VALUES</span>(NOW(),NOW());</span><br><span class="line"><span class="number">123</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">mysql<span class="operator">&gt;</span> <span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> temp_time;</span><br><span class="line"><span class="operator">+</span><span class="comment">---------------------+---------------------+</span></span><br><span class="line"><span class="operator">|</span> d1                  <span class="operator">|</span> d2                  <span class="operator">|</span></span><br><span class="line"><span class="operator">+</span><span class="comment">---------------------+---------------------+</span></span><br><span class="line"><span class="operator">|</span> <span class="number">2021</span><span class="number">-09</span><span class="number">-02</span> <span class="number">14</span>:<span class="number">45</span>:<span class="number">52</span> <span class="operator">|</span> <span class="number">2021</span><span class="number">-09</span><span class="number">-02</span> <span class="number">14</span>:<span class="number">45</span>:<span class="number">52</span> <span class="operator">|</span></span><br><span class="line"><span class="operator">|</span> <span class="number">2021</span><span class="number">-11</span><span class="number">-03</span> <span class="number">17</span>:<span class="number">38</span>:<span class="number">17</span> <span class="operator">|</span> <span class="number">2021</span><span class="number">-11</span><span class="number">-03</span> <span class="number">17</span>:<span class="number">38</span>:<span class="number">17</span> <span class="operator">|</span></span><br><span class="line"><span class="operator">+</span><span class="comment">---------------------+---------------------+</span></span><br><span class="line"><span class="number">2</span> <span class="keyword">rows</span> <span class="keyword">in</span> <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br><span class="line"><span class="number">12345678</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">#修改当前的时区</span><br><span class="line"><span class="keyword">SET</span> time_zone <span class="operator">=</span> <span class="string">&#x27;+9:00&#x27;</span>;</span><br><span class="line"><span class="number">12</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">mysql<span class="operator">&gt;</span> <span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> temp_time;</span><br><span class="line"><span class="operator">+</span><span class="comment">---------------------+---------------------+</span></span><br><span class="line"><span class="operator">|</span> d1                  <span class="operator">|</span> d2                  <span class="operator">|</span></span><br><span class="line"><span class="operator">+</span><span class="comment">---------------------+---------------------+</span></span><br><span class="line"><span class="operator">|</span> <span class="number">2021</span><span class="number">-09</span><span class="number">-02</span> <span class="number">14</span>:<span class="number">45</span>:<span class="number">52</span> <span class="operator">|</span> <span class="number">2021</span><span class="number">-09</span><span class="number">-02</span> <span class="number">15</span>:<span class="number">45</span>:<span class="number">52</span> <span class="operator">|</span></span><br><span class="line"><span class="operator">|</span> <span class="number">2021</span><span class="number">-11</span><span class="number">-03</span> <span class="number">17</span>:<span class="number">38</span>:<span class="number">17</span> <span class="operator">|</span> <span class="number">2021</span><span class="number">-11</span><span class="number">-03</span> <span class="number">18</span>:<span class="number">38</span>:<span class="number">17</span> <span class="operator">|</span></span><br><span class="line"><span class="operator">+</span><span class="comment">---------------------+---------------------+</span></span><br><span class="line"><span class="number">2</span> <span class="keyword">rows</span> <span class="keyword">in</span> <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br><span class="line"><span class="number">12345678</span></span><br></pre></td></tr></table></figure></li>
+</ul>
+<h3 id="6-6-开发中经验"><a href="#6-6-开发中经验" class="headerlink" title="6.6 开发中经验"></a>6.6 开发中经验</h3><ul>
+<li>用得最多的日期时间类型，就是 <code>DATETIME</code>。虽然 MySQL 也支持 YEAR（年）、 TIME（时间）、DATE（日期），以及 TIMESTAMP 类型，但是在实际项目中，尽量用 DATETIME 类型。</li>
+<li>因为这个数据类型包括了完整的日期和时间信息，取值范围也最大，使用起来比较方便。毕竟，如果日期时间信息分散在好几个字段，很不容易记，而且查询的时候，SQL 语句也会更加复杂。</li>
+</ul>
+<p>此外，一般存注册时间、商品发布时间等，不建议使用DATETIME存储，而是使用<code>时间戳</code>，因为DATETIME虽然直观，但不便于计算。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">mysql<span class="operator">&gt;</span> <span class="keyword">SELECT</span> UNIX_TIMESTAMP();</span><br><span class="line"><span class="operator">+</span><span class="comment">------------------+</span></span><br><span class="line"><span class="operator">|</span> UNIX_TIMESTAMP() <span class="operator">|</span></span><br><span class="line"><span class="operator">+</span><span class="comment">------------------+</span></span><br><span class="line"><span class="operator">|</span>       <span class="number">1635932762</span> <span class="operator">|</span></span><br><span class="line"><span class="operator">+</span><span class="comment">------------------+</span></span><br><span class="line"><span class="number">1</span> <span class="type">row</span> <span class="keyword">in</span> <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br><span class="line"><span class="number">1234567</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="7-文本字符串类型"><a href="#7-文本字符串类型" class="headerlink" title="7. 文本字符串类型"></a>7. 文本字符串类型</h2><p>在实际的项目中，我们还经常遇到一种数据，就是字符串数据。</p>
+<p>MySQL中，文本字符串总体上分为<code>CHAR</code>、<code>VARCHAR</code>、<code>TINYTEXT</code>、<code>TEXT</code>、<code>MEDIUMTEXT</code>、<code>LONGTEXT</code>、<code>ENUM</code>、<code>SET</code>等类型。</p>
+<p><img src="https://img-blog.csdnimg.cn/bdb24fd7ee294b3ca20faa89b369eff9.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAd2hpdGUgY2FtZWw=,size_20,color_FFFFFF,t_70,g_se,x_16" class="lazyload placeholder" data-srcset="https://img-blog.csdnimg.cn/bdb24fd7ee294b3ca20faa89b369eff9.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAd2hpdGUgY2FtZWw=,size_20,color_FFFFFF,t_70,g_se,x_16" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="[外链图片转存失败,源站可能有防盗链机制,建议将图片保存下来直接上传(img-vwX3b75I-1650184445012)(images/image-20211012003508730.png)]"></p>
+<h3 id="7-1-CHAR与VARCHAR类型-一般用varchar"><a href="#7-1-CHAR与VARCHAR类型-一般用varchar" class="headerlink" title="7.1 CHAR与VARCHAR类型 (一般用varchar)"></a>7.1 CHAR与VARCHAR类型 (一般用varchar)</h3><p>CHAR和VARCHAR类型都可以存储比较短的字符串。</p>
+<table>
+<thead>
+<tr>
+<th>字符串(文本)类型</th>
+<th>特点</th>
+<th>长度</th>
+<th>长度范围</th>
+<th>占用的存储空间</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>CHAR(M)</td>
+<td>固定长度</td>
+<td>M</td>
+<td>0 &lt;&#x3D; M &lt;&#x3D; 255</td>
+<td>M个字节</td>
+</tr>
+<tr>
+<td>VARCHAR(M)</td>
+<td>可变长度</td>
+<td>M</td>
+<td>0 &lt;&#x3D; M &lt;&#x3D; 65535</td>
+<td>(实际长度 + 1) 个字节</td>
+</tr>
+</tbody></table>
+<p><strong>CHAR类型：</strong></p>
+<ul>
+<li><strong>CHAR(M) 类型一般需要预先定义字符串长度</strong>。如果不指定(M)，则表示长度默认是1个字符。</li>
+<li>如果保存时，数据的实际长度比CHAR类型声明的长度小，则会在<code>右侧填充</code>空格以达到指定的长度。当MySQL检索CHAR类型的数据时，CHAR类型的字段会去除尾部的空格。</li>
+<li>定义CHAR类型字段时，声明的字段长度即为CHAR类型字段所占的存储空间的字节数。</li>
+</ul>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> test_char1(</span><br><span class="line">	c1 <span class="type">CHAR</span>,</span><br><span class="line">	c2 <span class="type">CHAR</span>(<span class="number">5</span>)</span><br><span class="line">);</span><br><span class="line"></span><br><span class="line"><span class="keyword">DESC</span> test_char1;</span><br><span class="line"><span class="number">123456</span></span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> test_char1</span><br><span class="line"><span class="keyword">VALUES</span>(<span class="string">&#x27;a&#x27;</span>,<span class="string">&#x27;Tom&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">SELECT</span> c1,CONCAT(c2,<span class="string">&#x27;***&#x27;</span>) <span class="keyword">FROM</span> test_char1;</span><br><span class="line"><span class="number">1234</span></span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> test_char1(c2)</span><br><span class="line"><span class="keyword">VALUES</span>(<span class="string">&#x27;a  &#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">SELECT</span> <span class="keyword">CHAR_LENGTH</span>(c2)</span><br><span class="line"><span class="keyword">FROM</span> test_char1;</span><br><span class="line"><span class="number">12345</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>VARCHAR类型：</strong></p>
+<ul>
+<li><strong>VARCHAR(M) 定义时，<code>必须指定</code>长度M，否则报错。</strong></li>
+<li>MySQL4.0版本以下，varchar(20)：指的是20字节，如果存放UTF8汉字时，只能存6个（每个汉字3字节） ；MySQL5.0版本以上，varchar(20)：指的是20字符。</li>
+<li>检索VARCHAR类型的字段数据时，会保留数据尾部的空格。VARCHAR类型的字段所占用的存储空间为字符串实际长度加1个字节。</li>
+</ul>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> test_varchar1(</span><br><span class="line">	NAME <span class="type">VARCHAR</span>  #错误</span><br><span class="line">);</span><br><span class="line"><span class="number">123</span></span><br><span class="line">#<span class="keyword">Column</span> length too big <span class="keyword">for</span> <span class="keyword">column</span> <span class="string">&#x27;NAME&#x27;</span> (max <span class="operator">=</span> <span class="number">21845</span>);</span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> test_varchar2(</span><br><span class="line">	NAME <span class="type">VARCHAR</span>(<span class="number">65535</span>)  #错误</span><br><span class="line">);</span><br><span class="line"><span class="number">1234</span></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> test_varchar3(</span><br><span class="line">	NAME <span class="type">VARCHAR</span>(<span class="number">5</span>)</span><br><span class="line">);</span><br><span class="line"></span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> test_varchar3</span><br><span class="line"><span class="keyword">VALUES</span>(<span class="string">&#x27;尚硅谷&#x27;</span>),(<span class="string">&#x27;尚硅谷教育&#x27;</span>);</span><br><span class="line"></span><br><span class="line">#Data too long <span class="keyword">for</span> <span class="keyword">column</span> <span class="string">&#x27;NAME&#x27;</span> <span class="keyword">at</span> <span class="type">row</span> <span class="number">1</span></span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> test_varchar3</span><br><span class="line"><span class="keyword">VALUES</span>(<span class="string">&#x27;尚硅谷IT教育&#x27;</span>);</span><br><span class="line"><span class="number">12345678910</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>哪些情况使用 CHAR 或 VARCHAR 更好</strong></p>
+<table>
+<thead>
+<tr>
+<th>类型</th>
+<th>特点</th>
+<th>空间上</th>
+<th>时间上</th>
+<th>适用场景</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>CHAR(M)</td>
+<td>固定长度</td>
+<td>浪费存储空间</td>
+<td>效率高</td>
+<td>存储不大，速度要求高</td>
+</tr>
+<tr>
+<td><code>VARCHAR(M)</code></td>
+<td>可变长度</td>
+<td>节省存储空间</td>
+<td>效率低</td>
+<td>非CHAR的情况</td>
+</tr>
+</tbody></table>
+<p>情况1：存储很短的信息。比如门牌号码101，201……这样很短的信息应该用char，因为varchar还要占个byte用于存储信息长度，本来打算节约存储的，结果得不偿失。</p>
+<p>情况2：固定长度的。比如使用uuid作为主键，那用char应该更合适。因为他固定长度，varchar动态根据长度的特性就消失了，而且还要占个长度信息。</p>
+<p>情况3：十分频繁改变的column。因为varchar每次存储都要有额外的计算，得到长度等工作，如果一个非常频繁改变的，那就要有很多的精力用于计算，而这些对于char来说是不需要的。</p>
+<p>情况4：具体存储引擎中的情况：</p>
+<ul>
+<li><code>MyISAM</code> 数据存储引擎和数据列：MyISAM数据表，最好使用固定长度(CHAR)的数据列代替可变长度(VARCHAR)的数据列。这样使得整个表静态化，从而使<code>数据检索更快</code>，用空间换时间。</li>
+<li><code>MEMORY</code> 存储引擎和数据列：MEMORY数据表目前都使用固定长度的数据行存储，因此无论使用CHAR或VARCHAR列都没有关系，两者都是作为CHAR类型处理的。</li>
+<li><strong><code>InnoDB</code>存储引擎，建议使用<code>VARCHAR</code>类型</strong>。因为对于InnoDB数据表，内部的行存储格式并没有区分固定长度和可变长度列（所有数据行都使用指向数据列值的头指针），而且<strong>主要影响性能的因素是数据行使用的存储总量</strong>，由于char平均占用的空间多于varchar，所以除了简短并且固定长度的，其他考虑varchar。这样节省空间，对磁盘I&#x2F;O和数据存储总量比较好。</li>
+</ul>
+<h3 id="7-2-TEXT类型"><a href="#7-2-TEXT类型" class="headerlink" title="7.2 TEXT类型"></a>7.2 TEXT类型</h3><p>在MySQL中，TEXT用来保存文本类型的字符串，总共包含4种类型，分别为TINYTEXT、TEXT、MEDIUMTEXT 和 LONGTEXT 类型。</p>
+<p>在向TEXT类型的字段保存和查询数据时，系统自动按照实际长度存储，不需要预先定义长度。这一点和 VARCHAR类型相同。</p>
+<p>每种TEXT类型保存的数据长度和所占用的存储空间不同，如下：</p>
+<table>
+<thead>
+<tr>
+<th>文本字符串类型</th>
+<th>特点</th>
+<th>长度</th>
+<th>长度范围</th>
+<th>占用的存储空间</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>TINYTEXT</td>
+<td>小文本、可变长度</td>
+<td>L</td>
+<td>0 &lt;&#x3D; L &lt;&#x3D; 255</td>
+<td>L + 2 个字节</td>
+</tr>
+<tr>
+<td>TEXT</td>
+<td>文本、可变长度</td>
+<td>L</td>
+<td>0 &lt;&#x3D; L &lt;&#x3D; 65535</td>
+<td>L + 2 个字节</td>
+</tr>
+<tr>
+<td>MEDIUMTEXT</td>
+<td>中等文本、可变长度</td>
+<td>L</td>
+<td>0 &lt;&#x3D; L &lt;&#x3D; 16777215</td>
+<td>L + 3 个字节</td>
+</tr>
+<tr>
+<td>LONGTEXT</td>
+<td>大文本、可变长度</td>
+<td>L</td>
+<td>0 &lt;&#x3D; L&lt;&#x3D; 4294967295（相当于4GB）</td>
+<td>L + 4 个字节</td>
+</tr>
+</tbody></table>
+<p><strong>由于实际存储的长度不确定，MySQL 不允许 TEXT 类型的字段做主键</strong>。遇到这种情况，你只能采用 CHAR(M)，或者 VARCHAR(M)。</p>
+<p><strong>举例：</strong></p>
+<p>创建数据表：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> test_text(</span><br><span class="line">tx TEXT</span><br><span class="line">);</span><br><span class="line"><span class="number">123</span></span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> test_text</span><br><span class="line"><span class="keyword">VALUES</span>(<span class="string">&#x27;atguigu   &#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">SELECT</span> <span class="keyword">CHAR_LENGTH</span>(tx)</span><br><span class="line"><span class="keyword">FROM</span> test_text; #<span class="number">10</span></span><br><span class="line"><span class="number">12345</span></span><br></pre></td></tr></table></figure>
+
+<p>说明在保存和查询数据时，并没有删除TEXT类型的数据尾部的空格。</p>
+<p><strong>开发中经验：</strong></p>
+<ul>
+<li><strong>TEXT文本类型，可以存比较大的文本段，搜索速度稍慢，因此如果不是特别大的内容，建议使用CHAR，VARCHAR来代替。</strong></li>
+<li>还有TEXT类型不用加默认值，加了也没用。而且text和blob类型的数据删除后容易导致“空洞”，使得文件碎片比较多，所以频繁使用的表不建议包含TEXT类型字段，建议单独分出去，单独用一个表。</li>
+</ul>
+<h2 id="8-ENUM类型"><a href="#8-ENUM类型" class="headerlink" title="8. ENUM类型"></a>8. ENUM类型</h2><p>ENUM类型也叫作枚举类型，ENUM类型的取值范围需要在定义字段时进行指定。设置字段值时，<strong>ENUM类型只允许从成员中选取单个值，不能一次选取多个值。</strong></p>
+<p>其所需要的存储空间由定义ENUM类型时指定的成员个数决定。</p>
+<table>
+<thead>
+<tr>
+<th>文本字符串类型</th>
+<th>长度</th>
+<th>长度范围</th>
+<th>占用的存储空间</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>ENUM</td>
+<td>L</td>
+<td>1 &lt;&#x3D; L &lt;&#x3D; 65535</td>
+<td>1或2个字节</td>
+</tr>
+</tbody></table>
+<ul>
+<li>当ENUM类型包含1～255个成员时，需要1个字节的存储空间；</li>
+<li>当ENUM类型包含256～65535个成员时，需要2个字节的存储空间。</li>
+<li>ENUM类型的成员个数的上限为65535个。</li>
+</ul>
+<p>举例：</p>
+<p>创建表如下：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> test_enum(</span><br><span class="line">	season ENUM(<span class="string">&#x27;春&#x27;</span>,<span class="string">&#x27;夏&#x27;</span>,<span class="string">&#x27;秋&#x27;</span>,<span class="string">&#x27;冬&#x27;</span>,<span class="string">&#x27;unknow&#x27;</span>)</span><br><span class="line">);</span><br><span class="line"><span class="number">123</span></span><br></pre></td></tr></table></figure>
+
+<p>添加数据：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> test_enum</span><br><span class="line"><span class="keyword">VALUES</span>(<span class="string">&#x27;春&#x27;</span>),(<span class="string">&#x27;秋&#x27;</span>);</span><br><span class="line"></span><br><span class="line"># 忽略大小写</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> test_enum</span><br><span class="line"><span class="keyword">VALUES</span>(<span class="string">&#x27;UNKNOW&#x27;</span>);</span><br><span class="line"></span><br><span class="line"># 允许按照角标的方式获取指定索引位置的枚举值</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> test_enum</span><br><span class="line"><span class="keyword">VALUES</span>(<span class="string">&#x27;1&#x27;</span>),(<span class="number">3</span>);</span><br><span class="line"></span><br><span class="line"># Data truncated <span class="keyword">for</span> <span class="keyword">column</span> <span class="string">&#x27;season&#x27;</span> <span class="keyword">at</span> <span class="type">row</span> <span class="number">1</span></span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> test_enum</span><br><span class="line"><span class="keyword">VALUES</span>(<span class="string">&#x27;ab&#x27;</span>);</span><br><span class="line"></span><br><span class="line"># 当ENUM类型的字段没有声明为<span class="keyword">NOT</span> <span class="keyword">NULL</span>时，插入<span class="keyword">NULL</span>也是有效的</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> test_enum</span><br><span class="line"><span class="keyword">VALUES</span>(<span class="keyword">NULL</span>);</span><br><span class="line"><span class="number">123456789101112131415161718</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="9-SET类型"><a href="#9-SET类型" class="headerlink" title="9. SET类型"></a>9. SET类型</h2><p>SET表示一个字符串对象，可以包含0个或多个成员，但成员个数的上限为<code>64</code>。设置字段值时，可以取取值范围内的 0 个或多个值。</p>
+<p>当SET类型包含的成员个数不同时，其所占用的存储空间也是不同的，具体如下：</p>
+<table>
+<thead>
+<tr>
+<th>成员个数范围（L表示实际成员个数）</th>
+<th>占用的存储空间</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1 &lt;&#x3D; L &lt;&#x3D; 8</td>
+<td>1个字节</td>
+</tr>
+<tr>
+<td>9 &lt;&#x3D; L &lt;&#x3D; 16</td>
+<td>2个字节</td>
+</tr>
+<tr>
+<td>17 &lt;&#x3D; L &lt;&#x3D; 24</td>
+<td>3个字节</td>
+</tr>
+<tr>
+<td>25 &lt;&#x3D; L &lt;&#x3D; 32</td>
+<td>4个字节</td>
+</tr>
+<tr>
+<td>33 &lt;&#x3D; L &lt;&#x3D; 64</td>
+<td>8个字节</td>
+</tr>
+</tbody></table>
+<p>SET类型在存储数据时成员个数越多，其占用的存储空间越大。注意：SET类型在选取成员时，可以一次选择多个成员，这一点与ENUM类型不同。</p>
+<p>举例：</p>
+<p>创建表：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> test_set(</span><br><span class="line">	s <span class="keyword">SET</span> (<span class="string">&#x27;A&#x27;</span>, <span class="string">&#x27;B&#x27;</span>, <span class="string">&#x27;C&#x27;</span>)</span><br><span class="line">);</span><br><span class="line"><span class="number">123</span></span><br></pre></td></tr></table></figure>
+
+<p>向表中插入数据：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> test_set (s) <span class="keyword">VALUES</span> (<span class="string">&#x27;A&#x27;</span>), (<span class="string">&#x27;A,B&#x27;</span>);</span><br><span class="line"></span><br><span class="line">#插入重复的<span class="keyword">SET</span>类型成员时，MySQL会自动删除重复的成员</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> test_set (s) <span class="keyword">VALUES</span> (<span class="string">&#x27;A,B,C,A&#x27;</span>);</span><br><span class="line"></span><br><span class="line">#向<span class="keyword">SET</span>类型的字段插入<span class="keyword">SET</span>成员中不存在的值时，MySQL会抛出错误。</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> test_set (s) <span class="keyword">VALUES</span> (<span class="string">&#x27;A,B,C,D&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span></span><br><span class="line"><span class="keyword">FROM</span> test_set;</span><br><span class="line"><span class="number">12345678910</span></span><br></pre></td></tr></table></figure>
+
+<p>举例：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> temp_mul(</span><br><span class="line">gender ENUM(<span class="string">&#x27;男&#x27;</span>,<span class="string">&#x27;女&#x27;</span>),</span><br><span class="line">hobby <span class="keyword">SET</span>(<span class="string">&#x27;吃饭&#x27;</span>,<span class="string">&#x27;睡觉&#x27;</span>,<span class="string">&#x27;打豆豆&#x27;</span>,<span class="string">&#x27;写代码&#x27;</span>)</span><br><span class="line">);</span><br><span class="line"><span class="number">1234</span></span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> temp_mul <span class="keyword">VALUES</span>(<span class="string">&#x27;男&#x27;</span>,<span class="string">&#x27;睡觉,打豆豆&#x27;</span>); #成功</span><br><span class="line"></span><br><span class="line"># Data truncated <span class="keyword">for</span> <span class="keyword">column</span> <span class="string">&#x27;gender&#x27;</span> <span class="keyword">at</span> <span class="type">row</span> <span class="number">1</span></span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> temp_mul <span class="keyword">VALUES</span>(<span class="string">&#x27;男,女&#x27;</span>,<span class="string">&#x27;睡觉,写代码&#x27;</span>); #失败</span><br><span class="line"></span><br><span class="line"># Data truncated <span class="keyword">for</span> <span class="keyword">column</span> <span class="string">&#x27;gender&#x27;</span> <span class="keyword">at</span> <span class="type">row</span> <span class="number">1</span></span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> temp_mul <span class="keyword">VALUES</span>(<span class="string">&#x27;妖&#x27;</span>,<span class="string">&#x27;睡觉,写代码&#x27;</span>);#失败</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> temp_mul <span class="keyword">VALUES</span>(<span class="string">&#x27;男&#x27;</span>,<span class="string">&#x27;睡觉,写代码,吃饭&#x27;</span>); #成功</span><br><span class="line"><span class="number">12345678910</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="10-二进制字符串类型-了解"><a href="#10-二进制字符串类型-了解" class="headerlink" title="10. 二进制字符串类型 (了解)"></a>10. 二进制字符串类型 (了解)</h2><p><strong>MySQL中的二进制字符串类型主要存储一些二进制数据，比如可以存储图片、音频和视频等二进制数据</strong>。</p>
+<p>MySQL中支持的二进制字符串类型主要包括BINARY、VARBINARY、TINYBLOB、BLOB、MEDIUMBLOB 和 LONGBLOB类型。</p>
+<h4 id="BINARY与VARBINARY类型"><a href="#BINARY与VARBINARY类型" class="headerlink" title="BINARY与VARBINARY类型"></a>BINARY与VARBINARY类型</h4><p>BINARY和VARBINARY类似于CHAR和VARCHAR，只是它们存储的是二进制字符串。</p>
+<p>BINARY (M)为固定长度的二进制字符串，M表示最多能存储的字节数，取值范围是0~255个字符。如果未指定(M)，表示只能存储<code>1个字节</code>。例如BINARY (8)，表示最多能存储8个字节，如果字段值不足(M)个字节，将在右边填充’\0’以补齐指定长度。</p>
+<p>VARBINARY (M)为可变长度的二进制字符串，M表示最多能存储的字节数，总字节数不能超过行的字节长度限制65535，另外还要考虑额外字节开销，VARBINARY类型的数据除了存储数据本身外，还需要1或2个字节来存储数据的字节数。<strong>VARBINARY类型<code>必须指定(M)</code>，否则报错。</strong></p>
+<table>
+<thead>
+<tr>
+<th>二进制字符串类型</th>
+<th>特点</th>
+<th>值的长度</th>
+<th>占用空间(字节)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>BINARY(M)</td>
+<td>固定长度</td>
+<td>M （0 &lt;&#x3D; M &lt;&#x3D; 255）</td>
+<td>M个字节</td>
+</tr>
+<tr>
+<td>VARBINARY(M)</td>
+<td>可变长度</td>
+<td>M（0 &lt;&#x3D; M &lt;&#x3D; 65535）</td>
+<td>M+1个字节</td>
+</tr>
+</tbody></table>
+<p>举例：</p>
+<p>创建表：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> test_binary1(</span><br><span class="line">	f1 <span class="type">BINARY</span>,</span><br><span class="line">	f2 <span class="type">BINARY</span>(<span class="number">3</span>),</span><br><span class="line">	# f3 <span class="type">VARBINARY</span>,</span><br><span class="line">	f4 <span class="type">VARBINARY</span>(<span class="number">10</span>)</span><br><span class="line">);</span><br><span class="line"><span class="number">123456</span></span><br></pre></td></tr></table></figure>
+
+<p>添加数据：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> test_binary1(f1,f2)</span><br><span class="line"><span class="keyword">VALUES</span>(<span class="string">&#x27;a&#x27;</span>,<span class="string">&#x27;a&#x27;</span>); # 一个a就相当于一个字节来存储了</span><br><span class="line"></span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> test_binary1(f1,f2)</span><br><span class="line"><span class="keyword">VALUES</span>(<span class="string">&#x27;尚&#x27;</span>,<span class="string">&#x27;尚&#x27;</span>);#失败</span><br><span class="line"><span class="number">12345</span></span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> test_binary1(f2,f4)</span><br><span class="line"><span class="keyword">VALUES</span>(<span class="string">&#x27;ab&#x27;</span>,<span class="string">&#x27;ab&#x27;</span>);</span><br><span class="line"></span><br><span class="line">mysql<span class="operator">&gt;</span> <span class="keyword">SELECT</span> LENGTH(f2),LENGTH(f4)</span><br><span class="line">    <span class="operator">-</span><span class="operator">&gt;</span> <span class="keyword">FROM</span> test_binary1;</span><br><span class="line"><span class="operator">+</span><span class="comment">------------+------------+</span></span><br><span class="line"><span class="operator">|</span> LENGTH(f2) <span class="operator">|</span> LENGTH(f4) <span class="operator">|</span></span><br><span class="line"><span class="operator">+</span><span class="comment">------------+------------+</span></span><br><span class="line"><span class="operator">|</span>          <span class="number">3</span> <span class="operator">|</span>       <span class="keyword">NULL</span> <span class="operator">|</span></span><br><span class="line"><span class="operator">|</span>          <span class="number">3</span> <span class="operator">|</span>          <span class="number">2</span> <span class="operator">|</span></span><br><span class="line"><span class="operator">+</span><span class="comment">------------+------------+</span></span><br><span class="line"><span class="number">2</span> <span class="keyword">rows</span> <span class="keyword">in</span> <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br><span class="line"><span class="number">123456789101112</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="BLOB类型"><a href="#BLOB类型" class="headerlink" title="BLOB类型"></a>BLOB类型</h4><p>BLOB是一个<code>二进制大对象</code>，可以容纳可变数量的数据。</p>
+<p>MySQL中的BLOB类型包括TINYBLOB、BLOB、MEDIUMBLOB和LONGBLOB 4种类型，它们可容纳值的最大长度不同。可以存储一个二进制的大对象，比如<code>图片</code>、<code>音频</code>和<code>视频</code>等。</p>
+<p><strong>需要注意的是，在实际工作中，往往不会在MySQL数据库中使用BLOB类型存储大对象数据，通常会将图片、音频和视频文件存储到<code>服务器的磁盘上</code>，并将图片、音频和视频的访问路径存储到MySQL中。</strong></p>
+<table>
+<thead>
+<tr>
+<th>二进制字符串类型</th>
+<th>值的长度</th>
+<th>长度范围</th>
+<th>占用空间</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>TINYBLOB</td>
+<td>L</td>
+<td>0 &lt;&#x3D; L &lt;&#x3D; 255</td>
+<td>L + 1 个字节</td>
+</tr>
+<tr>
+<td>BLOB</td>
+<td>L</td>
+<td>0 &lt;&#x3D; L &lt;&#x3D; 65535（相当于64KB）</td>
+<td>L + 2 个字节</td>
+</tr>
+<tr>
+<td>MEDIUMBLOB</td>
+<td>L</td>
+<td>0 &lt;&#x3D; L &lt;&#x3D; 16777215 （相当于16MB）</td>
+<td>L + 3 个字节</td>
+</tr>
+<tr>
+<td>LONGBLOB</td>
+<td>L</td>
+<td>0 &lt;&#x3D; L &lt;&#x3D; 4294967295（相当于4GB）</td>
+<td>L + 4 个字节</td>
+</tr>
+</tbody></table>
+<p>举例：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> test_blob1(</span><br><span class="line">	id <span class="type">INT</span>,</span><br><span class="line">	img MEDIUMBLOB</span><br><span class="line">);</span><br><span class="line"><span class="number">1234</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>TEXT和BLOB的使用注意事项：</strong></p>
+<p>在使用text和blob字段类型时要注意以下几点，以便更好的发挥数据库的性能。</p>
+<p>① BLOB和TEXT值也会引起自己的一些问题，特别是执行了大量的删除或更新操作的时候。删除这种值会在数据表中留下很大的”<code>空洞</code>“，以后填入这些”空洞”的记录可能长度不同。为了提高性能，建议定期使用 OPTIMIZE TABLE 功能对这类表进行<code>碎片整理</code>。</p>
+<p>② 如果需要对大文本字段进行模糊查询，MySQL 提供了<code>前缀索引</code>。但是仍然要在不必要的时候避免检索大型的BLOB或TEXT值。例如，SELECT * 查询就不是很好的想法，除非你能够确定作为约束条件的WHERE子句只会找到所需要的数据行。否则，你可能毫无目的地在网络上传输大量的值。</p>
+<p>③ 把BLOB或TEXT列<code>分离到单独的表</code>中。在某些环境中，如果把这些数据列移动到第二张数据表中，可以让你把原数据表中的数据列转换为固定长度的数据行格式，那么它就是有意义的。这会<code>减少主表中的碎片</code>，使你得到固定长度数据行的性能优势。它还使你在主数据表上运行 SELECT * 查询的时候不会通过网络传输大量的BLOB或TEXT值。</p>
+<h2 id="11-JSON-类型-了解"><a href="#11-JSON-类型-了解" class="headerlink" title="11. JSON 类型 (了解)"></a>11. JSON 类型 (了解)</h2><p>JSON（JavaScript Object Notation）是一种轻量级的<code>数据交换格式</code>。简洁和清晰的层次结构使得 JSON 成为理想的数据交换语言。它易于人阅读和编写，同时也易于机器解析和生成，并有效地提升网络传输效率。<strong>JSON 可以将 JavaScript 对象中表示的一组数据转换为字符串，然后就可以在网络或者程序之间轻松地传递这个字符串，并在需要的时候将它还原为各编程语言所支持的数据格式。</strong></p>
+<p>在MySQL 5.7中，就已经支持JSON数据类型。在MySQL 8.x版本中，JSON类型提供了可以进行自动验证的JSON文档和优化的存储结构，使得在MySQL中存储和读取JSON类型的数据更加方便和高效。<br>创建数据表，表中包含一个JSON类型的字段 js 。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> test_json(</span><br><span class="line">	js json</span><br><span class="line">);</span><br><span class="line"><span class="number">123</span></span><br></pre></td></tr></table></figure>
+
+<p>向表中插入JSON数据。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> test_json (js) </span><br><span class="line"><span class="keyword">VALUES</span> (<span class="string">&#x27;&#123;&quot;name&quot;:&quot;songhk&quot;, &quot;age&quot;:18, &quot;address&quot;:&#123;&quot;province&quot;:&quot;beijing&quot;, &quot;city&quot;:&quot;beijing&quot;&#125;&#125;&#x27;</span>);</span><br><span class="line"><span class="number">12</span></span><br></pre></td></tr></table></figure>
+
+<p>查询t19表中的数据。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">mysql<span class="operator">&gt;</span> <span class="keyword">SELECT</span> <span class="operator">*</span></span><br><span class="line">    <span class="operator">-</span><span class="operator">&gt;</span> <span class="keyword">FROM</span> test_json;</span><br><span class="line"><span class="number">12</span></span><br></pre></td></tr></table></figure>
+
+<p><img src="https://img-blog.csdnimg.cn/ac2d959bc4ca403296e81fde6de035d4.png" class="lazyload placeholder" data-srcset="https://img-blog.csdnimg.cn/ac2d959bc4ca403296e81fde6de035d4.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="[外链图片转存失败,源站可能有防盗链机制,建议将图片保存下来直接上传(img-bS3xKV4S-1650184445013)(images/image-20211104192516324.png)]"></p>
+<p>当需要检索JSON类型的字段中数据的某个具体值时，可以使用“-&gt;”和“-&gt;&gt;”符号。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">mysql<span class="operator">&gt;</span> <span class="keyword">SELECT</span> js <span class="operator">-</span><span class="operator">&gt;</span> <span class="string">&#x27;$.name&#x27;</span> <span class="keyword">AS</span> NAME,js <span class="operator">-</span><span class="operator">&gt;</span> <span class="string">&#x27;$.age&#x27;</span> <span class="keyword">AS</span> age ,js <span class="operator">-</span><span class="operator">&gt;</span> <span class="string">&#x27;$.address.province&#x27;</span> <span class="keyword">AS</span> province, js <span class="operator">-</span><span class="operator">&gt;</span> <span class="string">&#x27;$.address.city&#x27;</span> <span class="keyword">AS</span> city</span><br><span class="line">    <span class="operator">-</span><span class="operator">&gt;</span> <span class="keyword">FROM</span> test_json;</span><br><span class="line"><span class="operator">+</span><span class="comment">----------+------+-----------+-----------+</span></span><br><span class="line"><span class="operator">|</span> NAME     <span class="operator">|</span> age  <span class="operator">|</span> province  <span class="operator">|</span> city      <span class="operator">|</span></span><br><span class="line"><span class="operator">+</span><span class="comment">----------+------+-----------+-----------+</span></span><br><span class="line"><span class="operator">|</span> &quot;songhk&quot; <span class="operator">|</span> <span class="number">18</span>   <span class="operator">|</span> &quot;beijing&quot; <span class="operator">|</span> &quot;beijing&quot; <span class="operator">|</span></span><br><span class="line"><span class="operator">+</span><span class="comment">----------+------+-----------+-----------+</span></span><br><span class="line"><span class="number">1</span> <span class="type">row</span> <span class="keyword">in</span> <span class="keyword">set</span> (<span class="number">0.00</span> sec)</span><br><span class="line"><span class="number">12345678</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>通过“-&gt;”和“-&gt;&gt;”符号，从JSON字段中正确查询出了指定的JSON数据的值。</strong></p>
+<h2 id="12-空间类型-了解-了解"><a href="#12-空间类型-了解-了解" class="headerlink" title="12. 空间类型 (了解, 了解)"></a>12. 空间类型 (了解, 了解)</h2><p>MySQL 空间类型扩展支持地理特征的生成、存储和分析。这里的地理特征表示世界上具有位置的任何东西，可以是一个实体，例如一座山；可以是空间，例如一座办公楼；也可以是一个可定义的位置，例如一个十字路口等等。MySQL中使用<code>Geometry（几何）</code>来表示所有地理特征。Geometry指一个点或点的集合，代表世界上任何具有位置的事物。</p>
+<p>MySQL的空间数据类型（Spatial Data Type）对应于OpenGIS类，包括单值类型：GEOMETRY、POINT、LINESTRING、POLYGON以及集合类型：MULTIPOINT、MULTILINESTRING、MULTIPOLYGON、GEOMETRYCOLLECTION 。</p>
+<ul>
+<li>Geometry是所有空间集合类型的基类，其他类型如POINT、LINESTRING、POLYGON都是Geometry的子类。<ul>
+<li>Point，顾名思义就是点，有一个坐标值。例如POINT(121.213342 31.234532)，POINT(30 10)，坐标值支持DECIMAL类型，经度（longitude）在前，维度（latitude）在后，用空格分隔。</li>
+<li>LineString，线，由一系列点连接而成。如果线从头至尾没有交叉，那就是简单的（simple）；如果起点和终点重叠，那就是封闭的（closed）。例如LINESTRING(30 10,10 30,40 40)，点与点之间用逗号分隔，一个点中的经纬度用空格分隔，与POINT格式一致。</li>
+<li>Polygon，多边形。可以是一个实心平面形，即没有内部边界，也可以有空洞，类似纽扣。最简单的就是只有一个外边界的情况，例如POLYGON((0 0,10 0,10 10, 0 10))。</li>
+</ul>
+</li>
+</ul>
+<p>下面展示几种常见的几何图形元素：</p>
+<p><img src="https://img-blog.csdnimg.cn/3426ea47b4ce4e3d914ee9c548c6c51b.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAd2hpdGUgY2FtZWw=,size_16,color_FFFFFF,t_70,g_se,x_16" class="lazyload placeholder" data-srcset="https://img-blog.csdnimg.cn/3426ea47b4ce4e3d914ee9c548c6c51b.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAd2hpdGUgY2FtZWw=,size_16,color_FFFFFF,t_70,g_se,x_16" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="[外链图片转存失败,源站可能有防盗链机制,建议将图片保存下来直接上传(img-QioBUkse-1650184445013)(images/image-20211104192912988.png)]"></p>
+<ul>
+<li>MultiPoint、MultiLineString、MultiPolygon、GeometryCollection 这4种类型都是集合类，是多个Point、LineString或Polygon组合而成。</li>
+</ul>
+<p>下面展示的是多个同类或异类几何图形元素的组合：</p>
+<p><img src="https://img-blog.csdnimg.cn/fa502971d3174cfeb01e4ae57a280903.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAd2hpdGUgY2FtZWw=,size_16,color_FFFFFF,t_70,g_se,x_16" class="lazyload placeholder" data-srcset="https://img-blog.csdnimg.cn/fa502971d3174cfeb01e4ae57a280903.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAd2hpdGUgY2FtZWw=,size_16,color_FFFFFF,t_70,g_se,x_16" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="[外链图片转存失败,源站可能有防盗链机制,建议将图片保存下来直接上传(img-jHZ85CwF-1650184445014)(images/image-20211104193330204.png)]"></p>
+<h2 id="13-小结及选择建议-重要"><a href="#13-小结及选择建议-重要" class="headerlink" title="13. 小结及选择建议 (重要)"></a>13. 小结及选择建议 (<code>重要</code>)</h2><p><strong>在定义数据类型时，如果确定是<code>整数</code>，就用<code> INT</code>； 如果是<code>小数</code>，一定用定点数类型 <code>DECIMAL(M,D)</code>； 如果是日期与时间，就用 <code>DATETIME</code>。</strong></p>
+<p>这样做的好处是，首先确保你的系统不会因为数据类型定义出错。不过，凡事都是有两面的，可靠性好，并不意味着高效。比如，TEXT 虽然使用方便，但是效率不如 CHAR(M) 和 VARCHAR(M)。</p>
+<p>关于字符串的选择，建议参考如下阿里巴巴的《Java开发手册》规范：</p>
+<p><strong>阿里巴巴《Java开发手册》之MySQL数据库：</strong></p>
+<ul>
+<li>任何字段如果为非负数，必须是 UNSIGNED</li>
+<li>【<code>强制</code>】<strong>小数类型为 DECIMAL</strong>，禁止使用 FLOAT 和 DOUBLE。<ul>
+<li>说明：在存储的时候，FLOAT 和 DOUBLE 都存在精度损失的问题，很可能在比较值的时候，得到不正确的结果。如果存储的数据范围超过 DECIMAL 的范围，建议将数据拆成整数和小数并分开存储。</li>
+</ul>
+</li>
+<li>【<code>强制</code>】<strong>如果存储的字符串长度几乎相等，使用 CHAR 定长字符串类型。</strong></li>
+<li>【<code>强制</code>】<strong>VARCHAR 是可变长字符串，不预先分配存储空间，长度不要超过 5000。如果存储长度大于此值，定义字段类型为 TEXT，独立出来一张表，用主键来对应，避免影响其它字段索引效率。</strong></li>
+</ul>
+
+      </div>
+      <div class="post-tags-categories">
+        
+        <div class="tags">
+          
+            <a href="/tags/MySQL/" class="">
+              MySQL
+            </a>
+          
+            <a href="/tags/MySQL-shk/" class="">
+              MySQL-shk
+            </a>
+          
+            <a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/" class="">
+              数据库
+            </a>
+          
+        </div>
+        
+      </div>
+      
+        <div class="copyright">
+  <ul class="post-copyright">
+    <li class="post-copyright-author">
+    <strong>author:  </strong>John Doe</a>
+    </li>
+    <li class="post-copyright-link">
+    <strong>link:  </strong>
+    <a href="/2022/05/28/第12章 MySQL数据类型精讲/" target="_blank" title="第12章 MySQL数据类型精讲">http://example.com/2022/05/28/第12章 MySQL数据类型精讲/</a>
+    </li>
+    <li class="post-copyright-license">
+      <strong>Copyright notice:   </strong>
+      All articles on this website, unless otherwise stated, adopt <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">CC BY-NC-ND 4.0</a>
+      reprint policy. If reproduced, please indicate source!
+    </li>
+  </ul>
+<div>
+      
+    </article>
+    <!-- 上一篇文章和下一篇文章 -->
+    
+      <!-- 文章详情页的上一页和下一页 -->
+<div class="post-nav">
+
+
+
+  
+  <div class="post-nav-prev post-nav-item">
+    <div class="post-nav-img" style="background-size: cover; 
+      background-position: center center;">
+      <img class="lazyload lazyload placeholder" src="/medias/5.jpg" class="lazyload placeholder" data-srcset="/medias/5.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="">
+    </div>
+    <a href="/2022/05/28/%E7%AC%AC13%E7%AB%A0%20%E7%BA%A6%E6%9D%9F/" class="post-nav-link">
+      <div class="title">
+        <i class="fas fa-angle-left"></i> Prev:
+        <div class="title-text">第13章 约束</div>
+      </div>
+      
+      <!-- <div class="content">
+        第13章 约束
+1. 约束(constraint)概述1.1 为什么需要约束数据完整性（Data Integrity）是
+      </div> -->
+    </a>
+  </div>
+
+
+
+  
+  <div class="post-nav-next post-nav-item">
+    <div class="post-nav-img" style="background-size: cover; 
+      background-position: center center;">
+      <img class="lazyload lazyload placeholder" src="/medias/11.jpg" class="lazyload placeholder" data-srcset="/medias/11.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" src="" alt="">
+    </div>
+    <a href="/2022/05/28/%E7%AC%AC11%E7%AB%A0%20%20%E6%95%B0%E6%8D%AE%E5%A4%84%E7%90%86%E4%B9%8B%E5%A2%9E%E5%88%A0%E6%94%B9/" class="post-nav-link">
+      <div class="title">
+        Next: <i class="fas fa-angle-right"></i>
+        <div class="title-text">第03章_基本的SELECT语句</div>
+      </div>
+      <!-- <div class="content">
+        第11章_数据处理之增删改
+1. 插入数据1.1 实际问题
+解决方式：使用 INSERT 语句向表中插入数据。
+1.2 
+      </div> -->
+    </a>
+  </div>
+
+</div>
+
+    
+    
+
+    <!-- 打赏 -->
+    
+      <div id="appDonate" class="post-donate">
+  <div id="donate_board" class="donate_bar center" ref="donate">
+    <a id="btn_donate" class="btn_donate" href="javascript:;" title="打赏" @click="showDialogDrawer()"></a>
+  </div>
+  <transition name="fade">
+    <div 
+      class="donate-box-mask"
+      v-cloak 
+      v-show="visible"
+      @click="cancelDialogDrawer()"
+    >
+    </div>
+  </transition>
+  <transition name="bounce">
+    <div class="donate-box" v-cloak v-show="visible">
+      <div class="donate-box_close">
+        <i class="fas fa-times" aria-hidden="true" @click="cancelDialogDrawer" pointer></i>
+      </div>
+      <div class="donate-box_title">
+        <h4>
+          你的赏识是我前进的动力
+        </h4>
+      </div>
+      <div class="donate-box_tab">
+        <div class="Alipay" pointer :class="{'active': tabActive === 'Alipay'}" @click="changeTabActive('Alipay')">
+          支付宝
+        </div>
+        <div class="WeChatpay" pointer :class="{'active': tabActive === 'WeChatpay'}" @click="changeTabActive('WeChatpay')">
+          微信
+        </div>
+      </div>
+      <div class="donate-box_img">
+        <div class="AlipayImg" v-show="tabActive === 'Alipay'">
+          <img src="/medias/1.jpg" class="lazyload placeholder" data-srcset="/medias/1.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="支付宝打赏" />
+        </div> 
+        <div class="WeChatpayImg" v-show="tabActive === 'WeChatpay'">
+          <img src="/medias/2.jpg" class="lazyload placeholder" data-srcset="/medias/2.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="微信打赏" />
+        </div>
+      </div>
+    </div>
+  </transition>
+</div>
+
+<script>
+  var body = document.body || document.documentElement || window;
+  var vm = new Vue({
+    el: '#appDonate',
+    data: {
+      visible: false,
+      tabActive: 'Alipay',
+      top: 0,
+    },
+    computed: {
+    },
+    mounted() {
+    },
+    methods: {
+      showDialogDrawer() {
+        this.visible = true;
+        // 防止页面滚动，只能让弹框滚动
+        // function getScroll() {
+        //   return {
+        //     left: window.pageXOffset || document.documentElement.scrollLeft || document.body.scrollLeft || 0,
+        //     top: window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0
+        //   };
+        // }
+        this.top = $(document).scrollTop() // or getScroll().top
+        // console.log('aa', $('.main-content'));
+        body.style.cssText = 'overflow: hidden;';
+      },
+      cancelDialogDrawer() {
+        this.visible = false;
+        body.removeAttribute('style');
+        $(document).scrollTop(this.top)
+      },
+      changeTabActive(name) {
+        this.tabActive = name;
+      }
+    },
+    created() {}
+  })
+</script>
+    
+
+    <!-- 分享 -->
+    
+      <!-- https://github.com/overtrue/share.js -->
+<!-- 文章详情页的分享 -->
+<div class="social-share" data-sites="twitter,facebook,google,qq,qzone,wechat,weibo,douban,linkedin" data-wechat-qrcode-helper="<p>微信扫一扫即可分享！</p>"></div>
+
+<script src="/js/shareJs/social-share.min.js"></script>
+</script>
+
+<style>
+  .social-share {
+    margin: 20px 0;
+  }
+</style>
+
+
+    
+    
+    <!-- 评论 -->
+    <!-- 评论 -->
+
+  <div id="myComment">
+    
+      <div id="gitment-container"></div>
+
+    
+  </div>
+
+<!-- comment script in themes\hexo-theme-bamboo\layout\_partial\scripts\index.ejs -->
+
+
+  </div>
+
+  <!-- 目录 -->
+  <!-- 文章详情页右侧目录 -->
+
+  <div class="toc-aside">
+    <div class="toc-main">
+      <div class="toc-aside-title">
+        <i class="fas fa-list-ul" aria-hidden="true"></i><span>catalog</span>
+        
+          <div class="toc-open-close">catalog</div>
+        
+      </div>
+      <div class="toc-content">
+        <div class="toc"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 手机端目录按钮 -->
+  <div id="toc-mobile-btn">
+    <i class="fas fa-list-ul" aria-hidden="true"></i>
+  </div>
+
+
+<script>
+  function closeToc(init) {
+    $(".toc-aside").css({'width': 0, 'padding': 0, 'transition': init ?  'noe' : 'width 0.3s' });
+    $(".toc-content").css({'width': 0});
+    $(".toc-aside-title span, .toc-aside-title i").css({'display': 'none'});
+    $(".main-content").css({'width': '75%', 'margin-left': 'auto', 'margin-right': 'auto',});
+  };
+  function openToc() {
+    $(".main-content").css({'width': '65%', 'margin-right': '10px', 'margin-left': 'calc(35% - 350px)'});
+    $(".toc-aside").css({'width': '300px', 'padding': '0 10px', 'transition': 'width 0.3s'});
+    $(".toc-content").css({'width': '300px'});
+    $(".toc-aside-title span, .toc-aside-title i").css({'display': 'inline-block'});
+  }
+  function openBtnClickFn () {
+    let openOrCloseBtn = $('.toc-aside .toc-aside-title .toc-open-close');
+    let open = eval('' || 'true');
+    openOrCloseBtn.click(function() {
+      if (open) {
+        closeToc();
+        open = false;
+      } else {
+        openToc();
+        open = true;
+      }
+    });
+  };
+  openBtnClickFn();
+  initCloseTocWidth(true);
+
+  function initCloseTocWidth(init) {
+    if (window.innerWidth >= 992) {
+      let isClose = false;
+      isClose && closeToc(init)
+    }
+  }
+
+  document.addEventListener('pjax:complete', function () {
+    $(".toc-aside").css({'transition': 'no'});
+  })
+  document.addEventListener('pjax:complete', function () {
+    openBtnClickFn();
+  })
+  
+</script>
+
+  <!-- 图片放大 Wrap images with fancybox support -->
+  <script src="/js/wrapImage.js"></script>
+</div>
+
+<!-- 文章详情页背景图 -->
+<div id="appBgSwiper" style="position: fixed;left: 0;top: 0;width: 100%;height: 100%;z-index: -2;"
+	:style="{'background-color': bgColor ? bgColor : 'transparent'}">
+	<transition-group tag="ul" :name="names">
+		<li v-for='(image,index) in img' :key='index' v-show="index === mark" class="bg-swiper-box">
+			<img :src="image" class="bg-swiper-img no-lazy">
+		</li>
+	</transition-group>
+</div>
+<script>
+	var vm = new Vue({
+		el: '#appBgSwiper',
+		data: {
+			names: '' || 'fade' || 'fade', // translate-fade fade
+			mark: 0,
+			img: [],
+			bgColor: '',
+			time: null
+		},
+		methods: {   //添加方法
+			change(i, m) {
+				if (i > m) {
+					// this.names = 'fade';
+				} else if (i < m) {
+					// this.names = 'fade';
+				} else {
+					return;
+				}
+				this.mark = i;
+			},
+			prev() {
+				// this.names = 'fade';
+				this.mark--;
+				if (this.mark === -1) {
+					this.mark = 3;
+					return
+				}
+			},
+			next() {
+				// this.names = 'fade';
+				this.mark++;
+				if (this.mark === this.img.length) {
+					this.mark = 0;
+					return
+				}
+			},
+			autoPlay() {
+				// this.names = 'fade';
+				this.mark++;
+				if (this.mark === this.img.length) {
+					this.mark = 0;
+					return
+				}
+			},
+			play() {
+				let bgImgDelay = '' || '180000'
+				let delay = parseInt(bgImgDelay) || 180000;
+				this.time = setInterval(this.autoPlay, delay);
+			},
+			enter() {
+				clearInterval(this.time);
+			},
+			leave() {
+				this.play();
+			}
+		},
+		created() {
+			this.play()
+		},
+		beforeDestroy() {
+			clearInterval(this.time);
+		},
+		mounted() {
+			let prop = '' || '';
+			let isImg = prop.includes('.bmp') || prop.includes('.jpg') || prop.includes('.png') || prop.includes('.tif') || prop.includes('.gif') || prop.includes('.pcx') || prop.includes('.tga') || prop.includes('.exif') || prop.includes('.fpx') || prop.includes('.psd') || prop.includes('.cdr') || prop.includes('.pcd') || prop.includes('.dxf') || prop.includes('.ufo') || prop.includes('.eps') || prop.includes('.ai') || prop.includes('.raw') || prop.includes('.WMF') || prop.includes('.webp') || prop.includes('.jpeg') || prop.includes('http://') || prop.includes('https://')
+			if (isImg) {
+				let img = prop.split(',');
+				let configRoot = '/'
+				let arrImg = [];
+				img.forEach(el => {
+					var Expression = /http(s)?:\/\/([\w-]+\.)+[\w-]+(\/[\w- .\/?%&=]*)?/;
+					var objExp = new RegExp(Expression);
+
+					if (objExp.test(el)) {
+						// http or https
+						arrImg.push(el);
+					} else {
+						// 非http or https开头
+						// 本地文件
+						let firstStr = el.charAt(0);
+						if (firstStr == '/') {
+							el = el.substr(1); // 删除第一个字符 '/',因为 configRoot最后一个字符为 /
+						}
+						el = configRoot + el;
+						arrImg.push(el);
+					}
+				})
+				this.img = arrImg;
+			} else {
+				this.bgColor = prop;
+			}
+		}
+	})
+</script>
+
+<style>
+	.bg-swiper-box {
+		position: absolute;
+		display: block;
+		width: 100%;
+		height: 100%;
+	}
+
+	.bg-swiper-img {
+		object-fit: cover;
+		width: 100%;
+		height: 100%;
+	}
+</style>
+
+
+
+
+  <script>
+  function loadMermaid() {
+    if (document.getElementsByClassName('mermaid').length) {
+      if (window.mermaidJsLoad) mermaid.init()
+      else {
+        loadScript('https://unpkg.com/mermaid/dist/mermaid.min.js').then(() => {
+          window.mermaidJsLoad = true
+          mermaid.initialize({
+            theme: 'default',
+          })
+          if ('true') {
+            mermaid.init();
+          }
+        })
+      }
+    }
+  };
+  document.addEventListener("DOMContentLoaded", function () {
+    loadMermaid();
+  })
+
+  document.addEventListener('pjax:complete', function () {
+    loadMermaid();
+  })
+  
+</script>
+
+
+      </main>
+    </div>
+
+    <!-- 页脚 -->
+    
+  
+  
+    <!-- 底部鱼儿跳动效果，依赖于jquery-->
+<div id="j-fish-skip" style=" position: relative;height: 153px;width: auto;"></div>
+<script>
+  var RENDERER = {
+    POINT_INTERVAL: 5,
+    FISH_COUNT: 3,
+    MAX_INTERVAL_COUNT: 50,
+    INIT_HEIGHT_RATE: .5,
+    THRESHOLD: 50,
+    FISH_COLOR: '',
+    init: function () {
+      this.setFishColor(); this.setParameters(), this.reconstructMethods(), this.setup(), this.bindEvent(), this.render()
+    },
+    setFishColor: function () {
+      let isDark = JSON.parse(localStorage.getItem('dark')) || JSON.parse('false');
+      if (isDark) {
+        this.FISH_COLOR = '#222'; // 暗黑色，有时间把这整成一个变量
+      } else {
+        this.FISH_COLOR = '' || '#42b983';
+      }
+    },
+    setParameters: function () {
+      this.$window = $(window), this.$container = $("#j-fish-skip"), this.$canvas = $("<canvas />"), this.context = this.$canvas.appendTo(this.$container).get(0).getContext("2d"), this.points = [], this.fishes = [], this.watchIds = []
+    },
+    createSurfacePoints: function () {
+      var t = Math.round(this.width / this.POINT_INTERVAL);
+      this.pointInterval = this.width / (t - 1), this.points.push(new SURFACE_POINT(this, 0));
+      for (var i = 1; i < t; i++) {
+        var e = new SURFACE_POINT(this, i * this.pointInterval),
+          h = this.points[i - 1];
+        e.setPreviousPoint(h), h.setNextPoint(e), this.points.push(e)
+      }
+    },
+    reconstructMethods: function () {
+      this.watchWindowSize = this.watchWindowSize.bind(this), this.jdugeToStopResize = this.jdugeToStopResize.bind(this), this.startEpicenter = this.startEpicenter.bind(this), this.moveEpicenter = this.moveEpicenter.bind(this), this.reverseVertical = this.reverseVertical.bind(this), this.render = this.render.bind(this)
+    },
+    setup: function () {
+      this.points.length = 0, this.fishes.length = 0, this.watchIds.length = 0, this.intervalCount = this.MAX_INTERVAL_COUNT, this.width = this.$container.width(), this.height = this.$container.height(), this.fishCount = this.FISH_COUNT * this.width / 500 * this.height / 500, this.$canvas.attr({
+        width: this.width,
+        height: this.height
+      }), this.reverse = !1, this.fishes.push(new FISH(this)), this.createSurfacePoints()
+    },
+    watchWindowSize: function () {
+      this.clearTimer(), this.tmpWidth = this.$window.width(), this.tmpHeight = this.$window.height(), this.watchIds.push(setTimeout(this.jdugeToStopResize, this.WATCH_INTERVAL))
+    },
+    clearTimer: function () {
+      for (; this.watchIds.length > 0;) clearTimeout(this.watchIds.pop())
+    },
+    jdugeToStopResize: function () {
+      var t = this.$window.width(),
+        i = this.$window.height(),
+        e = t == this.tmpWidth && i == this.tmpHeight;
+      this.tmpWidth = t, this.tmpHeight = i, e && this.setup()
+    },
+    bindEvent: function () {
+      this.$window.on("resize", this.watchWindowSize), this.$container.on("mouseenter", this.startEpicenter), this.$container.on("mousemove", this.moveEpicenter)
+    },
+    getAxis: function (t) {
+      var i = this.$container.offset();
+      return {
+        x: t.clientX - i.left + this.$window.scrollLeft(),
+        y: t.clientY - i.top + this.$window.scrollTop()
+      }
+    },
+    startEpicenter: function (t) {
+      this.axis = this.getAxis(t)
+    },
+    moveEpicenter: function (t) {
+      var i = this.getAxis(t);
+      this.axis || (this.axis = i), this.generateEpicenter(i.x, i.y, i.y - this.axis.y), this.axis = i
+    },
+    generateEpicenter: function (t, i, e) {
+      if (!(i < this.height / 2 - this.THRESHOLD || i > this.height / 2 + this.THRESHOLD)) {
+        var h = Math.round(t / this.pointInterval);
+        h < 0 || h >= this.points.length || this.points[h].interfere(i, e)
+      }
+    },
+    reverseVertical: function () {
+      this.reverse = !this.reverse;
+      for (var t = 0, i = this.fishes.length; t < i; t++) this.fishes[t].reverseVertical()
+    },
+    controlStatus: function () {
+      for (var t = 0, i = this.points.length; t < i; t++) this.points[t].updateSelf();
+      for (t = 0, i = this.points.length; t < i; t++) this.points[t].updateNeighbors();
+      this.fishes.length < this.fishCount && 0 == --this.intervalCount && (this.intervalCount = this.MAX_INTERVAL_COUNT, this.fishes.push(new FISH(this)))
+    },
+    render: function () {
+      requestAnimationFrame(this.render), this.controlStatus(), this.context.clearRect(0, 0, this.width, this.height), this.context.fillStyle = this.FISH_COLOR;
+      for (var t = 0, i = this.fishes.length; t < i; t++) this.fishes[t].render(this.context);
+      this.context.save(), this.context.globalCompositeOperation = "xor", this.context.beginPath(), this.context.moveTo(0, this.reverse ? 0 : this.height);
+      for (t = 0, i = this.points.length; t < i; t++) this.points[t].render(this.context);
+      this.context.lineTo(this.width, this.reverse ? 0 : this.height), this.context.closePath(), this.context.fill(), this.context.restore()
+    }
+  },
+  SURFACE_POINT = function (t, i) {
+    this.renderer = t, this.x = i, this.init()
+  };
+  SURFACE_POINT.prototype = {
+    SPRING_CONSTANT: .03,
+    SPRING_FRICTION: .9,
+    WAVE_SPREAD: .3,
+    ACCELARATION_RATE: .01,
+    init: function () {
+      this.initHeight = this.renderer.height * this.renderer.INIT_HEIGHT_RATE, this.height = this.initHeight, this.fy = 0, this.force = {
+        previous: 0,
+        next: 0
+      }
+    },
+    setPreviousPoint: function (t) {
+      this.previous = t
+    },
+    setNextPoint: function (t) {
+      this.next = t
+    },
+    interfere: function (t, i) {
+      this.fy = this.renderer.height * this.ACCELARATION_RATE * (this.renderer.height - this.height - t >= 0 ? -1 : 1) * Math.abs(i)
+    },
+    updateSelf: function () {
+      this.fy += this.SPRING_CONSTANT * (this.initHeight - this.height), this.fy *= this.SPRING_FRICTION, this.height += this.fy
+    },
+    updateNeighbors: function () {
+      this.previous && (this.force.previous = this.WAVE_SPREAD * (this.height - this.previous.height)), this.next && (this.force.next = this.WAVE_SPREAD * (this.height - this.next.height))
+    },
+    render: function (t) {
+      this.previous && (this.previous.height += this.force.previous, this.previous.fy += this.force.previous), this.next && (this.next.height += this.force.next, this.next.fy += this.force.next), t.lineTo(this.x, this.renderer.height - this.height)
+    }
+  };
+  var FISH = function (t) {
+    this.renderer = t, this.init()
+  };
+  FISH.prototype = {
+    GRAVITY: .4,
+    init: function () {
+      this.direction = Math.random() < .5, this.x = this.direction ? this.renderer.width + this.renderer.THRESHOLD : -this.renderer.THRESHOLD, this.previousY = this.y, this.vx = this.getRandomValue(4, 10) * (this.direction ? -1 : 1), this.renderer.reverse ? (this.y = this.getRandomValue(1 * this.renderer.height / 10, 4 * this.renderer.height / 10), this.vy = this.getRandomValue(2, 5), this.ay = this.getRandomValue(.05, .2)) : (this.y = this.getRandomValue(6 * this.renderer.height / 10, 9 * this.renderer.height / 10), this.vy = this.getRandomValue(-5, -2), this.ay = this.getRandomValue(-.2, -.05)), this.isOut = !1, this.theta = 0, this.phi = 0
+    },
+    getRandomValue: function (t, i) {
+      return t + (i - t) * Math.random()
+    },
+    reverseVertical: function () {
+      this.isOut = !this.isOut, this.ay *= -1
+    },
+    controlStatus: function (t) {
+      this.previousY = this.y, this.x += this.vx, this.y += this.vy, this.vy += this.ay, this.renderer.reverse ? this.y > this.renderer.height * this.renderer.INIT_HEIGHT_RATE ? (this.vy -= this.GRAVITY, this.isOut = !0) : (this.isOut && (this.ay = this.getRandomValue(.05, .2)), this.isOut = !1) : this.y < this.renderer.height * this.renderer.INIT_HEIGHT_RATE ? (this.vy += this.GRAVITY, this.isOut = !0) : (this.isOut && (this.ay = this.getRandomValue(-.2, -.05)), this.isOut = !1), this.isOut || (this.theta += Math.PI / 20, this.theta %= 2 * Math.PI, this.phi += Math.PI / 30, this.phi %= 2 * Math.PI), this.renderer.generateEpicenter(this.x + (this.direction ? -1 : 1) * this.renderer.THRESHOLD, this.y, this.y - this.previousY), (this.vx > 0 && this.x > this.renderer.width + this.renderer.THRESHOLD || this.vx < 0 && this.x < -this.renderer.THRESHOLD) && this.init()
+    },
+    render: function (t) {
+      t.save(), t.translate(this.x, this.y), t.rotate(Math.PI + Math.atan2(this.vy, this.vx)), t.scale(1, this.direction ? 1 : -1), t.beginPath(), t.moveTo(-30, 0), t.bezierCurveTo(-20, 15, 15, 10, 40, 0), t.bezierCurveTo(15, -10, -20, -15, -30, 0), t.fill(), t.save(), t.translate(40, 0), t.scale(.9 + .2 * Math.sin(this.theta), 1), t.beginPath(), t.moveTo(0, 0), t.quadraticCurveTo(5, 10, 20, 8), t.quadraticCurveTo(12, 5, 10, 0), t.quadraticCurveTo(12, -5, 20, -8), t.quadraticCurveTo(5, -10, 0, 0), t.fill(), t.restore(), t.save(), t.translate(-3, 0), t.rotate((Math.PI / 3 + Math.PI / 10 * Math.sin(this.phi)) * (this.renderer.reverse ? -1 : 1)), t.beginPath(), this.renderer.reverse ? (t.moveTo(5, 0), t.bezierCurveTo(10, 10, 10, 30, 0, 40), t.bezierCurveTo(-12, 25, -8, 10, 0, 0)) : (t.moveTo(-5, 0), t.bezierCurveTo(-10, -10, -10, -30, 0, -40), t.bezierCurveTo(12, -25, 8, -10, 0, 0)), t.closePath(), t.fill(), t.restore(), t.restore(), this.controlStatus(t)
+    }
+  }, $(function () {
+    RENDERER.init()
+    $('.dark').click(function () {
+      setTimeout(() => {
+        RENDERER.setFishColor();
+        RENDERER.context.fill();
+      });
+    })
+  });
+</script>
+  
+  <div class="footer bg-color">
+    <div class="footer-main">
+      
+        
+          <div class="link">
+            
+          </div>
+        
+      
+        
+          <div class="footer-copyright">
+            <p>Copyright © 2019 - 2020 <a target="_blank" rel="noopener" href="https://github.com/yuang01">yuang01</a> | Powered by <a target="_blank" rel="noopener" href="https://hexo.io/zh-cn/docs/">Hexo</a> | Theme <a target="_blank" rel="noopener" href="https://github.com/yuang01/theme">Bamboo</a> </p>
+
+          </div>
+        
+      
+        
+          
+            <!-- 不蒜子统计 -->
+            <!-- 不蒜子统计 -->
+<span id="busuanzi_container_site_pv">
+      <i class="fas fa-eye" aria-hidden="true"></i>Total visits：<span id="busuanzi_value_site_pv"></span> times
+</span>
+<span class="post-meta-divider">|</span>
+<span id="busuanzi_container_site_uv" style='display:none'>
+      <i class="fas fa-users" aria-hidden="true"></i>Number of visitors：<span id="busuanzi_value_site_uv"></span> people
+</span>
+
+          
+        
+      
+        
+          <div class="footer-custom">
+            
+          </div>
+        
+      
+    </div>
+  </div>
+
+
+
+    <!-- 渲染暗黑按钮 -->
+    
+      <div class="dark">
+  <div class="dark-content">
+    <i class="fas fa-moon" aria-hidden="true"></i>
+    <!-- <span>关灯</span> -->
+  </div>
+  
+</div>
+
+<script>
+  $(function() {
+    let isDark = JSON.parse(localStorage.getItem('dark'))  || JSON.parse('false');
+    if (isDark) {
+      $(".dark-content").replaceWith(
+          `
+          <div class='dark-content'>
+            <i class="fas fa-lightbulb" aria-hidden="true"></i>
+          </div>
+          `
+        );
+    }
+    $('.dark').click(function() {
+      if ($(document.body).is('.darkModel')) {
+        $(document.body).removeClass('darkModel');
+        localStorage.setItem('dark', false);
+        $(".dark-content").replaceWith(
+          `
+          <div class='dark-content'>
+            <i class="fas fa-moon" aria-hidden="true"></i>
+          </div>
+          `
+        );
+      } else {
+        $(document.body).addClass('darkModel');
+        localStorage.setItem('dark', true);
+        $(".dark-content").replaceWith(
+          `
+          <div class='dark-content'>
+            <i class="fas fa-lightbulb" aria-hidden="true"></i>
+          </div>
+          `
+        );
+      }
+    })
+  })
+</script>
+    
+    <!-- 渲染回到顶部按钮 -->
+    
+      <div class="goTop top-btn-color" pointer>
+  <i class="fas fa-arrow-up" aria-hidden="true"></i>
+</div>
+<script src="/js/goTop.js"></script>
+
+    
+    <!-- 渲染左下角音乐播放器 -->
+    
+      <link rel="stylesheet" href="/js/aplayer/APlayer@1.10.1.min.css">
+<style>
+.aplayer .aplayer-lrc p {
+  
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 16px !important;
+}
+
+.aplayer .aplayer-lrc p.aplayer-lrc-current {
+  
+  font-size: 15px;
+  color: #42b983;
+}
+
+
+.aplayer.aplayer-fixed.aplayer-narrow .aplayer-body {
+  left: -66px !important;
+}
+
+.aplayer.aplayer-fixed.aplayer-narrow .aplayer-body:hover {
+  left: 0px !important;
+}
+
+
+</style>
+<meting-js  
+  class=""
+  server="tencent"
+  type="playlist"
+  id="8062553743"
+  fixed='true'
+  autoplay='false'
+  theme='#42b983'
+  loop='all'
+  order='random'
+  preload='auto'
+  volume='0.7'
+  list-folded='true'
+>
+</meting-js>
+
+<!-- <style>
+  #aplayer {
+    position: fixed;
+    left: 0;
+    bottom: 300px;
+  }
+</style> -->
+<script src="https://unpkg.com/aplayer@1.10.1/dist/APlayer.min.js"></script>
+<script src="https://unpkg.com/meting@2/dist/Meting.min.js"></script>
+    
+
+    <!-- 图片放大 -->
+    
+      <script src="/js/fancybox/jquery.fancybox.min.js"></script>
+    
+
+    <!-- 百度解析 -->
+    <!-- Baidu Analytics -->
+
+    <!-- Baidu Push -->
+
+<script>
+    (function () {
+        var bp = document.createElement('script');
+        var curProtocol = window.location.protocol.split(':')[0];
+        if (curProtocol === 'https') {
+            bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+        } else {
+            bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+        }
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(bp, s);
+    })();
+</script>
+
+    
+    <!-- 背景彩带 -->
+    
+      <script type="text/javascript" size="100" alpha='0.4' zIndex="-1" src="/js/ribbon.min.js"></script>
+    
+
+    <script src="/js/utils/index.js"></script>
+    <script src="/js/app.js"></script>
+    
+    <!-- 文章目录所需js -->
+<link href="/js/tocbot/tocbot.css" rel="stylesheet">
+<script src="/js/tocbot/tocbot.min.js"></script>
+
+<script>
+  var headerEl = 'h2, h3, h4',  //headers 
+    content = '.post-detail',//文章容器
+    idArr = {};  //标题数组以确定是否增加索引id
+  //add #id
+  var option = {
+    // Where to render the table of contents.
+    tocSelector: '.toc',
+    // Where to grab the headings to build the table of contents.
+    contentSelector: content,
+    // Which headings to grab inside of the contentSelector element.
+    headingSelector: headerEl,
+    scrollSmooth: true,
+    scrollSmoothOffset: -80,
+    headingsOffset: -($(window).height() * 0.4 - 45),
+    positionFixedSelector: '.toc-main',
+    positionFixedClass: 'is-position-fixed',
+    fixedSidebarOffset: 'auto',
+    activeLinkClass: 'is-active-link',
+    // onClick: function (e) {},
+  }
+  if ($('.toc').length > 0) {
+
+    $(content).children(headerEl).each(function () {
+      //去除空格以及多余标点
+      var headerId = $(this).text().replace(/[\s|\~|`|\!|\@|\#|\$|\%|\^|\&|\*|\(|\)|\_|\+|\=|\||\|\[|\]|\{|\}|\;|\:|\"|\'|\,|\<|\.|\>|\/|\?|\：|\，|\。]/g, '');
+
+      headerId = headerId.toLowerCase();
+      if (idArr[headerId]) {
+        //id已经存在
+        $(this).attr('id', headerId + '-' + idArr[headerId]);
+        idArr[headerId]++;
+      }
+      else {
+        //id未存在
+        idArr[headerId] = 1;
+        $(this).attr('id', headerId);
+      }
+    });
+
+    document.addEventListener("DOMContentLoaded", function () {
+      tocbot.init(option);
+      mobileTocClick();
+    });
+
+  }
+
+  window.tocScrollFn = function () {
+    return bamboo.throttle(function () {
+      findHeadPosition();
+    }, 100)()
+  }
+  window.addEventListener('scroll', tocScrollFn);
+
+  const findHeadPosition = function (top) {
+    if ($('.toc-list').length <= 0) {
+      return false;
+    }
+    setTimeout(() => {  // or DOMContentLoaded 
+      autoScrollToc();
+    }, 0);
+  }
+
+  const autoScrollToc = function () {
+    const $activeItem = document.querySelector('.is-active-link');
+    const $cardToc = document.querySelector('.toc-content');
+    const activePosition = $activeItem.getBoundingClientRect().top
+    const sidebarScrollTop = $cardToc.scrollTop
+    if (activePosition > (document.documentElement.clientHeight - 100)) {
+      $cardToc.scrollTop = sidebarScrollTop + 150
+    }
+    if (activePosition < 100) {
+      $cardToc.scrollTop = sidebarScrollTop - 150
+    }
+  }
+
+  document.addEventListener('pjax:send', function () {
+    if ($('.toc').length) {
+      tocbot.destroy();
+    }
+  });
+
+  document.addEventListener('pjax:complete', function () {
+    if ($('.toc').length) {
+      tocbot.init(option);
+      mobileTocClick();
+    }
+  });
+  
+  // 手机端toc按钮点击出现目录
+  const mobileTocClick = function () {
+    const $cardTocLayout = document.getElementsByClassName('toc-aside')[0];
+    const $cardToc = $cardTocLayout.getElementsByClassName('toc-content')[0];
+    let right = '45px';
+    if (window.innerWidth >= 551 && window.innerWidth <= 992) {
+      right = '100px'
+    }
+    const mobileToc = {
+      open: () => {
+        $cardTocLayout.style.cssText = 'animation: toc-open .3s; opacity: 1; right: ' + right
+      },
+
+      close: () => {
+        $cardTocLayout.style.animation = 'toc-close .2s'
+        setTimeout(() => {
+          $cardTocLayout.style.cssText = "opacity:''; animation: ''; right: ''"
+        }, 100)
+      }
+    }
+    document.getElementById('toc-mobile-btn').addEventListener('click', () => {
+      if (window.getComputedStyle($cardTocLayout).getPropertyValue('opacity') === '0') mobileToc.open()
+      else mobileToc.close()
+    })
+
+    $cardToc.addEventListener('click', (e) => {
+      if (window.innerWidth < 992) { // 小于992px的时候
+        mobileToc.close()
+      }
+    })
+  }
+</script>
+
+<style>
+  .is-position-fixed {
+    position: sticky !important;
+    top: 74px;
+  }
+
+  .toc-main ul {
+    counter-reset: show-list;
+  }
+
+  .toc-main ul li::before {
+    content: counter(item)".";
+    display: block;
+    position: absolute;
+    left: 12px;
+    top: 0;
+  }
+</style> 
+
+<!-- 设置导航背景 -->
+<script>
+  let setHeaderClass = () => {
+    const headerMenuTransparent = true;
+    if (!headerMenuTransparent) { return; }
+    const nav = $('#navHeader');
+    const navTop = nav.outerHeight();
+    const winTop = $(window).scrollTop();
+    if(winTop > navTop) {
+      nav.addClass('header-bg-color');
+    }
+    else {
+      nav.removeClass('header-bg-color');
+    }
+  };
+
+  let scrollCollect = () => {
+    return bamboo.throttle(function (e) {
+      setHeaderClass();
+    }, 200)()
+  }
+
+  let initHeaderBg = () => {
+    setHeaderClass();
+  }
+
+  setHeaderClass();
+  window.addEventListener('scroll', scrollCollect);
+
+  document.addEventListener('pjax:send', function () {
+    window.removeEventListener('scroll', scrollCollect)
+  })
+  document.addEventListener('pjax:complete', function () {
+    window.addEventListener('scroll', scrollCollect);
+    setHeaderClass();
+  })
+</script> 
+
+<!-- 渲染issues标签里的内容 -->
+<script>
+  function loadIssuesJS() {
+    if ($(".post-detail").find(".issues-api").length == 0) {
+      return;
+    } 
+    loadScript('/js/issues/index.js');
+  };
+  $(function () {
+    loadIssuesJS();
+  });
+  document.addEventListener('pjax:complete', function () {
+    if (typeof IssuesAPI == "undefined") {
+      loadIssuesJS();
+    }
+  })
+</script>
+
+<!-- 输入框打字特效 -->
+<!-- 输入框打字特效 -->
+
+  <script src="/js/activate-power-mode.js"></script>
+  <script>
+    POWERMODE.colorful = true;  // 打开随机颜色特效
+    POWERMODE.shake = false;    // 关闭输入框抖动
+    document.body.addEventListener('input', POWERMODE);//监听打字事件
+  </script>
+
+
+<!-- markdown代码一键复制功能 -->
+
+  <link rel="stylesheet" href="https://unpkg.com/v-plugs-ayu/lib/ayu.css">
+  <script src="https://unpkg.com/v-plugs-ayu/lib/ayu.umd.min.js"></script>
+  <script src="/js/clipboard/clipboard.min.js"></script>
+  <div id="appCopy">
+  </div>
+  <script data-pjax>
+    var vm = new Vue({
+      el: '#appCopy',
+      data: {
+      },
+      computed: {
+      },
+      mounted() {
+        const that = this;
+        var copy = 'copy';
+        /* code */
+        var initCopyCode = function () {
+          var copyHtml = '';
+          copyHtml += '<button class="btn-copy" data-clipboard-snippet="" style="position:absolute;top:0;right:0;z-index:1;">';
+          copyHtml += '<i class="fas fa-copy"></i><span>' + copy + '</span>';
+          copyHtml += '</button>';
+          $(".post-detail pre").not('.gutter pre').wrap("<div class='codeBox' style='position:relative;width:100%;'></div>")
+          $(".post-detail pre").not('.gutter pre').before(copyHtml);
+          new ClipboardJS('.btn-copy', {
+            target: function (trigger) {
+              return trigger.nextElementSibling;
+            }
+          });
+        }
+        initCopyCode();
+        $('.btn-copy').unbind('click').bind('click', function () {
+          doSomething();
+        })
+        $(document).unbind('keypress').bind('keypress', function (e) {
+          if (e.ctrlKey && e.keyCode == 67) {
+            doSomething();
+          }
+        })
+
+        function doSomething() {
+          that.$notify({
+            title: "成功",
+            content: "代码已复制，请遵守相关授权协议。",
+            type: 'success'
+          })
+        }
+      },
+      methods: {
+      },
+      created() { }
+    })
+  </script>
+  
+
+<!-- 图片懒加载 -->
+<script defer src="https://unpkg.com/vanilla-lazyload@17.1.0/dist/lazyload.min.js"></script>
+<script>
+  // https://www.npmjs.com/package/vanilla-lazyload
+  // Set the options globally
+  // to make LazyLoad self-initialize
+  window.lazyLoadOptions = {
+    elements_selector: ".lazyload",
+    threshold: 0
+  };
+  // Listen to the initialization event
+  // and get the instance of LazyLoad
+  window.addEventListener(
+    "LazyLoad::Initialized",
+    function (event) {
+      window.lazyLoadInstance = event.detail.instance;
+    },
+    false
+  );
+  document.addEventListener('DOMContentLoaded', function () {
+    lazyLoadInstance.update();
+  });
+  document.addEventListener('pjax:complete', function () {
+    lazyLoadInstance.update();
+  });
+</script>
+
+
+<!-- 卡片滚动动画 -->
+   
+
+<!-- 评论所需js -->
+
+  
+    <script type="text/javascript">
+  var utteranceCommon = {};
+
+  function check_utterance() {
+    let isDark = JSON.parse(localStorage.getItem('dark')) || JSON.parse('false');
+    if (isDark) {
+      utteranceCommon.Theme = 'github-dark';
+    } else {
+      utteranceCommon.Theme = 'github-light';
+    }
+
+    return document.getElementById("gitment-container");
+  }
+  comment_el = '#gitment-container';
+  load_utterance = function () {
+    if ($(comment_el).length) {
+      // 匿名函数，防止污染全局变量
+      const HEAD = check_utterance();
+
+      var utterances = document.createElement('script');
+      utterances.type = 'text/javascript';
+      utterances.async = true;
+      utterances.setAttribute('issue-term', 'pathname')
+      utterances.setAttribute('theme', utteranceCommon.Theme)
+      utterances.setAttribute('repo', '')
+      utterances.crossorigin = 'anonymous';
+      utterances.src = 'https://utteranc.es/client.js';
+      // content 是要插入评论的地方
+      document.getElementById('gitment-container').appendChild(utterances);
+
+    }
+  }
+
+  function dark_utterance() {
+    const HEAD = check_utterance();
+    if (!HEAD) return;
+    const message = {
+      type: 'set-theme',
+      theme: utteranceCommon.Theme
+    };
+    const utteranceIframe = document.querySelector('iframe');
+    utteranceIframe.contentWindow.postMessage(message, 'https://utteranc.es');
+  }
+
+  $(document).ready(load_utterance);
+  document.addEventListener('pjax:complete', function () {
+    load_utterance();
+  });
+
+  $('.dark').click(function () {
+    setTimeout(() => {
+      dark_utterance();
+    });
+  })
+
+</script>
+
+<style>
+  .utterances {
+    max-width: inherit !important;
+  }
+</style>
+  
+
+
+<!-- 鼠标点击特效 -->
+<!-- 爱心点击 -->
+
+  
+    <canvas class="fireworks" style="position: fixed;left: 0;top: 0;z-index: 999; pointer-events: none;" ></canvas>
+    <script src="//cdn.bootcss.com/animejs/2.2.0/anime.min.js"></script>
+    <script src="/js/cursor/explosion.min.js"></script>
+  
+
+
+
+
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" data-pjax></script>
+
+
+    <!-- pjax -->
+    
+
+<!-- pjax -->
+
+
+  <script src="/js/pjax@0.2.8/index.js"></script>
+  
+    <!-- 样式位于：source/css/_third-party/pjaxanimate.styl -->
+
+<div class="pjax-animate">
+  
+    <div class="loading-circle"><div id="loader-circle"></div></div>
+    <script>
+      window.ShowLoading = function() {
+        $(".loading-circle").css("display", "block");
+      };
+      window.HideLoading = function() {
+        $(".loading-circle").css("display", "none");
+      }
+    </script>
+  
+	<script>
+    document.addEventListener('pjax:complete', function () {
+      window.HideLoading();
+    })
+    document.addEventListener('pjax:send', function () {
+      window.ShowLoading();
+    })
+    document.addEventListener('pjax:error', function () {
+      window.HideLoading();
+    })
+	</script>
+</div>
+
+  
+
+  <script>
+    var pjax = new Pjax({
+      elements: 'a[href]:not([href^="#"]):not([href="javascript:void(0)"]):not([no-pjax])',   // 拦截正常带链接的 a 标签
+      selectors: ["#pjax-container","title"],                                   // 根据实际需要确认重载区域
+      cacheBust: false,   // url 地址追加时间戳，用以避免浏览器缓存
+      timeout: 5000
+    });
+
+    document.addEventListener('pjax:send', function (e) {
+
+      try {
+        var currentUrl = window.location.pathname;
+        var targetUrl = e.triggerElement.href;
+        var banUrl = [""];
+        if (banUrl[0] != "") {
+          banUrl.forEach(item => {
+            if(currentUrl.indexOf(item) != -1 || targetUrl.indexOf(item) != -1) {
+              window.location.href = targetUrl;
+            }
+          });
+        }
+      } catch (error) {}
+
+      $(window).unbind('resize');
+      $(window).unbind('scroll');
+      $(document).unbind('scroll');
+      $(document).unbind('click');
+      $('body').unbind('click');
+
+    })
+    
+    document.addEventListener('pjax:complete', function () {
+      $('script[data-pjax], .pjax-reload script').each(function () {
+        $(this).parent().append($(this).remove());
+      });
+    });
+
+    document.addEventListener('pjax:error', function (e) {
+      window.location.href = e.triggerElement.href;
+    })
+    
+    // 刷新不从顶部开始
+    document.addEventListener("DOMContentLoaded", function () {
+      history.scrollRestoration = 'auto';
+    })
+  </script>
+
+
+
+  </body>
+</html>

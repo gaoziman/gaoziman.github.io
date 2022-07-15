@@ -1,0 +1,2312 @@
+<!DOCTYPE html>
+<html>
+  <!-- meta/link... -->
+  
+
+
+
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport">
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+
+
+  <title>hm-MySQL进阶 | Hexo</title>
+
+  <link rel="icon" type="image/x-icon, image/vnd.microsoft.icon" href="/favicon.ico">
+  <link rel="stylesheet" href="https://at.alicdn.com/t/font_1911880_c1nvbyezg17.css">
+  <link href="https://unpkg.com/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet">
+  <link href="/js/swiper/swiper@5.4.1.min.css" rel="stylesheet">
+  
+  
+  
+  
+<link rel="stylesheet" href="/css/animate.min.css">
+
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+  
+    
+<link rel="stylesheet" href="/js/fancybox/jquery.fancybox.min.css">
+
+  
+  
+    
+<link rel="stylesheet" href="/js/shareJs/share.min.css">
+
+  
+  <style>
+        @media (max-width: 992px) {
+            #waifu {
+                display: none;
+            }
+        }
+    </style>
+    <script src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
+    <link href="//cdn.bootcss.com/pace/1.0.2/themes/pink/pace-theme-flash.css" rel="stylesheet">
+
+    
+
+    <!-- import link -->
+    
+        
+            
+        
+            
+        
+    
+    <!-- import script -->
+    
+        
+            
+        
+            
+        
+    
+
+<meta name="generator" content="Hexo 6.2.0"></head>
+
+  
+  <!-- 依赖于jquery和vue -->
+  
+    
+<script src="https://unpkg.com/jquery@3.5.1/dist/jquery.min.js"></script>
+
+  
+
+  
+    
+<script src="https://unpkg.com/vue@2.6.11/dist/vue.min.js"></script>
+
+  
+  
+  <body>
+    <!-- 预加载动画 -->
+    <!-- 页面预加载动画 -->
+
+<div id='loader'>
+  <link rel="stylesheet" href="/js/loaded/index.css" >
+  <div class="loading-left-bg"></div>
+  <div class="loading-right-bg"></div>
+  <div class="spinner-box">
+    <div class="configure-border-1">
+      <div class="configure-core"></div>
+    </div>
+    <div class="configure-border-2">
+      <div class="configure-core"></div>
+    </div>
+    <div class="loading-word">loading...</div>
+  </div>
+</div>
+
+<script>
+  var endLoading = function () {
+    document.body.style.overflow = 'auto';
+    document.getElementById('loader').classList.add("loading");
+  }
+  window.addEventListener('DOMContentLoaded',endLoading);
+  
+</script>
+
+    
+    <!-- 判断是否为暗黑风格 -->
+    <!-- 判断是否为黑夜模式 -->
+<script>
+  let isDark = JSON.parse(localStorage.getItem('dark')) || JSON.parse('false');
+
+  if (isDark) {
+    $(document.body).addClass('darkModel');
+  }
+</script>
+
+    <!-- 需要在上面加载的js -->
+    <script>
+  function loadScript(src, cb) {
+    return new Promise(resolve => {
+      setTimeout(function () {
+        var HEAD = document.getElementsByTagName("head")[0] || document.documentElement;
+        var script = document.createElement("script");
+        script.setAttribute("type", "text/javascript");
+        if (cb) {
+          if (JSON.stringify(cb)) {
+            for (let p in cb) {
+              if (p == "onload") {
+                script[p] = () => {
+                  cb[p]()
+                  resolve()
+                }
+              } else {
+                script[p] = cb[p]
+                script.onload = resolve
+              }
+            }
+          } else {
+            script.onload = () => {
+              cb()
+              resolve()
+            };
+          }
+        } else {
+          script.onload = resolve
+        }
+        script.setAttribute("src", src);
+        HEAD.appendChild(script);
+      });
+    });
+  }
+
+  //https://github.com/filamentgroup/loadCSS
+  var loadCSS = function (href, before, media, attributes) {
+    return new Promise(resolve => {
+      setTimeout(function () {
+        var link = document.createElement('link');
+        link.rel = "stylesheet";
+        link.href = src;
+        link.onload = resolve;
+        document.getElementsByTagName("head")[0].appendChild(link);
+      });
+    });
+  };
+
+</script> 
+
+<!-- 轮播图所需要的js -->
+<script src="/js/swiper/swiper.min.js"></script>
+<script src="/js/swiper/vue-awesome-swiper.js"></script>
+<script src="/js/swiper/swiper.animate1.0.3.min.js"></script>
+
+<script type="text/javascript">
+  Vue.use(window.VueAwesomeSwiper)
+</script>
+
+
+  <script src="/js/vue-typed-js/index.js"></script>
+
+
+<!-- 首页的公告滚动插件的js需要重新加载 -->
+<script src="/js/vue-seamless-scroll/index.js"></script>
+
+<!-- 打字机效果js -->
+<script src="https://unpkg.com/typed.js@2.0.11"></script>
+
+
+    <div id="safearea">
+      <main class="main" id="pjax-container">
+        <!-- 头部导航 -->
+        
+<header class="header   " 
+  id="navHeader"
+  style="position: fixed;
+  left: 0; top: 0; z-index: 10;width: 100%;"
+>
+  <div class="header-content">
+    <div class="bars">
+      <div id="appDrawer" class="sidebar-image">
+  <div class="drawer-box-icon">
+    <i class="fas fa-bars" aria-hidden="true" @click="showDialogDrawer"></i>
+  </div>
+  
+  <transition name="fade">
+    <div class="drawer-box_mask" v-cloak style="display: none;" v-show="visible" @click.self="cancelDialogDrawer">
+    </div>
+  </transition>
+  <div class="drawer-box" :class="{'active': visible}">
+    <div class="drawer-box-head bg-color">
+      <img class="drawer-box-head_logo lazyload placeholder" src="/medias/logo.png" class="lazyload placeholder" data-srcset="/medias/logo.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="logo">
+      <h3 class="drawer-box-head_title">Hexo</h3>
+      <h5 class="drawer-box-head_desc"></h5>
+    </div>
+    
+    <div class="drawer-box-content">
+      <ul class="drawer-box-content_menu">
+        
+        
+          <li class="drawer-box-content_item">
+            <a target="_blank" rel="noopener" href="https://github.com/yuang01/hexo-theme-bamboo">
+              <i class="fas fa-github" aria-hidden="true"></i>
+              <span>Github</span>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</div>
+
+<script>
+  var body = document.body || document.documentElement || window;
+  var vm = new Vue({
+    el: '#appDrawer',
+    data: {
+      visible: false,
+      top: 0,
+      openArr: [],
+    },
+    computed: {
+    },
+    mounted() {
+    },
+    methods: {
+      isOpen(index) {
+        if (this.openArr.includes(index)) {
+          return true;
+        } else {
+          return false;
+        }
+      },
+      openOrCloseMenu(curIndex) {
+        const index = this.openArr.indexOf(curIndex);
+        if (index !== -1) {
+          this.openArr.splice(index, 1);
+        } else {
+          this.openArr.push(curIndex);
+        }
+      },
+      showDialogDrawer() {
+        this.visible = true;
+        // 防止页面滚动，只能让弹框滚动
+        this.top = $(document).scrollTop()
+        body.style.cssText = 'width: 100%; height: 100%;overflow: hidden;';
+      },
+      cancelDialogDrawer() {
+        this.visible = false;
+        body.removeAttribute('style');
+        $(document).scrollTop(this.top)
+      }
+    },
+    created() {}
+  })
+</script>
+
+    </div>
+    <div class="blog-title" id="author-avatar">
+      
+        <div class="avatar">
+          <img src="/medias/logo.png" class="lazyload placeholder" data-srcset="/medias/logo.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="logo">
+        </div>
+      
+      <a href="/" class="logo">Hexo</a>
+    </div>
+    <nav class="navbar">
+      <ul class="menu">
+        
+      </ul>
+      
+      
+        <div id="appSearch">
+  <div class="search"  @click="showDialog()"><i class="fas fa-search" aria-hidden="true"></i></div>
+  <transition name="fade">
+    <div class="message-box_wrapper" style="display: none;" v-cloak v-show="dialogVisible" @click.self="cancelDialogVisible()">
+      <div class="message-box animated bounceInDown">
+        <h2>
+          <span>
+            <i class="fas fa-search" aria-hidden="true"></i>
+            <span class="title">Search</span>
+          </span>
+          <i class="fas fa-times close" pointer style="float:right;" aria-hidden="true" @click.self="cancelDialogVisible()"></i>
+        </h2>
+        <form class="site-search-form">
+          <input type="text"
+            placeholder="Please enter keywords"
+            id="local-search-input" 
+            @click="getSearchFile()"
+            class="st-search-input"
+            v-model="searchInput"
+          />
+        </form>
+        <div class="result-wrapper">
+          <div id="local-search-result" class="local-search-result-cls"></div>
+        </div>
+      </div>
+    </div>
+  </transition>
+</div>
+<script src="/js/local_search.js"></script>
+<script>
+  var body = document.body || document.documentElement || window;
+  var vm = new Vue({
+    el: '#appSearch',
+    data: {
+      dialogVisible: false,
+      searchInput: '',
+      top: 0,
+    },
+    computed: {
+    },
+    mounted() {
+      window.addEventListener('pjax:complete', () => {
+        this.cancelDialogVisible();
+      })
+    },
+    methods: {
+      showDialog() {
+        this.dialogVisible = true;
+        // 防止页面滚动，只能让弹框滚动
+        this.top = $(document).scrollTop()
+        body.style.cssText = 'overflow: hidden;';
+      },
+      getSearchFile() {
+        if (!this.searchInput) {
+          getSearchFile("/search.xml");
+        }
+      },
+      cancelDialogVisible() {
+        this.dialogVisible = false;
+        body.removeAttribute('style');
+        $(document).scrollTop(this.top)
+      },
+    },
+    created() {}
+  })
+</script>
+<!-- 解决刷新页面闪烁问题，可以在元素上添加display: none, 或者用vue.extend方法，详情：https://blog.csdn.net/qq_31393401/article/details/81017912 -->
+<!-- 下面是搜索基本写法 -->
+<!-- <script type="text/javascript" id="local.search.active">
+  var inputArea = document.querySelector("#local-search-input");
+  inputArea.onclick   = function(){ getSearchFile(); this.onclick = null }
+  inputArea.onkeydown = function(){ if(event.keyCode == 13) return false }
+</script> -->
+
+      
+
+    </nav>
+  </div>
+  
+    <a target="_blank" rel="noopener" href="https://github.com/yuang01/hexo-theme-bamboo" class="github-corner color-primary" aria-label="View source on GitHub"><svg width="60" height="60" viewBox="0 0 250 250" style="fill:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+  
+  
+</header>
+        <!-- 内容区域 -->
+        
+ <!-- prismjs 代码高亮 -->
+ 
+
+
+<div class="bg-dark-floor" style="position: fixed;left: 0;top: 0;width: 100%;height: 100%;z-index: -1;"></div>
+
+
+  <!-- 文章详情页顶部图片和标题 -->
+
+
+
+
+<div class="post-detail-header" id="thumbnail_canvas" style="background-repeat: no-repeat; background-size: cover; 
+  background-position: center center;position: relative;background-image:url('/medias/9.jpg')">
+  <div class="post-detail-header-mask"></div>
+  <canvas id="header_canvas"style="position:absolute;bottom:0;pointer-events:none;"></canvas>
+  
+  <div class="post-detail-header_info-box">
+    <div class="title-box">
+      <span class="title">
+        hm-MySQL进阶
+      </span>
+    </div>
+    
+    
+      
+        <span class="post-detail-header_date">
+          <i class="fas fa-calendar"></i> Published in：2022-05-27 |
+        </span>
+      
+
+      
+        <span class="post-detail-header_categories">
+          <i class="iconfont iconbookmark1"></i> category：
+          
+            <a href="/categories/hmJavaWeb/" class="post-detail-header_category">
+              hmJavaWeb
+            </a>
+          
+        </span>
+      
+
+      
+    
+  </div>
+  
+  
+    <script src="/js/bubble/bubble.js"></script>
+  
+</div>
+
+
+
+
+
+<div class="post-detail-content row justify-position" 
+  style="padding-top: 0px;">
+  <div class="main-content">
+    <article class="post post-detail">
+      <div class="post-content">
+        <h2 id="mysql高级"><a href="#mysql高级" class="headerlink" title="mysql高级"></a>mysql高级</h2><p><strong>今日目标</strong></p>
+<blockquote>
+<ul>
+<li><p>掌握约束的使用</p>
+</li>
+<li><p>掌握表关系及建表原则</p>
+</li>
+<li><p>重点掌握多表查询操作</p>
+</li>
+<li><p>掌握事务操作</p>
+</li>
+</ul>
+</blockquote>
+<h2 id="1，约束"><a href="#1，约束" class="headerlink" title="1，约束"></a>1，约束</h2><img src="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210724104749122.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210724104749122.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20210724104749122" style="zoom:70%;" />
+
+<p>上面表中可以看到表中数据存在一些问题：</p>
+<ul>
+<li><p>id 列一般是用标示数据的唯一性的，而上述表中的id为1的有三条数据，并且 <code>马花疼</code> 没有id进行标示</p>
+</li>
+<li><p><code>柳白</code> 这条数据的age列的数据是3000，而人也不可能活到3000岁</p>
+</li>
+<li><p><code>马运</code>  这条数据的math数学成绩是-5，而数学学得再不好也不可能出现负分</p>
+</li>
+<li><p><code>柳青</code> 这条数据的english列（英文成绩）值为null，而成绩即使没考也得是0分</p>
+</li>
+</ul>
+<p>针对上述数据问题，我们就可以从数据库层面在添加数据的时候进行限制，这个就是约束。</p>
+<h3 id="1-1-概念"><a href="#1-1-概念" class="headerlink" title="1.1  概念"></a>1.1  概念</h3><ul>
+<li><p>约束是作用于表中列上的规则，用于限制加入表的数据</p>
+<p>例如：我们可以给id列加约束，让其值不能重复，不能为null值。</p>
+</li>
+<li><p>约束的存在保证了数据库中数据的正确性、有效性和完整性</p>
+<p>添加约束可以在添加数据的时候就限制不正确的数据，年龄是3000，数学成绩是-5分这样无效的数据，继而保障数据的完整性。</p>
+</li>
+</ul>
+<h3 id="1-2-分类"><a href="#1-2-分类" class="headerlink" title="1.2  分类"></a>1.2  分类</h3><ul>
+<li><strong>非空约束： 关键字是 NOT NULL</strong></li>
+</ul>
+<p>  保证列中所有的数据不能有null值。</p>
+<p>  例如：id列在添加 <code>马花疼</code> 这条数据时就不能添加成功。</p>
+<ul>
+<li><p><strong>唯一约束：关键字是  UNIQUE</strong></p>
+<p>保证列中所有数据各不相同。</p>
+<p>例如：id列中三条数据的值都是1，这样的数据在添加时是绝对不允许的。</p>
+</li>
+<li><p><strong>主键约束： 关键字是  PRIMARY KEY</strong></p>
+</li>
+</ul>
+<p>  主键是一行数据的唯一标识，要求非空且唯一。一般我们都会给没张表添加一个主键列用来唯一标识数据。</p>
+<p>  例如：上图表中id就可以作为主键，来标识每条数据。那么这样就要求数据中id的值不能重复，不能为null值。</p>
+<ul>
+<li><p><strong>检查约束： 关键字是  CHECK</strong> </p>
+<p>保证列中的值满足某一条件。</p>
+<p>例如：我们可以给age列添加一个范围，最低年龄可以设置为1，最大年龄就可以设置为300，这样的数据才更合理些。</p>
+<blockquote>
+<p>注意：MySQL不支持检查约束。</p>
+<p>这样是不是就没办法保证年龄在指定的范围内了？从数据库层面不能保证，以后可以在java代码中进行限制，一样也可以实现要求。</p>
+</blockquote>
+</li>
+<li><p><strong>默认约束： 关键字是   DEFAULT</strong></p>
+<p>保存数据时，未指定值则采用默认值。</p>
+<p>例如：我们在给english列添加该约束，指定默认值是0，这样在添加数据时没有指定具体值时就会采用默认给定的0。</p>
+</li>
+<li><p><strong>外键约束： 关键字是  FOREIGN KEY</strong></p>
+<p>外键用来让两个表的数据之间建立链接，保证数据的一致性和完整性。</p>
+<p>外键约束现在可能还不太好理解，后面我们会重点进行讲解。</p>
+</li>
+</ul>
+<h3 id="1-3-非空约束"><a href="#1-3-非空约束" class="headerlink" title="1.3  非空约束"></a>1.3  非空约束</h3><ul>
+<li><p>概念</p>
+<p>非空约束用于保证列中所有数据不能有NULL值</p>
+</li>
+<li><p>语法</p>
+<ul>
+<li><p>添加约束</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 创建表时添加非空约束</span></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> 表名(</span><br><span class="line">   列名 数据类型 <span class="keyword">NOT</span> <span class="keyword">NULL</span>,</span><br><span class="line">   …</span><br><span class="line">); </span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 建完表后添加非空约束</span></span><br><span class="line"><span class="keyword">ALTER</span> <span class="keyword">TABLE</span> 表名 MODIFY 字段名 数据类型 <span class="keyword">NOT</span> <span class="keyword">NULL</span>;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>删除约束</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">ALTER</span> <span class="keyword">TABLE</span> 表名 MODIFY 字段名 数据类型;</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+</ul>
+<h3 id="1-4-唯一约束"><a href="#1-4-唯一约束" class="headerlink" title="1.4  唯一约束"></a>1.4  唯一约束</h3><ul>
+<li><p>概念</p>
+<p>唯一约束用于保证列中所有数据各不相同</p>
+</li>
+<li><p>语法</p>
+<ul>
+<li><p>添加约束</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 创建表时添加唯一约束</span></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> 表名(</span><br><span class="line">   列名 数据类型 <span class="keyword">UNIQUE</span> [AUTO_INCREMENT],</span><br><span class="line">   <span class="comment">-- AUTO_INCREMENT: 当不指定值时自动增长</span></span><br><span class="line">   …</span><br><span class="line">); </span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> 表名(</span><br><span class="line">   列名 数据类型,</span><br><span class="line">   …</span><br><span class="line">   [<span class="keyword">CONSTRAINT</span>] [约束名称] <span class="keyword">UNIQUE</span>(列名)</span><br><span class="line">); </span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 建完表后添加唯一约束</span></span><br><span class="line"><span class="keyword">ALTER</span> <span class="keyword">TABLE</span> 表名 MODIFY 字段名 数据类型 <span class="keyword">UNIQUE</span>;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>删除约束</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">ALTER</span> <span class="keyword">TABLE</span> 表名 <span class="keyword">DROP</span> INDEX 字段名;</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+</ul>
+<h3 id="1-5-主键约束"><a href="#1-5-主键约束" class="headerlink" title="1.5  主键约束"></a>1.5  主键约束</h3><ul>
+<li><p>概念</p>
+<p>主键是一行数据的唯一标识，要求非空且唯一</p>
+<p>一张表只能有一个主键</p>
+</li>
+<li><p>语法</p>
+<ul>
+<li><p>添加约束</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 创建表时添加主键约束</span></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> 表名(</span><br><span class="line">   列名 数据类型 <span class="keyword">PRIMARY</span> KEY [AUTO_INCREMENT],</span><br><span class="line">   …</span><br><span class="line">); </span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> 表名(</span><br><span class="line">   列名 数据类型,</span><br><span class="line">   [<span class="keyword">CONSTRAINT</span>] [约束名称] <span class="keyword">PRIMARY</span> KEY(列名)</span><br><span class="line">); </span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 建完表后添加主键约束</span></span><br><span class="line"><span class="keyword">ALTER</span> <span class="keyword">TABLE</span> 表名 <span class="keyword">ADD</span> <span class="keyword">PRIMARY</span> KEY(字段名);</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>删除约束</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">ALTER</span> <span class="keyword">TABLE</span> 表名 <span class="keyword">DROP</span> <span class="keyword">PRIMARY</span> KEY;</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+</ul>
+<h3 id="1-6-默认约束"><a href="#1-6-默认约束" class="headerlink" title="1.6  默认约束"></a>1.6  默认约束</h3><ul>
+<li><p>概念</p>
+<p>保存数据时，未指定值则采用默认值</p>
+</li>
+<li><p>语法</p>
+<ul>
+<li><p>添加约束</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 创建表时添加默认约束</span></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> 表名(</span><br><span class="line">   列名 数据类型 <span class="keyword">DEFAULT</span> 默认值,</span><br><span class="line">   …</span><br><span class="line">); </span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 建完表后添加默认约束</span></span><br><span class="line"><span class="keyword">ALTER</span> <span class="keyword">TABLE</span> 表名 <span class="keyword">ALTER</span> 列名 <span class="keyword">SET</span> <span class="keyword">DEFAULT</span> 默认值;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>删除约束</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">ALTER</span> <span class="keyword">TABLE</span> 表名 <span class="keyword">ALTER</span> 列名 <span class="keyword">DROP</span> <span class="keyword">DEFAULT</span>;</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+</ul>
+<h3 id="1-7-约束练习"><a href="#1-7-约束练习" class="headerlink" title="1.7  约束练习"></a>1.7  约束练习</h3><p><strong>根据需求，为表添加合适的约束</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 员工表</span></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> emp (</span><br><span class="line">	id <span class="type">INT</span>,  <span class="comment">-- 员工id，主键且自增长</span></span><br><span class="line">    ename <span class="type">VARCHAR</span>(<span class="number">50</span>), <span class="comment">-- 员工姓名，非空且唯一</span></span><br><span class="line">    joindate <span class="type">DATE</span>,  <span class="comment">-- 入职日期，非空</span></span><br><span class="line">    salary <span class="keyword">DOUBLE</span>(<span class="number">7</span>,<span class="number">2</span>),  <span class="comment">-- 工资，非空</span></span><br><span class="line">    bonus <span class="keyword">DOUBLE</span>(<span class="number">7</span>,<span class="number">2</span>)  <span class="comment">-- 奖金，如果没有将近默认为0</span></span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+
+<p>上面一定给出了具体的要求，我们可以根据要求创建这张表，并为每一列添加对应的约束。建表语句如下：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">DROP</span> <span class="keyword">TABLE</span> IF <span class="keyword">EXISTS</span> emp;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 员工表</span></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> emp (</span><br><span class="line">  id <span class="type">INT</span> <span class="keyword">PRIMARY</span> KEY, <span class="comment">-- 员工id，主键且自增长</span></span><br><span class="line">  ename <span class="type">VARCHAR</span>(<span class="number">50</span>) <span class="keyword">NOT</span> <span class="keyword">NULL</span> <span class="keyword">UNIQUE</span>, <span class="comment">-- 员工姓名，非空并且唯一</span></span><br><span class="line">  joindate <span class="type">DATE</span> <span class="keyword">NOT</span> <span class="keyword">NULL</span> , <span class="comment">-- 入职日期，非空</span></span><br><span class="line">  salary <span class="keyword">DOUBLE</span>(<span class="number">7</span>,<span class="number">2</span>) <span class="keyword">NOT</span> <span class="keyword">NULL</span> , <span class="comment">-- 工资，非空</span></span><br><span class="line">  bonus <span class="keyword">DOUBLE</span>(<span class="number">7</span>,<span class="number">2</span>) <span class="keyword">DEFAULT</span> <span class="number">0</span> <span class="comment">-- 奖金，如果没有奖金默认为0</span></span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+
+<p>通过上面语句可以创建带有约束的 <code>emp</code> 表，约束能不能发挥作用呢。接下来我们一一进行验证，先添加一条没有问题的数据</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> emp(id,ename,joindate,salary,bonus) <span class="keyword">values</span>(<span class="number">1</span>,<span class="string">&#x27;张三&#x27;</span>,<span class="string">&#x27;1999-11-11&#x27;</span>,<span class="number">8800</span>,<span class="number">5000</span>);</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>验证主键约束，非空且唯一</strong></li>
+</ul>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> emp(id,ename,joindate,salary,bonus) <span class="keyword">values</span>(<span class="keyword">null</span>,<span class="string">&#x27;张三&#x27;</span>,<span class="string">&#x27;1999-11-11&#x27;</span>,<span class="number">8800</span>,<span class="number">5000</span>);</span><br></pre></td></tr></table></figure>
+
+<p>执行结果如下：</p>
+<img src="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210724114548170.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210724114548170.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20210724114548170" style="zoom:80%;" />
+
+<p>从上面的结果可以看到，字段 <code>id</code> 不能为null。那我们重新添加一条数据，如下：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> emp(id,ename,joindate,salary,bonus) <span class="keyword">values</span>(<span class="number">1</span>,<span class="string">&#x27;张三&#x27;</span>,<span class="string">&#x27;1999-11-11&#x27;</span>,<span class="number">8800</span>,<span class="number">5000</span>);</span><br></pre></td></tr></table></figure>
+
+<p>执行结果如下：</p>
+<img src="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210724114805350.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210724114805350.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20210724114805350" style="zoom:80%;" />
+
+<p>从上面结果可以看到，1这个值重复了。所以主键约束是用来限制数据非空且唯一的。那我们再添加一条符合要求的数据</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> emp(id,ename,joindate,salary,bonus) <span class="keyword">values</span>(<span class="number">2</span>,<span class="string">&#x27;李四&#x27;</span>,<span class="string">&#x27;1999-11-11&#x27;</span>,<span class="number">8800</span>,<span class="number">5000</span>);</span><br></pre></td></tr></table></figure>
+
+<p>执行结果如下：</p>
+<img src="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210724115024106.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210724115024106.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20210724115024106" style="zoom:80%;" />
+
+<ul>
+<li><strong>验证非空约束</strong></li>
+</ul>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> emp(id,ename,joindate,salary,bonus) <span class="keyword">values</span>(<span class="number">3</span>,<span class="keyword">null</span>,<span class="string">&#x27;1999-11-11&#x27;</span>,<span class="number">8800</span>,<span class="number">5000</span>);</span><br></pre></td></tr></table></figure>
+
+<p>执行结果如下：</p>
+<img src="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210724115149415.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210724115149415.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20210724115149415" style="zoom:80%;" />
+
+<p>从上面结果可以看到，<code>ename</code> 字段的非空约束生效了。</p>
+<ul>
+<li><strong>验证唯一约束</strong></li>
+</ul>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> emp(id,ename,joindate,salary,bonus) <span class="keyword">values</span>(<span class="number">3</span>,<span class="string">&#x27;李四&#x27;</span>,<span class="string">&#x27;1999-11-11&#x27;</span>,<span class="number">8800</span>,<span class="number">5000</span>);</span><br></pre></td></tr></table></figure>
+
+<p>执行结果如下：</p>
+<img src="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210724115336916.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210724115336916.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20210724115336916" style="zoom:80%;" />
+
+<p>从上面结果可以看到，<code>ename</code> 字段的唯一约束生效了。</p>
+<ul>
+<li><strong>验证默认约束</strong></li>
+</ul>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> emp(id,ename,joindate,salary) <span class="keyword">values</span>(<span class="number">3</span>,<span class="string">&#x27;王五&#x27;</span>,<span class="string">&#x27;1999-11-11&#x27;</span>,<span class="number">8800</span>);</span><br></pre></td></tr></table></figure>
+
+<p>执行完上面语句后查询表中数据，如下图可以看到王五这条数据的bonus列就有了默认值0。</p>
+<img src="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210724115547951.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210724115547951.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20210724115547951" style="zoom:80%;" />
+
+<p>&#x3D;&#x3D;注意：默认约束只有在不给值时才会采用默认值。如果给了null，那值就是null值。&#x3D;&#x3D;</p>
+<p>如下：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> emp(id,ename,joindate,salary,bonus) <span class="keyword">values</span>(<span class="number">4</span>,<span class="string">&#x27;赵六&#x27;</span>,<span class="string">&#x27;1999-11-11&#x27;</span>,<span class="number">8800</span>,<span class="keyword">null</span>);</span><br></pre></td></tr></table></figure>
+
+<p>执行完上面语句后查询表中数据，如下图可以看到赵六这条数据的bonus列的值是null。</p>
+<img src="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210724115826516.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210724115826516.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20210724115826516" style="zoom:80%;" />
+
+<ul>
+<li><strong>验证自动增长： auto_increment  当列是数字类型 并且唯一约束</strong></li>
+</ul>
+<p>重新创建 <code>emp</code> 表，并给id列添加自动增长</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 员工表</span></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> emp (</span><br><span class="line">  id <span class="type">INT</span> <span class="keyword">PRIMARY</span> KEY auto_increment, <span class="comment">-- 员工id，主键且自增长</span></span><br><span class="line">  ename <span class="type">VARCHAR</span>(<span class="number">50</span>) <span class="keyword">NOT</span> <span class="keyword">NULL</span> <span class="keyword">UNIQUE</span>, <span class="comment">-- 员工姓名，非空并且唯一</span></span><br><span class="line">  joindate <span class="type">DATE</span> <span class="keyword">NOT</span> <span class="keyword">NULL</span> , <span class="comment">-- 入职日期，非空</span></span><br><span class="line">  salary <span class="keyword">DOUBLE</span>(<span class="number">7</span>,<span class="number">2</span>) <span class="keyword">NOT</span> <span class="keyword">NULL</span> , <span class="comment">-- 工资，非空</span></span><br><span class="line">  bonus <span class="keyword">DOUBLE</span>(<span class="number">7</span>,<span class="number">2</span>) <span class="keyword">DEFAULT</span> <span class="number">0</span> <span class="comment">-- 奖金，如果没有奖金默认为0</span></span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+
+<p>接下来给emp添加数据，分别验证不给id列添加值以及给id列添加null值，id列的值会不会自动增长：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> emp(ename,joindate,salary,bonus) <span class="keyword">values</span>(<span class="string">&#x27;赵六&#x27;</span>,<span class="string">&#x27;1999-11-11&#x27;</span>,<span class="number">8800</span>,<span class="keyword">null</span>);</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> emp(id,ename,joindate,salary,bonus) <span class="keyword">values</span>(<span class="keyword">null</span>,<span class="string">&#x27;赵六2&#x27;</span>,<span class="string">&#x27;1999-11-11&#x27;</span>,<span class="number">8800</span>,<span class="keyword">null</span>);</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> emp(id,ename,joindate,salary,bonus) <span class="keyword">values</span>(<span class="keyword">null</span>,<span class="string">&#x27;赵六3&#x27;</span>,<span class="string">&#x27;1999-11-11&#x27;</span>,<span class="number">8800</span>,<span class="keyword">null</span>);</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="1-8-外键约束"><a href="#1-8-外键约束" class="headerlink" title="1.8  外键约束"></a>1.8  外键约束</h3><h4 id="1-8-1-概述"><a href="#1-8-1-概述" class="headerlink" title="1.8.1  概述"></a>1.8.1  概述</h4><p>外键用来让两个表的数据之间建立链接，保证数据的一致性和完整性。</p>
+<p>如何理解上面的概念呢？如下图有两张表，员工表和部门表：</p>
+<img src="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210724120904180.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210724120904180.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20210724120904180" style="zoom:80%;" />
+
+<p>员工表中的dep_id字段是部门表的id字段关联，也就是说1号学生张三属于1号部门研发部的员工。现在我要删除1号部门，就会出现错误的数据（员工表中属于1号部门的数据）。而我们上面说的两张表的关系只是我们认为它们有关系，此时需要通过外键让这两张表产生数据库层面的关系，这样你要删除部门表中的1号部门的数据将无法删除。</p>
+<h4 id="1-8-2-语法"><a href="#1-8-2-语法" class="headerlink" title="1.8.2  语法"></a>1.8.2  语法</h4><ul>
+<li>添加外键约束</li>
+</ul>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 创建表时添加外键约束</span></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> 表名(</span><br><span class="line">   列名 数据类型,</span><br><span class="line">   …</span><br><span class="line">   [<span class="keyword">CONSTRAINT</span>] [外键名称] <span class="keyword">FOREIGN</span> KEY(外键列名) <span class="keyword">REFERENCES</span> 主表(主表列名) </span><br><span class="line">); </span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 建完表后添加外键约束</span></span><br><span class="line"><span class="keyword">ALTER</span> <span class="keyword">TABLE</span> 表名 <span class="keyword">ADD</span> <span class="keyword">CONSTRAINT</span> 外键名称 <span class="keyword">FOREIGN</span> KEY (外键字段名称) <span class="keyword">REFERENCES</span> 主表名称(主表列名称);</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>删除外键约束</li>
+</ul>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">ALTER</span> <span class="keyword">TABLE</span> 表名 <span class="keyword">DROP</span> <span class="keyword">FOREIGN</span> KEY 外键名称;</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="1-8-3-练习"><a href="#1-8-3-练习" class="headerlink" title="1.8.3  练习"></a>1.8.3  练习</h4><p>根据上述语法创建员工表和部门表，并添加上外键约束：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 删除表</span></span><br><span class="line"><span class="keyword">DROP</span> <span class="keyword">TABLE</span> IF <span class="keyword">EXISTS</span> emp;</span><br><span class="line"><span class="keyword">DROP</span> <span class="keyword">TABLE</span> IF <span class="keyword">EXISTS</span> dept;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 部门表</span></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> dept(</span><br><span class="line">	id <span class="type">int</span> <span class="keyword">primary</span> key auto_increment,</span><br><span class="line">	dep_name <span class="type">varchar</span>(<span class="number">20</span>),</span><br><span class="line">	addr <span class="type">varchar</span>(<span class="number">20</span>)</span><br><span class="line">);</span><br><span class="line"><span class="comment">-- 员工表 </span></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> emp(</span><br><span class="line">	id <span class="type">int</span> <span class="keyword">primary</span> key auto_increment,</span><br><span class="line">	name <span class="type">varchar</span>(<span class="number">20</span>),</span><br><span class="line">	age <span class="type">int</span>,</span><br><span class="line">	dep_id <span class="type">int</span>,</span><br><span class="line"></span><br><span class="line">	<span class="comment">-- 添加外键 dep_id,关联 dept 表的id主键</span></span><br><span class="line">	<span class="keyword">CONSTRAINT</span> fk_emp_dept <span class="keyword">FOREIGN</span> KEY(dep_id) <span class="keyword">REFERENCES</span> dept(id)	</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+
+<p>添加数据</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 添加 2 个部门</span></span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> dept(dep_name,addr) <span class="keyword">values</span></span><br><span class="line">(<span class="string">&#x27;研发部&#x27;</span>,<span class="string">&#x27;广州&#x27;</span>),(<span class="string">&#x27;销售部&#x27;</span>, <span class="string">&#x27;深圳&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 添加员工,dep_id 表示员工所在的部门</span></span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> emp (NAME, age, dep_id) <span class="keyword">VALUES</span> </span><br><span class="line">(<span class="string">&#x27;张三&#x27;</span>, <span class="number">20</span>, <span class="number">1</span>),</span><br><span class="line">(<span class="string">&#x27;李四&#x27;</span>, <span class="number">20</span>, <span class="number">1</span>),</span><br><span class="line">(<span class="string">&#x27;王五&#x27;</span>, <span class="number">20</span>, <span class="number">1</span>),</span><br><span class="line">(<span class="string">&#x27;赵六&#x27;</span>, <span class="number">20</span>, <span class="number">2</span>),</span><br><span class="line">(<span class="string">&#x27;孙七&#x27;</span>, <span class="number">22</span>, <span class="number">2</span>),</span><br><span class="line">(<span class="string">&#x27;周八&#x27;</span>, <span class="number">18</span>, <span class="number">2</span>);</span><br></pre></td></tr></table></figure>
+
+<p>此时删除 <code>研发部</code> 这条数据，会发现无法删除。</p>
+<p>删除外键</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">alter</span> <span class="keyword">table</span> emp <span class="keyword">drop</span> <span class="keyword">FOREIGN</span> key fk_emp_dept;</span><br></pre></td></tr></table></figure>
+
+<p>重新添加外键</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">alter</span> <span class="keyword">table</span> emp <span class="keyword">add</span> <span class="keyword">CONSTRAINT</span> fk_emp_dept <span class="keyword">FOREIGN</span> key(dep_id) <span class="keyword">REFERENCES</span> dept(id);</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="2，数据库设计"><a href="#2，数据库设计" class="headerlink" title="2，数据库设计"></a>2，数据库设计</h2><h3 id="2-1-数据库设计简介"><a href="#2-1-数据库设计简介" class="headerlink" title="2.1  数据库设计简介"></a>2.1  数据库设计简介</h3><ul>
+<li><p>软件的研发步骤</p>
+<img src="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210724130925801.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210724130925801.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20210724130925801" style="zoom:80%;" />
+</li>
+<li><p>数据库设计概念</p>
+<ul>
+<li>数据库设计就是根据业务系统的具体需求，结合我们所选用的DBMS，为这个业务系统构造出最优的数据存储模型。</li>
+<li>建立数据库中的&#x3D;&#x3D;表结构&#x3D;&#x3D;以及&#x3D;&#x3D;表与表之间的关联关系&#x3D;&#x3D;的过程。</li>
+<li>有哪些表？表里有哪些字段？表和表之间有什么关系？</li>
+</ul>
+</li>
+<li><p>数据库设计的步骤</p>
+<ul>
+<li><p>需求分析（数据是什么? 数据具有哪些属性? 数据与属性的特点是什么）</p>
+</li>
+<li><p>逻辑分析（通过ER图对数据库进行逻辑建模，不需要考虑我们所选用的数据库管理系统）</p>
+<p>如下图就是ER(Entity&#x2F;Relation)图：</p>
+<img src="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210724131210759.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210724131210759.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20210724131210759" style="zoom:80%;" />
+</li>
+<li><p>物理设计（根据数据库自身的特点把逻辑设计转换为物理设计）</p>
+</li>
+<li><p>维护设计（1.对新的需求进行建表；2.表优化）</p>
+</li>
+</ul>
+</li>
+<li><p>表关系</p>
+<ul>
+<li><p>一对一</p>
+<ul>
+<li>如：用户 和 用户详情</li>
+<li>一对一关系多用于表拆分，将一个实体中经常使用的字段放一张表，不经常使用的字段放另一张表，用于提升查询性能</li>
+</ul>
+<img src="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210724133015129.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210724133015129.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20210724133015129" style="zoom:80%;" />
+
+<p>上图左边是用户的详细信息，而我们真正在展示用户信息时最长用的则是上图右边红框所示，所以我们会将详细信息查分成两周那个表。</p>
+</li>
+<li><p>一对多</p>
+<ul>
+<li><p>如：部门 和 员工</p>
+</li>
+<li><p>一个部门对应多个员工，一个员工对应一个部门。如下图：</p>
+<img src="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210724133443094.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210724133443094.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20210724133443094" style="zoom:90%;" /></li>
+</ul>
+</li>
+<li><p>多对多</p>
+<ul>
+<li><p>如：商品 和 订单</p>
+</li>
+<li><p>一个商品对应多个订单，一个订单包含多个商品。如下图：</p>
+<img src="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210724133704682.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210724133704682.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20210724133704682" style="zoom:80%;" /></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="2-2-表关系-一对多"><a href="#2-2-表关系-一对多" class="headerlink" title="2.2  表关系(一对多)"></a>2.2  表关系(一对多)</h3><ul>
+<li><p>一对多</p>
+<ul>
+<li>如：部门 和 员工</li>
+<li>一个部门对应多个员工，一个员工对应一个部门。</li>
+</ul>
+</li>
+<li><p>实现方式</p>
+<p>&#x3D;&#x3D;在多的一方建立外键，指向一的一方的主键&#x3D;&#x3D;</p>
+</li>
+<li><p>案例</p>
+<p>我们还是以 <code>员工表</code> 和 <code>部门表</code> 举例:</p>
+<img src="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210724134145803.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210724134145803.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20210724134145803" style="zoom:70%;" />
+
+<p>经过分析发现，员工表属于多的一方，而部门表属于一的一方，此时我们会在员工表中添加一列（dep_id），指向于部门表的主键（id）：</p>
+<img src="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210724134318685.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210724134318685.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20210724134318685" style="zoom:70%;" />
+
+<p>建表语句如下：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 删除表</span></span><br><span class="line"><span class="keyword">DROP</span> <span class="keyword">TABLE</span> IF <span class="keyword">EXISTS</span> tb_emp;</span><br><span class="line"><span class="keyword">DROP</span> <span class="keyword">TABLE</span> IF <span class="keyword">EXISTS</span> tb_dept;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 部门表</span></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> tb_dept(</span><br><span class="line">	id <span class="type">int</span> <span class="keyword">primary</span> key auto_increment,</span><br><span class="line">	dep_name <span class="type">varchar</span>(<span class="number">20</span>),</span><br><span class="line">	addr <span class="type">varchar</span>(<span class="number">20</span>)</span><br><span class="line">);</span><br><span class="line"><span class="comment">-- 员工表 </span></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> tb_emp(</span><br><span class="line">	id <span class="type">int</span> <span class="keyword">primary</span> key auto_increment,</span><br><span class="line">	name <span class="type">varchar</span>(<span class="number">20</span>),</span><br><span class="line">	age <span class="type">int</span>,</span><br><span class="line">	dep_id <span class="type">int</span>,</span><br><span class="line"></span><br><span class="line">	<span class="comment">-- 添加外键 dep_id,关联 dept 表的id主键</span></span><br><span class="line">	<span class="keyword">CONSTRAINT</span> fk_emp_dept <span class="keyword">FOREIGN</span> KEY(dep_id) <span class="keyword">REFERENCES</span> tb_dept(id)	</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+
+<p>查看表结构模型图：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20220527153806865.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20220527153806865.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20220527153806865"></p>
+</li>
+</ul>
+<h3 id="2-3-表关系-多对多"><a href="#2-3-表关系-多对多" class="headerlink" title="2.3  表关系(多对多)"></a>2.3  表关系(多对多)</h3><ul>
+<li><p>多对多</p>
+<ul>
+<li>如：商品 和 订单</li>
+<li>一个商品对应多个订单，一个订单包含多个商品</li>
+</ul>
+</li>
+<li><p>实现方式</p>
+<p>&#x3D;&#x3D;建立第三张中间表，中间表至少包含两个外键，分别关联两方主键&#x3D;&#x3D;</p>
+</li>
+<li><p>案例</p>
+<p>我们以 <code>订单表</code> 和 <code>商品表</code> 举例：</p>
+<img src="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210724134735939.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210724134735939.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20210724134735939" style="zoom:70%;" />
+
+<p>经过分析发现，订单表和商品表都属于多的一方，此时需要创建一个中间表，在中间表中添加订单表的外键和商品表的外键指向两张表的主键：</p>
+<img src="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210724135054834.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210724135054834.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20210724135054834" style="zoom:70%;" />
+
+<p>建表语句如下：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 删除表</span></span><br><span class="line"><span class="keyword">DROP</span> <span class="keyword">TABLE</span> IF <span class="keyword">EXISTS</span> tb_order_goods;</span><br><span class="line"><span class="keyword">DROP</span> <span class="keyword">TABLE</span> IF <span class="keyword">EXISTS</span> tb_order;</span><br><span class="line"><span class="keyword">DROP</span> <span class="keyword">TABLE</span> IF <span class="keyword">EXISTS</span> tb_goods;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 订单表</span></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> tb_order(</span><br><span class="line">	id <span class="type">int</span> <span class="keyword">primary</span> key auto_increment,</span><br><span class="line">	payment <span class="keyword">double</span>(<span class="number">10</span>,<span class="number">2</span>),</span><br><span class="line">	payment_type TINYINT,</span><br><span class="line">	status TINYINT</span><br><span class="line">);</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 商品表</span></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> tb_goods(</span><br><span class="line">	id <span class="type">int</span> <span class="keyword">primary</span> key auto_increment,</span><br><span class="line">	title <span class="type">varchar</span>(<span class="number">100</span>),</span><br><span class="line">	price <span class="keyword">double</span>(<span class="number">10</span>,<span class="number">2</span>)</span><br><span class="line">);</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 订单商品中间表</span></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> tb_order_goods(</span><br><span class="line">	id <span class="type">int</span> <span class="keyword">primary</span> key auto_increment,</span><br><span class="line">	order_id <span class="type">int</span>,</span><br><span class="line">	goods_id <span class="type">int</span>,</span><br><span class="line">	count <span class="type">int</span></span><br><span class="line">);</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 建完表后，添加外键</span></span><br><span class="line"><span class="keyword">alter</span> <span class="keyword">table</span> tb_order_goods <span class="keyword">add</span> <span class="keyword">CONSTRAINT</span> fk_order_id <span class="keyword">FOREIGN</span> key(order_id) <span class="keyword">REFERENCES</span> tb_order(id);</span><br><span class="line"><span class="keyword">alter</span> <span class="keyword">table</span> tb_order_goods <span class="keyword">add</span> <span class="keyword">CONSTRAINT</span> fk_goods_id <span class="keyword">FOREIGN</span> key(goods_id) <span class="keyword">REFERENCES</span> tb_goods(id);</span><br></pre></td></tr></table></figure>
+
+<p>查看表结构模型图：</p>
+<img src="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210724140307910.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210724140307910.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20210724140307910" style="zoom:80%;" /></li>
+</ul>
+<h3 id="2-4-表关系-一对一"><a href="#2-4-表关系-一对一" class="headerlink" title="2.4  表关系(一对一)"></a>2.4  表关系(一对一)</h3><ul>
+<li><p>一对一</p>
+<ul>
+<li>如：用户 和 用户详情</li>
+<li>一对一关系多用于表拆分，将一个实体中经常使用的字段放一张表，不经常使用的字段放另一张表，用于提升查询性能</li>
+</ul>
+</li>
+<li><p>实现方式</p>
+<p>&#x3D;&#x3D;在任意一方加入外键，关联另一方主键，并且设置外键为唯一(UNIQUE)&#x3D;&#x3D;</p>
+</li>
+<li><p>案例</p>
+<p>我们以 <code>用户表</code> 举例：</p>
+<img src="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210724135346913.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210724135346913.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20210724135346913" style="zoom:70%;" />
+
+<p>而在真正使用过程中发现 id、photo、nickname、age、gender 字段比较常用，此时就可以将这张表查分成两张表。</p>
+</li>
+</ul>
+<p>​	<img src="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210724135649341.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210724135649341.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20210724135649341" style="zoom:70%;" /></p>
+<p>​	</p>
+<p>​	建表语句如下：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">create</span> <span class="keyword">table</span> tb_user_desc (</span><br><span class="line">	id <span class="type">int</span> <span class="keyword">primary</span> key auto_increment,</span><br><span class="line">	city <span class="type">varchar</span>(<span class="number">20</span>),</span><br><span class="line">	edu <span class="type">varchar</span>(<span class="number">10</span>),</span><br><span class="line">	income <span class="type">int</span>,</span><br><span class="line">	status <span class="type">char</span>(<span class="number">2</span>),</span><br><span class="line">	des <span class="type">varchar</span>(<span class="number">100</span>)</span><br><span class="line">);</span><br><span class="line"></span><br><span class="line"><span class="keyword">create</span> <span class="keyword">table</span> tb_user (</span><br><span class="line">	id <span class="type">int</span> <span class="keyword">primary</span> key auto_increment,</span><br><span class="line">	photo <span class="type">varchar</span>(<span class="number">100</span>),</span><br><span class="line">	nickname <span class="type">varchar</span>(<span class="number">50</span>),</span><br><span class="line">	age <span class="type">int</span>,</span><br><span class="line">	gender <span class="type">char</span>(<span class="number">1</span>),</span><br><span class="line">	desc_id <span class="type">int</span> <span class="keyword">unique</span>,</span><br><span class="line">	<span class="comment">-- 添加外键</span></span><br><span class="line">	<span class="keyword">CONSTRAINT</span> fk_user_desc <span class="keyword">FOREIGN</span> KEY(desc_id) <span class="keyword">REFERENCES</span> tb_user_desc(id)	</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+
+<p>​	查看表结构模型图：</p>
+<img src="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210724141445785.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210724141445785.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20210724141445785" style="zoom:80%;" />
+
+
+
+<h3 id="2-5-数据库设计案例"><a href="#2-5-数据库设计案例" class="headerlink" title="2.5  数据库设计案例"></a>2.5  数据库设计案例</h3><p>根据下图设计表及表和表之间的关系：</p>
+<img src="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210724141822204.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210724141822204.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20210724141822204" style="zoom:80%;" />
+
+<p>经过分析，我们分为 <code>专辑表</code>  <code>曲目表</code>  <code>短评表</code>  <code>用户表</code>   4张表。</p>
+<img src="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210724141550446.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210724141550446.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20210724141550446" style="zoom:80%;" />
+
+<p>一个专辑可以有多个曲目，一个曲目只能属于某一张专辑，所以专辑表和曲目表的关系是&#x3D;&#x3D;一对多&#x3D;&#x3D;。</p>
+<p>一个专辑可以被多个用户进行评论，一个用户可以对多个专辑进行评论，所以专辑表和用户表的关系是 &#x3D;&#x3D;多对多&#x3D;&#x3D;。</p>
+<p>一个用户可以发多个短评，一个短评只能是某一个人发的，所以用户表和短评表的关系是 &#x3D;&#x3D;一对多&#x3D;&#x3D;。</p>
+<img src="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210724142550839.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210724142550839.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20210724142550839" style="zoom:80%;" />
+
+
+
+<h2 id="3，多表查询"><a href="#3，多表查询" class="headerlink" title="3，多表查询"></a>3，多表查询</h2><p>多表查询顾名思义就是从多张表中一次性的查询出我们想要的数据。我们通过具体的sql给他们演示，先准备环境</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">DROP</span> <span class="keyword">TABLE</span> IF <span class="keyword">EXISTS</span> emp;</span><br><span class="line"><span class="keyword">DROP</span> <span class="keyword">TABLE</span> IF <span class="keyword">EXISTS</span> dept;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># 创建部门表</span><br><span class="line">	<span class="keyword">CREATE</span> <span class="keyword">TABLE</span> dept(</span><br><span class="line">        did <span class="type">INT</span> <span class="keyword">PRIMARY</span> KEY AUTO_INCREMENT,</span><br><span class="line">        dname <span class="type">VARCHAR</span>(<span class="number">20</span>)</span><br><span class="line">    );</span><br><span class="line"></span><br><span class="line">	# 创建员工表</span><br><span class="line">	<span class="keyword">CREATE</span> <span class="keyword">TABLE</span> emp (</span><br><span class="line">        id <span class="type">INT</span> <span class="keyword">PRIMARY</span> KEY AUTO_INCREMENT,</span><br><span class="line">        NAME <span class="type">VARCHAR</span>(<span class="number">10</span>),</span><br><span class="line">        gender <span class="type">CHAR</span>(<span class="number">1</span>), <span class="comment">-- 性别</span></span><br><span class="line">        salary <span class="keyword">DOUBLE</span>, <span class="comment">-- 工资</span></span><br><span class="line">        join_date <span class="type">DATE</span>, <span class="comment">-- 入职日期</span></span><br><span class="line">        dep_id <span class="type">INT</span>,</span><br><span class="line">        <span class="keyword">FOREIGN</span> KEY (dep_id) <span class="keyword">REFERENCES</span> dept(did) <span class="comment">-- 外键，关联部门表(部门表的主键)</span></span><br><span class="line">    );</span><br><span class="line">	<span class="comment">-- 添加部门数据</span></span><br><span class="line">	<span class="keyword">INSERT</span> <span class="keyword">INTO</span> dept (dNAME) <span class="keyword">VALUES</span> (<span class="string">&#x27;研发部&#x27;</span>),(<span class="string">&#x27;市场部&#x27;</span>),(<span class="string">&#x27;财务部&#x27;</span>),(<span class="string">&#x27;销售部&#x27;</span>);</span><br><span class="line">	<span class="comment">-- 添加员工数据</span></span><br><span class="line">	<span class="keyword">INSERT</span> <span class="keyword">INTO</span> emp(NAME,gender,salary,join_date,dep_id) <span class="keyword">VALUES</span></span><br><span class="line">	(<span class="string">&#x27;孙悟空&#x27;</span>,<span class="string">&#x27;男&#x27;</span>,<span class="number">7200</span>,<span class="string">&#x27;2013-02-24&#x27;</span>,<span class="number">1</span>),</span><br><span class="line">	(<span class="string">&#x27;猪八戒&#x27;</span>,<span class="string">&#x27;男&#x27;</span>,<span class="number">3600</span>,<span class="string">&#x27;2010-12-02&#x27;</span>,<span class="number">2</span>),</span><br><span class="line">	(<span class="string">&#x27;唐僧&#x27;</span>,<span class="string">&#x27;男&#x27;</span>,<span class="number">9000</span>,<span class="string">&#x27;2008-08-08&#x27;</span>,<span class="number">2</span>),</span><br><span class="line">	(<span class="string">&#x27;白骨精&#x27;</span>,<span class="string">&#x27;女&#x27;</span>,<span class="number">5000</span>,<span class="string">&#x27;2015-10-07&#x27;</span>,<span class="number">3</span>),</span><br><span class="line">	(<span class="string">&#x27;蜘蛛精&#x27;</span>,<span class="string">&#x27;女&#x27;</span>,<span class="number">4500</span>,<span class="string">&#x27;2011-03-14&#x27;</span>,<span class="number">1</span>),</span><br><span class="line">	(<span class="string">&#x27;小白龙&#x27;</span>,<span class="string">&#x27;男&#x27;</span>,<span class="number">2500</span>,<span class="string">&#x27;2011-02-14&#x27;</span>,<span class="keyword">null</span>);	</span><br></pre></td></tr></table></figure>
+
+<p>执行下面的多表查询语句</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> emp , dept;  <span class="comment">-- 从emp和dept表中查询所有的字段数据</span></span><br></pre></td></tr></table></figure>
+
+<p>结果如下：</p>
+<img src="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210724173630506.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210724173630506.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20210724173630506" style="zoom:90%;" />
+
+<p>从上面的结果我们看到有一些无效的数据，如 <code>孙悟空</code> 这个员工属于1号部门，但也同时关联的2、3、4号部门。所以我们要通过限制员工表中的 <code>dep_id</code> 字段的值和部门表 <code>did</code> 字段的值相等来消除这些无效的数据，</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> emp , dept <span class="keyword">where</span> emp.dep_id <span class="operator">=</span> dept.did;</span><br></pre></td></tr></table></figure>
+
+<p>执行后结果如下：</p>
+<img src="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210724174212443.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210724174212443.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20210724174212443" style="zoom:90%;" />
+
+<p>上面语句就是连接查询，那么多表查询都有哪些呢？</p>
+<ul>
+<li><p>连接查询</p>
+<img src="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210724174717647.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210724174717647.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20210724174717647" style="zoom:80%;" /> 
+
+<ul>
+<li>内连接查询 ：相当于查询AB交集数据</li>
+<li>外连接查询<ul>
+<li>左外连接查询 ：相当于查询A表所有数据和交集部门数据</li>
+<li>右外连接查询 ： 相当于查询B表所有数据和交集部分数据</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>子查询</p>
+</li>
+</ul>
+<h3 id="3-1-内连接查询"><a href="#3-1-内连接查询" class="headerlink" title="3.1  内连接查询"></a>3.1  内连接查询</h3><ul>
+<li>语法</li>
+</ul>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 隐式内连接</span></span><br><span class="line"><span class="keyword">SELECT</span> 字段列表 <span class="keyword">FROM</span> 表<span class="number">1</span>,表<span class="number">2</span>… <span class="keyword">WHERE</span> 条件;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 显示内连接</span></span><br><span class="line"><span class="keyword">SELECT</span> 字段列表 <span class="keyword">FROM</span> 表<span class="number">1</span> [<span class="keyword">INNER</span>] <span class="keyword">JOIN</span> 表<span class="number">2</span> <span class="keyword">ON</span> 条件;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>内连接相当于查询 A B 交集数据</p>
+</blockquote>
+<p><img src="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20220527153854856.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20220527153854856.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20220527153854856"></p>
+<ul>
+<li><p>案例</p>
+<ul>
+<li><p>隐式内连接</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">	<span class="operator">*</span></span><br><span class="line"><span class="keyword">FROM</span></span><br><span class="line">	emp,</span><br><span class="line">	dept</span><br><span class="line"><span class="keyword">WHERE</span></span><br><span class="line">	emp.dep_id <span class="operator">=</span> dept.did;</span><br></pre></td></tr></table></figure>
+
+<p>执行上述语句结果如下：</p>
+<img src="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210724175344508.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210724175344508.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20210724175344508" style="zoom:80%;" />
+</li>
+<li><p>查询 emp的 name， gender，dept表的dname</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">	emp. NAME,</span><br><span class="line">	emp.gender,</span><br><span class="line">	dept.dname</span><br><span class="line"><span class="keyword">FROM</span></span><br><span class="line">	emp,</span><br><span class="line">	dept</span><br><span class="line"><span class="keyword">WHERE</span></span><br><span class="line">	emp.dep_id <span class="operator">=</span> dept.did;</span><br></pre></td></tr></table></figure>
+
+<p>执行语句结果如下：</p>
+<img src="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210724175518159.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210724175518159.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20210724175518159" style="zoom:80%;" />
+
+<p>上面语句中使用表名指定字段所属有点麻烦，sql也支持给表指别名，上述语句可以改进为</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">	t1. NAME,</span><br><span class="line">	t1.gender,</span><br><span class="line">	t2.dname</span><br><span class="line"><span class="keyword">FROM</span></span><br><span class="line">	emp t1,</span><br><span class="line">	dept t2</span><br><span class="line"><span class="keyword">WHERE</span></span><br><span class="line">	t1.dep_id <span class="operator">=</span> t2.did;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>显式内连接</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> emp <span class="keyword">inner</span> <span class="keyword">join</span> dept <span class="keyword">on</span> emp.dep_id <span class="operator">=</span> dept.did;</span><br><span class="line"><span class="comment">-- 上面语句中的inner可以省略，可以书写为如下语句</span></span><br><span class="line"><span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> emp  <span class="keyword">join</span> dept <span class="keyword">on</span> emp.dep_id <span class="operator">=</span> dept.did;</span><br></pre></td></tr></table></figure>
+
+<p>执行结果如下：</p>
+<img src="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210724180103531.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210724180103531.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20210724180103531" style="zoom:80%;" /></li>
+</ul>
+</li>
+</ul>
+<h3 id="3-2-外连接查询"><a href="#3-2-外连接查询" class="headerlink" title="3.2  外连接查询"></a>3.2  外连接查询</h3><ul>
+<li><p>语法</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 左外连接</span></span><br><span class="line"><span class="keyword">SELECT</span> 字段列表 <span class="keyword">FROM</span> 表<span class="number">1</span> <span class="keyword">LEFT</span> [<span class="keyword">OUTER</span>] <span class="keyword">JOIN</span> 表<span class="number">2</span> <span class="keyword">ON</span> 条件;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 右外连接</span></span><br><span class="line"><span class="keyword">SELECT</span> 字段列表 <span class="keyword">FROM</span> 表<span class="number">1</span> <span class="keyword">RIGHT</span> [<span class="keyword">OUTER</span>] <span class="keyword">JOIN</span> 表<span class="number">2</span> <span class="keyword">ON</span> 条件;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>左外连接：相当于查询A表所有数据和交集部分数据</p>
+<p>右外连接：相当于查询B表所有数据和交集部分数据</p>
+</blockquote>
+<p><img src="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20220527153919557.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20220527153919557.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20220527153919557"></p>
+</li>
+<li><p>案例</p>
+<ul>
+<li><p>查询emp表所有数据和对应的部门信息（左外连接）</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> emp <span class="keyword">left</span> <span class="keyword">join</span> dept <span class="keyword">on</span> emp.dep_id <span class="operator">=</span> dept.did;</span><br></pre></td></tr></table></figure>
+
+<p>执行语句结果如下：</p>
+<img src="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210724180542757.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210724180542757.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20210724180542757" style="zoom:80%;" />
+
+<p>结果显示查询到了左表（emp）中所有的数据及两张表能关联的数据。</p>
+</li>
+<li><p>查询dept表所有数据和对应的员工信息（右外连接）</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> emp <span class="keyword">right</span> <span class="keyword">join</span> dept <span class="keyword">on</span> emp.dep_id <span class="operator">=</span> dept.did;</span><br></pre></td></tr></table></figure>
+
+<p>执行语句结果如下：</p>
+<img src="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210724180613494.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210724180613494.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20210724180613494" style="zoom:80%;" />
+
+<p>结果显示查询到了右表（dept）中所有的数据及两张表能关联的数据。</p>
+<p>要查询出部门表中所有的数据，也可以通过左外连接实现，只需要将两个表的位置进行互换：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> dept <span class="keyword">left</span> <span class="keyword">join</span> emp <span class="keyword">on</span> emp.dep_id <span class="operator">=</span> dept.did;</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+</ul>
+<h3 id="3-3-子查询"><a href="#3-3-子查询" class="headerlink" title="3.3  子查询"></a>3.3  子查询</h3><ul>
+<li><p>概念</p>
+<p>&#x3D;&#x3D;查询中嵌套查询，称嵌套查询为子查询。&#x3D;&#x3D;</p>
+<p>什么是查询中嵌套查询呢？我们通过一个例子来看：</p>
+<p><strong>需求：查询工资高于猪八戒的员工信息。</strong></p>
+<p>来实现这个需求，我们就可以通过二步实现，第一步：先查询出来 猪八戒的工资</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> salary <span class="keyword">from</span> emp <span class="keyword">where</span> name <span class="operator">=</span> <span class="string">&#x27;猪八戒&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<p> 第二步：查询工资高于猪八戒的员工信息</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> emp <span class="keyword">where</span> salary <span class="operator">&gt;</span> <span class="number">3600</span>;</span><br></pre></td></tr></table></figure>
+
+<p>第二步中的3600可以通过第一步的sql查询出来，所以将3600用第一步的sql语句进行替换</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> emp <span class="keyword">where</span> salary <span class="operator">&gt;</span> (<span class="keyword">select</span> salary <span class="keyword">from</span> emp <span class="keyword">where</span> name <span class="operator">=</span> <span class="string">&#x27;猪八戒&#x27;</span>);</span><br></pre></td></tr></table></figure>
+
+<p>这就是查询语句中嵌套查询语句。</p>
+</li>
+<li><p>子查询根据查询结果不同，作用不同</p>
+<ul>
+<li>子查询语句结果是单行单列，子查询语句作为条件值，使用 &#x3D;  !&#x3D;  &gt;  &lt;  等进行条件判断</li>
+<li>子查询语句结果是多行单列，子查询语句作为条件值，使用 in 等关键字进行条件判断</li>
+<li>子查询语句结果是多行多列，子查询语句作为虚拟表</li>
+</ul>
+</li>
+<li><p>案例</p>
+<ul>
+<li><p>查询 ‘财务部’ 和 ‘市场部’ 所有的员工信息</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 查询 &#x27;财务部&#x27; 或者 &#x27;市场部&#x27; 所有的员工的部门did</span></span><br><span class="line"><span class="keyword">select</span> did <span class="keyword">from</span> dept <span class="keyword">where</span> dname <span class="operator">=</span> <span class="string">&#x27;财务部&#x27;</span> <span class="keyword">or</span> dname <span class="operator">=</span> <span class="string">&#x27;市场部&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> emp <span class="keyword">where</span> dep_id <span class="keyword">in</span> (<span class="keyword">select</span> did <span class="keyword">from</span> dept <span class="keyword">where</span> dname <span class="operator">=</span> <span class="string">&#x27;财务部&#x27;</span> <span class="keyword">or</span> dname <span class="operator">=</span> <span class="string">&#x27;市场部&#x27;</span>);</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>查询入职日期是 ‘2011-11-11’ 之后的员工信息和部门信息</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 查询入职日期是 &#x27;2011-11-11&#x27; 之后的员工信息</span></span><br><span class="line"><span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> emp <span class="keyword">where</span> join_date <span class="operator">&gt;</span> <span class="string">&#x27;2011-11-11&#x27;</span> ;</span><br><span class="line"><span class="comment">-- 将上面语句的结果作为虚拟表和dept表进行内连接查询</span></span><br><span class="line"><span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> (<span class="keyword">select</span> <span class="operator">*</span> <span class="keyword">from</span> emp <span class="keyword">where</span> join_date <span class="operator">&gt;</span> <span class="string">&#x27;2011-11-11&#x27;</span> ) t1, dept <span class="keyword">where</span> t1.dep_id <span class="operator">=</span> dept.did;</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+</ul>
+<h3 id="3-4-案例"><a href="#3-4-案例" class="headerlink" title="3.4  案例"></a>3.4  案例</h3><ul>
+<li>环境准备：</li>
+</ul>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">DROP</span> <span class="keyword">TABLE</span> IF <span class="keyword">EXISTS</span> emp;</span><br><span class="line"><span class="keyword">DROP</span> <span class="keyword">TABLE</span> IF <span class="keyword">EXISTS</span> dept;</span><br><span class="line"><span class="keyword">DROP</span> <span class="keyword">TABLE</span> IF <span class="keyword">EXISTS</span> job;</span><br><span class="line"><span class="keyword">DROP</span> <span class="keyword">TABLE</span> IF <span class="keyword">EXISTS</span> salarygrade;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 部门表</span></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> dept (</span><br><span class="line">  did <span class="type">INT</span> <span class="keyword">PRIMARY</span> KEY <span class="keyword">PRIMARY</span> KEY, <span class="comment">-- 部门id</span></span><br><span class="line">  dname <span class="type">VARCHAR</span>(<span class="number">50</span>), <span class="comment">-- 部门名称</span></span><br><span class="line">  loc <span class="type">VARCHAR</span>(<span class="number">50</span>) <span class="comment">-- 部门所在地</span></span><br><span class="line">);</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 职务表，职务名称，职务描述</span></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> job (</span><br><span class="line">  id <span class="type">INT</span> <span class="keyword">PRIMARY</span> KEY,</span><br><span class="line">  jname <span class="type">VARCHAR</span>(<span class="number">20</span>),</span><br><span class="line">  description <span class="type">VARCHAR</span>(<span class="number">50</span>)</span><br><span class="line">);</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 员工表</span></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> emp (</span><br><span class="line">  id <span class="type">INT</span> <span class="keyword">PRIMARY</span> KEY, <span class="comment">-- 员工id</span></span><br><span class="line">  ename <span class="type">VARCHAR</span>(<span class="number">50</span>), <span class="comment">-- 员工姓名</span></span><br><span class="line">  job_id <span class="type">INT</span>, <span class="comment">-- 职务id</span></span><br><span class="line">  mgr <span class="type">INT</span> , <span class="comment">-- 上级领导</span></span><br><span class="line">  joindate <span class="type">DATE</span>, <span class="comment">-- 入职日期</span></span><br><span class="line">  salary <span class="type">DECIMAL</span>(<span class="number">7</span>,<span class="number">2</span>), <span class="comment">-- 工资</span></span><br><span class="line">  bonus <span class="type">DECIMAL</span>(<span class="number">7</span>,<span class="number">2</span>), <span class="comment">-- 奖金</span></span><br><span class="line">  dept_id <span class="type">INT</span>, <span class="comment">-- 所在部门编号</span></span><br><span class="line">  <span class="keyword">CONSTRAINT</span> emp_jobid_ref_job_id_fk <span class="keyword">FOREIGN</span> KEY (job_id) <span class="keyword">REFERENCES</span> job (id),</span><br><span class="line">  <span class="keyword">CONSTRAINT</span> emp_deptid_ref_dept_id_fk <span class="keyword">FOREIGN</span> KEY (dept_id) <span class="keyword">REFERENCES</span> dept (id)</span><br><span class="line">);</span><br><span class="line"><span class="comment">-- 工资等级表</span></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> salarygrade (</span><br><span class="line">  grade <span class="type">INT</span> <span class="keyword">PRIMARY</span> KEY,   <span class="comment">-- 级别</span></span><br><span class="line">  losalary <span class="type">INT</span>,  <span class="comment">-- 最低工资</span></span><br><span class="line">  hisalary <span class="type">INT</span> <span class="comment">-- 最高工资</span></span><br><span class="line">);</span><br><span class="line">				</span><br><span class="line"><span class="comment">-- 添加4个部门</span></span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> dept(did,dname,loc) <span class="keyword">VALUES</span> </span><br><span class="line">(<span class="number">10</span>,<span class="string">&#x27;教研部&#x27;</span>,<span class="string">&#x27;北京&#x27;</span>),</span><br><span class="line">(<span class="number">20</span>,<span class="string">&#x27;学工部&#x27;</span>,<span class="string">&#x27;上海&#x27;</span>),</span><br><span class="line">(<span class="number">30</span>,<span class="string">&#x27;销售部&#x27;</span>,<span class="string">&#x27;广州&#x27;</span>),</span><br><span class="line">(<span class="number">40</span>,<span class="string">&#x27;财务部&#x27;</span>,<span class="string">&#x27;深圳&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 添加4个职务</span></span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> job (id, jname, description) <span class="keyword">VALUES</span></span><br><span class="line">(<span class="number">1</span>, <span class="string">&#x27;董事长&#x27;</span>, <span class="string">&#x27;管理整个公司，接单&#x27;</span>),</span><br><span class="line">(<span class="number">2</span>, <span class="string">&#x27;经理&#x27;</span>, <span class="string">&#x27;管理部门员工&#x27;</span>),</span><br><span class="line">(<span class="number">3</span>, <span class="string">&#x27;销售员&#x27;</span>, <span class="string">&#x27;向客人推销产品&#x27;</span>),</span><br><span class="line">(<span class="number">4</span>, <span class="string">&#x27;文员&#x27;</span>, <span class="string">&#x27;使用办公软件&#x27;</span>);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">-- 添加员工</span></span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> emp(id,ename,job_id,mgr,joindate,salary,bonus,dept_id) <span class="keyword">VALUES</span> </span><br><span class="line">(<span class="number">1001</span>,<span class="string">&#x27;孙悟空&#x27;</span>,<span class="number">4</span>,<span class="number">1004</span>,<span class="string">&#x27;2000-12-17&#x27;</span>,<span class="string">&#x27;8000.00&#x27;</span>,<span class="keyword">NULL</span>,<span class="number">20</span>),</span><br><span class="line">(<span class="number">1002</span>,<span class="string">&#x27;卢俊义&#x27;</span>,<span class="number">3</span>,<span class="number">1006</span>,<span class="string">&#x27;2001-02-20&#x27;</span>,<span class="string">&#x27;16000.00&#x27;</span>,<span class="string">&#x27;3000.00&#x27;</span>,<span class="number">30</span>),</span><br><span class="line">(<span class="number">1003</span>,<span class="string">&#x27;林冲&#x27;</span>,<span class="number">3</span>,<span class="number">1006</span>,<span class="string">&#x27;2001-02-22&#x27;</span>,<span class="string">&#x27;12500.00&#x27;</span>,<span class="string">&#x27;5000.00&#x27;</span>,<span class="number">30</span>),</span><br><span class="line">(<span class="number">1004</span>,<span class="string">&#x27;唐僧&#x27;</span>,<span class="number">2</span>,<span class="number">1009</span>,<span class="string">&#x27;2001-04-02&#x27;</span>,<span class="string">&#x27;29750.00&#x27;</span>,<span class="keyword">NULL</span>,<span class="number">20</span>),</span><br><span class="line">(<span class="number">1005</span>,<span class="string">&#x27;李逵&#x27;</span>,<span class="number">4</span>,<span class="number">1006</span>,<span class="string">&#x27;2001-09-28&#x27;</span>,<span class="string">&#x27;12500.00&#x27;</span>,<span class="string">&#x27;14000.00&#x27;</span>,<span class="number">30</span>),</span><br><span class="line">(<span class="number">1006</span>,<span class="string">&#x27;宋江&#x27;</span>,<span class="number">2</span>,<span class="number">1009</span>,<span class="string">&#x27;2001-05-01&#x27;</span>,<span class="string">&#x27;28500.00&#x27;</span>,<span class="keyword">NULL</span>,<span class="number">30</span>),</span><br><span class="line">(<span class="number">1007</span>,<span class="string">&#x27;刘备&#x27;</span>,<span class="number">2</span>,<span class="number">1009</span>,<span class="string">&#x27;2001-09-01&#x27;</span>,<span class="string">&#x27;24500.00&#x27;</span>,<span class="keyword">NULL</span>,<span class="number">10</span>),</span><br><span class="line">(<span class="number">1008</span>,<span class="string">&#x27;猪八戒&#x27;</span>,<span class="number">4</span>,<span class="number">1004</span>,<span class="string">&#x27;2007-04-19&#x27;</span>,<span class="string">&#x27;30000.00&#x27;</span>,<span class="keyword">NULL</span>,<span class="number">20</span>),</span><br><span class="line">(<span class="number">1009</span>,<span class="string">&#x27;罗贯中&#x27;</span>,<span class="number">1</span>,<span class="keyword">NULL</span>,<span class="string">&#x27;2001-11-17&#x27;</span>,<span class="string">&#x27;50000.00&#x27;</span>,<span class="keyword">NULL</span>,<span class="number">10</span>),</span><br><span class="line">(<span class="number">1010</span>,<span class="string">&#x27;吴用&#x27;</span>,<span class="number">3</span>,<span class="number">1006</span>,<span class="string">&#x27;2001-09-08&#x27;</span>,<span class="string">&#x27;15000.00&#x27;</span>,<span class="string">&#x27;0.00&#x27;</span>,<span class="number">30</span>),</span><br><span class="line">(<span class="number">1011</span>,<span class="string">&#x27;沙僧&#x27;</span>,<span class="number">4</span>,<span class="number">1004</span>,<span class="string">&#x27;2007-05-23&#x27;</span>,<span class="string">&#x27;11000.00&#x27;</span>,<span class="keyword">NULL</span>,<span class="number">20</span>),</span><br><span class="line">(<span class="number">1012</span>,<span class="string">&#x27;李逵&#x27;</span>,<span class="number">4</span>,<span class="number">1006</span>,<span class="string">&#x27;2001-12-03&#x27;</span>,<span class="string">&#x27;9500.00&#x27;</span>,<span class="keyword">NULL</span>,<span class="number">30</span>),</span><br><span class="line">(<span class="number">1013</span>,<span class="string">&#x27;小白龙&#x27;</span>,<span class="number">4</span>,<span class="number">1004</span>,<span class="string">&#x27;2001-12-03&#x27;</span>,<span class="string">&#x27;30000.00&#x27;</span>,<span class="keyword">NULL</span>,<span class="number">20</span>),</span><br><span class="line">(<span class="number">1014</span>,<span class="string">&#x27;关羽&#x27;</span>,<span class="number">4</span>,<span class="number">1007</span>,<span class="string">&#x27;2002-01-23&#x27;</span>,<span class="string">&#x27;13000.00&#x27;</span>,<span class="keyword">NULL</span>,<span class="number">10</span>);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">-- 添加5个工资等级</span></span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> salarygrade(grade,losalary,hisalary) <span class="keyword">VALUES</span> </span><br><span class="line">(<span class="number">1</span>,<span class="number">7000</span>,<span class="number">12000</span>),</span><br><span class="line">(<span class="number">2</span>,<span class="number">12010</span>,<span class="number">14000</span>),</span><br><span class="line">(<span class="number">3</span>,<span class="number">14010</span>,<span class="number">20000</span>),</span><br><span class="line">(<span class="number">4</span>,<span class="number">20010</span>,<span class="number">30000</span>),</span><br><span class="line">(<span class="number">5</span>,<span class="number">30010</span>,<span class="number">99990</span>);</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>需求</p>
+<ol>
+<li><p>查询所有员工信息。查询员工编号，员工姓名，工资，职务名称，职务描述</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">	分析：</span></span><br><span class="line"><span class="comment">		1. 员工编号，员工姓名，工资 信息在emp 员工表中</span></span><br><span class="line"><span class="comment">		2. 职务名称，职务描述 信息在 job 职务表中</span></span><br><span class="line"><span class="comment">		3. job 职务表 和 emp 员工表 是 一对多的关系 emp.job_id = job.id</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="comment">-- 方式一 ：隐式内连接</span></span><br><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">	emp.id,</span><br><span class="line">	emp.ename,</span><br><span class="line">	emp.salary,</span><br><span class="line">	job.jname,</span><br><span class="line">	job.description</span><br><span class="line"><span class="keyword">FROM</span></span><br><span class="line">	emp,</span><br><span class="line">	job</span><br><span class="line"><span class="keyword">WHERE</span></span><br><span class="line">	emp.job_id <span class="operator">=</span> job.id;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 方式二 ：显式内连接</span></span><br><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">	emp.id,</span><br><span class="line">	emp.ename,</span><br><span class="line">	emp.salary,</span><br><span class="line">	job.jname,</span><br><span class="line">	job.description</span><br><span class="line"><span class="keyword">FROM</span></span><br><span class="line">	emp</span><br><span class="line"><span class="keyword">INNER</span> <span class="keyword">JOIN</span> job <span class="keyword">ON</span> emp.job_id <span class="operator">=</span> job.id;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>查询员工编号，员工姓名，工资，职务名称，职务描述，部门名称，部门位置</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">	分析：</span></span><br><span class="line"><span class="comment">		1. 员工编号，员工姓名，工资 信息在emp 员工表中</span></span><br><span class="line"><span class="comment">		2. 职务名称，职务描述 信息在 job 职务表中</span></span><br><span class="line"><span class="comment">		3. job 职务表 和 emp 员工表 是 一对多的关系 emp.job_id = job.id</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">		4. 部门名称，部门位置 来自于 部门表 dept</span></span><br><span class="line"><span class="comment">		5. dept 和 emp 一对多关系 dept.id = emp.dept_id</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"></span><br><span class="line"><span class="comment">-- 方式一 ：隐式内连接</span></span><br><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">	emp.id,</span><br><span class="line">	emp.ename,</span><br><span class="line">	emp.salary,</span><br><span class="line">	job.jname,</span><br><span class="line">	job.description,</span><br><span class="line">	dept.dname,</span><br><span class="line">	dept.loc</span><br><span class="line"><span class="keyword">FROM</span></span><br><span class="line">	emp,</span><br><span class="line">	job,</span><br><span class="line">	dept</span><br><span class="line"><span class="keyword">WHERE</span></span><br><span class="line">	emp.job_id <span class="operator">=</span> job.id</span><br><span class="line">	<span class="keyword">and</span> dept.id <span class="operator">=</span> emp.dept_id</span><br><span class="line">;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 方式二 ：显式内连接</span></span><br><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">	emp.id,</span><br><span class="line">	emp.ename,</span><br><span class="line">	emp.salary,</span><br><span class="line">	job.jname,</span><br><span class="line">	job.description,</span><br><span class="line">	dept.dname,</span><br><span class="line">	dept.loc</span><br><span class="line"><span class="keyword">FROM</span></span><br><span class="line">	emp</span><br><span class="line"><span class="keyword">INNER</span> <span class="keyword">JOIN</span> job <span class="keyword">ON</span> emp.job_id <span class="operator">=</span> job.id</span><br><span class="line"><span class="keyword">INNER</span> <span class="keyword">JOIN</span> dept <span class="keyword">ON</span> dept.id <span class="operator">=</span> emp.dept_id</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>查询员工姓名，工资，工资等级</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">	分析：</span></span><br><span class="line"><span class="comment">		1. 员工姓名，工资 信息在emp 员工表中</span></span><br><span class="line"><span class="comment">		2. 工资等级 信息在 salarygrade 工资等级表中</span></span><br><span class="line"><span class="comment">		3. emp.salary &gt;= salarygrade.losalary  and emp.salary &lt;= salarygrade.hisalary</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">	emp.ename,</span><br><span class="line">	emp.salary,</span><br><span class="line">	t2.<span class="operator">*</span></span><br><span class="line"><span class="keyword">FROM</span></span><br><span class="line">	emp,</span><br><span class="line">	salarygrade t2</span><br><span class="line"><span class="keyword">WHERE</span></span><br><span class="line">	emp.salary <span class="operator">&gt;=</span> t2.losalary</span><br><span class="line"><span class="keyword">AND</span> emp.salary <span class="operator">&lt;=</span> t2.hisalary</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>查询员工姓名，工资，职务名称，职务描述，部门名称，部门位置，工资等级</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">	分析：</span></span><br><span class="line"><span class="comment">		1. 员工编号，员工姓名，工资 信息在emp 员工表中</span></span><br><span class="line"><span class="comment">		2. 职务名称，职务描述 信息在 job 职务表中</span></span><br><span class="line"><span class="comment">		3. job 职务表 和 emp 员工表 是 一对多的关系 emp.job_id = job.id</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">		4. 部门名称，部门位置 来自于 部门表 dept</span></span><br><span class="line"><span class="comment">		5. dept 和 emp 一对多关系 dept.id = emp.dept_id</span></span><br><span class="line"><span class="comment">		6. 工资等级 信息在 salarygrade 工资等级表中</span></span><br><span class="line"><span class="comment">		7. emp.salary &gt;= salarygrade.losalary  and emp.salary &lt;= salarygrade.hisalary</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">	emp.id,</span><br><span class="line">	emp.ename,</span><br><span class="line">	emp.salary,</span><br><span class="line">	job.jname,</span><br><span class="line">	job.description,</span><br><span class="line">	dept.dname,</span><br><span class="line">	dept.loc,</span><br><span class="line">	t2.grade</span><br><span class="line"><span class="keyword">FROM</span></span><br><span class="line">	emp</span><br><span class="line"><span class="keyword">INNER</span> <span class="keyword">JOIN</span> job <span class="keyword">ON</span> emp.job_id <span class="operator">=</span> job.id</span><br><span class="line"><span class="keyword">INNER</span> <span class="keyword">JOIN</span> dept <span class="keyword">ON</span> dept.id <span class="operator">=</span> emp.dept_id</span><br><span class="line"><span class="keyword">INNER</span> <span class="keyword">JOIN</span> salarygrade t2 <span class="keyword">ON</span> emp.salary <span class="keyword">BETWEEN</span> t2.losalary <span class="keyword">and</span> t2.hisalary;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>查询出部门编号、部门名称、部门位置、部门人数</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">	分析：</span></span><br><span class="line"><span class="comment">		1. 部门编号、部门名称、部门位置 来自于部门 dept 表</span></span><br><span class="line"><span class="comment">		2. 部门人数: 在emp表中 按照dept_id 进行分组，然后count(*)统计数量</span></span><br><span class="line"><span class="comment">		3. 使用子查询，让部门表和分组后的表进行内连接</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="comment">-- 根据部门id分组查询每一个部门id和员工数</span></span><br><span class="line"><span class="keyword">select</span> dept_id, <span class="built_in">count</span>(<span class="operator">*</span>) <span class="keyword">from</span> emp <span class="keyword">group</span> <span class="keyword">by</span> dept_id;</span><br><span class="line"></span><br><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">	dept.id,</span><br><span class="line">	dept.dname,</span><br><span class="line">	dept.loc,</span><br><span class="line">	t1.count</span><br><span class="line"><span class="keyword">FROM</span></span><br><span class="line">	dept,</span><br><span class="line">	(</span><br><span class="line">		<span class="keyword">SELECT</span></span><br><span class="line">			dept_id,</span><br><span class="line">			<span class="built_in">count</span>(<span class="operator">*</span>) count</span><br><span class="line">		<span class="keyword">FROM</span></span><br><span class="line">			emp</span><br><span class="line">		<span class="keyword">GROUP</span> <span class="keyword">BY</span></span><br><span class="line">			dept_id</span><br><span class="line">	) t1</span><br><span class="line"><span class="keyword">WHERE</span></span><br><span class="line">	dept.id <span class="operator">=</span> t1.dept_id</span><br></pre></td></tr></table></figure></li>
+</ol>
+</li>
+</ul>
+<h2 id="4，事务"><a href="#4，事务" class="headerlink" title="4，事务"></a>4，事务</h2><h3 id="4-1-概述"><a href="#4-1-概述" class="headerlink" title="4.1  概述"></a>4.1  概述</h3><blockquote>
+<p>数据库的事务（Transaction）是一种机制、一个操作序列，包含了&#x3D;&#x3D;一组数据库操作命令&#x3D;&#x3D;。</p>
+<p>事务把所有的命令作为一个整体一起向系统提交或撤销操作请求，即这一组数据库命令&#x3D;&#x3D;要么同时成功，要么同时失败&#x3D;&#x3D;。</p>
+<p>事务是一个不可分割的工作逻辑单元。</p>
+</blockquote>
+<p>这些概念不好理解，接下来举例说明，如下图有一张表</p>
+<img src="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210724224955876.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210724224955876.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20210724224955876" style="zoom:80%;" />
+
+<p>张三和李四账户中各有100块钱，现李四需要转换500块钱给张三，具体的转账操作为</p>
+<ul>
+<li>第一步：查询李四账户余额</li>
+<li>第二步：从李四账户金额 -500</li>
+<li>第三步：给张三账户金额 +500</li>
+</ul>
+<p>现在假设在转账过程中第二步完成后出现了异常第三步没有执行，就会造成李四账户金额少了500，而张三金额并没有多500；这样的系统是有问题的。如果解决呢？使用事务可以解决上述问题</p>
+<img src="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210724225537533.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210724225537533.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20210724225537533" style="zoom:70%;" />
+
+<p>从上图可以看到在转账前开启事务，如果出现了异常回滚事务，三步正常执行就提交事务，这样就可以完美解决问题。</p>
+<h3 id="4-2-语法"><a href="#4-2-语法" class="headerlink" title="4.2  语法"></a>4.2  语法</h3><ul>
+<li><p>开启事务</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">START</span> TRANSACTION;</span><br><span class="line">或者  </span><br><span class="line"><span class="keyword">BEGIN</span>;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>提交事务</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">commit</span>;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>回滚事务</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">rollback</span>;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h3 id="4-3-代码验证"><a href="#4-3-代码验证" class="headerlink" title="4.3  代码验证"></a>4.3  代码验证</h3><ul>
+<li><p>环境准备</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">DROP</span> <span class="keyword">TABLE</span> IF <span class="keyword">EXISTS</span> account;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 创建账户表</span></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> account(</span><br><span class="line">	id <span class="type">int</span> <span class="keyword">PRIMARY</span> KEY auto_increment,</span><br><span class="line">	name <span class="type">varchar</span>(<span class="number">10</span>),</span><br><span class="line">	money <span class="keyword">double</span>(<span class="number">10</span>,<span class="number">2</span>)</span><br><span class="line">);</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 添加数据</span></span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> account(name,money) <span class="keyword">values</span>(<span class="string">&#x27;张三&#x27;</span>,<span class="number">1000</span>),(<span class="string">&#x27;李四&#x27;</span>,<span class="number">1000</span>);</span><br></pre></td></tr></table></figure>
+
+
+</li>
+<li><p>不加事务演示问题</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 转账操作</span></span><br><span class="line"><span class="comment">-- 1. 查询李四账户金额是否大于500</span></span><br><span class="line"></span><br><span class="line"><span class="comment">-- 2. 李四账户 -500</span></span><br><span class="line"><span class="keyword">UPDATE</span> account <span class="keyword">set</span> money <span class="operator">=</span> money <span class="operator">-</span> <span class="number">500</span> <span class="keyword">where</span> name <span class="operator">=</span> <span class="string">&#x27;李四&#x27;</span>;</span><br><span class="line"></span><br><span class="line">出现异常了...  <span class="comment">-- 此处不是注释，在整体执行时会出问题，后面的sql则不执行</span></span><br><span class="line"><span class="comment">-- 3. 张三账户 +500</span></span><br><span class="line"><span class="keyword">UPDATE</span> account <span class="keyword">set</span> money <span class="operator">=</span> money <span class="operator">+</span> <span class="number">500</span> <span class="keyword">where</span> name <span class="operator">=</span> <span class="string">&#x27;张三&#x27;</span>;</span><br></pre></td></tr></table></figure>
+
+<p>整体执行结果肯定会出问题，我们查询账户表中数据，发现李四账户少了500。</p>
+<img src="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210724230250263.png" class="lazyload placeholder" data-srcset="https://cdn.jsdelivr.net/gh/gaoziman/bed/img/image-20210724230250263.png" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="image-20210724230250263" style="zoom:90%;" />
+</li>
+<li><p>添加事务sql如下：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 开启事务</span></span><br><span class="line"><span class="keyword">BEGIN</span>;</span><br><span class="line"><span class="comment">-- 转账操作</span></span><br><span class="line"><span class="comment">-- 1. 查询李四账户金额是否大于500</span></span><br><span class="line"></span><br><span class="line"><span class="comment">-- 2. 李四账户 -500</span></span><br><span class="line"><span class="keyword">UPDATE</span> account <span class="keyword">set</span> money <span class="operator">=</span> money <span class="operator">-</span> <span class="number">500</span> <span class="keyword">where</span> name <span class="operator">=</span> <span class="string">&#x27;李四&#x27;</span>;</span><br><span class="line"></span><br><span class="line">出现异常了...  <span class="comment">-- 此处不是注释，在整体执行时会出问题，后面的sql则不执行</span></span><br><span class="line"><span class="comment">-- 3. 张三账户 +500</span></span><br><span class="line"><span class="keyword">UPDATE</span> account <span class="keyword">set</span> money <span class="operator">=</span> money <span class="operator">+</span> <span class="number">500</span> <span class="keyword">where</span> name <span class="operator">=</span> <span class="string">&#x27;张三&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 提交事务</span></span><br><span class="line"><span class="keyword">COMMIT</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 回滚事务</span></span><br><span class="line"><span class="keyword">ROLLBACK</span>;</span><br></pre></td></tr></table></figure>
+
+<p>上面sql中的执行成功进选择执行提交事务，而出现问题则执行回滚事务的语句。以后我们肯定不可能这样操作，而是在java中进行操作，在java中可以抓取异常，没出现异常提交事务，出现异常回滚事务。</p>
+</li>
+</ul>
+<h3 id="4-4-事务的四大特征"><a href="#4-4-事务的四大特征" class="headerlink" title="4.4  事务的四大特征"></a>4.4  事务的四大特征</h3><ul>
+<li><p>原子性（Atomicity）: 事务是不可分割的最小操作单位，要么同时成功，要么同时失败</p>
+</li>
+<li><p>一致性（Consistency） :事务完成时，必须使所有的数据都保持一致状态</p>
+</li>
+<li><p>隔离性（Isolation） :多个事务之间，操作的可见性</p>
+</li>
+<li><p>持久性（Durability） :事务一旦提交或回滚，它对数据库中的数据的改变就是永久的</p>
+</li>
+</ul>
+<blockquote>
+<p>&#x3D;&#x3D;说明：&#x3D;&#x3D;</p>
+<p>mysql中事务是自动提交的。</p>
+<p>也就是说我们不添加事务执行sql语句，语句执行完毕会自动的提交事务。</p>
+<p>可以通过下面语句查询默认提交方式：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SELECT @<span class="meta">@autocommit</span>;</span><br></pre></td></tr></table></figure>
+
+<p>查询到的结果是1 则表示自动提交，结果是0表示手动提交。当然也可以通过下面语句修改提交方式</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">set</span> @<span class="variable">@autocommit</span> <span class="operator">=</span> <span class="number">0</span>;</span><br></pre></td></tr></table></figure>
+</blockquote>
+
+      </div>
+      <div class="post-tags-categories">
+        
+        <div class="tags">
+          
+            <a href="/tags/JavaWeb/" class="">
+              JavaWeb
+            </a>
+          
+            <a href="/tags/MySQL/" class="">
+              MySQL
+            </a>
+          
+            <a href="/tags/hm/" class="">
+              hm
+            </a>
+          
+        </div>
+        
+      </div>
+      
+        <div class="copyright">
+  <ul class="post-copyright">
+    <li class="post-copyright-author">
+    <strong>author:  </strong>John Doe</a>
+    </li>
+    <li class="post-copyright-link">
+    <strong>link:  </strong>
+    <a href="/2022/05/27/mysql进阶/" target="_blank" title="hm-MySQL进阶">http://example.com/2022/05/27/mysql进阶/</a>
+    </li>
+    <li class="post-copyright-license">
+      <strong>Copyright notice:   </strong>
+      All articles on this website, unless otherwise stated, adopt <a rel="license" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" title="Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)">CC BY-NC-ND 4.0</a>
+      reprint policy. If reproduced, please indicate source!
+    </li>
+  </ul>
+<div>
+      
+    </article>
+    <!-- 上一篇文章和下一篇文章 -->
+    
+      <!-- 文章详情页的上一页和下一页 -->
+<div class="post-nav">
+
+
+
+  
+  <div class="post-nav-prev post-nav-item">
+    <div class="post-nav-img" style="background-size: cover; 
+      background-position: center center;">
+      <img class="lazyload lazyload placeholder" src="/medias/2.jpg" class="lazyload placeholder" data-srcset="/medias/2.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="">
+    </div>
+    <a href="/2022/05/27/hm-JDBC/" class="post-nav-link">
+      <div class="title">
+        <i class="fas fa-angle-left"></i> Prev:
+        <div class="title-text">hm-JDBC</div>
+      </div>
+      
+      <!-- <div class="content">
+        JDBC今日目标
+
+
+掌握JDBC的的CRUD
+理解JDBC中各个对象的作用
+掌握Druid的使用
+
+
+1，JDBC概述
+      </div> -->
+    </a>
+  </div>
+
+
+
+  
+  <div class="post-nav-next post-nav-item">
+    <div class="post-nav-img" style="background-size: cover; 
+      background-position: center center;">
+      <img class="lazyload lazyload placeholder" src="/medias/9.jpg" class="lazyload placeholder" data-srcset="/medias/9.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" src="" alt="">
+    </div>
+    <a href="/2022/05/27/mysql%E5%9F%BA%E7%A1%80/" class="post-nav-link">
+      <div class="title">
+        Next: <i class="fas fa-angle-right"></i>
+        <div class="title-text">hm-MySQL基础</div>
+      </div>
+      <!-- <div class="content">
+        MySQL基础今日目标：
+
+
+完成MySQL的安装及登陆基本操作
+能通过SQL对数据库进行CRUD
+能通过SQL对表进行
+      </div> -->
+    </a>
+  </div>
+
+</div>
+
+    
+    
+
+    <!-- 打赏 -->
+    
+      <div id="appDonate" class="post-donate">
+  <div id="donate_board" class="donate_bar center" ref="donate">
+    <a id="btn_donate" class="btn_donate" href="javascript:;" title="打赏" @click="showDialogDrawer()"></a>
+  </div>
+  <transition name="fade">
+    <div 
+      class="donate-box-mask"
+      v-cloak 
+      v-show="visible"
+      @click="cancelDialogDrawer()"
+    >
+    </div>
+  </transition>
+  <transition name="bounce">
+    <div class="donate-box" v-cloak v-show="visible">
+      <div class="donate-box_close">
+        <i class="fas fa-times" aria-hidden="true" @click="cancelDialogDrawer" pointer></i>
+      </div>
+      <div class="donate-box_title">
+        <h4>
+          你的赏识是我前进的动力
+        </h4>
+      </div>
+      <div class="donate-box_tab">
+        <div class="Alipay" pointer :class="{'active': tabActive === 'Alipay'}" @click="changeTabActive('Alipay')">
+          支付宝
+        </div>
+        <div class="WeChatpay" pointer :class="{'active': tabActive === 'WeChatpay'}" @click="changeTabActive('WeChatpay')">
+          微信
+        </div>
+      </div>
+      <div class="donate-box_img">
+        <div class="AlipayImg" v-show="tabActive === 'Alipay'">
+          <img src="/medias/1.jpg" class="lazyload placeholder" data-srcset="/medias/1.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="支付宝打赏" />
+        </div> 
+        <div class="WeChatpayImg" v-show="tabActive === 'WeChatpay'">
+          <img src="/medias/2.jpg" class="lazyload placeholder" data-srcset="/medias/2.jpg" srcset="https://pic1.zhimg.com/v2-cd38920285d125be80b3eb504052c550_b.webp" alt="微信打赏" />
+        </div>
+      </div>
+    </div>
+  </transition>
+</div>
+
+<script>
+  var body = document.body || document.documentElement || window;
+  var vm = new Vue({
+    el: '#appDonate',
+    data: {
+      visible: false,
+      tabActive: 'Alipay',
+      top: 0,
+    },
+    computed: {
+    },
+    mounted() {
+    },
+    methods: {
+      showDialogDrawer() {
+        this.visible = true;
+        // 防止页面滚动，只能让弹框滚动
+        // function getScroll() {
+        //   return {
+        //     left: window.pageXOffset || document.documentElement.scrollLeft || document.body.scrollLeft || 0,
+        //     top: window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0
+        //   };
+        // }
+        this.top = $(document).scrollTop() // or getScroll().top
+        // console.log('aa', $('.main-content'));
+        body.style.cssText = 'overflow: hidden;';
+      },
+      cancelDialogDrawer() {
+        this.visible = false;
+        body.removeAttribute('style');
+        $(document).scrollTop(this.top)
+      },
+      changeTabActive(name) {
+        this.tabActive = name;
+      }
+    },
+    created() {}
+  })
+</script>
+    
+
+    <!-- 分享 -->
+    
+      <!-- https://github.com/overtrue/share.js -->
+<!-- 文章详情页的分享 -->
+<div class="social-share" data-sites="twitter,facebook,google,qq,qzone,wechat,weibo,douban,linkedin" data-wechat-qrcode-helper="<p>微信扫一扫即可分享！</p>"></div>
+
+<script src="/js/shareJs/social-share.min.js"></script>
+</script>
+
+<style>
+  .social-share {
+    margin: 20px 0;
+  }
+</style>
+
+
+    
+    
+    <!-- 评论 -->
+    <!-- 评论 -->
+
+  <div id="myComment">
+    
+      <div id="gitment-container"></div>
+
+    
+  </div>
+
+<!-- comment script in themes\hexo-theme-bamboo\layout\_partial\scripts\index.ejs -->
+
+
+  </div>
+
+  <!-- 目录 -->
+  <!-- 文章详情页右侧目录 -->
+
+  <div class="toc-aside">
+    <div class="toc-main">
+      <div class="toc-aside-title">
+        <i class="fas fa-list-ul" aria-hidden="true"></i><span>catalog</span>
+        
+          <div class="toc-open-close">catalog</div>
+        
+      </div>
+      <div class="toc-content">
+        <div class="toc"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 手机端目录按钮 -->
+  <div id="toc-mobile-btn">
+    <i class="fas fa-list-ul" aria-hidden="true"></i>
+  </div>
+
+
+<script>
+  function closeToc(init) {
+    $(".toc-aside").css({'width': 0, 'padding': 0, 'transition': init ?  'noe' : 'width 0.3s' });
+    $(".toc-content").css({'width': 0});
+    $(".toc-aside-title span, .toc-aside-title i").css({'display': 'none'});
+    $(".main-content").css({'width': '75%', 'margin-left': 'auto', 'margin-right': 'auto',});
+  };
+  function openToc() {
+    $(".main-content").css({'width': '65%', 'margin-right': '10px', 'margin-left': 'calc(35% - 350px)'});
+    $(".toc-aside").css({'width': '300px', 'padding': '0 10px', 'transition': 'width 0.3s'});
+    $(".toc-content").css({'width': '300px'});
+    $(".toc-aside-title span, .toc-aside-title i").css({'display': 'inline-block'});
+  }
+  function openBtnClickFn () {
+    let openOrCloseBtn = $('.toc-aside .toc-aside-title .toc-open-close');
+    let open = eval('' || 'true');
+    openOrCloseBtn.click(function() {
+      if (open) {
+        closeToc();
+        open = false;
+      } else {
+        openToc();
+        open = true;
+      }
+    });
+  };
+  openBtnClickFn();
+  initCloseTocWidth(true);
+
+  function initCloseTocWidth(init) {
+    if (window.innerWidth >= 992) {
+      let isClose = false;
+      isClose && closeToc(init)
+    }
+  }
+
+  document.addEventListener('pjax:complete', function () {
+    $(".toc-aside").css({'transition': 'no'});
+  })
+  document.addEventListener('pjax:complete', function () {
+    openBtnClickFn();
+  })
+  
+</script>
+
+  <!-- 图片放大 Wrap images with fancybox support -->
+  <script src="/js/wrapImage.js"></script>
+</div>
+
+<!-- 文章详情页背景图 -->
+<div id="appBgSwiper" style="position: fixed;left: 0;top: 0;width: 100%;height: 100%;z-index: -2;"
+	:style="{'background-color': bgColor ? bgColor : 'transparent'}">
+	<transition-group tag="ul" :name="names">
+		<li v-for='(image,index) in img' :key='index' v-show="index === mark" class="bg-swiper-box">
+			<img :src="image" class="bg-swiper-img no-lazy">
+		</li>
+	</transition-group>
+</div>
+<script>
+	var vm = new Vue({
+		el: '#appBgSwiper',
+		data: {
+			names: '' || 'fade' || 'fade', // translate-fade fade
+			mark: 0,
+			img: [],
+			bgColor: '',
+			time: null
+		},
+		methods: {   //添加方法
+			change(i, m) {
+				if (i > m) {
+					// this.names = 'fade';
+				} else if (i < m) {
+					// this.names = 'fade';
+				} else {
+					return;
+				}
+				this.mark = i;
+			},
+			prev() {
+				// this.names = 'fade';
+				this.mark--;
+				if (this.mark === -1) {
+					this.mark = 3;
+					return
+				}
+			},
+			next() {
+				// this.names = 'fade';
+				this.mark++;
+				if (this.mark === this.img.length) {
+					this.mark = 0;
+					return
+				}
+			},
+			autoPlay() {
+				// this.names = 'fade';
+				this.mark++;
+				if (this.mark === this.img.length) {
+					this.mark = 0;
+					return
+				}
+			},
+			play() {
+				let bgImgDelay = '' || '180000'
+				let delay = parseInt(bgImgDelay) || 180000;
+				this.time = setInterval(this.autoPlay, delay);
+			},
+			enter() {
+				clearInterval(this.time);
+			},
+			leave() {
+				this.play();
+			}
+		},
+		created() {
+			this.play()
+		},
+		beforeDestroy() {
+			clearInterval(this.time);
+		},
+		mounted() {
+			let prop = '' || '';
+			let isImg = prop.includes('.bmp') || prop.includes('.jpg') || prop.includes('.png') || prop.includes('.tif') || prop.includes('.gif') || prop.includes('.pcx') || prop.includes('.tga') || prop.includes('.exif') || prop.includes('.fpx') || prop.includes('.psd') || prop.includes('.cdr') || prop.includes('.pcd') || prop.includes('.dxf') || prop.includes('.ufo') || prop.includes('.eps') || prop.includes('.ai') || prop.includes('.raw') || prop.includes('.WMF') || prop.includes('.webp') || prop.includes('.jpeg') || prop.includes('http://') || prop.includes('https://')
+			if (isImg) {
+				let img = prop.split(',');
+				let configRoot = '/'
+				let arrImg = [];
+				img.forEach(el => {
+					var Expression = /http(s)?:\/\/([\w-]+\.)+[\w-]+(\/[\w- .\/?%&=]*)?/;
+					var objExp = new RegExp(Expression);
+
+					if (objExp.test(el)) {
+						// http or https
+						arrImg.push(el);
+					} else {
+						// 非http or https开头
+						// 本地文件
+						let firstStr = el.charAt(0);
+						if (firstStr == '/') {
+							el = el.substr(1); // 删除第一个字符 '/',因为 configRoot最后一个字符为 /
+						}
+						el = configRoot + el;
+						arrImg.push(el);
+					}
+				})
+				this.img = arrImg;
+			} else {
+				this.bgColor = prop;
+			}
+		}
+	})
+</script>
+
+<style>
+	.bg-swiper-box {
+		position: absolute;
+		display: block;
+		width: 100%;
+		height: 100%;
+	}
+
+	.bg-swiper-img {
+		object-fit: cover;
+		width: 100%;
+		height: 100%;
+	}
+</style>
+
+
+
+
+  <script>
+  function loadMermaid() {
+    if (document.getElementsByClassName('mermaid').length) {
+      if (window.mermaidJsLoad) mermaid.init()
+      else {
+        loadScript('https://unpkg.com/mermaid/dist/mermaid.min.js').then(() => {
+          window.mermaidJsLoad = true
+          mermaid.initialize({
+            theme: 'default',
+          })
+          if ('true') {
+            mermaid.init();
+          }
+        })
+      }
+    }
+  };
+  document.addEventListener("DOMContentLoaded", function () {
+    loadMermaid();
+  })
+
+  document.addEventListener('pjax:complete', function () {
+    loadMermaid();
+  })
+  
+</script>
+
+
+      </main>
+    </div>
+
+    <!-- 页脚 -->
+    
+  
+  
+    <!-- 底部鱼儿跳动效果，依赖于jquery-->
+<div id="j-fish-skip" style=" position: relative;height: 153px;width: auto;"></div>
+<script>
+  var RENDERER = {
+    POINT_INTERVAL: 5,
+    FISH_COUNT: 3,
+    MAX_INTERVAL_COUNT: 50,
+    INIT_HEIGHT_RATE: .5,
+    THRESHOLD: 50,
+    FISH_COLOR: '',
+    init: function () {
+      this.setFishColor(); this.setParameters(), this.reconstructMethods(), this.setup(), this.bindEvent(), this.render()
+    },
+    setFishColor: function () {
+      let isDark = JSON.parse(localStorage.getItem('dark')) || JSON.parse('false');
+      if (isDark) {
+        this.FISH_COLOR = '#222'; // 暗黑色，有时间把这整成一个变量
+      } else {
+        this.FISH_COLOR = '' || '#42b983';
+      }
+    },
+    setParameters: function () {
+      this.$window = $(window), this.$container = $("#j-fish-skip"), this.$canvas = $("<canvas />"), this.context = this.$canvas.appendTo(this.$container).get(0).getContext("2d"), this.points = [], this.fishes = [], this.watchIds = []
+    },
+    createSurfacePoints: function () {
+      var t = Math.round(this.width / this.POINT_INTERVAL);
+      this.pointInterval = this.width / (t - 1), this.points.push(new SURFACE_POINT(this, 0));
+      for (var i = 1; i < t; i++) {
+        var e = new SURFACE_POINT(this, i * this.pointInterval),
+          h = this.points[i - 1];
+        e.setPreviousPoint(h), h.setNextPoint(e), this.points.push(e)
+      }
+    },
+    reconstructMethods: function () {
+      this.watchWindowSize = this.watchWindowSize.bind(this), this.jdugeToStopResize = this.jdugeToStopResize.bind(this), this.startEpicenter = this.startEpicenter.bind(this), this.moveEpicenter = this.moveEpicenter.bind(this), this.reverseVertical = this.reverseVertical.bind(this), this.render = this.render.bind(this)
+    },
+    setup: function () {
+      this.points.length = 0, this.fishes.length = 0, this.watchIds.length = 0, this.intervalCount = this.MAX_INTERVAL_COUNT, this.width = this.$container.width(), this.height = this.$container.height(), this.fishCount = this.FISH_COUNT * this.width / 500 * this.height / 500, this.$canvas.attr({
+        width: this.width,
+        height: this.height
+      }), this.reverse = !1, this.fishes.push(new FISH(this)), this.createSurfacePoints()
+    },
+    watchWindowSize: function () {
+      this.clearTimer(), this.tmpWidth = this.$window.width(), this.tmpHeight = this.$window.height(), this.watchIds.push(setTimeout(this.jdugeToStopResize, this.WATCH_INTERVAL))
+    },
+    clearTimer: function () {
+      for (; this.watchIds.length > 0;) clearTimeout(this.watchIds.pop())
+    },
+    jdugeToStopResize: function () {
+      var t = this.$window.width(),
+        i = this.$window.height(),
+        e = t == this.tmpWidth && i == this.tmpHeight;
+      this.tmpWidth = t, this.tmpHeight = i, e && this.setup()
+    },
+    bindEvent: function () {
+      this.$window.on("resize", this.watchWindowSize), this.$container.on("mouseenter", this.startEpicenter), this.$container.on("mousemove", this.moveEpicenter)
+    },
+    getAxis: function (t) {
+      var i = this.$container.offset();
+      return {
+        x: t.clientX - i.left + this.$window.scrollLeft(),
+        y: t.clientY - i.top + this.$window.scrollTop()
+      }
+    },
+    startEpicenter: function (t) {
+      this.axis = this.getAxis(t)
+    },
+    moveEpicenter: function (t) {
+      var i = this.getAxis(t);
+      this.axis || (this.axis = i), this.generateEpicenter(i.x, i.y, i.y - this.axis.y), this.axis = i
+    },
+    generateEpicenter: function (t, i, e) {
+      if (!(i < this.height / 2 - this.THRESHOLD || i > this.height / 2 + this.THRESHOLD)) {
+        var h = Math.round(t / this.pointInterval);
+        h < 0 || h >= this.points.length || this.points[h].interfere(i, e)
+      }
+    },
+    reverseVertical: function () {
+      this.reverse = !this.reverse;
+      for (var t = 0, i = this.fishes.length; t < i; t++) this.fishes[t].reverseVertical()
+    },
+    controlStatus: function () {
+      for (var t = 0, i = this.points.length; t < i; t++) this.points[t].updateSelf();
+      for (t = 0, i = this.points.length; t < i; t++) this.points[t].updateNeighbors();
+      this.fishes.length < this.fishCount && 0 == --this.intervalCount && (this.intervalCount = this.MAX_INTERVAL_COUNT, this.fishes.push(new FISH(this)))
+    },
+    render: function () {
+      requestAnimationFrame(this.render), this.controlStatus(), this.context.clearRect(0, 0, this.width, this.height), this.context.fillStyle = this.FISH_COLOR;
+      for (var t = 0, i = this.fishes.length; t < i; t++) this.fishes[t].render(this.context);
+      this.context.save(), this.context.globalCompositeOperation = "xor", this.context.beginPath(), this.context.moveTo(0, this.reverse ? 0 : this.height);
+      for (t = 0, i = this.points.length; t < i; t++) this.points[t].render(this.context);
+      this.context.lineTo(this.width, this.reverse ? 0 : this.height), this.context.closePath(), this.context.fill(), this.context.restore()
+    }
+  },
+  SURFACE_POINT = function (t, i) {
+    this.renderer = t, this.x = i, this.init()
+  };
+  SURFACE_POINT.prototype = {
+    SPRING_CONSTANT: .03,
+    SPRING_FRICTION: .9,
+    WAVE_SPREAD: .3,
+    ACCELARATION_RATE: .01,
+    init: function () {
+      this.initHeight = this.renderer.height * this.renderer.INIT_HEIGHT_RATE, this.height = this.initHeight, this.fy = 0, this.force = {
+        previous: 0,
+        next: 0
+      }
+    },
+    setPreviousPoint: function (t) {
+      this.previous = t
+    },
+    setNextPoint: function (t) {
+      this.next = t
+    },
+    interfere: function (t, i) {
+      this.fy = this.renderer.height * this.ACCELARATION_RATE * (this.renderer.height - this.height - t >= 0 ? -1 : 1) * Math.abs(i)
+    },
+    updateSelf: function () {
+      this.fy += this.SPRING_CONSTANT * (this.initHeight - this.height), this.fy *= this.SPRING_FRICTION, this.height += this.fy
+    },
+    updateNeighbors: function () {
+      this.previous && (this.force.previous = this.WAVE_SPREAD * (this.height - this.previous.height)), this.next && (this.force.next = this.WAVE_SPREAD * (this.height - this.next.height))
+    },
+    render: function (t) {
+      this.previous && (this.previous.height += this.force.previous, this.previous.fy += this.force.previous), this.next && (this.next.height += this.force.next, this.next.fy += this.force.next), t.lineTo(this.x, this.renderer.height - this.height)
+    }
+  };
+  var FISH = function (t) {
+    this.renderer = t, this.init()
+  };
+  FISH.prototype = {
+    GRAVITY: .4,
+    init: function () {
+      this.direction = Math.random() < .5, this.x = this.direction ? this.renderer.width + this.renderer.THRESHOLD : -this.renderer.THRESHOLD, this.previousY = this.y, this.vx = this.getRandomValue(4, 10) * (this.direction ? -1 : 1), this.renderer.reverse ? (this.y = this.getRandomValue(1 * this.renderer.height / 10, 4 * this.renderer.height / 10), this.vy = this.getRandomValue(2, 5), this.ay = this.getRandomValue(.05, .2)) : (this.y = this.getRandomValue(6 * this.renderer.height / 10, 9 * this.renderer.height / 10), this.vy = this.getRandomValue(-5, -2), this.ay = this.getRandomValue(-.2, -.05)), this.isOut = !1, this.theta = 0, this.phi = 0
+    },
+    getRandomValue: function (t, i) {
+      return t + (i - t) * Math.random()
+    },
+    reverseVertical: function () {
+      this.isOut = !this.isOut, this.ay *= -1
+    },
+    controlStatus: function (t) {
+      this.previousY = this.y, this.x += this.vx, this.y += this.vy, this.vy += this.ay, this.renderer.reverse ? this.y > this.renderer.height * this.renderer.INIT_HEIGHT_RATE ? (this.vy -= this.GRAVITY, this.isOut = !0) : (this.isOut && (this.ay = this.getRandomValue(.05, .2)), this.isOut = !1) : this.y < this.renderer.height * this.renderer.INIT_HEIGHT_RATE ? (this.vy += this.GRAVITY, this.isOut = !0) : (this.isOut && (this.ay = this.getRandomValue(-.2, -.05)), this.isOut = !1), this.isOut || (this.theta += Math.PI / 20, this.theta %= 2 * Math.PI, this.phi += Math.PI / 30, this.phi %= 2 * Math.PI), this.renderer.generateEpicenter(this.x + (this.direction ? -1 : 1) * this.renderer.THRESHOLD, this.y, this.y - this.previousY), (this.vx > 0 && this.x > this.renderer.width + this.renderer.THRESHOLD || this.vx < 0 && this.x < -this.renderer.THRESHOLD) && this.init()
+    },
+    render: function (t) {
+      t.save(), t.translate(this.x, this.y), t.rotate(Math.PI + Math.atan2(this.vy, this.vx)), t.scale(1, this.direction ? 1 : -1), t.beginPath(), t.moveTo(-30, 0), t.bezierCurveTo(-20, 15, 15, 10, 40, 0), t.bezierCurveTo(15, -10, -20, -15, -30, 0), t.fill(), t.save(), t.translate(40, 0), t.scale(.9 + .2 * Math.sin(this.theta), 1), t.beginPath(), t.moveTo(0, 0), t.quadraticCurveTo(5, 10, 20, 8), t.quadraticCurveTo(12, 5, 10, 0), t.quadraticCurveTo(12, -5, 20, -8), t.quadraticCurveTo(5, -10, 0, 0), t.fill(), t.restore(), t.save(), t.translate(-3, 0), t.rotate((Math.PI / 3 + Math.PI / 10 * Math.sin(this.phi)) * (this.renderer.reverse ? -1 : 1)), t.beginPath(), this.renderer.reverse ? (t.moveTo(5, 0), t.bezierCurveTo(10, 10, 10, 30, 0, 40), t.bezierCurveTo(-12, 25, -8, 10, 0, 0)) : (t.moveTo(-5, 0), t.bezierCurveTo(-10, -10, -10, -30, 0, -40), t.bezierCurveTo(12, -25, 8, -10, 0, 0)), t.closePath(), t.fill(), t.restore(), t.restore(), this.controlStatus(t)
+    }
+  }, $(function () {
+    RENDERER.init()
+    $('.dark').click(function () {
+      setTimeout(() => {
+        RENDERER.setFishColor();
+        RENDERER.context.fill();
+      });
+    })
+  });
+</script>
+  
+  <div class="footer bg-color">
+    <div class="footer-main">
+      
+        
+          <div class="link">
+            
+          </div>
+        
+      
+        
+          <div class="footer-copyright">
+            <p>Copyright © 2019 - 2020 <a target="_blank" rel="noopener" href="https://github.com/yuang01">yuang01</a> | Powered by <a target="_blank" rel="noopener" href="https://hexo.io/zh-cn/docs/">Hexo</a> | Theme <a target="_blank" rel="noopener" href="https://github.com/yuang01/theme">Bamboo</a> </p>
+
+          </div>
+        
+      
+        
+          
+            <!-- 不蒜子统计 -->
+            <!-- 不蒜子统计 -->
+<span id="busuanzi_container_site_pv">
+      <i class="fas fa-eye" aria-hidden="true"></i>Total visits：<span id="busuanzi_value_site_pv"></span> times
+</span>
+<span class="post-meta-divider">|</span>
+<span id="busuanzi_container_site_uv" style='display:none'>
+      <i class="fas fa-users" aria-hidden="true"></i>Number of visitors：<span id="busuanzi_value_site_uv"></span> people
+</span>
+
+          
+        
+      
+        
+          <div class="footer-custom">
+            
+          </div>
+        
+      
+    </div>
+  </div>
+
+
+
+    <!-- 渲染暗黑按钮 -->
+    
+      <div class="dark">
+  <div class="dark-content">
+    <i class="fas fa-moon" aria-hidden="true"></i>
+    <!-- <span>关灯</span> -->
+  </div>
+  
+</div>
+
+<script>
+  $(function() {
+    let isDark = JSON.parse(localStorage.getItem('dark'))  || JSON.parse('false');
+    if (isDark) {
+      $(".dark-content").replaceWith(
+          `
+          <div class='dark-content'>
+            <i class="fas fa-lightbulb" aria-hidden="true"></i>
+          </div>
+          `
+        );
+    }
+    $('.dark').click(function() {
+      if ($(document.body).is('.darkModel')) {
+        $(document.body).removeClass('darkModel');
+        localStorage.setItem('dark', false);
+        $(".dark-content").replaceWith(
+          `
+          <div class='dark-content'>
+            <i class="fas fa-moon" aria-hidden="true"></i>
+          </div>
+          `
+        );
+      } else {
+        $(document.body).addClass('darkModel');
+        localStorage.setItem('dark', true);
+        $(".dark-content").replaceWith(
+          `
+          <div class='dark-content'>
+            <i class="fas fa-lightbulb" aria-hidden="true"></i>
+          </div>
+          `
+        );
+      }
+    })
+  })
+</script>
+    
+    <!-- 渲染回到顶部按钮 -->
+    
+      <div class="goTop top-btn-color" pointer>
+  <i class="fas fa-arrow-up" aria-hidden="true"></i>
+</div>
+<script src="/js/goTop.js"></script>
+
+    
+    <!-- 渲染左下角音乐播放器 -->
+    
+      <link rel="stylesheet" href="/js/aplayer/APlayer@1.10.1.min.css">
+<style>
+.aplayer .aplayer-lrc p {
+  
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 16px !important;
+}
+
+.aplayer .aplayer-lrc p.aplayer-lrc-current {
+  
+  font-size: 15px;
+  color: #42b983;
+}
+
+
+.aplayer.aplayer-fixed.aplayer-narrow .aplayer-body {
+  left: -66px !important;
+}
+
+.aplayer.aplayer-fixed.aplayer-narrow .aplayer-body:hover {
+  left: 0px !important;
+}
+
+
+</style>
+<meting-js  
+  class=""
+  server="tencent"
+  type="playlist"
+  id="8062553743"
+  fixed='true'
+  autoplay='false'
+  theme='#42b983'
+  loop='all'
+  order='random'
+  preload='auto'
+  volume='0.7'
+  list-folded='true'
+>
+</meting-js>
+
+<!-- <style>
+  #aplayer {
+    position: fixed;
+    left: 0;
+    bottom: 300px;
+  }
+</style> -->
+<script src="https://unpkg.com/aplayer@1.10.1/dist/APlayer.min.js"></script>
+<script src="https://unpkg.com/meting@2/dist/Meting.min.js"></script>
+    
+
+    <!-- 图片放大 -->
+    
+      <script src="/js/fancybox/jquery.fancybox.min.js"></script>
+    
+
+    <!-- 百度解析 -->
+    <!-- Baidu Analytics -->
+
+    <!-- Baidu Push -->
+
+<script>
+    (function () {
+        var bp = document.createElement('script');
+        var curProtocol = window.location.protocol.split(':')[0];
+        if (curProtocol === 'https') {
+            bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+        } else {
+            bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+        }
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(bp, s);
+    })();
+</script>
+
+    
+    <!-- 背景彩带 -->
+    
+      <script type="text/javascript" size="100" alpha='0.4' zIndex="-1" src="/js/ribbon.min.js"></script>
+    
+
+    <script src="/js/utils/index.js"></script>
+    <script src="/js/app.js"></script>
+    
+    <!-- 文章目录所需js -->
+<link href="/js/tocbot/tocbot.css" rel="stylesheet">
+<script src="/js/tocbot/tocbot.min.js"></script>
+
+<script>
+  var headerEl = 'h2, h3, h4',  //headers 
+    content = '.post-detail',//文章容器
+    idArr = {};  //标题数组以确定是否增加索引id
+  //add #id
+  var option = {
+    // Where to render the table of contents.
+    tocSelector: '.toc',
+    // Where to grab the headings to build the table of contents.
+    contentSelector: content,
+    // Which headings to grab inside of the contentSelector element.
+    headingSelector: headerEl,
+    scrollSmooth: true,
+    scrollSmoothOffset: -80,
+    headingsOffset: -($(window).height() * 0.4 - 45),
+    positionFixedSelector: '.toc-main',
+    positionFixedClass: 'is-position-fixed',
+    fixedSidebarOffset: 'auto',
+    activeLinkClass: 'is-active-link',
+    // onClick: function (e) {},
+  }
+  if ($('.toc').length > 0) {
+
+    $(content).children(headerEl).each(function () {
+      //去除空格以及多余标点
+      var headerId = $(this).text().replace(/[\s|\~|`|\!|\@|\#|\$|\%|\^|\&|\*|\(|\)|\_|\+|\=|\||\|\[|\]|\{|\}|\;|\:|\"|\'|\,|\<|\.|\>|\/|\?|\：|\，|\。]/g, '');
+
+      headerId = headerId.toLowerCase();
+      if (idArr[headerId]) {
+        //id已经存在
+        $(this).attr('id', headerId + '-' + idArr[headerId]);
+        idArr[headerId]++;
+      }
+      else {
+        //id未存在
+        idArr[headerId] = 1;
+        $(this).attr('id', headerId);
+      }
+    });
+
+    document.addEventListener("DOMContentLoaded", function () {
+      tocbot.init(option);
+      mobileTocClick();
+    });
+
+  }
+
+  window.tocScrollFn = function () {
+    return bamboo.throttle(function () {
+      findHeadPosition();
+    }, 100)()
+  }
+  window.addEventListener('scroll', tocScrollFn);
+
+  const findHeadPosition = function (top) {
+    if ($('.toc-list').length <= 0) {
+      return false;
+    }
+    setTimeout(() => {  // or DOMContentLoaded 
+      autoScrollToc();
+    }, 0);
+  }
+
+  const autoScrollToc = function () {
+    const $activeItem = document.querySelector('.is-active-link');
+    const $cardToc = document.querySelector('.toc-content');
+    const activePosition = $activeItem.getBoundingClientRect().top
+    const sidebarScrollTop = $cardToc.scrollTop
+    if (activePosition > (document.documentElement.clientHeight - 100)) {
+      $cardToc.scrollTop = sidebarScrollTop + 150
+    }
+    if (activePosition < 100) {
+      $cardToc.scrollTop = sidebarScrollTop - 150
+    }
+  }
+
+  document.addEventListener('pjax:send', function () {
+    if ($('.toc').length) {
+      tocbot.destroy();
+    }
+  });
+
+  document.addEventListener('pjax:complete', function () {
+    if ($('.toc').length) {
+      tocbot.init(option);
+      mobileTocClick();
+    }
+  });
+  
+  // 手机端toc按钮点击出现目录
+  const mobileTocClick = function () {
+    const $cardTocLayout = document.getElementsByClassName('toc-aside')[0];
+    const $cardToc = $cardTocLayout.getElementsByClassName('toc-content')[0];
+    let right = '45px';
+    if (window.innerWidth >= 551 && window.innerWidth <= 992) {
+      right = '100px'
+    }
+    const mobileToc = {
+      open: () => {
+        $cardTocLayout.style.cssText = 'animation: toc-open .3s; opacity: 1; right: ' + right
+      },
+
+      close: () => {
+        $cardTocLayout.style.animation = 'toc-close .2s'
+        setTimeout(() => {
+          $cardTocLayout.style.cssText = "opacity:''; animation: ''; right: ''"
+        }, 100)
+      }
+    }
+    document.getElementById('toc-mobile-btn').addEventListener('click', () => {
+      if (window.getComputedStyle($cardTocLayout).getPropertyValue('opacity') === '0') mobileToc.open()
+      else mobileToc.close()
+    })
+
+    $cardToc.addEventListener('click', (e) => {
+      if (window.innerWidth < 992) { // 小于992px的时候
+        mobileToc.close()
+      }
+    })
+  }
+</script>
+
+<style>
+  .is-position-fixed {
+    position: sticky !important;
+    top: 74px;
+  }
+
+  .toc-main ul {
+    counter-reset: show-list;
+  }
+
+  .toc-main ul li::before {
+    content: counter(item)".";
+    display: block;
+    position: absolute;
+    left: 12px;
+    top: 0;
+  }
+</style> 
+
+<!-- 设置导航背景 -->
+<script>
+  let setHeaderClass = () => {
+    const headerMenuTransparent = true;
+    if (!headerMenuTransparent) { return; }
+    const nav = $('#navHeader');
+    const navTop = nav.outerHeight();
+    const winTop = $(window).scrollTop();
+    if(winTop > navTop) {
+      nav.addClass('header-bg-color');
+    }
+    else {
+      nav.removeClass('header-bg-color');
+    }
+  };
+
+  let scrollCollect = () => {
+    return bamboo.throttle(function (e) {
+      setHeaderClass();
+    }, 200)()
+  }
+
+  let initHeaderBg = () => {
+    setHeaderClass();
+  }
+
+  setHeaderClass();
+  window.addEventListener('scroll', scrollCollect);
+
+  document.addEventListener('pjax:send', function () {
+    window.removeEventListener('scroll', scrollCollect)
+  })
+  document.addEventListener('pjax:complete', function () {
+    window.addEventListener('scroll', scrollCollect);
+    setHeaderClass();
+  })
+</script> 
+
+<!-- 渲染issues标签里的内容 -->
+<script>
+  function loadIssuesJS() {
+    if ($(".post-detail").find(".issues-api").length == 0) {
+      return;
+    } 
+    loadScript('/js/issues/index.js');
+  };
+  $(function () {
+    loadIssuesJS();
+  });
+  document.addEventListener('pjax:complete', function () {
+    if (typeof IssuesAPI == "undefined") {
+      loadIssuesJS();
+    }
+  })
+</script>
+
+<!-- 输入框打字特效 -->
+<!-- 输入框打字特效 -->
+
+  <script src="/js/activate-power-mode.js"></script>
+  <script>
+    POWERMODE.colorful = true;  // 打开随机颜色特效
+    POWERMODE.shake = false;    // 关闭输入框抖动
+    document.body.addEventListener('input', POWERMODE);//监听打字事件
+  </script>
+
+
+<!-- markdown代码一键复制功能 -->
+
+  <link rel="stylesheet" href="https://unpkg.com/v-plugs-ayu/lib/ayu.css">
+  <script src="https://unpkg.com/v-plugs-ayu/lib/ayu.umd.min.js"></script>
+  <script src="/js/clipboard/clipboard.min.js"></script>
+  <div id="appCopy">
+  </div>
+  <script data-pjax>
+    var vm = new Vue({
+      el: '#appCopy',
+      data: {
+      },
+      computed: {
+      },
+      mounted() {
+        const that = this;
+        var copy = 'copy';
+        /* code */
+        var initCopyCode = function () {
+          var copyHtml = '';
+          copyHtml += '<button class="btn-copy" data-clipboard-snippet="" style="position:absolute;top:0;right:0;z-index:1;">';
+          copyHtml += '<i class="fas fa-copy"></i><span>' + copy + '</span>';
+          copyHtml += '</button>';
+          $(".post-detail pre").not('.gutter pre').wrap("<div class='codeBox' style='position:relative;width:100%;'></div>")
+          $(".post-detail pre").not('.gutter pre').before(copyHtml);
+          new ClipboardJS('.btn-copy', {
+            target: function (trigger) {
+              return trigger.nextElementSibling;
+            }
+          });
+        }
+        initCopyCode();
+        $('.btn-copy').unbind('click').bind('click', function () {
+          doSomething();
+        })
+        $(document).unbind('keypress').bind('keypress', function (e) {
+          if (e.ctrlKey && e.keyCode == 67) {
+            doSomething();
+          }
+        })
+
+        function doSomething() {
+          that.$notify({
+            title: "成功",
+            content: "代码已复制，请遵守相关授权协议。",
+            type: 'success'
+          })
+        }
+      },
+      methods: {
+      },
+      created() { }
+    })
+  </script>
+  
+
+<!-- 图片懒加载 -->
+<script defer src="https://unpkg.com/vanilla-lazyload@17.1.0/dist/lazyload.min.js"></script>
+<script>
+  // https://www.npmjs.com/package/vanilla-lazyload
+  // Set the options globally
+  // to make LazyLoad self-initialize
+  window.lazyLoadOptions = {
+    elements_selector: ".lazyload",
+    threshold: 0
+  };
+  // Listen to the initialization event
+  // and get the instance of LazyLoad
+  window.addEventListener(
+    "LazyLoad::Initialized",
+    function (event) {
+      window.lazyLoadInstance = event.detail.instance;
+    },
+    false
+  );
+  document.addEventListener('DOMContentLoaded', function () {
+    lazyLoadInstance.update();
+  });
+  document.addEventListener('pjax:complete', function () {
+    lazyLoadInstance.update();
+  });
+</script>
+
+
+<!-- 卡片滚动动画 -->
+   
+
+<!-- 评论所需js -->
+
+  
+    <script type="text/javascript">
+  var utteranceCommon = {};
+
+  function check_utterance() {
+    let isDark = JSON.parse(localStorage.getItem('dark')) || JSON.parse('false');
+    if (isDark) {
+      utteranceCommon.Theme = 'github-dark';
+    } else {
+      utteranceCommon.Theme = 'github-light';
+    }
+
+    return document.getElementById("gitment-container");
+  }
+  comment_el = '#gitment-container';
+  load_utterance = function () {
+    if ($(comment_el).length) {
+      // 匿名函数，防止污染全局变量
+      const HEAD = check_utterance();
+
+      var utterances = document.createElement('script');
+      utterances.type = 'text/javascript';
+      utterances.async = true;
+      utterances.setAttribute('issue-term', 'pathname')
+      utterances.setAttribute('theme', utteranceCommon.Theme)
+      utterances.setAttribute('repo', '')
+      utterances.crossorigin = 'anonymous';
+      utterances.src = 'https://utteranc.es/client.js';
+      // content 是要插入评论的地方
+      document.getElementById('gitment-container').appendChild(utterances);
+
+    }
+  }
+
+  function dark_utterance() {
+    const HEAD = check_utterance();
+    if (!HEAD) return;
+    const message = {
+      type: 'set-theme',
+      theme: utteranceCommon.Theme
+    };
+    const utteranceIframe = document.querySelector('iframe');
+    utteranceIframe.contentWindow.postMessage(message, 'https://utteranc.es');
+  }
+
+  $(document).ready(load_utterance);
+  document.addEventListener('pjax:complete', function () {
+    load_utterance();
+  });
+
+  $('.dark').click(function () {
+    setTimeout(() => {
+      dark_utterance();
+    });
+  })
+
+</script>
+
+<style>
+  .utterances {
+    max-width: inherit !important;
+  }
+</style>
+  
+
+
+<!-- 鼠标点击特效 -->
+<!-- 爱心点击 -->
+
+  
+    <canvas class="fireworks" style="position: fixed;left: 0;top: 0;z-index: 999; pointer-events: none;" ></canvas>
+    <script src="//cdn.bootcss.com/animejs/2.2.0/anime.min.js"></script>
+    <script src="/js/cursor/explosion.min.js"></script>
+  
+
+
+
+
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" data-pjax></script>
+
+
+    <!-- pjax -->
+    
+
+<!-- pjax -->
+
+
+  <script src="/js/pjax@0.2.8/index.js"></script>
+  
+    <!-- 样式位于：source/css/_third-party/pjaxanimate.styl -->
+
+<div class="pjax-animate">
+  
+    <div class="loading-circle"><div id="loader-circle"></div></div>
+    <script>
+      window.ShowLoading = function() {
+        $(".loading-circle").css("display", "block");
+      };
+      window.HideLoading = function() {
+        $(".loading-circle").css("display", "none");
+      }
+    </script>
+  
+	<script>
+    document.addEventListener('pjax:complete', function () {
+      window.HideLoading();
+    })
+    document.addEventListener('pjax:send', function () {
+      window.ShowLoading();
+    })
+    document.addEventListener('pjax:error', function () {
+      window.HideLoading();
+    })
+	</script>
+</div>
+
+  
+
+  <script>
+    var pjax = new Pjax({
+      elements: 'a[href]:not([href^="#"]):not([href="javascript:void(0)"]):not([no-pjax])',   // 拦截正常带链接的 a 标签
+      selectors: ["#pjax-container","title"],                                   // 根据实际需要确认重载区域
+      cacheBust: false,   // url 地址追加时间戳，用以避免浏览器缓存
+      timeout: 5000
+    });
+
+    document.addEventListener('pjax:send', function (e) {
+
+      try {
+        var currentUrl = window.location.pathname;
+        var targetUrl = e.triggerElement.href;
+        var banUrl = [""];
+        if (banUrl[0] != "") {
+          banUrl.forEach(item => {
+            if(currentUrl.indexOf(item) != -1 || targetUrl.indexOf(item) != -1) {
+              window.location.href = targetUrl;
+            }
+          });
+        }
+      } catch (error) {}
+
+      $(window).unbind('resize');
+      $(window).unbind('scroll');
+      $(document).unbind('scroll');
+      $(document).unbind('click');
+      $('body').unbind('click');
+
+    })
+    
+    document.addEventListener('pjax:complete', function () {
+      $('script[data-pjax], .pjax-reload script').each(function () {
+        $(this).parent().append($(this).remove());
+      });
+    });
+
+    document.addEventListener('pjax:error', function (e) {
+      window.location.href = e.triggerElement.href;
+    })
+    
+    // 刷新不从顶部开始
+    document.addEventListener("DOMContentLoaded", function () {
+      history.scrollRestoration = 'auto';
+    })
+  </script>
+
+
+
+  </body>
+</html>
